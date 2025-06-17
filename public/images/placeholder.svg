@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="600" viewBox="0 0 400 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="600" fill="#F3F4F6"/>
+  
+  <!-- Wine Bottle Shape -->
+  <path d="M160 100 L160 500 L240 500 L240 100 L200 60 Z" fill="#E5E7EB"/>
+  
+  <!-- Bottle Neck -->
+  <path d="M180 100 L180 60 L220 60 L220 100" fill="#D1D5DB"/>
+  
+  <!-- Wine Level -->
+  <path d="M160 300 L160 500 L240 500 L240 300" fill="#9CA3AF"/>
+  
+  <!-- Gradient Overlay -->
+  <rect width="400" height="600" fill="url(#gradient)" fill-opacity="0.1"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="400" y2="600">
+      <stop offset="0%" stop-color="#9CA3AF"/>
+      <stop offset="100%" stop-color="#6B7280"/>
+    </linearGradient>
+  </defs>
+</svg> 

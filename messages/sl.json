@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "Nalaganje...",
+    "error": "Prišlo je do napake",
+    "success": "Uspešno",
+    "save": "Shrani",
+    "cancel": "Prekliči",
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "search": "Išči"
+  },
+  "auth": {
+    "login": "Prijava",
+    "register": "Registracija",
+    "logout": "Odjava",
+    "email": "E-pošta",
+    "password": "Geslo",
+    "forgotPassword": "Pozabljeno geslo?",
+    "resetPassword": "Ponastavi geslo",
+    "verifyEmail": "Potrdi e-pošto",
+    "magicLink": "Pošlji čarobno povezavo",
+    "continueWithGoogle": "Nadaljuj z Google"
+  },
+  "wine": {
+    "title": "Vina",
+    "details": "Podrobnosti vina",
+    "region": "Regija",
+    "variety": "Sorta grozdja",
+    "year": "Letnik",
+    "price": "Cena",
+    "addToCart": "Dodaj v košarico",
+    "inStock": "Na zalogi",
+    "outOfStock": "Ni na zalogi",
+    "filters": {
+      "title": "Filtri",
+      "price": "Cenovni razpon",
+      "region": "Regija",
+      "variety": "Sorta grozdja",
+      "year": "Letnik"
+    }
+  },
+  "cart": {
+    "title": "Nakupna košarica",
+    "empty": "Vaša košarica je prazna",
+    "subtotal": "Vmesni znesek",
+    "total": "Skupaj",
+    "checkout": "Na blagajno",
+    "continueShopping": "Nadaljuj z nakupom",
+    "remove": "Odstrani izdelek"
+  },
+  "checkout": {
+    "title": "Blagajna",
+    "shipping": "Podatki za dostavo",
+    "orderSummary": "Povzetek naročila",
+    "placeOrder": "Oddaj naročilo",
+    "address": {
+      "street": "Ulica",
+      "city": "Mesto",
+      "postalCode": "Poštna številka",
+      "country": "Država"
+    },
+    "payment": {
+      "title": "Podatki za plačilo",
+      "cardNumber": "Številka kartice",
+      "expiry": "Datum veljavnosti",
+      "cvv": "CVV"
+    }
+  },
+  "errors": {
+    "required": "To polje je obvezno",
+    "invalidEmail": "Neveljaven e-poštni naslov",
+    "invalidPassword": "Geslo mora vsebovati vsaj 8 znakov",
+    "passwordsDoNotMatch": "Gesli se ne ujemata",
+    "invalidCard": "Neveljavna številka kartice",
+    "invalidExpiry": "Neveljaven datum veljavnosti",
+    "invalidCVV": "Neveljaven CVV"
+  },
+  "home": {
+    "hero": {
+      "title": "Butelka",
+      "subtitle": "Odkrijte najboljše slovenske vina",
+      "alt": "Čaša vina s trto v ozadju",
+      "cta": "Raziskujte Vina"
+    },
+    "featured": {
+      "title": "Izbrana Vina",
+      "wines": {
+        "rebula": {
+          "name": "Rebula",
+          "region": "Goriška Brda",
+          "alt": "Steklenica vina Rebula"
+        },
+        "teran": {
+          "name": "Teran",
+          "region": "Kras",
+          "alt": "Steklenica vina Teran"
+        },
+        "malvazija": {
+          "name": "Malvazija",
+          "region": "Primorska",
+          "alt": "Steklenica vina Malvazija"
+        },
+        "learnMore": "Več o Vinu"
+      }
+    },
+    "about": {
+      "title": "O Butelki",
+      "description": "Strastno vam prinašamo najboljšo izbiro slovenskih vin, skrbno izbrano iz najboljših vinogradov naše lepe države.",
+      "cta": "Naša Zgodba"
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "verifyEmail": "Verify Email",
+    "magicLink": "Send Magic Link",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "wine": {
+    "title": "Wines",
+    "details": "Wine Details",
+    "region": "Region",
+    "variety": "Grape Variety",
+    "year": "Vintage",
+    "price": "Price",
+    "addToCart": "Add to Cart",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "filters": {
+      "title": "Filters",
+      "price": "Price Range",
+      "region": "Region",
+      "variety": "Grape Variety",
+      "year": "Vintage Year"
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping",
+    "remove": "Remove Item"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shipping": "Shipping Information",
+    "orderSummary": "Order Summary",
+    "placeOrder": "Place Order",
+    "address": {
+      "street": "Street Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country"
+    },
+    "payment": {
+      "title": "Payment Information",
+      "cardNumber": "Card Number",
+      "expiry": "Expiry Date",
+      "cvv": "CVV"
+    }
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPassword": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidCard": "Invalid card number",
+    "invalidExpiry": "Invalid expiry date",
+    "invalidCVV": "Invalid CVV"
+  },
+  "home": {
+    "hero": {
+      "title": "Butelka",
+      "subtitle": "Discover the finest Slovenian wines",
+      "alt": "A beautiful glass of wine with a vineyard in the background",
+      "cta": "Explore Wines"
+    },
+    "featured": {
+      "title": "Featured Wines",
+      "wines": {
+        "rebula": {
+          "name": "Rebula",
+          "region": "Goriška Brda",
+          "alt": "A bottle of Rebula wine"
+        },
+        "teran": {
+          "name": "Teran",
+          "region": "Kras",
+          "alt": "A bottle of Teran wine"
+        },
+        "malvazija": {
+          "name": "Malvazija",
+          "region": "Primorska",
+          "alt": "A bottle of Malvazija wine"
+        },
+        "learnMore": "Learn More"
+      }
+    },
+    "about": {
+      "title": "About Butelka",
+      "description": "We are passionate about bringing you the finest selection of Slovenian wines, carefully curated from the best vineyards across our beautiful country.",
+      "cta": "Our Story"
+    }
+  }
+}
