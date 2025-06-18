@@ -13,7 +13,7 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
     "@auth/core": "^0.39.1",
@@ -37,6 +37,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.5.0",
     "express-rate-limit": "^7.5.0",
     "graphql": "^16.11.0",
     "helmet": "^8.1.0",

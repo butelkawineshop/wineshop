@@ -1,6 +1,9 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
+import { queueRelatedWineVariants } from '@/tasks/queueRelatedWineVariants'
+
+const { afterChange, afterDelete } = queueRelatedWineVariants('aroma')
 
 export const Aromas: CollectionConfig = {
   slug: 'aromas',
@@ -53,6 +56,8 @@ export const Aromas: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [afterChange],
+    afterDelete: [afterDelete],
   },
   fields: [
     {

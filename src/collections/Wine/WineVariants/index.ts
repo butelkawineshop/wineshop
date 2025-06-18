@@ -2,6 +2,7 @@ import type { CollectionConfig, CollectionSlug } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
 import { generateWineVariantSlug } from '@/utils/generateWineVariantSlug'
+import { queueFlatWineVariantSync } from '@/hooks/queueFlatWineVariantSync'
 
 interface WineData {
   id: string
@@ -341,6 +342,7 @@ export const WineVariants: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [queueFlatWineVariantSync],
   },
   versions: {
     drafts: {

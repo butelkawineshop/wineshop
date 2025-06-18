@@ -2,6 +2,9 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { slugField } from '@/fields/slug'
 import { seoField } from '@/fields/seo'
+import { queueRelatedWineVariants } from '@/tasks/queueRelatedWineVariants'
+
+const { afterChange, afterDelete } = queueRelatedWineVariants('grapeVariety')
 
 export const GrapeVarieties: CollectionConfig = {
   slug: 'grape-varieties',
@@ -15,6 +18,10 @@ export const GrapeVarieties: CollectionConfig = {
     delete: isAdmin,
     read: () => true,
     update: isAdmin,
+  },
+  hooks: {
+    afterChange: [afterChange],
+    afterDelete: [afterDelete],
   },
   fields: [
     {

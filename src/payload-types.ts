@@ -91,6 +91,7 @@ export interface Config {
     climates: Climate
     moods: Mood
     dishes: Dish
+    'flat-wine-variants': FlatWineVariant
     'payload-jobs': PayloadJob
     'payload-locked-documents': PayloadLockedDocument
     'payload-preferences': PayloadPreference
@@ -128,6 +129,7 @@ export interface Config {
     climates: ClimatesSelect<false> | ClimatesSelect<true>
     moods: MoodsSelect<false> | MoodsSelect<true>
     dishes: DishesSelect<false> | DishesSelect<true>
+    'flat-wine-variants': FlatWineVariantsSelect<false> | FlatWineVariantsSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-locked-documents':
       | PayloadLockedDocumentsSelect<false>
@@ -150,13 +152,16 @@ export interface Config {
       })
   jobs: {
     tasks: {
+      syncFlatWineVariant: TaskSyncFlatWineVariant
       schedulePublish: TaskSchedulePublish
       inline: {
         input: unknown
         output: unknown
       }
     }
-    workflows: unknown
+    workflows: {
+      queueAllFlatWineVariants: WorkflowQueueAllFlatWineVariants
+    }
   }
 }
 export interface UserAuthOperations {
@@ -1030,6 +1035,60 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flat-wine-variants".
+ */
+export interface FlatWineVariant {
+  id: number
+  originalVariant: number | WineVariant
+  sku?: string | null
+  wineTitle?: string | null
+  wineryTitle?: string | null
+  wineryCode?: string | null
+  regionTitle?: string | null
+  countryTitle?: string | null
+  size?: string | null
+  vintage?: string | null
+  price?: number | null
+  stockOnHand?: number | null
+  canBackorder?: boolean | null
+  maxBackorderQuantity?: number | null
+  servingTemp?: string | null
+  decanting?: boolean | null
+  tastingProfile?: string | null
+  aromas?:
+    | {
+        title?: string | null
+        id?: string | null
+      }[]
+    | null
+  tags?:
+    | {
+        title?: string | null
+        id?: string | null
+      }[]
+    | null
+  moods?:
+    | {
+        title?: string | null
+        id?: string | null
+      }[]
+    | null
+  grapeVarieties?:
+    | {
+        title?: string | null
+        id?: string | null
+      }[]
+    | null
+  primaryImageUrl?: string | null
+  slug?: string | null
+  syncedAt?: string | null
+  isPublished?: boolean | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
@@ -1080,7 +1139,7 @@ export interface PayloadJob {
     | {
         executedAt: string
         completedAt: string
-        taskSlug: 'inline' | 'schedulePublish'
+        taskSlug: 'inline' | 'syncFlatWineVariant' | 'schedulePublish'
         taskID: string
         input?:
           | {
@@ -1113,7 +1172,8 @@ export interface PayloadJob {
         id?: string | null
       }[]
     | null
-  taskSlug?: ('inline' | 'schedulePublish') | null
+  workflowSlug?: 'queueAllFlatWineVariants' | null
+  taskSlug?: ('inline' | 'syncFlatWineVariant' | 'schedulePublish') | null
   queue?: string | null
   waitUntil?: string | null
   processing?: boolean | null
@@ -1218,6 +1278,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'dishes'
         value: number | Dish
+      } | null)
+    | ({
+        relationTo: 'flat-wine-variants'
+        value: number | FlatWineVariant
       } | null)
     | ({
         relationTo: 'payload-jobs'
@@ -1850,6 +1914,59 @@ export interface DishesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flat-wine-variants_select".
+ */
+export interface FlatWineVariantsSelect<T extends boolean = true> {
+  originalVariant?: T
+  sku?: T
+  wineTitle?: T
+  wineryTitle?: T
+  wineryCode?: T
+  regionTitle?: T
+  countryTitle?: T
+  size?: T
+  vintage?: T
+  price?: T
+  stockOnHand?: T
+  canBackorder?: T
+  maxBackorderQuantity?: T
+  servingTemp?: T
+  decanting?: T
+  tastingProfile?: T
+  aromas?:
+    | T
+    | {
+        title?: T
+        id?: T
+      }
+  tags?:
+    | T
+    | {
+        title?: T
+        id?: T
+      }
+  moods?:
+    | T
+    | {
+        title?: T
+        id?: T
+      }
+  grapeVarieties?:
+    | T
+    | {
+        title?: T
+        id?: T
+      }
+  primaryImageUrl?: T
+  slug?: T
+  syncedAt?: T
+  isPublished?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs_select".
  */
 export interface PayloadJobsSelect<T extends boolean = true> {
@@ -1872,6 +1989,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
         error?: T
         id?: T
       }
+  workflowSlug?: T
   taskSlug?: T
   queue?: T
   waitUntil?: T
@@ -1913,6 +2031,19 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSyncFlatWineVariant".
+ */
+export interface TaskSyncFlatWineVariant {
+  input: {
+    wineVariantId: string
+  }
+  output: {
+    count?: number | null
+    message?: string | null
+  }
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -1927,6 +2058,13 @@ export interface TaskSchedulePublish {
     user?: (number | null) | User
   }
   output?: unknown
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WorkflowQueueAllFlatWineVariants".
+ */
+export interface WorkflowQueueAllFlatWineVariants {
+  input?: unknown
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -387,3 +387,33 @@ pnpm test --coverage
 ```
 
 ---
+
+## 📝 Logging
+
+- Use **Pino** for all server-side logging
+- Create logger instance at the start of each task/hook:
+  ```ts
+  const logger = createLogger(req, {
+    task: 'taskName',
+    operation: 'create|update|delete',
+    collection: 'collectionName',
+    id: docId,
+  })
+  ```
+- Log levels:
+  - `debug`: Development details
+  - `info`: Normal operations
+  - `warn`: Potential issues
+  - `error`: Actual errors
+- Always include error objects in error logs
+- Never log sensitive data
+- Use structured logging format:
+  ```ts
+  logger.info('Operation completed', {
+    task: 'syncFlatWineVariant',
+    id: variantId,
+    duration: endTime - startTime,
+  })
+  ```
+
+---

@@ -16,6 +16,7 @@ import { WineCollections } from './collections/Wine'
 import { CartCollections } from './collections/Ecommerce/Cart'
 import { StockReservations } from './collections/Ecommerce/StockReservations'
 import { Orders } from './collections/Ecommerce/Orders/index'
+import { FlatCollections } from './collections/Flat'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,6 +38,7 @@ export default buildConfig({
     StockReservations,
     Orders,
     ...WineCollections,
+    ...FlatCollections,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -74,4 +76,58 @@ export default buildConfig({
       },
     }),
   ],
+  jobs: {
+    tasks: [
+      {
+        slug: 'syncFlatWineVariant',
+        handler: path.resolve(dirname, 'tasks/syncFlatWineVariant.ts') + '#syncFlatWineVariant',
+        inputSchema: [
+          {
+            name: 'wineVariantId',
+            type: 'text',
+            required: true,
+          },
+        ],
+        outputSchema: [
+          {
+            name: 'count',
+            type: 'number',
+          },
+          {
+            name: 'message',
+            type: 'text',
+          },
+        ],
+        retries: 2,
+      },
+    ],
+    workflows: [
+      {
+        slug: 'queueAllFlatWineVariants',
+        handler:
+          path.resolve(dirname, 'tasks/queueAllFlatWineVariants.ts') + '#queueAllFlatWineVariants',
+        inputSchema: [],
+      },
+    ],
+    autoRun: [
+      {
+        cron: '*/5 * * * *',
+        limit: 100,
+        queue: 'syncFlatWineVariant',
+      },
+      {
+        cron: '0 3 * * *',
+        limit: 1,
+        queue: 'default',
+      },
+    ],
+    jobsCollectionOverrides: ({ defaultJobsCollection }) => {
+      if (!defaultJobsCollection.admin) {
+        defaultJobsCollection.admin = {}
+      }
+
+      defaultJobsCollection.admin.hidden = false
+      return defaultJobsCollection
+    },
+  },
 })

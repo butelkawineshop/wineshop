@@ -8,8 +8,14 @@ const config: Config = {
   },
   testMatch: ['**/__tests__/**/*.test.ts'],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
   },
+  transformIgnorePatterns: ['/node_modules/(?!(payload|@payloadcms)/)'],
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
@@ -18,6 +24,9 @@ const config: Config = {
     '!src/**/*.stories.{ts,tsx}',
     '!src/**/*.test.{ts,tsx}',
   ],
+  extensionsToTreatAsEsm: ['.ts'],
+  setupFiles: ['<rootDir>/jest.env.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
 }
 
 export default config

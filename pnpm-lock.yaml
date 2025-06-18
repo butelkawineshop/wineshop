@@ -70,6 +70,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
       express-rate-limit:
         specifier: ^7.5.0
         version: 7.5.0(express@5.1.0)
@@ -5543,6 +5546,13 @@ packages:
       {
         integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==,
       }
+
+  dotenv@16.5.0:
+    resolution:
+      {
+        integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==,
+      }
+    engines: { node: '>=12' }
 
   drizzle-kit@0.28.0:
     resolution:
@@ -14639,6 +14649,8 @@ snapshots:
       dom-serializer: 2.0.0
       domelementtype: 2.3.0
       domhandler: 5.0.3
+
+  dotenv@16.5.0: {}
 
   drizzle-kit@0.28.0:
     dependencies:
