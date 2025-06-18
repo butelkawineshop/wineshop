@@ -323,3 +323,67 @@ pnpm run typecheck
 | React 19           | https://react.dev            |
 
 ---
+
+## 🧪 Testing
+
+### Structure
+
+- All tests must be placed in `src/__tests__/` directory
+- Mirror the source directory structure in `__tests__/`
+- Test files must be named `*.test.ts` or `*.test.tsx`
+- Test files are ignored in git (see .gitignore)
+
+### Configuration
+
+- Use Jest as the testing framework
+- Configure in `jest.config.ts`
+- Coverage reports go to `/coverage`
+- Ignore test files in coverage collection
+
+### Writing Tests
+
+- Group related tests using `describe` blocks
+- Use clear, descriptive test names
+- Test both success and failure cases
+- Mock external dependencies
+- Keep tests focused and atomic
+- Follow AAA pattern (Arrange, Act, Assert)
+
+Example:
+
+```typescript
+describe('feature name', () => {
+  it('should do something specific', () => {
+    // Arrange
+    const input = 'test'
+
+    // Act
+    const result = functionUnderTest(input)
+
+    // Assert
+    expect(result).toBe(expected)
+  })
+})
+```
+
+### Coverage
+
+- Aim for high test coverage
+- Focus on critical business logic
+- Don't test implementation details
+- Use coverage reports to identify gaps
+
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test --watch
+
+# Run tests with coverage
+pnpm test --coverage
+```
+
+---

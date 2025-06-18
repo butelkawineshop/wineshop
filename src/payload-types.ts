@@ -71,15 +71,64 @@ export interface Config {
     users: User
     customers: Customer
     media: Media
+    invoices: Invoice
+    'active-carts': ActiveCart
+    'saved-carts': SavedCart
+    'shared-carts': SharedCart
+    'stock-reservations': StockReservation
+    orders: Order
+    wines: Wine
+    'wine-variants': WineVariant
+    wineries: Winery
+    regions: Region
+    wineCountries: WineCountry
+    'grape-varieties': GrapeVariety
+    tags: Tag
+    aromas: Aroma
+    adjectives: Adjective
+    flavours: Flavour
+    styles: Style
+    climates: Climate
+    moods: Mood
+    dishes: Dish
+    'payload-jobs': PayloadJob
     'payload-locked-documents': PayloadLockedDocument
     'payload-preferences': PayloadPreference
     'payload-migrations': PayloadMigration
   }
-  collectionsJoins: {}
+  collectionsJoins: {
+    wines: {
+      variants: 'wine-variants'
+    }
+    wineCountries: {
+      regions: 'regions'
+    }
+  }
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>
     customers: CustomersSelect<false> | CustomersSelect<true>
     media: MediaSelect<false> | MediaSelect<true>
+    invoices: InvoicesSelect<false> | InvoicesSelect<true>
+    'active-carts': ActiveCartsSelect<false> | ActiveCartsSelect<true>
+    'saved-carts': SavedCartsSelect<false> | SavedCartsSelect<true>
+    'shared-carts': SharedCartsSelect<false> | SharedCartsSelect<true>
+    'stock-reservations': StockReservationsSelect<false> | StockReservationsSelect<true>
+    orders: OrdersSelect<false> | OrdersSelect<true>
+    wines: WinesSelect<false> | WinesSelect<true>
+    'wine-variants': WineVariantsSelect<false> | WineVariantsSelect<true>
+    wineries: WineriesSelect<false> | WineriesSelect<true>
+    regions: RegionsSelect<false> | RegionsSelect<true>
+    wineCountries: WineCountriesSelect<false> | WineCountriesSelect<true>
+    'grape-varieties': GrapeVarietiesSelect<false> | GrapeVarietiesSelect<true>
+    tags: TagsSelect<false> | TagsSelect<true>
+    aromas: AromasSelect<false> | AromasSelect<true>
+    adjectives: AdjectivesSelect<false> | AdjectivesSelect<true>
+    flavours: FlavoursSelect<false> | FlavoursSelect<true>
+    styles: StylesSelect<false> | StylesSelect<true>
+    climates: ClimatesSelect<false> | ClimatesSelect<true>
+    moods: MoodsSelect<false> | MoodsSelect<true>
+    dishes: DishesSelect<false> | DishesSelect<true>
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-locked-documents':
       | PayloadLockedDocumentsSelect<false>
       | PayloadLockedDocumentsSelect<true>
@@ -100,7 +149,13 @@ export interface Config {
         collection: 'customers'
       })
   jobs: {
-    tasks: unknown
+    tasks: {
+      schedulePublish: TaskSchedulePublish
+      inline: {
+        input: unknown
+        output: unknown
+      }
+    }
     workflows: unknown
   }
 }
@@ -186,6 +241,7 @@ export interface Customer {
 export interface Media {
   id: number
   alt: string
+  cloudflareId?: string | null
   updatedAt: string
   createdAt: string
   url?: string | null
@@ -197,6 +253,872 @@ export interface Media {
   height?: number | null
   focalX?: number | null
   focalY?: number | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: number
+  alt: string
+  updatedAt: string
+  createdAt: string
+  url?: string | null
+  thumbnailURL?: string | null
+  filename?: string | null
+  mimeType?: string | null
+  filesize?: number | null
+  width?: number | null
+  height?: number | null
+  focalX?: number | null
+  focalY?: number | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "active-carts".
+ */
+export interface ActiveCart {
+  id: number
+  user?: (number | null) | Customer
+  sessionId?: string | null
+  items?:
+    | {
+        wineVariant: number | WineVariant
+        quantity: number
+        addedAt: string
+        id?: string | null
+      }[]
+    | null
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wine-variants".
+ */
+export interface WineVariant {
+  id: number
+  wine: number | Wine
+  size: '187' | '375' | '500' | '750' | '1500' | '3000' | '6000'
+  /**
+   * Use "NV" for Non-Vintage wines
+   */
+  vintage: string
+  sku?: string | null
+  price: number
+  /**
+   * Current stock level
+   */
+  stockOnHand: number
+  /**
+   * Allow unlimited orders (max 100 bottles)
+   */
+  canBackorder?: boolean | null
+  /**
+   * Maximum quantity that can be backordered
+   */
+  maxBackorderQuantity?: number | null
+  servingTemp?: ('6-8' | '8-10' | '10-12' | '12-14' | '14-16' | '16-18') | null
+  decanting?: boolean | null
+  foodPairing?: (number | Dish)[] | null
+  tastingProfile?: string | null
+  aromas?: (number | Aroma)[] | null
+  tags?: (number | Tag)[] | null
+  moods?: (number | Mood)[] | null
+  tastingNotes?: {
+    dry?: number | null
+    ripe?: number | null
+    creamy?: number | null
+    oaky?: number | null
+    complex?: number | null
+    light?: number | null
+    smooth?: number | null
+    youthful?: number | null
+    energetic?: number | null
+    alcohol?: number | null
+  }
+  grapeVarieties?:
+    | {
+        variety?: (number | null) | GrapeVariety
+        percentage?: number | null
+        id?: string | null
+      }[]
+    | null
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  /**
+   * Automatically generated from wine, vintage, and size
+   */
+  slug?: string | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wines".
+ */
+export interface Wine {
+  id: number
+  winery: number | Winery
+  title: string
+  region: number | Region
+  style: number | Style
+  description?: string | null
+  variants?: {
+    docs?: (number | WineVariant)[]
+    hasNextPage?: boolean
+    totalDocs?: number
+  }
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  /**
+   * Automatically generated from winery, region, country, and wine title
+   */
+  slug?: string | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineries".
+ */
+export interface Winery {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  wineryCode: string
+  description?: string | null
+  whyCool?: string | null
+  /**
+   * Tags, farming practices, etc.
+   */
+  tags?: (number | Tag)[] | null
+  social?: {
+    instagram?: string | null
+    website?: string | null
+  }
+  /**
+   * Other wineries run by the same people or under the same ownership
+   */
+  relatedWineries?: (number | Winery)[] | null
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  media?: (number | null) | Media
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions".
+ */
+export interface Region {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  whyCool: string
+  priceRange?: ('8-12' | '12-18' | '18-24' | '24-30' | '30-40' | '40-50' | '50-60') | null
+  climate?: (number | null) | Climate
+  description?: string | null
+  country: number | WineCountry
+  /**
+   * Neighbouring regions
+   */
+  neighbours?: (number | Region)[] | null
+  bestGrapes?: (number | GrapeVariety)[] | null
+  legends?: (number | Winery)[] | null
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "climates".
+ */
+export interface Climate {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  climate?: ('desert' | 'maritime' | 'mediterranean' | 'continental' | 'alpine') | null
+  climateTemperature?: ('cool' | 'moderate' | 'warm' | 'hot') | null
+  diurnalTemperatureRange?: ('low' | 'medium' | 'high') | null
+  climateHumidity?: ('dry' | 'moderate' | 'humid') | null
+  bestRegions?: (number | Region)[] | null
+  bestGrapes?: (number | GrapeVariety)[] | null
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "grape-varieties".
+ */
+export interface GrapeVariety {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  typicalStyle?: string | null
+  whyCool?: string | null
+  character?: string | null
+  synonyms?:
+    | {
+        title?: string | null
+        id?: string | null
+      }[]
+    | null
+  skin?: ('red' | 'white') | null
+  /**
+   * Distinctive aromas of the grape variety.
+   */
+  distinctiveAromas?: (number | Aroma)[] | null
+  /**
+   * Best regions for the grape variety.
+   */
+  bestRegions?: (number | Region)[] | null
+  /**
+   * Grape varieties that are genetically related or commonly blended together
+   */
+  blendingPartners?: (number | GrapeVariety)[] | null
+  /**
+   * Grape varieties similar in style.
+   */
+  similarVarieties?: (number | GrapeVariety)[] | null
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aromas".
+ */
+export interface Aroma {
+  id: number
+  /**
+   * Automatically generated from adjective and flavour
+   */
+  title?: string | null
+  /**
+   * Automatically generated from adjective and flavour slugs
+   */
+  slug?: string | null
+  adjective: number | Adjective
+  flavour: number | Flavour
+  media?: (number | null) | Media
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "adjectives".
+ */
+export interface Adjective {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  metaTitle?: string | null
+  metaDescription?: string | null
+  metaImage?: (number | null) | Media
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flavours".
+ */
+export interface Flavour {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  category: 'fruit' | 'floral' | 'herbal' | 'mineral' | 'creamy' | 'earth' | 'wood' | 'other'
+  /**
+   * Color group for fruits and flowers
+   */
+  colorGroup?: ('red' | 'green' | 'yellow' | 'orange' | 'blue' | 'black' | 'white') | null
+  metaTitle?: string | null
+  metaDescription?: string | null
+  metaImage?: (number | null) | Media
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineCountries".
+ */
+export interface WineCountry {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  whyCool?: string | null
+  landArea?: number | null
+  wineriesCount?: number | null
+  regions?: {
+    docs?: (number | Region)[]
+    hasNextPage?: boolean
+    totalDocs?: number
+  }
+  bestRegions?: (number | Region)[] | null
+  bestGrapes?: (number | GrapeVariety)[] | null
+  legends?: (number | Winery)[] | null
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styles".
+ */
+export interface Style {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  iconKey: string
+  media?: (number | null) | Media
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dishes".
+ */
+export interface Dish {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  media?: (number | null) | Media
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moods".
+ */
+export interface Mood {
+  id: number
+  title: string
+  /**
+   * Automatically generated from title
+   */
+  slug: string
+  description?: string | null
+  media?: (number | null) | Media
+  /**
+   * Automatically generated SEO data
+   */
+  seo: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title: string
+    description: string
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "saved-carts".
+ */
+export interface SavedCart {
+  id: number
+  name: string
+  user: number | Customer
+  items?:
+    | {
+        wineVariant: number | WineVariant
+        quantity: number
+        addedAt: string
+        id?: string | null
+      }[]
+    | null
+  createdAt: string
+  updatedAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shared-carts".
+ */
+export interface SharedCart {
+  id: number
+  shareId: string
+  items?:
+    | {
+        wineVariant: number | WineVariant
+        quantity: number
+        addedAt: string
+        id?: string | null
+      }[]
+    | null
+  createdAt: string
+  expiresAt: string
+  updatedAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock-reservations".
+ */
+export interface StockReservation {
+  id: number
+  variant: number | WineVariant
+  quantity: number
+  expiresAt: string
+  status: 'active' | 'expired' | 'completed'
+  order?: (number | null) | Order
+  /**
+   * The cart this reservation belongs to
+   */
+  cart?: (number | null) | ActiveCart
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number
+  orderNumber: string
+  /**
+   * Customer who placed the order (optional for guest checkouts)
+   */
+  customer?: (number | null) | Customer
+  /**
+   * Session ID for guest checkouts
+   */
+  sessionId?: string | null
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  items: {
+    variant: number | WineVariant
+    quantity: number
+    price: number
+    reservation: number | StockReservation
+    id?: string | null
+  }[]
+  subtotal: number
+  shipping: number
+  tax: number
+  total: number
+  shippingAddress: {
+    firstName: string
+    lastName: string
+    address1: string
+    address2?: string | null
+    city: string
+    postalCode: string
+    country: string
+    phone: string
+  }
+  billingAddress: {
+    firstName: string
+    lastName: string
+    address1: string
+    address2?: string | null
+    city: string
+    postalCode: string
+    country: string
+    phone: string
+  }
+  paymentMethod: 'credit_card' | 'paypal' | 'bank_transfer' | 'pay_in_store'
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded'
+  paymentIntentId?: string | null
+  notes?: string | null
+  trackingNumber?: string | null
+  /**
+   * Upload order invoice or other related PDF documents
+   */
+  invoice?: (number | null) | Invoice
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
+  taskStatus?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
+  completedAt?: string | null
+  totalTried?: number | null
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string
+        completedAt: string
+        taskSlug: 'inline' | 'schedulePublish'
+        taskID: string
+        input?:
+          | {
+              [k: string]: unknown
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null
+        output?:
+          | {
+              [k: string]: unknown
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null
+        state: 'failed' | 'succeeded'
+        error?:
+          | {
+              [k: string]: unknown
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null
+        id?: string | null
+      }[]
+    | null
+  taskSlug?: ('inline' | 'schedulePublish') | null
+  queue?: string | null
+  waitUntil?: string | null
+  processing?: boolean | null
+  updatedAt: string
+  createdAt: string
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -216,6 +1138,90 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media'
         value: number | Media
+      } | null)
+    | ({
+        relationTo: 'invoices'
+        value: number | Invoice
+      } | null)
+    | ({
+        relationTo: 'active-carts'
+        value: number | ActiveCart
+      } | null)
+    | ({
+        relationTo: 'saved-carts'
+        value: number | SavedCart
+      } | null)
+    | ({
+        relationTo: 'shared-carts'
+        value: number | SharedCart
+      } | null)
+    | ({
+        relationTo: 'stock-reservations'
+        value: number | StockReservation
+      } | null)
+    | ({
+        relationTo: 'orders'
+        value: number | Order
+      } | null)
+    | ({
+        relationTo: 'wines'
+        value: number | Wine
+      } | null)
+    | ({
+        relationTo: 'wine-variants'
+        value: number | WineVariant
+      } | null)
+    | ({
+        relationTo: 'wineries'
+        value: number | Winery
+      } | null)
+    | ({
+        relationTo: 'regions'
+        value: number | Region
+      } | null)
+    | ({
+        relationTo: 'wineCountries'
+        value: number | WineCountry
+      } | null)
+    | ({
+        relationTo: 'grape-varieties'
+        value: number | GrapeVariety
+      } | null)
+    | ({
+        relationTo: 'tags'
+        value: number | Tag
+      } | null)
+    | ({
+        relationTo: 'aromas'
+        value: number | Aroma
+      } | null)
+    | ({
+        relationTo: 'adjectives'
+        value: number | Adjective
+      } | null)
+    | ({
+        relationTo: 'flavours'
+        value: number | Flavour
+      } | null)
+    | ({
+        relationTo: 'styles'
+        value: number | Style
+      } | null)
+    | ({
+        relationTo: 'climates'
+        value: number | Climate
+      } | null)
+    | ({
+        relationTo: 'moods'
+        value: number | Mood
+      } | null)
+    | ({
+        relationTo: 'dishes'
+        value: number | Dish
+      } | null)
+    | ({
+        relationTo: 'payload-jobs'
+        value: number | PayloadJob
       } | null)
   globalSlug?: string | null
   user:
@@ -310,6 +1316,7 @@ export interface CustomersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T
+  cloudflareId?: T
   updatedAt?: T
   createdAt?: T
   url?: T
@@ -321,6 +1328,556 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T
   focalX?: T
   focalY?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices_select".
+ */
+export interface InvoicesSelect<T extends boolean = true> {
+  alt?: T
+  updatedAt?: T
+  createdAt?: T
+  url?: T
+  thumbnailURL?: T
+  filename?: T
+  mimeType?: T
+  filesize?: T
+  width?: T
+  height?: T
+  focalX?: T
+  focalY?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "active-carts_select".
+ */
+export interface ActiveCartsSelect<T extends boolean = true> {
+  user?: T
+  sessionId?: T
+  items?:
+    | T
+    | {
+        wineVariant?: T
+        quantity?: T
+        addedAt?: T
+        id?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "saved-carts_select".
+ */
+export interface SavedCartsSelect<T extends boolean = true> {
+  name?: T
+  user?: T
+  items?:
+    | T
+    | {
+        wineVariant?: T
+        quantity?: T
+        addedAt?: T
+        id?: T
+      }
+  createdAt?: T
+  updatedAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shared-carts_select".
+ */
+export interface SharedCartsSelect<T extends boolean = true> {
+  shareId?: T
+  items?:
+    | T
+    | {
+        wineVariant?: T
+        quantity?: T
+        addedAt?: T
+        id?: T
+      }
+  createdAt?: T
+  expiresAt?: T
+  updatedAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock-reservations_select".
+ */
+export interface StockReservationsSelect<T extends boolean = true> {
+  variant?: T
+  quantity?: T
+  expiresAt?: T
+  status?: T
+  order?: T
+  cart?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T
+  customer?: T
+  sessionId?: T
+  status?: T
+  items?:
+    | T
+    | {
+        variant?: T
+        quantity?: T
+        price?: T
+        reservation?: T
+        id?: T
+      }
+  subtotal?: T
+  shipping?: T
+  tax?: T
+  total?: T
+  shippingAddress?:
+    | T
+    | {
+        firstName?: T
+        lastName?: T
+        address1?: T
+        address2?: T
+        city?: T
+        postalCode?: T
+        country?: T
+        phone?: T
+      }
+  billingAddress?:
+    | T
+    | {
+        firstName?: T
+        lastName?: T
+        address1?: T
+        address2?: T
+        city?: T
+        postalCode?: T
+        country?: T
+        phone?: T
+      }
+  paymentMethod?: T
+  paymentStatus?: T
+  paymentIntentId?: T
+  notes?: T
+  trackingNumber?: T
+  invoice?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wines_select".
+ */
+export interface WinesSelect<T extends boolean = true> {
+  winery?: T
+  title?: T
+  region?: T
+  style?: T
+  description?: T
+  variants?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  slug?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wine-variants_select".
+ */
+export interface WineVariantsSelect<T extends boolean = true> {
+  wine?: T
+  size?: T
+  vintage?: T
+  sku?: T
+  price?: T
+  stockOnHand?: T
+  canBackorder?: T
+  maxBackorderQuantity?: T
+  servingTemp?: T
+  decanting?: T
+  foodPairing?: T
+  tastingProfile?: T
+  aromas?: T
+  tags?: T
+  moods?: T
+  tastingNotes?:
+    | T
+    | {
+        dry?: T
+        ripe?: T
+        creamy?: T
+        oaky?: T
+        complex?: T
+        light?: T
+        smooth?: T
+        youthful?: T
+        energetic?: T
+        alcohol?: T
+      }
+  grapeVarieties?:
+    | T
+    | {
+        variety?: T
+        percentage?: T
+        id?: T
+      }
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  slug?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineries_select".
+ */
+export interface WineriesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  wineryCode?: T
+  description?: T
+  whyCool?: T
+  tags?: T
+  social?:
+    | T
+    | {
+        instagram?: T
+        website?: T
+      }
+  relatedWineries?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions_select".
+ */
+export interface RegionsSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  whyCool?: T
+  priceRange?: T
+  climate?: T
+  description?: T
+  country?: T
+  neighbours?: T
+  bestGrapes?: T
+  legends?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineCountries_select".
+ */
+export interface WineCountriesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  whyCool?: T
+  landArea?: T
+  wineriesCount?: T
+  regions?: T
+  bestRegions?: T
+  bestGrapes?: T
+  legends?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "grape-varieties_select".
+ */
+export interface GrapeVarietiesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  typicalStyle?: T
+  whyCool?: T
+  character?: T
+  synonyms?:
+    | T
+    | {
+        title?: T
+        id?: T
+      }
+  skin?: T
+  distinctiveAromas?: T
+  bestRegions?: T
+  blendingPartners?: T
+  similarVarieties?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aromas_select".
+ */
+export interface AromasSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  adjective?: T
+  flavour?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "adjectives_select".
+ */
+export interface AdjectivesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  metaTitle?: T
+  metaDescription?: T
+  metaImage?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flavours_select".
+ */
+export interface FlavoursSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  category?: T
+  colorGroup?: T
+  metaTitle?: T
+  metaDescription?: T
+  metaImage?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styles_select".
+ */
+export interface StylesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  iconKey?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "climates_select".
+ */
+export interface ClimatesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  climate?: T
+  climateTemperature?: T
+  diurnalTemperatureRange?: T
+  climateHumidity?: T
+  bestRegions?: T
+  bestGrapes?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moods_select".
+ */
+export interface MoodsSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dishes_select".
+ */
+export interface DishesSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T
+  taskStatus?: T
+  completedAt?: T
+  totalTried?: T
+  hasError?: T
+  error?: T
+  log?:
+    | T
+    | {
+        executedAt?: T
+        completedAt?: T
+        taskSlug?: T
+        taskID?: T
+        input?: T
+        output?: T
+        state?: T
+        error?: T
+        id?: T
+      }
+  taskSlug?: T
+  queue?: T
+  waitUntil?: T
+  processing?: T
+  updatedAt?: T
+  createdAt?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -353,6 +1910,23 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T
   updatedAt?: T
   createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSchedulePublish".
+ */
+export interface TaskSchedulePublish {
+  input: {
+    type?: ('publish' | 'unpublish') | null
+    locale?: string | null
+    doc?: {
+      relationTo: 'wine-variants'
+      value: number | WineVariant
+    } | null
+    global?: string | null
+    user?: (number | null) | User
+  }
+  output?: unknown
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
