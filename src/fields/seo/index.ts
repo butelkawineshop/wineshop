@@ -53,12 +53,11 @@ export const seoField = ({
   admin: {
     position: 'sidebar',
     description: 'Automatically generated SEO data',
-    // readOnly removed to allow manual override
   },
   hooks: {
-    beforeChange: [
+    beforeValidate: [
       ({ data }) => {
-        if (data?.seo?.manualOverride) return data.seo
+        if (data?.seo?.manualOverride) return data
 
         const fallbackImage = '/logo-square.jpg'
 
@@ -102,7 +101,10 @@ export const seoField = ({
           }
         }
 
-        return seo
+        return {
+          ...data,
+          seo,
+        }
       },
     ],
   },
@@ -119,28 +121,24 @@ export const seoField = ({
     {
       name: 'title',
       type: 'text',
-      required: true,
+      required: false,
       localized,
-      // readOnly removed to allow manual override
     },
     {
       name: 'description',
       type: 'textarea',
-      required: true,
+      required: false,
       localized,
-      // readOnly removed to allow manual override
     },
     {
       name: 'image',
       type: 'text',
       required: false,
-      // readOnly removed to allow manual override
     },
     {
       name: 'structuredData',
       type: 'json',
       required: false,
-      // readOnly removed to allow manual override
     },
   ],
 })

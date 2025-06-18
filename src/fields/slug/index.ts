@@ -14,7 +14,7 @@ interface SlugFieldOptions {
   localized?: boolean
   /**
    * Whether the field should be required
-   * @default true
+   * @default false
    */
   required?: boolean
   /**
@@ -32,7 +32,7 @@ interface SlugFieldOptions {
 export const slugField = ({
   sourceField = 'title',
   localized = true,
-  required = true,
+  required = false,
   admin = {
     position: 'sidebar',
     description: 'Automatically generated from title',
@@ -47,15 +47,20 @@ export const slugField = ({
     readOnly: true,
   },
   hooks: {
-    beforeValidate: [
-      ({ data }) => {
-        if (data?.[sourceField] && !data.slug) {
-          return {
-            ...data,
-            slug: generateSlug(data[sourceField]),
-          }
+    beforeChange: [
+      ({ data, value }) => {
+        if (data?.[sourceField]) {
+          return generateSlug(data[sourceField])
         }
-        return data
+        return value
+      },
+    ],
+    beforeValidate: [
+      ({ data, value }) => {
+        if (data?.[sourceField] && !value) {
+          return generateSlug(data[sourceField])
+        }
+        return value
       },
     ],
   },
