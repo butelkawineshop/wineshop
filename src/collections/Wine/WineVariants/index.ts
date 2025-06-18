@@ -127,7 +127,7 @@ export const WineVariants: CollectionConfig = {
           name: 'canBackorder',
           type: 'checkbox',
           label: 'Can Backorder',
-          defaultValue: false,
+          defaultValue: true,
           admin: { width: '50%', description: 'Allow unlimited orders (max 100 bottles)' },
         },
         {

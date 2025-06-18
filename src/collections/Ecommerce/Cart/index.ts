@@ -68,7 +68,7 @@ export const SavedCarts: CollectionConfig = {
   slug: 'saved-carts',
   admin: {
     useAsTitle: 'name',
-    group: 'Cart',
+    group: 'Ecommerce',
     defaultColumns: ['name', 'user', 'items', 'createdAt'],
   },
   access: {
@@ -114,7 +114,7 @@ export const SharedCarts: CollectionConfig = {
   slug: 'shared-carts',
   admin: {
     useAsTitle: 'shareId',
-    group: 'Cart',
+    group: 'Ecommerce',
     defaultColumns: ['shareId', 'items', 'createdAt', 'expiresAt'],
   },
   access: {

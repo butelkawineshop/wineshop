@@ -348,13 +348,13 @@ export interface WineVariant {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -394,13 +394,13 @@ export interface Wine {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -430,7 +430,7 @@ export interface Winery {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   wineryCode: string
   description?: string | null
   whyCool?: string | null
@@ -450,13 +450,13 @@ export interface Winery {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -482,19 +482,19 @@ export interface Tag {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   media?: (number | null) | Media
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -520,7 +520,7 @@ export interface Region {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   whyCool: string
   priceRange?: ('8-12' | '12-18' | '18-24' | '24-30' | '30-40' | '40-50' | '50-60') | null
   climate?: (number | null) | Climate
@@ -536,13 +536,13 @@ export interface Region {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -568,7 +568,7 @@ export interface Climate {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   climate?: ('desert' | 'maritime' | 'mediterranean' | 'continental' | 'alpine') | null
   climateTemperature?: ('cool' | 'moderate' | 'warm' | 'hot') | null
@@ -580,13 +580,13 @@ export interface Climate {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -612,7 +612,7 @@ export interface GrapeVariety {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   typicalStyle?: string | null
   whyCool?: string | null
@@ -644,13 +644,13 @@ export interface GrapeVariety {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -686,13 +686,13 @@ export interface Aroma {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -718,7 +718,7 @@ export interface Adjective {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
   metaImage?: (number | null) | Media
@@ -736,7 +736,7 @@ export interface Flavour {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   category: 'fruit' | 'floral' | 'herbal' | 'mineral' | 'creamy' | 'earth' | 'wood' | 'other'
   /**
    * Color group for fruits and flowers
@@ -759,7 +759,7 @@ export interface WineCountry {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   whyCool?: string | null
   landArea?: number | null
@@ -776,13 +776,13 @@ export interface WineCountry {
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -808,20 +808,20 @@ export interface Style {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   iconKey: string
   media?: (number | null) | Media
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -847,19 +847,19 @@ export interface Dish {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   media?: (number | null) | Media
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {
@@ -885,19 +885,19 @@ export interface Mood {
   /**
    * Automatically generated from title
    */
-  slug: string
+  slug?: string | null
   description?: string | null
   media?: (number | null) | Media
   /**
    * Automatically generated SEO data
    */
-  seo: {
+  seo?: {
     /**
      * Check this to edit SEO fields manually
      */
     manualOverride?: boolean | null
-    title: string
-    description: string
+    title?: string | null
+    description?: string | null
     image?: string | null
     structuredData?:
       | {

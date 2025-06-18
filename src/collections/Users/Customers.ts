@@ -19,7 +19,7 @@ export const Customers: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'email',
-    group: 'Shop',
+    group: 'Users',
   },
   access: {
     read: () => true,

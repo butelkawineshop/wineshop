@@ -10,6 +10,7 @@ export const Media: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'alt',
+    group: 'Content',
   },
   fields: [
     {
