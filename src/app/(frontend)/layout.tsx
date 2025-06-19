@@ -1,12 +1,13 @@
 import React from 'react'
 import { NextIntlClientProvider } from 'next-intl'
-import { getLocale } from 'next-intl/server'
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
-import { Header } from '@/components/Header'
-import './styles.css'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
+import { type Locale } from '@/i18n/locales'
+import slMessages from '../../../messages/sl.json'
+import enMessages from '../../../messages/en.json'
+import './styles.css'
 
 const asap = localFont({
   src: [
@@ -50,8 +51,13 @@ export const viewport: Viewport = {
   ],
 }
 
-export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale()
+interface LayoutProps {
+  children: React.ReactNode
+  locale: Locale
+}
+
+export default function Layout({ children, locale }: LayoutProps): React.ReactElement {
+  const messages = locale === 'en' ? enMessages : slMessages
 
   return (
     <html className={`${tanker.variable} ${asap.variable}`} lang={locale} suppressHydrationWarning>
@@ -64,10 +70,9 @@ export default async function FrontendLayout({ children }: { children: React.Rea
         />
       </head>
       <body className="min-h-screen min-w-full max-w-full bg-background antialiased">
-        <NextIntlClientProvider>
-          <LanguageProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <LanguageProvider locale={locale}>
             <ThemeProvider>
-              <Header />
               <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">
                 {children}
               </main>

@@ -110,6 +110,9 @@
     }
   },
   "header": {
+    "language": {
+      "switch": "Slovenščina"
+    },
     "theme": {
       "light": "Turn on the lights",
       "dark": "Turn off the lights"

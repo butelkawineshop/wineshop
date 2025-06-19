@@ -3,15 +3,28 @@
 import React from 'react'
 import { useTheme } from '@/providers/ThemeProvider'
 import { IconColor } from '@/components/IconColor'
-import { useTranslation } from '@/hooks/useTranslation'
 import { useLanguage } from '@/providers/LanguageProvider'
+import slMessages from '../../../messages/sl.json'
+import enMessages from '../../../messages/en.json'
 
-export const TopBar: React.FC = () => {
+export const TopBar: React.FC = (): React.ReactElement => {
   const { theme, toggleTheme } = useTheme()
-  const { t } = useTranslation()
   const { language, toggleLanguage } = useLanguage()
 
-  console.log('Current theme:', theme)
+  // Use the same translation approach as HomePage
+  const messages = language === 'en' ? enMessages : slMessages
+  const t = (key: string): string => {
+    const keys = key.split('.')
+    let value: unknown = messages
+    for (const k of keys) {
+      value = (value as Record<string, unknown>)?.[k]
+    }
+    return typeof value === 'string' ? value : key
+  }
+
+  const handleLanguageClick = (): void => {
+    toggleLanguage()
+  }
 
   return (
     <div className="hidden md:flex w-full h-10 bg-background text-foreground font-accent items-center px-8 text-sm border-b border-gray-200">
@@ -37,10 +50,10 @@ export const TopBar: React.FC = () => {
       <div className="w-1/3 flex items-center justify-end gap-4">
         <button
           className="flex items-center gap-2 px-2 py-1 rounded hover:bg-foreground/10"
-          onClick={toggleLanguage}
+          onClick={handleLanguageClick}
         >
           <IconColor name="language" width={20} height={20} theme={theme} />
-          {language === 'sl' ? 'English' : 'Slovenščina'}
+          {t('header.language.switch')}
         </button>
         <span>|</span>
         <button

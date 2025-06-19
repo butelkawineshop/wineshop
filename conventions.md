@@ -4,6 +4,20 @@ This document outlines the architectural and code conventions for the Butelka e-
 
 ---
 
+## 🧹 Clean Code Principles
+
+- **No unused variables, imports, or code** - Delete anything that's not needed
+- **No commented-out code** - Remove it completely, use git history if needed later
+- **No console.log in production** - Use proper logging or remove debug statements
+- **No TODO comments without tickets** - Create tickets for todos, don't leave code comments
+- **No magic numbers** - Use named constants
+- **No hardcoded strings in UI** - All text must use i18n keys
+- **Keep functions small and focused** - Single responsibility principle
+- **Meaningful variable names** - Self-documenting code
+- **Remove dead code immediately** - Don't accumulate technical debt
+
+---
+
 ## 📁 File Structure
 
 All core logic must reside under `/src` and follow this structure:
@@ -180,6 +194,8 @@ layout/: Header.tsx, Footer.tsx
   - Disallow `useContext` for app state
   - Enforce `try/catch` on all async logic
   - Enforce explicit return types for all exported functions
+  - **No unused variables, imports, or code**
+  - **No console.log in production**
 
 ---
 
@@ -304,6 +320,8 @@ pnpm run typecheck
   - `useContext` (except for non-state providers)
   - untyped exports or return values
   - magic strings in UI
+  - **unused variables, imports, or code**
+  - **console.log in production**
 
 ---
 

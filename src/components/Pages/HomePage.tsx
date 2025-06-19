@@ -1,16 +1,24 @@
 import React from 'react'
 import Link from 'next/link'
-import { getTranslations } from 'next-intl/server'
-import type { Metadata } from 'next'
 import { Media } from '@/components/Media'
+import { type Locale } from '@/i18n/locales'
+import slMessages from '../../../messages/sl.json'
+import enMessages from '../../../messages/en.json'
 
-export const metadata: Metadata = {
-  title: 'Butelka - Fine Wines',
-  description: 'Discover and order fine wines from Slovenia',
+interface HomePageProps {
+  locale: Locale
 }
 
-export default async function HomePage(): Promise<React.ReactElement> {
-  const t = await getTranslations('home')
+export function HomePage({ locale }: HomePageProps): React.ReactElement {
+  const messages = locale === 'en' ? enMessages : slMessages
+  const t = (key: string): string => {
+    const keys = key.split('.')
+    let value: unknown = messages
+    for (const k of keys) {
+      value = (value as Record<string, unknown>)?.[k]
+    }
+    return typeof value === 'string' ? value : key
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -19,7 +27,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
         <div className="absolute inset-0 z-0">
           <Media
             src="9de8a83a-19aa-4ab7-1ce4-dae6ef427d00/hero"
-            alt={t('hero.alt')}
+            alt={t('home.hero.alt')}
             className="w-full h-full"
             priority
             fill
@@ -27,13 +35,13 @@ export default async function HomePage(): Promise<React.ReactElement> {
           <div className="absolute inset-0 bg-other-bg/40" />
         </div>
         <div className="relative z-10 text-center text-other-fg px-4">
-          <h1 className="text-5xl md:text-7xl font-accent mb-6">{t('hero.title')}</h1>
-          <p className="text-xl md:text-2xl mb-8">{t('hero.subtitle')}</p>
+          <h1 className="text-5xl md:text-7xl font-accent mb-6">{t('home.hero.title')}</h1>
+          <p className="text-xl md:text-2xl mb-8">{t('home.hero.subtitle')}</p>
           <Link
             href="/wineshop"
             className="inline-block bg-background text-foreground px-8 py-3 rounded-full font-asap hover:bg-opacity-90 transition-all"
           >
-            {t('hero.cta')}
+            {t('home.hero.cta')}
           </Link>
         </div>
       </section>
@@ -42,7 +50,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
       <section className="py-20 px-4 bg-background">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-tanker text-center mb-12">
-            {t('featured.title')}
+            {t('home.featured.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Wine Card 1 */}
@@ -50,16 +58,16 @@ export default async function HomePage(): Promise<React.ReactElement> {
               <div className="relative h-64">
                 <Media
                   src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
-                  alt={t('featured.wines.rebula.alt')}
+                  alt={t('home.featured.wines.rebula.alt')}
                   className="h-full"
                   fill
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-tanker mb-2">{t('featured.wines.rebula.name')}</h3>
-                <p className="text-gray-600 mb-4">{t('featured.wines.rebula.region')}</p>
+                <h3 className="text-xl font-tanker mb-2">{t('home.featured.wines.rebula.name')}</h3>
+                <p className="text-gray-600 mb-4">{t('home.featured.wines.rebula.region')}</p>
                 <Link href="/wineshop/rebula" className="text-black font-asap hover:underline">
-                  {t('featured.wines.learnMore')} →
+                  {t('home.featured.wines.learnMore')} →
                 </Link>
               </div>
             </div>
@@ -69,16 +77,16 @@ export default async function HomePage(): Promise<React.ReactElement> {
               <div className="relative h-64">
                 <Media
                   src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
-                  alt={t('featured.wines.teran.alt')}
+                  alt={t('home.featured.wines.teran.alt')}
                   className="h-full"
                   fill
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-tanker mb-2">{t('featured.wines.teran.name')}</h3>
-                <p className="text-gray-600 mb-4">{t('featured.wines.teran.region')}</p>
+                <h3 className="text-xl font-tanker mb-2">{t('home.featured.wines.teran.name')}</h3>
+                <p className="text-gray-600 mb-4">{t('home.featured.wines.teran.region')}</p>
                 <Link href="/wineshop/teran" className="text-black font-asap hover:underline">
-                  {t('featured.wines.learnMore')} →
+                  {t('home.featured.wines.learnMore')} →
                 </Link>
               </div>
             </div>
@@ -88,16 +96,18 @@ export default async function HomePage(): Promise<React.ReactElement> {
               <div className="relative h-64">
                 <Media
                   src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
-                  alt={t('featured.wines.malvazija.alt')}
+                  alt={t('home.featured.wines.malvazija.alt')}
                   className="h-full"
                   fill
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-tanker mb-2">{t('featured.wines.malvazija.name')}</h3>
-                <p className="text-gray-600 mb-4">{t('featured.wines.malvazija.region')}</p>
+                <h3 className="text-xl font-tanker mb-2">
+                  {t('home.featured.wines.malvazija.name')}
+                </h3>
+                <p className="text-gray-600 mb-4">{t('home.featured.wines.malvazija.region')}</p>
                 <Link href="/wineshop/malvazija" className="text-black font-asap hover:underline">
-                  {t('featured.wines.learnMore')} →
+                  {t('home.featured.wines.learnMore')} →
                 </Link>
               </div>
             </div>
@@ -108,13 +118,13 @@ export default async function HomePage(): Promise<React.ReactElement> {
       {/* About Section */}
       <section className="py-20 px-4 bg-background">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-tanker mb-8">{t('about.title')}</h2>
-          <p className="text-lg text-foreground/70 mb-8">{t('about.description')}</p>
+          <h2 className="text-3xl md:text-4xl font-tanker mb-8">{t('home.about.title')}</h2>
+          <p className="text-lg text-foreground/70 mb-8">{t('home.about.description')}</p>
           <Link
             href="/about"
             className="inline-block bg-other-bg text-other-fg px-8 py-3 rounded-full font-asap hover:bg-opacity-90 transition-all"
           >
-            {t('about.cta')}
+            {t('home.about.cta')}
           </Link>
         </div>
       </section>

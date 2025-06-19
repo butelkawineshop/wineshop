@@ -110,6 +110,9 @@
     }
   },
   "header": {
+    "language": {
+      "switch": "English"
+    },
     "theme": {
       "light": "Prižgi lučke",
       "dark": "Ugasni lučke"

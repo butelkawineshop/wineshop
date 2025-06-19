@@ -1,10 +1,9 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useRef } from 'react'
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { useRouter, usePathname } from 'next/navigation'
-import { locales, defaultLocale, Locale } from '@/i18n/locales'
+import React, { createContext, useContext, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
+import { type Locale } from '@/i18n/locales'
+import { routeMappings, getCollectionForRouteSegment } from '@/utils/routeMappings'
 
 interface LanguageState {
   language: Locale
@@ -12,76 +11,138 @@ interface LanguageState {
   toggleLanguage: () => void
 }
 
-const useLanguageStore = create<LanguageState>()(
-  persist(
-    (set, get) => ({
-      language: defaultLocale,
-      setLanguage: (lang) => set({ language: lang }),
-      toggleLanguage: () => {
-        const current = get().language
-        const next = locales[(locales.indexOf(current) + 1) % locales.length]
-        set({ language: next })
-      },
-    }),
-    { name: 'language' },
-  ),
-)
-
 const LanguageContext = createContext<LanguageState | undefined>(undefined)
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const languageState = useLanguageStore()
-  const router = useRouter()
-  const pathname = usePathname()
-  const hasInitialized = useRef(false)
-
-  // Sync language state with current URL locale (only on mount)
-  useEffect(() => {
-    if (!hasInitialized.current) {
-      const currentLocale = pathname.startsWith('/en') ? 'en' : 'sl'
-      if (currentLocale !== languageState.language) {
-        languageState.setLanguage(currentLocale)
-      }
-      hasInitialized.current = true
-    }
-  }, [pathname, languageState])
-
-  const handleLanguageChange = (newLanguage: Locale) => {
-    // Update the store
-    languageState.setLanguage(newLanguage)
-
-    // Navigate to the new locale
-    if (newLanguage === 'en') {
-      // Add /en prefix for English
-      router.push(`/en${pathname}`)
-    } else {
-      // Remove /en prefix for Slovenian (default)
-      const pathWithoutEn = pathname.replace(/^\/en/, '')
-      router.push(pathWithoutEn || '/')
-    }
-
-    // Force a full page refresh to reload translations
-    setTimeout(() => {
-      window.location.reload()
-    }, 100)
-  }
-
-  const enhancedLanguageState = {
-    ...languageState,
-    setLanguage: handleLanguageChange,
-    toggleLanguage: () => {
-      const current = languageState.language
-      const next = locales[(locales.indexOf(current) + 1) % locales.length]
-      handleLanguageChange(next)
-    },
-  }
-
-  return (
-    <LanguageContext.Provider value={enhancedLanguageState}>{children}</LanguageContext.Provider>
-  )
+interface LanguageProviderProps {
+  children: React.ReactNode
+  locale: Locale
 }
 
-export function useLanguage() {
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+  children,
+  locale,
+}): React.ReactElement => {
+  const pathname = usePathname()
+
+  const handleLanguageChange = useCallback(
+    async (newLanguage: Locale): Promise<void> => {
+      try {
+        // Handle root path
+        if (pathname === '/' || pathname === '/en') {
+          const newPath = newLanguage === 'en' ? '/en' : '/'
+          window.location.href = newPath
+          return
+        }
+
+        const segments = pathname.split('/').filter(Boolean)
+        const validSegments = segments.filter(
+          (segment) => !segment.startsWith('(') && !segment.endsWith(')'),
+        )
+
+        if (validSegments.length === 0) {
+          return
+        }
+
+        const currentLocale = pathname.startsWith('/en') ? 'en' : 'sl'
+        const base = currentLocale === 'en' ? validSegments[1] : validSegments[0]
+        const slug = currentLocale === 'en' ? validSegments[2] : validSegments[1]
+        const route = base
+
+        if (!route) {
+          return
+        }
+
+        const collection =
+          route === 'wine' || route === 'vino' ? 'wines' : getCollectionForRouteSegment(route)
+        if (!collection) {
+          return
+        }
+
+        let translatedSlug: string | null = null
+
+        if (slug) {
+          try {
+            const where = {
+              [`slug.${currentLocale}`]: { equals: slug },
+            }
+
+            const params = new URLSearchParams()
+            params.set('where', JSON.stringify(where))
+            params.set('depth', '1')
+            params.set('locale', 'all')
+            params.set('sort', '-createdAt')
+            const url = `/api/${collection}?${params.toString()}`
+
+            const res = await fetch(url)
+            if (!res.ok) {
+              throw new Error(`API request failed with status ${res.status}`)
+            }
+
+            const data = await res.json()
+
+            if (!data.docs || data.docs.length === 0) {
+              return
+            }
+
+            const doc = data.docs.find((doc: unknown) => {
+              const docSlug =
+                typeof doc === 'object' && doc !== null && 'slug' in doc
+                  ? typeof doc.slug === 'string'
+                    ? doc.slug
+                    : (doc.slug as Record<string, string>)?.[currentLocale]
+                  : null
+              return docSlug?.toLowerCase?.() === slug.toLowerCase()
+            })
+
+            if (!doc) {
+              return
+            }
+
+            const slugs = (doc as { slug: Record<string, string> }).slug
+            if (!slugs) {
+              return
+            }
+
+            translatedSlug = slugs[newLanguage] || slug
+          } catch {
+            translatedSlug = slug
+          }
+        }
+
+        const newBase = Object.entries(routeMappings).find(
+          ([, val]) => val[currentLocale] === base && val.collection === collection,
+        )?.[1]?.[newLanguage]
+
+        if (!newBase) {
+          return
+        }
+
+        const newPath = `/${newLanguage === 'en' ? 'en/' : ''}${newBase}${translatedSlug ? '/' + translatedSlug : ''}`
+
+        window.location.href = newPath
+      } catch {
+        // Silent fail - fallback to current page
+      }
+    },
+    [pathname],
+  )
+
+  const toggleLanguage = useCallback((): void => {
+    const currentLocale = pathname.startsWith('/en') ? 'en' : 'sl'
+    const next = currentLocale === 'en' ? 'sl' : 'en'
+    handleLanguageChange(next)
+  }, [pathname, handleLanguageChange])
+
+  const languageState: LanguageState = {
+    language: locale,
+    setLanguage: handleLanguageChange,
+    toggleLanguage,
+  }
+
+  return <LanguageContext.Provider value={languageState}>{children}</LanguageContext.Provider>
+}
+
+export function useLanguage(): LanguageState {
   const ctx = useContext(LanguageContext)
   if (!ctx) throw new Error('useLanguage must be used within LanguageProvider')
   return ctx

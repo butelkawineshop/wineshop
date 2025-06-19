@@ -1,6 +1,6 @@
-@import "tailwindcss";
 @import url('asap.css');
 @import url('tanker.css');
+@import "tailwindcss";
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));

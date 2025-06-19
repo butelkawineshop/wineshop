@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { Icon } from '@/components/Icon'
 // import { useTranslations } from 'next-intl' // Uncomment if using next-intl
 import { MobileMenu } from '@/components/Header/MobileMenu'
@@ -23,7 +22,6 @@ export const Header = () => {
   const [showLogo, setShowLogo] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const pathname = usePathname()
   // const t = useTranslations() // Uncomment if using next-intl
   const { theme } = useTheme()
 
