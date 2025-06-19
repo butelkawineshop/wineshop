@@ -108,5 +108,11 @@
       "description": "Strastno vam prinašamo najboljšo izbiro slovenskih vin, skrbno izbrano iz najboljših vinogradov naše lepe države.",
       "cta": "Naša Zgodba"
     }
+  },
+  "header": {
+    "theme": {
+      "light": "Prižgi lučke",
+      "dark": "Ugasni lučke"
+    }
   }
 }

@@ -1,25 +1,53 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+function detectLocaleFromPath(pathname: string): 'sl' | 'en' {
+  return pathname.startsWith('/en') ? 'en' : 'sl'
+}
+
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // Check if the pathname starts with /en
-  const pathnameHasEnglishLocale = pathname.startsWith('/en/') || pathname === '/en'
-
-  // If it's already an English path, let it through
-  if (pathnameHasEnglishLocale) return
-
-  // If it's a static file or API route, let it through
-  if (pathname.startsWith('/_next/') || pathname.startsWith('/api/') || pathname.includes('.')) {
-    return
+  // Skip middleware for static files, API routes, and admin panel
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/static') ||
+    pathname.startsWith('/admin') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next()
   }
 
-  // For all other paths, they are considered Slovenian (no prefix needed)
-  return NextResponse.next()
+  // Determine locale from path
+  const locale = detectLocaleFromPath(pathname)
+
+  // Set the locale in headers for server components
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-locale', locale)
+  requestHeaders.set('x-pathname', pathname)
+
+  // Create response
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
+
+  // Set the cookie for future requests
+  response.cookies.set('NEXT_LOCALE', locale, {
+    path: '/',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    secure: process.env.NODE_ENV === 'production',
+  })
+
+  return response
 }
 
 export const config = {
-  // Matcher ignoring `/_next/` and `/api/`
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    // Skip all internal paths (_next), admin panel, and static files
+    '/((?!_next|api|static|admin|.*\\..*).*)',
+  ],
 }

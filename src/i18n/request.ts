@@ -1,15 +1,22 @@
 import { getRequestConfig } from 'next-intl/server'
-import { defaultLocale } from './locales'
+import { headers } from 'next/headers'
+import { defaultLocale, Locale } from './locales'
 
 export default getRequestConfig(async () => {
-  // For now, we'll use the default locale
-  // Later we can add logic to detect from user settings, cookies, etc.
-  const locale = defaultLocale
+  try {
+    const headersList = await headers()
+    const locale = (headersList.get('x-locale') as Locale) || defaultLocale
 
-  return {
-    locale,
-    messages: (await import(`../../messages/${locale}.json`)).default,
-    timeZone: 'Europe/Ljubljana',
-    now: new Date(),
+    return {
+      locale,
+      messages: (await import(`../../messages/${locale}.json`)).default,
+    }
+  } catch (error) {
+    // Fallback to default locale if there's an error
+    console.error('Failed to load i18n config:', error)
+    return {
+      locale: defaultLocale,
+      messages: (await import(`../../messages/${defaultLocale}.json`)).default,
+    }
   }
 })

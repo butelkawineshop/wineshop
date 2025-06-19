@@ -3,8 +3,10 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getLocale } from 'next-intl/server'
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
-
+import { Header } from '@/components/Header'
 import './styles.css'
+import { ThemeProvider } from '@/providers/ThemeProvider'
+import { LanguageProvider } from '@/providers/LanguageProvider'
 
 const asap = localFont({
   src: [
@@ -63,7 +65,14 @@ export default async function FrontendLayout({ children }: { children: React.Rea
       </head>
       <body className="min-h-screen min-w-full max-w-full bg-background antialiased">
         <NextIntlClientProvider>
-          <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">{children}</main>
+          <LanguageProvider>
+            <ThemeProvider>
+              <Header />
+              <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">
+                {children}
+              </main>
+            </ThemeProvider>
+          </LanguageProvider>
         </NextIntlClientProvider>
       </body>
     </html>

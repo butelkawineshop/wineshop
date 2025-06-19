@@ -108,5 +108,11 @@
       "description": "We are passionate about bringing you the finest selection of Slovenian wines, carefully curated from the best vineyards across our beautiful country.",
       "cta": "Our Story"
     }
+  },
+  "header": {
+    "theme": {
+      "light": "Turn on the lights",
+      "dark": "Turn off the lights"
+    }
   }
 }
