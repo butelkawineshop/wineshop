@@ -109,7 +109,9 @@ export const Header = () => {
                   <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
                     <Icon name={item.icon} width={32} height={32} />
                   </div>
-                  {showLogo && <span className="text-[10px] text-foreground/60">{item.title}</span>}
+                  {showLogo && (
+                    <span className="text-[10px] text-foreground/60 subtitle">{item.title}</span>
+                  )}
                 </Link>
               ))}
             </nav>
@@ -134,7 +136,9 @@ export const Header = () => {
                   <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
                     <Icon name={item.icon} width={32} height={32} />
                   </div>
-                  {showLogo && <span className="text-[10px] text-foreground/60">{item.title}</span>}
+                  {showLogo && (
+                    <span className="text-[10px] text-foreground/60 subtitle">{item.title}</span>
+                  )}
                 </Link>
               ))}
             </nav>
@@ -142,7 +146,11 @@ export const Header = () => {
         </div>
         {/* Mobile Header */}
         <div className="md:hidden h-32 flex items-center justify-between flex-row relative">
-          <button onClick={() => setIsMobileMenuOpen(true)} className="p-4" aria-label="menu">
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-4 button-secondary"
+            aria-label="menu"
+          >
             <Icon name="menu" width={24} height={24} />
           </button>
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center h-full">

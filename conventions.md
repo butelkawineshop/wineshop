@@ -18,6 +18,41 @@ This document outlines the architectural and code conventions for the Butelka e-
 
 ---
 
+## 🎨 Styling Principles
+
+### **Use Reusable Styles**
+
+- **Always use predefined utility classes** from `styles.css` for consistency
+- **Typography**: Use `.heading-1`, `.heading-2`, `.heading-3`, `.text-base`, `.subtitle`, `.hashtag`
+- **Layout**: Use `.container-narrow`, `.container-wide`, `.section-padding`, `.section-padding-sm`
+- **Components**: Use `.card`, `.card-hover`, `.btn-primary`, `.btn-secondary`, `.btn-ghost`
+- **Spacing**: Use `.space-y-section`, `.space-y-content` for consistent vertical spacing
+- **Interactive**: Use `.interactive`, `.interactive-text`, `.scale-hover` for hover effects
+- **Accessibility**: Use `.focus-ring`, `.sr-only` for proper focus management
+
+### **Design System Compliance**
+
+- **Font families**: Use `font-accent` for headings, `font-sans` for body text
+- **Color system**: Use CSS custom properties (e.g., `hsl(var(--primary))`)
+- **Spacing scale**: Follow the defined padding/margin utilities
+- **Border radius**: Use consistent rounded corners (`rounded-lg`, `rounded-full`)
+- **Transitions**: Use standard duration classes (`transition-colors`, `transition-all`)
+
+### **Responsive Design**
+
+- **Mobile-first**: Start with mobile styles, enhance for larger screens
+- **Breakpoint consistency**: Use Tailwind's standard breakpoints (`md:`, `lg:`, `xl:`)
+- **Responsive utilities**: Use `.hidden-mobile`, `.visible-mobile` for conditional display
+
+### **Performance & Maintainability**
+
+- **Avoid custom CSS** - Prefer utility classes over custom styles
+- **CSS-in-JS discouraged** - Use Tailwind utilities and CSS custom properties
+- **Consistent naming** - Follow the established class naming conventions
+- **Theme support** - All styles must work with both light and dark themes
+
+---
+
 ## 📁 File Structure
 
 All core logic must reside under `/src` and follow this structure:

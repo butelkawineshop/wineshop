@@ -35,26 +35,21 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
           <div className="absolute inset-0 bg-other-bg/40" />
         </div>
         <div className="relative z-10 text-center text-other-fg px-4">
-          <h1 className="text-5xl md:text-7xl font-accent mb-6">{t('home.hero.title')}</h1>
+          <h1 className="heading-1 mb-6">{t('home.hero.title')}</h1>
           <p className="text-xl md:text-2xl mb-8">{t('home.hero.subtitle')}</p>
-          <Link
-            href="/wineshop"
-            className="inline-block bg-background text-foreground px-8 py-3 rounded-full font-asap hover:bg-opacity-90 transition-all"
-          >
+          <Link href="/wineshop" className="btn-primary">
             {t('home.hero.cta')}
           </Link>
         </div>
       </section>
 
       {/* Featured Wines */}
-      <section className="py-20 px-4 bg-background">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-tanker text-center mb-12">
-            {t('home.featured.title')}
-          </h2>
+      <section className="section-padding bg-background">
+        <div className="container-wide">
+          <h2 className="heading-2 text-center mb-12">{t('home.featured.title')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Wine Card 1 */}
-            <div className="bg-other-bg rounded-lg overflow-hidden">
+            <div className="card-hover">
               <div className="relative h-64">
                 <Media
                   src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
@@ -64,16 +59,16 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-tanker mb-2">{t('home.featured.wines.rebula.name')}</h3>
-                <p className="text-gray-600 mb-4">{t('home.featured.wines.rebula.region')}</p>
-                <Link href="/wineshop/rebula" className="text-black font-asap hover:underline">
+                <h3 className="heading-3 mb-2">{t('home.featured.wines.rebula.name')}</h3>
+                <p className="subtitle mb-4">{t('home.featured.wines.rebula.region')}</p>
+                <Link href="/wineshop/rebula" className="interactive-text">
                   {t('home.featured.wines.learnMore')} →
                 </Link>
               </div>
             </div>
 
             {/* Wine Card 2 */}
-            <div className="bg-other-bg rounded-lg overflow-hidden">
+            <div className="card-hover">
               <div className="relative h-64">
                 <Media
                   src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
@@ -83,16 +78,16 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-tanker mb-2">{t('home.featured.wines.teran.name')}</h3>
-                <p className="text-gray-600 mb-4">{t('home.featured.wines.teran.region')}</p>
-                <Link href="/wineshop/teran" className="text-black font-asap hover:underline">
+                <h3 className="heading-3 mb-2">{t('home.featured.wines.teran.name')}</h3>
+                <p className="subtitle mb-4">{t('home.featured.wines.teran.region')}</p>
+                <Link href="/wineshop/teran" className="interactive-text">
                   {t('home.featured.wines.learnMore')} →
                 </Link>
               </div>
             </div>
 
             {/* Wine Card 3 */}
-            <div className="bg-other-bg rounded-lg overflow-hidden">
+            <div className="card-hover">
               <div className="relative h-64">
                 <Media
                   src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
@@ -102,11 +97,9 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-tanker mb-2">
-                  {t('home.featured.wines.malvazija.name')}
-                </h3>
-                <p className="text-gray-600 mb-4">{t('home.featured.wines.malvazija.region')}</p>
-                <Link href="/wineshop/malvazija" className="text-black font-asap hover:underline">
+                <h3 className="heading-3 mb-2">{t('home.featured.wines.malvazija.name')}</h3>
+                <p className="subtitle mb-4">{t('home.featured.wines.malvazija.region')}</p>
+                <Link href="/wineshop/malvazija" className="interactive-text">
                   {t('home.featured.wines.learnMore')} →
                 </Link>
               </div>
@@ -116,14 +109,11 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
       </section>
 
       {/* About Section */}
-      <section className="py-20 px-4 bg-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-tanker mb-8">{t('home.about.title')}</h2>
+      <section className="section-padding bg-background">
+        <div className="container-narrow text-center">
+          <h2 className="heading-2 mb-8">{t('home.about.title')}</h2>
           <p className="text-lg text-foreground/70 mb-8">{t('home.about.description')}</p>
-          <Link
-            href="/about"
-            className="inline-block bg-other-bg text-other-fg px-8 py-3 rounded-full font-asap hover:bg-opacity-90 transition-all"
-          >
+          <Link href="/about" className="btn-secondary">
             {t('home.about.cta')}
           </Link>
         </div>

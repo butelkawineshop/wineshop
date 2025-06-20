@@ -28,7 +28,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, menuIte
     <div className="fixed inset-0 z-50 bg-background md:hidden">
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between p-4">
-          <button onClick={onClose} className="p-2 hover:text-primary" aria-label="close">
+          <button
+            onClick={onClose}
+            className="p-2 hover:text-primary button-secondary"
+            aria-label="close"
+          >
             <Icon name="close" width={24} height={24} />
           </button>
         </div>
@@ -38,11 +42,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, menuIte
               <li key={item.id}>
                 <Link
                   href={item.url}
-                  className="flex items-center gap-2 p-2 hover:text-primary"
+                  className="flex items-center gap-2 p-2 hover:text-primary text-base link-container"
                   onClick={onClose}
                 >
                   <Icon name={item.icon} width={24} height={24} />
-                  <span>{item.title}</span>
+                  <span className="text-base">{item.title}</span>
                 </Link>
               </li>
             ))}
