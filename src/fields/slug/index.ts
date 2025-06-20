@@ -50,7 +50,18 @@ export const slugField = ({
     beforeChange: [
       ({ data, value }) => {
         if (data?.[sourceField]) {
-          return generateSlug(data[sourceField])
+          // Handle localized fields by using the Slovenian value
+          const sourceValue = data[sourceField]
+          const title =
+            typeof sourceValue === 'object' && sourceValue?.sl
+              ? sourceValue.sl
+              : typeof sourceValue === 'string'
+                ? sourceValue
+                : null
+
+          if (title) {
+            return generateSlug(title)
+          }
         }
         return value
       },
@@ -58,7 +69,18 @@ export const slugField = ({
     beforeValidate: [
       ({ data, value }) => {
         if (data?.[sourceField] && !value) {
-          return generateSlug(data[sourceField])
+          // Handle localized fields by using the Slovenian value
+          const sourceValue = data[sourceField]
+          const title =
+            typeof sourceValue === 'object' && sourceValue?.sl
+              ? sourceValue.sl
+              : typeof sourceValue === 'string'
+                ? sourceValue
+                : null
+
+          if (title) {
+            return generateSlug(title)
+          }
         }
         return value
       },

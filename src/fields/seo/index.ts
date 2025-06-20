@@ -75,8 +75,20 @@ export const seoField = ({
         }
 
         const seo: SEOData = {
-          title: data?.[titleField] || '',
-          description: data?.[descriptionField] || '',
+          title: (() => {
+            const titleValue = data?.[titleField]
+            if (typeof titleValue === 'object' && titleValue?.sl) {
+              return titleValue.sl
+            }
+            return titleValue || ''
+          })(),
+          description: (() => {
+            const descValue = data?.[descriptionField]
+            if (typeof descValue === 'object' && descValue?.sl) {
+              return descValue.sl
+            }
+            return descValue || ''
+          })(),
           image: imageUrl,
           ogType: 'website',
           twitterCard: 'summary_large_image',
@@ -84,11 +96,14 @@ export const seoField = ({
         }
 
         if (data?.price) {
+          const titleValue = data[titleField]
+          const descValue = data[descriptionField]
+
           seo.structuredData = {
             '@context': 'https://schema.org',
             '@type': 'Product',
-            name: data[titleField],
-            description: data[descriptionField],
+            name: typeof titleValue === 'object' && titleValue?.sl ? titleValue.sl : titleValue,
+            description: typeof descValue === 'object' && descValue?.sl ? descValue.sl : descValue,
             image: imageUrl,
             offers: {
               '@type': 'Offer',

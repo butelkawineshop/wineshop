@@ -15,7 +15,14 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "seed:countries": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-wine-countries.ts",
+    "seed:tags": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-tags.ts",
+    "seed:grape-varieties": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-grape-varieties.ts",
+    "seed:regions": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-wine-regions.ts",
+    "seed:wineries": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-wineries.ts",
+    "seed:moods": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-moods.ts",
+    "seed:all": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-all.ts"
   },
   "dependencies": {
     "@auth/core": "^0.39.1",
@@ -84,6 +91,7 @@
     "lint-staged": "^16.1.2",
     "prettier": "^3.5.3",
     "ts-jest": "^29.4.0",
+    "tsx": "^4.20.3",
     "typescript": "5.7.3",
     "wrangler": "^4.20.1"
   },
