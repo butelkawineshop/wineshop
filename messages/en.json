@@ -7,7 +7,13 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
-    "search": "Search"
+    "search": "Search",
+    "previous": "Previous",
+    "next": "Next",
+    "showing": "Showing",
+    "of": "of",
+    "results": "results",
+    "noResults": "No results found"
   },
   "auth": {
     "login": "Login",
@@ -31,12 +37,111 @@
     "addToCart": "Add to Cart",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
+    "list": {
+      "title": "Wines",
+      "description": "Discover our curated selection of wines"
+    },
     "filters": {
       "title": "Filters",
       "price": "Price Range",
       "region": "Region",
       "variety": "Grape Variety",
       "year": "Vintage Year"
+    }
+  },
+  "winery": {
+    "list": {
+      "title": "Wineries",
+      "description": "Explore the wineries behind our wines"
+    }
+  },
+  "region": {
+    "list": {
+      "title": "Regions",
+      "description": "Discover wine regions around the world"
+    }
+  },
+  "wineCountry": {
+    "list": {
+      "title": "Wine Countries",
+      "description": "Explore wine-producing countries and their traditions"
+    }
+  },
+  "grapeVariety": {
+    "list": {
+      "title": "Grape Varieties",
+      "description": "Learn about different grape varieties"
+    }
+  },
+  "style": {
+    "list": {
+      "title": "Wine Styles",
+      "description": "Explore different wine styles"
+    }
+  },
+  "aroma": {
+    "list": {
+      "title": "Aromas",
+      "description": "Discover wine aromas and flavors"
+    }
+  },
+  "climate": {
+    "list": {
+      "title": "Climates",
+      "description": "Learn about wine climates"
+    }
+  },
+  "mood": {
+    "list": {
+      "title": "Moods",
+      "description": "Find wines for every mood"
+    }
+  },
+  "food": {
+    "list": {
+      "title": "Food Pairings",
+      "description": "Discover perfect food and wine pairings"
+    }
+  },
+  "tag": {
+    "list": {
+      "title": "Collections",
+      "description": "Browse our curated collections"
+    }
+  },
+  "tasting": {
+    "list": {
+      "title": "Tastings",
+      "description": "Join our wine tasting events"
+    }
+  },
+  "giftCard": {
+    "list": {
+      "title": "Gift Cards",
+      "description": "Perfect gifts for wine lovers"
+    }
+  },
+  "merch": {
+    "list": {
+      "title": "Merchandise",
+      "description": "Wine-themed merchandise and accessories"
+    }
+  },
+  "post": {
+    "list": {
+      "title": "Encyclopedia",
+      "description": "Learn about wine, regions, and more"
+    }
+  },
+  "page": {
+    "list": {
+      "title": "Pages",
+      "description": "Information and resources"
+    }
+  },
+  "collection": {
+    "list": {
+      "title": "Collection"
     }
   },
   "cart": {

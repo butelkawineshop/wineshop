@@ -73,6 +73,9 @@ export const routeMappings = {
 
   potrditev: { sl: 'potrditev', en: 'confirmation', collection: 'pages' },
   confirmation: { sl: 'potrditev', en: 'confirmation', collection: 'pages' },
+
+  drzave: { sl: 'drzave', en: 'countries', collection: 'wineCountries' },
+  countries: { sl: 'drzave', en: 'countries', collection: 'wineCountries' },
 } as const
 
 export function getTranslatedSegment(segment: string, targetLocale: Locale): string | null {

@@ -7,7 +7,13 @@
     "cancel": "Prekliči",
     "delete": "Izbriši",
     "edit": "Uredi",
-    "search": "Išči"
+    "search": "Išči",
+    "previous": "Prejšnja",
+    "next": "Naslednja",
+    "showing": "Prikazujem",
+    "of": "od",
+    "results": "rezultatov",
+    "noResults": "Ni najdenih rezultatov"
   },
   "auth": {
     "login": "Prijava",
@@ -31,12 +37,111 @@
     "addToCart": "Dodaj v košarico",
     "inStock": "Na zalogi",
     "outOfStock": "Ni na zalogi",
+    "list": {
+      "title": "Vina",
+      "description": "Odkrijte našo skrbno izbrano zbirko vin"
+    },
     "filters": {
       "title": "Filtri",
       "price": "Cenovni razpon",
       "region": "Regija",
       "variety": "Sorta grozdja",
       "year": "Letnik"
+    }
+  },
+  "winery": {
+    "list": {
+      "title": "Kleti",
+      "description": "Raziskujte kleti za našimi vini"
+    }
+  },
+  "region": {
+    "list": {
+      "title": "Regije",
+      "description": "Odkrijte vinske regije po vsem svetu"
+    }
+  },
+  "wineCountry": {
+    "list": {
+      "title": "Vinske Države",
+      "description": "Raziskujte vinske države in njihove tradicije"
+    }
+  },
+  "grapeVariety": {
+    "list": {
+      "title": "Sorte Grozdja",
+      "description": "Spoznajte različne sorte grozdja"
+    }
+  },
+  "style": {
+    "list": {
+      "title": "Vinski Stili",
+      "description": "Raziskujte različne vinske stile"
+    }
+  },
+  "aroma": {
+    "list": {
+      "title": "Arome",
+      "description": "Odkrijte vinske arome in okuse"
+    }
+  },
+  "climate": {
+    "list": {
+      "title": "Podnebja",
+      "description": "Spoznajte vinska podnebja"
+    }
+  },
+  "mood": {
+    "list": {
+      "title": "Filing",
+      "description": "Poiščite vina za vsak razpoloženje"
+    }
+  },
+  "food": {
+    "list": {
+      "title": "Jedi",
+      "description": "Odkrijte popolne kombinacije hrane in vina"
+    }
+  },
+  "tag": {
+    "list": {
+      "title": "Zbirke",
+      "description": "Raziskujte naše skrbno izbrane zbirke"
+    }
+  },
+  "tasting": {
+    "list": {
+      "title": "Tejstingi",
+      "description": "Pridružite se našim degustacijam vin"
+    }
+  },
+  "giftCard": {
+    "list": {
+      "title": "Darilni Boni",
+      "description": "Popolni darila za ljubitelje vina"
+    }
+  },
+  "merch": {
+    "list": {
+      "title": "Roba",
+      "description": "Vinska meršanda in dodatki"
+    }
+  },
+  "post": {
+    "list": {
+      "title": "Enciklopedija",
+      "description": "Spoznajte vina, regije in več"
+    }
+  },
+  "page": {
+    "list": {
+      "title": "Strani",
+      "description": "Informacije in viri"
+    }
+  },
+  "collection": {
+    "list": {
+      "title": "Zbirka"
     }
   },
   "cart": {
