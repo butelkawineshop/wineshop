@@ -1,13 +1,13 @@
 import React from 'react'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getPayloadClient } from '@/lib/payload'
 import { routeMappings, type Locale, getCollectionForRouteSegment } from '@/utils/routeMappings'
 import { CollectionConfig, type CollectionDisplayConfig } from './CollectionConfig'
-import { FieldRenderer } from './FieldRenderer'
 import { logger } from '@/lib/logger'
 import slMessages from '../../../messages/sl.json'
 import enMessages from '../../../messages/en.json'
+import { InfoCarousel } from '../InfoCarousel'
+import { Media } from '../Media'
 
 // Helper function to get nested object values
 function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
@@ -222,29 +222,30 @@ function SingleItemView({
   const subtitle = config.subtitleField ? (data[config.subtitleField] as string) : undefined
   const media = config.mediaField ? (data[config.mediaField] as Array<{ url: string }>) : undefined
 
+  // Log media info for debugging
+  if (typeof window !== 'undefined') {
+    console.log('SingleItemView media:', media)
+    if (media && media.length > 0) {
+      media.forEach((m, i) => console.log(`Media[${i}] url:`, m.url))
+    }
+  }
+
   return (
     <article className="container-narrow">
       <header className="space-y-content">
-        <h1 className="heading-1">{title}</h1>
+        <h1 className="heading-1 text-center justify-center">{title}</h1>
         {subtitle && <p className="subtitle">{subtitle}</p>}
       </header>
 
-      {media && media[0] && (
-        <div className="space-y-content">
-          <Image
-            src={media[0].url}
-            alt={title}
-            width={800}
-            height={400}
-            className="w-full h-64 object-cover rounded-lg"
-          />
-        </div>
-      )}
-
-      <div className="prose max-w-none space-y-content">
-        {config.fields?.map((field) => (
-          <FieldRenderer key={field.name} field={field} data={data} locale={locale} t={t} />
-        ))}
+      {/* InfoCarousel for field-by-field display */}
+      <div className="my-8">
+        <InfoCarousel
+          item={data}
+          fields={config.fields}
+          mediaField={config.mediaField || 'media'}
+          locale={locale}
+          messages={locale === 'sl' ? slMessages : enMessages}
+        />
       </div>
     </article>
   )
@@ -311,45 +312,43 @@ function ListView({
 
       {items.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 w-full min-h-0 min-w-0">
             {items.map((item) => {
               const title = item[config.titleField || 'title'] as string
-              const subtitle = config.subtitleField
-                ? (item[config.subtitleField] as string)
-                : undefined
-              const description = config.descriptionField
-                ? (item[config.descriptionField] as string)
-                : undefined
               const media = config.mediaField
                 ? (item[config.mediaField] as Array<{ url: string }>)
                 : undefined
 
               return (
-                <div key={item.id} className="card card-hover">
-                  {media && media[0] && (
-                    <Image
-                      src={media[0].url}
-                      alt={title}
-                      width={400}
-                      height={300}
-                      className="w-full h-48 object-cover"
-                    />
-                  )}
-                  <div className="p-4 space-y-content">
-                    <h2 className="heading-3">
-                      <a
-                        href={`${locale === 'en' ? '/en' : ''}/${baseSegment}/${item.slug}`}
-                        className="interactive-text"
-                      >
+                <a
+                  key={item.id}
+                  href={`${locale === 'en' ? '/en' : ''}/${baseSegment}/${item.slug}`}
+                  className="relative w-full aspect-square min-w-[120px] flex items-center justify-center group overflow-hidden"
+                >
+                  {media && media[0] ? (
+                    <>
+                      <Media
+                        src={(media[0] as any).baseUrl || media[0].url}
+                        alt={title}
+                        fill
+                        size="feature"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        priority={false}
+                      />
+                      <div className="absolute inset-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                        <h2 className="text-background text-center font-medium px-2 group-hover:opacity-0 transition-opacity duration-300 text-sm md:text-base">
+                          {title}
+                        </h2>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 bg-black hover:bg-foreground/50 transition-all duration-300 flex items-center justify-center">
+                      <h2 className="text-white text-center font-medium px-2 text-sm md:text-base z-10">
                         {title}
-                      </a>
-                    </h2>
-                    {subtitle && <p className="text-base text-gray-600">{subtitle}</p>}
-                    {description && (
-                      <p className="text-base text-gray-700 line-clamp-3">{description}</p>
-                    )}
-                  </div>
-                </div>
+                      </h2>
+                    </div>
+                  )}
+                </a>
               )
             })}
           </div>

@@ -14,16 +14,22 @@ interface MediaProps {
   quality?: number
   placeholder?: string
   fill?: boolean
+  size?: string
 }
 
 // Ensure we have a valid base URL
 const CLOUDFLARE_IMAGES_URL = process.env.NEXT_PUBLIC_CLOUDFLARE_IMAGES_URL
 
-const getImageUrl = (src: string | null | undefined): string => {
+const getImageUrl = (src: string | null | undefined, size?: string): string => {
   if (!src) return ''
 
-  // If the URL is already a full URL, return it as is
-  if (src.startsWith('http')) return src
+  // If the URL already ends with a known size, return as is
+  if (src.match(/\/(winecards|feature|hero|thumbnail)$/)) return src
+
+  // If the URL is a full URL and a size is provided, append the size
+  if (src.startsWith('http')) {
+    return size ? `${src}/${size}` : src
+  }
 
   // If we don't have a Cloudflare URL, return the placeholder
   if (!CLOUDFLARE_IMAGES_URL) {
@@ -31,7 +37,12 @@ const getImageUrl = (src: string | null | undefined): string => {
     return ''
   }
 
-  // Otherwise, construct the Cloudflare Images URL
+  // If a size is provided, append it
+  if (size) {
+    return `${CLOUDFLARE_IMAGES_URL}/${src}/${size}`
+  }
+
+  // Otherwise, construct the Cloudflare Images URL as is
   return `${CLOUDFLARE_IMAGES_URL}/${src}`
 }
 
@@ -45,11 +56,12 @@ export const Media: React.FC<MediaProps> = ({
   quality = 75,
   placeholder = '/images/placeholder.jpg',
   fill = false,
+  size,
 }) => {
   const [error, setError] = useState(false)
 
   // If no src or error occurred, use placeholder
-  const imageSrc = !src || error ? placeholder : getImageUrl(src)
+  const imageSrc = !src || error ? placeholder : getImageUrl(src, size)
 
   // If we have no valid image source, don't render the Image component
   if (!imageSrc) {

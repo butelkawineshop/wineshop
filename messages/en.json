@@ -47,96 +47,184 @@
       "region": "Region",
       "variety": "Grape Variety",
       "year": "Vintage Year"
+    },
+    "fields": {
+      "description": "Description",
+      "winery": "Winery",
+      "region": "Region",
+      "style": "Style",
+      "variants": "Variants"
     }
   },
   "winery": {
     "list": {
       "title": "Wineries",
       "description": "Explore the wineries behind our wines"
+    },
+    "fields": {
+      "description": "Description",
+      "whyCool": "Why it's cool",
+      "tags": "Tags",
+      "social": "Social",
+      "relatedWineries": "Related Wineries"
     }
   },
   "region": {
     "list": {
       "title": "Regions",
       "description": "Discover wine regions around the world"
+    },
+    "fields": {
+      "description": "Description",
+      "country": "Country",
+      "wines": "Wines"
     }
   },
   "wineCountry": {
     "list": {
       "title": "Wine Countries",
       "description": "Explore wine-producing countries and their traditions"
+    },
+    "fields": {
+      "description": "Description",
+      "whyCool": "Why it's cool",
+      "landArea": "Land Area",
+      "wineriesCount": "Wineries Count",
+      "regions": "Regions",
+      "bestRegions": "Best Regions",
+      "bestGrapes": "Best Grapes",
+      "legends": "Legends"
     }
   },
   "grapeVariety": {
     "list": {
       "title": "Grape Varieties",
       "description": "Learn about different grape varieties"
+    },
+    "fields": {
+      "description": "Description",
+      "typicalStyle": "Typical Style",
+      "whyCool": "Why it's cool",
+      "character": "Character",
+      "skin": "Skin",
+      "synonyms": "Synonyms",
+      "distinctiveAromas": "Distinctive Aromas",
+      "bestRegions": "Best Regions",
+      "blendingPartners": "Blending Partners",
+      "similarVarieties": "Similar Varieties"
     }
   },
   "style": {
     "list": {
       "title": "Wine Styles",
       "description": "Explore different wine styles"
+    },
+    "fields": {
+      "description": "Description",
+      "wines": "Wines"
     }
   },
   "aroma": {
     "list": {
       "title": "Aromas",
       "description": "Discover wine aromas and flavors"
+    },
+    "fields": {
+      "description": "Description",
+      "wines": "Wines"
     }
   },
   "climate": {
     "list": {
       "title": "Climates",
       "description": "Learn about wine climates"
+    },
+    "fields": {
+      "description": "Description",
+      "regions": "Regions"
     }
   },
   "mood": {
     "list": {
       "title": "Moods",
       "description": "Find wines for every mood"
+    },
+    "fields": {
+      "description": "Description",
+      "wines": "Wines"
     }
   },
   "food": {
     "list": {
       "title": "Food Pairings",
       "description": "Discover perfect food and wine pairings"
+    },
+    "fields": {
+      "description": "Description",
+      "wines": "Wines"
     }
   },
   "tag": {
     "list": {
       "title": "Collections",
       "description": "Browse our curated collections"
+    },
+    "fields": {
+      "description": "Description",
+      "wines": "Wines"
     }
   },
   "tasting": {
     "list": {
       "title": "Tastings",
       "description": "Join our wine tasting events"
+    },
+    "fields": {
+      "description": "Description",
+      "date": "Date",
+      "location": "Location"
     }
   },
   "giftCard": {
     "list": {
       "title": "Gift Cards",
       "description": "Perfect gifts for wine lovers"
+    },
+    "fields": {
+      "description": "Description",
+      "value": "Value"
     }
   },
   "merch": {
     "list": {
       "title": "Merchandise",
       "description": "Wine-themed merchandise and accessories"
+    },
+    "fields": {
+      "description": "Description",
+      "price": "Price"
     }
   },
   "post": {
     "list": {
       "title": "Encyclopedia",
       "description": "Learn about wine, regions, and more"
+    },
+    "fields": {
+      "excerpt": "Excerpt",
+      "content": "Content",
+      "author": "Author",
+      "categories": "Categories"
     }
   },
   "page": {
     "list": {
       "title": "Pages",
       "description": "Information and resources"
+    },
+    "fields": {
+      "excerpt": "Excerpt",
+      "content": "Content"
     }
   },
   "collection": {

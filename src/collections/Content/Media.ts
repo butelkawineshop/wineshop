@@ -49,6 +49,7 @@ export const Media: CollectionConfig = {
           return {
             ...doc,
             url: `${baseUrl}/winecards`,
+            baseUrl,
             thumbnailURL: `${baseUrl}/thumbnail`,
           }
         }
@@ -142,6 +143,7 @@ export const Media: CollectionConfig = {
               ...data,
               cloudflareId,
               url: `${baseUrl}/winecards`,
+              baseUrl,
               thumbnailURL: `${baseUrl}/thumbnail`,
             }
           }

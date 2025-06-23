@@ -20,6 +20,7 @@ export interface FieldConfig {
   name: string
   type: 'text' | 'textarea' | 'relationship' | 'array' | 'select' | 'group' | 'media'
   label?: string
+  labelKey?: string
   renderAs?: 'card' | 'list' | 'grid' | 'table'
   showInList?: boolean
   showInDetail?: boolean
@@ -59,30 +60,39 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: '-createdAt',
     depth: 2,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'wine.fields.description',
+      },
       {
         name: 'winery',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wineries' },
+        labelKey: 'wine.fields.winery',
       },
       {
         name: 'region',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'regions' },
+        labelKey: 'wine.fields.region',
       },
       {
         name: 'style',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'styles' },
+        labelKey: 'wine.fields.style',
       },
       {
         name: 'variants',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'sku' },
+        labelKey: 'wine.fields.variants',
       },
     ],
   },
@@ -97,21 +107,27 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
-      { name: 'whyCool', type: 'textarea', showInDetail: true },
-      { name: 'wineryCode', type: 'text', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'winery.fields.description',
+      },
+      { name: 'whyCool', type: 'textarea', showInDetail: true, labelKey: 'winery.fields.whyCool' },
       {
         name: 'tags',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title' },
+        labelKey: 'winery.fields.tags',
       },
-      { name: 'social', type: 'group', showInDetail: true },
+      { name: 'social', type: 'group', showInDetail: true, labelKey: 'winery.fields.social' },
       {
         name: 'relatedWineries',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wineries' },
+        labelKey: 'winery.fields.relatedWineries',
       },
     ],
   },
@@ -126,18 +142,25 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 2,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'region.fields.description',
+      },
       {
         name: 'country',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title' },
+        labelKey: 'region.fields.country',
       },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
+        labelKey: 'region.fields.wines',
       },
     ],
   },
@@ -152,33 +175,57 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 2,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
-      { name: 'whyCool', type: 'textarea', showInDetail: true },
-      { name: 'landArea', type: 'text', showInDetail: true },
-      { name: 'wineriesCount', type: 'text', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'wineCountry.fields.description',
+      },
+      {
+        name: 'whyCool',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'wineCountry.fields.whyCool',
+      },
+      {
+        name: 'landArea',
+        type: 'text',
+        showInDetail: true,
+        labelKey: 'wineCountry.fields.landArea',
+      },
+      {
+        name: 'wineriesCount',
+        type: 'text',
+        showInDetail: true,
+        labelKey: 'wineCountry.fields.wineriesCount',
+      },
       {
         name: 'regions',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'regions' },
+        labelKey: 'wineCountry.fields.regions',
       },
       {
         name: 'bestRegions',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'regions' },
+        labelKey: 'wineCountry.fields.bestRegions',
       },
       {
         name: 'bestGrapes',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'grape-varieties' },
+        labelKey: 'wineCountry.fields.bestGrapes',
       },
       {
         name: 'legends',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wineries' },
+        labelKey: 'wineCountry.fields.legends',
       },
     ],
   },
@@ -193,40 +240,65 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 2,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
-      { name: 'typicalStyle', type: 'textarea', showInDetail: true },
-      { name: 'whyCool', type: 'textarea', showInDetail: true },
-      { name: 'character', type: 'textarea', showInDetail: true },
-      { name: 'skin', type: 'select', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'grapeVariety.fields.description',
+      },
+      {
+        name: 'typicalStyle',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'grapeVariety.fields.typicalStyle',
+      },
+      {
+        name: 'whyCool',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'grapeVariety.fields.whyCool',
+      },
+      {
+        name: 'character',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'grapeVariety.fields.character',
+      },
+      { name: 'skin', type: 'select', showInDetail: true, labelKey: 'grapeVariety.fields.skin' },
       {
         name: 'synonyms',
         type: 'array',
         showInDetail: true,
         arrayConfig: { itemType: 'text', displayField: 'title' },
+        labelKey: 'grapeVariety.fields.synonyms',
       },
       {
         name: 'distinctiveAromas',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'aromas' },
+        labelKey: 'grapeVariety.fields.distinctiveAromas',
       },
       {
         name: 'bestRegions',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'regions' },
+        labelKey: 'grapeVariety.fields.bestRegions',
       },
       {
         name: 'blendingPartners',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'grape-varieties' },
+        labelKey: 'grapeVariety.fields.blendingPartners',
       },
       {
         name: 'similarVarieties',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'grape-varieties' },
+        labelKey: 'grapeVariety.fields.similarVarieties',
       },
     ],
   },
@@ -241,12 +313,18 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'style.fields.description',
+      },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
+        labelKey: 'style.fields.wines',
       },
     ],
   },
@@ -261,12 +339,18 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'aroma.fields.description',
+      },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
+        labelKey: 'aroma.fields.wines',
       },
     ],
   },
@@ -281,12 +365,18 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'climate.fields.description',
+      },
       {
         name: 'regions',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'regions' },
+        labelKey: 'climate.fields.regions',
       },
     ],
   },
@@ -301,12 +391,18 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'mood.fields.description',
+      },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
+        labelKey: 'mood.fields.wines',
       },
     ],
   },
@@ -321,12 +417,18 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'food.fields.description',
+      },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
+        labelKey: 'food.fields.wines',
       },
     ],
   },
@@ -341,12 +443,18 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'tag.fields.description',
+      },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
+        labelKey: 'tag.fields.wines',
       },
     ],
   },
@@ -361,9 +469,14 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: '-date',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
-      { name: 'date', type: 'text', showInDetail: true },
-      { name: 'location', type: 'text', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'tasting.fields.description',
+      },
+      { name: 'date', type: 'text', showInDetail: true, labelKey: 'tasting.fields.date' },
+      { name: 'location', type: 'text', showInDetail: true, labelKey: 'tasting.fields.location' },
     ],
   },
 
@@ -377,8 +490,13 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
-      { name: 'value', type: 'text', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'giftCard.fields.description',
+      },
+      { name: 'value', type: 'text', showInDetail: true, labelKey: 'giftCard.fields.value' },
     ],
   },
 
@@ -392,8 +510,13 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'description', type: 'textarea', showInDetail: true },
-      { name: 'price', type: 'text', showInDetail: true },
+      {
+        name: 'description',
+        type: 'textarea',
+        showInDetail: true,
+        labelKey: 'merch.fields.description',
+      },
+      { name: 'price', type: 'text', showInDetail: true, labelKey: 'merch.fields.price' },
     ],
   },
 
@@ -407,19 +530,21 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: '-publishedAt',
     depth: 1,
     fields: [
-      { name: 'excerpt', type: 'textarea', showInDetail: true },
-      { name: 'content', type: 'textarea', showInDetail: true },
+      { name: 'excerpt', type: 'textarea', showInDetail: true, labelKey: 'post.fields.excerpt' },
+      { name: 'content', type: 'textarea', showInDetail: true, labelKey: 'post.fields.content' },
       {
         name: 'author',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'name' },
+        labelKey: 'post.fields.author',
       },
       {
         name: 'categories',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title' },
+        labelKey: 'post.fields.categories',
       },
     ],
   },
@@ -434,8 +559,8 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     sort: 'title',
     depth: 1,
     fields: [
-      { name: 'excerpt', type: 'textarea', showInDetail: true },
-      { name: 'content', type: 'textarea', showInDetail: true },
+      { name: 'excerpt', type: 'textarea', showInDetail: true, labelKey: 'page.fields.excerpt' },
+      { name: 'content', type: 'textarea', showInDetail: true, labelKey: 'page.fields.content' },
     ],
   },
 }

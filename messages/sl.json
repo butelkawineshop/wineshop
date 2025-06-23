@@ -47,96 +47,184 @@
       "region": "Regija",
       "variety": "Sorta grozdja",
       "year": "Letnik"
+    },
+    "fields": {
+      "description": "Opis",
+      "winery": "Klet",
+      "region": "Regija",
+      "style": "Stil",
+      "variants": "Različice"
     }
   },
   "winery": {
     "list": {
       "title": "Kleti",
       "description": "Raziskujte kleti za našimi vini"
+    },
+    "fields": {
+      "description": "Opis",
+      "whyCool": "Zakaj je kul",
+      "tags": "Oznake",
+      "social": "Družbena omrežja",
+      "relatedWineries": "Sorodne kleti"
     }
   },
   "region": {
     "list": {
       "title": "Regije",
       "description": "Odkrijte vinske regije po vsem svetu"
+    },
+    "fields": {
+      "description": "Opis",
+      "country": "Država",
+      "wines": "Vina"
     }
   },
   "wineCountry": {
     "list": {
       "title": "Vinske Države",
       "description": "Raziskujte vinske države in njihove tradicije"
+    },
+    "fields": {
+      "description": "Opis",
+      "whyCool": "Zakaj je kul",
+      "landArea": "Površina",
+      "wineriesCount": "Število kleti",
+      "regions": "Regije",
+      "bestRegions": "Najboljše regije",
+      "bestGrapes": "Najboljše sorte",
+      "legends": "Legende"
     }
   },
   "grapeVariety": {
     "list": {
       "title": "Sorte Grozdja",
       "description": "Spoznajte različne sorte grozdja"
+    },
+    "fields": {
+      "description": "Opis",
+      "typicalStyle": "Tipičen stil",
+      "whyCool": "Zakaj je kul",
+      "character": "Značaj",
+      "skin": "Kožica",
+      "synonyms": "Sinonimi",
+      "distinctiveAromas": "Značilne arome",
+      "bestRegions": "Najboljše regije",
+      "blendingPartners": "Partnerji za zmešavo",
+      "similarVarieties": "Podobne sorte"
     }
   },
   "style": {
     "list": {
       "title": "Vinski Stili",
       "description": "Raziskujte različne vinske stile"
+    },
+    "fields": {
+      "description": "Opis",
+      "wines": "Vina"
     }
   },
   "aroma": {
     "list": {
       "title": "Arome",
       "description": "Odkrijte vinske arome in okuse"
+    },
+    "fields": {
+      "description": "Opis",
+      "wines": "Vina"
     }
   },
   "climate": {
     "list": {
       "title": "Podnebja",
       "description": "Spoznajte vinska podnebja"
+    },
+    "fields": {
+      "description": "Opis",
+      "regions": "Regije"
     }
   },
   "mood": {
     "list": {
       "title": "Filing",
       "description": "Poiščite vina za vsak razpoloženje"
+    },
+    "fields": {
+      "description": "Opis",
+      "wines": "Vina"
     }
   },
   "food": {
     "list": {
       "title": "Jedi",
       "description": "Odkrijte popolne kombinacije hrane in vina"
+    },
+    "fields": {
+      "description": "Opis",
+      "wines": "Vina"
     }
   },
   "tag": {
     "list": {
       "title": "Zbirke",
       "description": "Raziskujte naše skrbno izbrane zbirke"
+    },
+    "fields": {
+      "description": "Opis",
+      "wines": "Vina"
     }
   },
   "tasting": {
     "list": {
       "title": "Tejstingi",
       "description": "Pridružite se našim degustacijam vin"
+    },
+    "fields": {
+      "description": "Opis",
+      "date": "Datum",
+      "location": "Lokacija"
     }
   },
   "giftCard": {
     "list": {
       "title": "Darilni Boni",
       "description": "Popolni darila za ljubitelje vina"
+    },
+    "fields": {
+      "description": "Opis",
+      "value": "Vrednost"
     }
   },
   "merch": {
     "list": {
       "title": "Roba",
       "description": "Vinska meršanda in dodatki"
+    },
+    "fields": {
+      "description": "Opis",
+      "price": "Cena"
     }
   },
   "post": {
     "list": {
       "title": "Enciklopedija",
       "description": "Spoznajte vina, regije in več"
+    },
+    "fields": {
+      "excerpt": "Izvleček",
+      "content": "Vsebina",
+      "author": "Avtor",
+      "categories": "Kategorije"
     }
   },
   "page": {
     "list": {
       "title": "Strani",
       "description": "Informacije in viri"
+    },
+    "fields": {
+      "excerpt": "Izvleček",
+      "content": "Vsebina"
     }
   },
   "collection": {
