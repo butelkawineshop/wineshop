@@ -21,17 +21,43 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
   try {
     logger.debug('Input to task:', input)
 
-    const wineVariant = await req.payload.findByID({
-      collection: 'wine-variants',
-      id: Number(input.wineVariantId),
-      depth: 3,
-    })
-    logger.debug('Found wine variant', {
-      id: wineVariant?.id,
-      vintage: wineVariant?.vintage,
-      size: wineVariant?.size,
-      status: wineVariant?._status,
-    })
+    let wineVariant
+    try {
+      wineVariant = await req.payload.findByID({
+        collection: 'wine-variants',
+        id: Number(input.wineVariantId),
+        depth: 3,
+      })
+      logger.debug('Found wine variant', {
+        id: wineVariant?.id,
+        vintage: wineVariant?.vintage,
+        size: wineVariant?.size,
+        status: wineVariant?._status,
+      })
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'name' in error && error.name === 'NotFound') {
+        logger.info('Wine variant not found, deleting flat variant if exists')
+        const deleteResult = await req.payload.delete({
+          collection: 'flat-wine-variants',
+          where: {
+            originalVariant: {
+              equals: Number(input.wineVariantId),
+            },
+          },
+        })
+        logger.debug('Delete result', {
+          deletedCount: deleteResult.docs?.length,
+        })
+        return {
+          output: {
+            success: true,
+            message: 'Wine variant not found, deleted flat variant if it existed',
+          },
+        }
+      }
+      // If it's not a NotFound error, re-throw it
+      throw error
+    }
 
     if (!wineVariant) {
       logger.info('Wine variant not found, deleting flat variant if exists')
@@ -75,30 +101,27 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       })
     }
 
-    const mapTitleId = (arr: (Aroma | Tag | Mood | number)[] | undefined) =>
+    const mapTitleOnly = (arr: (Aroma | Tag | Mood | number)[] | undefined) =>
       arr?.map((item) => {
         if (typeof item === 'object' && item !== null) {
           return {
             title: typeof item.title === 'string' ? item.title : null,
-            id: item.id ? String(item.id) : undefined,
           }
         }
-        return { title: typeof item === 'string' ? item : String(item), id: undefined }
+        return { title: typeof item === 'string' ? item : String(item) }
       })
 
     const mapGrapeVarieties = (arr: GrapeVarietyItem[] | undefined) =>
       arr?.map((gv) => {
         let title: string | null = null
-        let id: string | null | undefined = undefined
         if (gv && typeof gv === 'object') {
           if (gv.variety && typeof gv.variety === 'object') {
             title = typeof gv.variety.title === 'string' ? gv.variety.title : null
-            id = gv.variety.id ? String(gv.variety.id) : undefined
           } else if (typeof gv.variety === 'string' || typeof gv.variety === 'number') {
             title = String(gv.variety)
           }
         }
-        return { title, id }
+        return { title }
       })
 
     let primaryImageUrl: string | undefined = undefined
@@ -131,9 +154,9 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       servingTemp: wineVariant.servingTemp,
       decanting: wineVariant.decanting,
       tastingProfile: wineVariant.tastingProfile,
-      aromas: wineVariant.aromas ? mapTitleId(wineVariant.aromas) : undefined,
-      tags: wineVariant.tags ? mapTitleId(wineVariant.tags) : undefined,
-      moods: wineVariant.moods ? mapTitleId(wineVariant.moods) : undefined,
+      aromas: wineVariant.aromas ? mapTitleOnly(wineVariant.aromas) : undefined,
+      tags: wineVariant.tags ? mapTitleOnly(wineVariant.tags) : undefined,
+      moods: wineVariant.moods ? mapTitleOnly(wineVariant.moods) : undefined,
       grapeVarieties: wineVariant.grapeVarieties
         ? mapGrapeVarieties(wineVariant.grapeVarieties)
         : undefined,

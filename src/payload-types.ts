@@ -247,6 +247,10 @@ export interface Media {
   id: number
   alt: string
   cloudflareId?: string | null
+  /**
+   * Original filename before Cloudflare processing
+   */
+  originalFilename?: string | null
   updatedAt: string
   createdAt: string
   url?: string | null
@@ -1381,6 +1385,7 @@ export interface CustomersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T
   cloudflareId?: T
+  originalFilename?: T
   updatedAt?: T
   createdAt?: T
   url?: T

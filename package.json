@@ -22,7 +22,12 @@
     "seed:regions": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-wine-regions.ts",
     "seed:wineries": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-wineries.ts",
     "seed:moods": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-moods.ts",
-    "seed:all": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-all.ts"
+    "seed:wines": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-wines.ts",
+    "seed:all": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/seed-all.ts",
+    "upload:wine-images": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/upload-wine-images.ts",
+    "verify:image-mapping": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/verify-image-mapping.ts",
+    "check:extensions": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/check-extensions.ts",
+    "test:cloudflare-api": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/test-cloudflare-api.ts"
   },
   "dependencies": {
     "@auth/core": "^0.39.1",
@@ -55,6 +60,7 @@
     "next": "15.3.0",
     "next-auth": "^4.24.11",
     "next-intl": "^4.1.0",
+    "papaparse": "^5.5.3",
     "payload": "3.42.0",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",

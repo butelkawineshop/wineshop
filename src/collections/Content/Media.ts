@@ -34,6 +34,14 @@ export const Media: CollectionConfig = {
         hidden: true,
       },
     },
+    {
+      name: 'originalFilename',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'Original filename before Cloudflare processing',
+      },
+    },
   ],
   upload: {
     mimeTypes: ['image/*'],
@@ -68,6 +76,7 @@ export const Media: CollectionConfig = {
           cloudflareId?: string
           url?: string
           thumbnailURL?: string
+          originalFilename?: string
           [key: string]: unknown
         }
         operation: 'create' | 'update'
@@ -83,14 +92,32 @@ export const Media: CollectionConfig = {
         }
 
         try {
+          // Get the file from the request
+          const file = req.file
+          if (!file) {
+            throw new Error('No file found in request')
+          }
+
+          // Generate a custom ID based on the original filename
+          // Remove file extension and sanitize for Cloudflare
+          const originalName = file.name || 'image'
+          const nameWithoutExt = originalName.replace(/\.[^/.]+$/, '') // Remove extension
+          const sanitizedName = nameWithoutExt
+            .toLowerCase()
+            .replace(/[^a-z0-9-]/g, '-') // Replace special chars with hyphens
+            .replace(/-+/g, '-') // Replace multiple hyphens with single
+            .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+
+          // Add timestamp to ensure uniqueness if needed
+          const customId = `${sanitizedName}-${Date.now()}`
+
           // First, get the upload URL from Cloudflare
           const uploadResponse = await fetch(
-            `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
+            `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/images/v1/direct_upload`,
             {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${process.env.CLOUDFLARE_IMAGES_API_TOKEN}`,
-                'Content-Type': 'application/json',
               },
             },
           )
@@ -109,15 +136,19 @@ export const Media: CollectionConfig = {
           // Now upload the file to the provided URL
           const formData = new FormData()
 
-          // Get the file from the request
-          const file = req.file
-          if (!file) {
-            throw new Error('No file found in request')
-          }
+          // Create a Blob from the buffer data for Node.js compatibility
+          const blob = new Blob([file.data], { type: file.mimetype })
+          formData.append('file', blob, file.name)
 
-          // Create a new File object with the correct mime type
-          const newFile = new File([file.data], file.name, { type: file.mimetype })
-          formData.append('file', newFile)
+          // Add custom ID and metadata
+          formData.append('id', customId)
+          formData.append(
+            'metadata',
+            JSON.stringify({
+              originalFilename: originalName,
+              uploadedAt: new Date().toISOString(),
+            }),
+          )
 
           // Clear the file data from memory
           delete (file as { data?: Buffer }).data
@@ -135,13 +166,14 @@ export const Media: CollectionConfig = {
           const result = await uploadResult.json()
 
           if (result.success) {
-            // Store the Cloudflare image ID
+            // Store the Cloudflare image ID (which will be our custom ID)
             const cloudflareId = result.result.id
             const baseUrl = `${process.env.CLOUDFLARE_IMAGES_URL}/${cloudflareId}`
 
             return {
               ...data,
               cloudflareId,
+              originalFilename: originalName,
               url: `${baseUrl}/winecards`,
               baseUrl,
               thumbnailURL: `${baseUrl}/thumbnail`,

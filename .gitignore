@@ -42,6 +42,9 @@ next-env.d.ts
 
 /media
 
+# Wine images
+wine-images/
+
 # Test coverage
 coverage/
 .nyc_output/

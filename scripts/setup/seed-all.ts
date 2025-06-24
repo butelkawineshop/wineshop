@@ -6,6 +6,7 @@ import { seedGrapeVarieties } from './seed-grape-varieties'
 import { seedWineRegions } from './seed-wine-regions'
 import { seedWineries } from './seed-wineries'
 import { seedMoods } from './seed-moods'
+import { seedWines } from './seed-wines'
 
 async function seedAll(): Promise<void> {
   try {
@@ -29,6 +30,9 @@ async function seedAll(): Promise<void> {
 
     logger.info('Step 6: Seeding moods...', { task: 'seed-all', step: 6 })
     await seedMoods()
+
+    logger.info('Step 7: Seeding wines and wine variants...', { task: 'seed-all', step: 7 })
+    await seedWines()
 
     logger.info('Complete seeding process finished successfully!', { task: 'seed-all' })
   } catch (error) {
