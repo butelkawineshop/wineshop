@@ -69,7 +69,7 @@ export const Media: React.FC<MediaProps> = ({
   }
 
   return (
-    <div className={cn('relative overflow-hidden', className)}>
+    <div className={cn('relative overflow-hidden h-full', className)}>
       <Image
         src={imageSrc}
         alt={alt}

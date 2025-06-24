@@ -10,6 +10,7 @@ export const getPayloadClient = () => {
       limit = 10,
       sort = '-createdAt',
       locale = 'all',
+      fields,
     }: {
       collection: string
       where?: Record<string, unknown>
@@ -18,6 +19,7 @@ export const getPayloadClient = () => {
       limit?: number
       sort?: string
       locale?: string
+      fields?: string[]
     }) {
       const params = new URLSearchParams({
         depth: depth.toString(),
@@ -29,6 +31,12 @@ export const getPayloadClient = () => {
 
       if (Object.keys(where).length > 0) {
         params.set('where', JSON.stringify(where))
+      }
+
+      if (fields && fields.length > 0) {
+        for (const field of fields) {
+          params.append('fields', field)
+        }
       }
 
       const response = await fetch(`${PAYLOAD_API_URL}/api/${collection}?${params.toString()}`, {

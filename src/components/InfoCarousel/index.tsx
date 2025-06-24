@@ -6,11 +6,11 @@ import { Media } from '../Media'
 import type { Locale } from '@/utils/routeMappings'
 
 interface InfoCarouselProps {
-  item: Record<string, any>
+  item: Record<string, unknown>
   fields: FieldConfig[]
   mediaField: string
   locale: Locale
-  messages: Record<string, any>
+  messages: Record<string, unknown>
 }
 
 function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
@@ -22,13 +22,7 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string | un
   }, obj) as string | undefined
 }
 
-function getHeroUrl(url?: string) {
-  if (!url) return undefined
-  const cleanUrl = url.replace(/\/$/, '')
-  return cleanUrl.endsWith('/feature') ? cleanUrl : `${cleanUrl}/feature`
-}
-
-export function InfoCarousel({ item, fields, mediaField, locale, messages }: InfoCarouselProps) {
+export function InfoCarousel({ item, fields, mediaField, messages }: InfoCarouselProps) {
   const t = (key: string): string => {
     try {
       return getNestedValue(messages, key) || key
@@ -47,7 +41,9 @@ export function InfoCarousel({ item, fields, mediaField, locale, messages }: Inf
         const value = item[field.name]
         if (!value) return null
         const mediaObj = media[idx % media.length] || media[0]
-        const imageBase = (mediaObj as any)?.baseUrl || mediaObj?.url
+        const imageBase =
+          (mediaObj as { baseUrl?: string } | undefined)?.baseUrl ||
+          (mediaObj as { url?: string } | undefined)?.url
         return (
           <SwiperSlide key={field.name} className="h-full">
             <div className="relative w-full h-full flex items-center justify-center">
@@ -56,7 +52,7 @@ export function InfoCarousel({ item, fields, mediaField, locale, messages }: Inf
                   src={imageBase}
                   alt={field.label || field.name}
                   fill
-                  size="hero"
+                  size="square"
                   className="absolute inset-0 w-full h-full object-cover"
                   priority={false}
                 />
