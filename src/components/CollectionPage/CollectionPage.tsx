@@ -1,13 +1,18 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 import { getPayloadClient } from '@/lib/payload'
-import { routeMappings, type Locale, getCollectionForRouteSegment } from '@/utils/routeMappings'
+import {
+  routeMappings as _routeMappings,
+  type Locale,
+  getCollectionForRouteSegment,
+} from '@/utils/routeMappings'
 import { CollectionConfig, type CollectionDisplayConfig } from './CollectionConfig'
 import slMessages from '../../../messages/sl.json'
 import enMessages from '../../../messages/en.json'
 import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'
 import { Pagination } from '../Layout/Pagination'
+import * as motion from 'motion/react-client'
 
 // Helper function to get nested object values
 function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
@@ -138,7 +143,7 @@ export async function CollectionPage({
         hasPrevPage: result.hasPrevPage,
       }
     }
-  } catch (error) {
+  } catch (_error) {
     notFound()
   }
 
@@ -177,13 +182,38 @@ function SingleItemView({
       <header className="space-y-content"></header>
       {/* InfoCarousel for field-by-field display */}
       <div className="my-8">
-        <InfoCarousel
-          item={data}
-          fields={config.fields}
-          mediaField={config.mediaField || 'media'}
-          locale={locale}
-          messages={locale === 'sl' ? slMessages : enMessages}
-        />
+        <motion.div
+          className="relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Peel effect - starts from top-left corner */}
+          <motion.div
+            className="relative"
+            initial={{
+              clipPath: 'polygon(0 0, 0 0, 0 100%, 0% 100%)',
+              opacity: 0,
+            }}
+            animate={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
+              opacity: 1,
+            }}
+            transition={{
+              duration: 0.8,
+              ease: [0.4, 0, 0.2, 1],
+              delay: 0.2,
+            }}
+          >
+            <InfoCarousel
+              item={data}
+              fields={config.fields}
+              mediaField={config.mediaField || 'media'}
+              locale={locale}
+              messages={locale === 'sl' ? slMessages : enMessages}
+            />
+          </motion.div>
+        </motion.div>
       </div>
     </article>
   )
@@ -247,8 +277,20 @@ function ListView({
 
       {items.length > 0 ? (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full min-h-0 min-w-0">
-            {items.map((item) => {
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full min-h-0 min-w-0"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.08,
+                  delayChildren: 0.1,
+                },
+              },
+            }}
+          >
+            {items.map((item, idx) => {
               const title = config.titleField ? (item[config.titleField] as string) : ''
               type MediaObj = { url?: string; baseUrl?: string }
               const mediaArr = Array.isArray(item[config.mediaField || 'media'])
@@ -258,33 +300,98 @@ function ListView({
               const imageBase = mediaObj?.baseUrl || mediaObj?.url
 
               return (
-                <a
-                  key={item.id}
-                  href={`${locale === 'en' ? '/en' : ''}/${baseSegment}/${item.slug}`}
+                <motion.div
+                  key={item.id || item.slug || idx}
                   className="relative w-full aspect-square min-h-[200px] h-full flex items-center justify-center group overflow-hidden"
+                  variants={{
+                    hidden: {
+                      opacity: 0,
+                      y: 50,
+                      scale: 0.8,
+                      rotateY: -15,
+                      filter: 'blur(4px)',
+                    },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      rotateY: 0,
+                      filter: 'blur(0px)',
+                      transition: {
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 25,
+                        duration: 0.6,
+                      },
+                    },
+                  }}
+                  whileHover={{
+                    scale: 1.05,
+                    rotateY: 5,
+                    transition: {
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 20,
+                    },
+                  }}
+                  whileTap={{
+                    scale: 0.98,
+                    transition: { duration: 0.1 },
+                  }}
                 >
+                  <a
+                    href={`${locale === 'en' ? '/en' : ''}/${baseSegment}/${item.slug}`}
+                    className="absolute inset-0 w-full h-full z-20"
+                    tabIndex={0}
+                    aria-label={title}
+                  ></a>
                   {imageBase && (
-                    <Media
-                      src={imageBase}
-                      alt={title}
-                      fill
-                      size="square"
-                      className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                      priority={false}
-                    />
+                    <motion.div
+                      className="absolute inset-0"
+                      whileHover={{
+                        scale: 1.1,
+                        transition: { duration: 0.4, ease: 'easeOut' },
+                      }}
+                    >
+                      <Media
+                        src={imageBase}
+                        alt={title}
+                        fill
+                        size="square"
+                        className="object-cover w-full h-full"
+                        priority={false}
+                      />
+                    </motion.div>
                   )}
                   <div
                     className={`absolute inset-0 flex items-center justify-center ${!imageBase ? 'bg-black' : ''}`}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <h2 className="relative text-white text-center font-medium px-2 text-sm md:text-base z-10">
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+                      whileHover={{
+                        background:
+                          'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
+                        transition: { duration: 0.3 },
+                      }}
+                    />
+                    <motion.h2
+                      className="relative text-white text-center font-medium px-2 text-sm md:text-base z-10"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.4 }}
+                      whileHover={{
+                        scale: 1.05,
+                        textShadow: '0 0 8px rgba(255,255,255,0.5)',
+                        transition: { duration: 0.2 },
+                      }}
+                    >
                       {title}
-                    </h2>
+                    </motion.h2>
                   </div>
-                </a>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
 
           {/* Pagination */}
           {pagination && (

@@ -1,10 +1,10 @@
 'use client'
 import React from 'react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { routeMappings, type Locale } from '@/utils/routeMappings'
 import { getPayloadClient } from '@/lib/payload'
+import * as motion from 'motion/react-client'
 
 interface NavigationItem {
   id: string
@@ -29,24 +29,11 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
   const [currentTitle, setCurrentTitle] = React.useState<string>(initialTitle)
   const [collection, setCollection] = React.useState<string>('')
-  const [isVisible, setIsVisible] = React.useState<boolean>(false)
 
   // Get current slug and collection from pathname
   const segments = pathname.split('/').filter(Boolean)
   const currentSlug = locale === 'en' ? segments[2] : segments[1] // Get slug from current URL
   const collectionSegment = locale === 'en' ? segments[1] : segments[0] // Get collection from current URL
-
-  // Debug: Always show something to confirm the component is rendering
-  console.log('ItemNavigation rendering:', {
-    pathname,
-    locale,
-    collectionSegment,
-    currentSlug,
-    initialTitle,
-    isLoading,
-    navigationItemsLength: navigationItems.length,
-    currentIndex,
-  })
 
   // Determine collection from pathname
   React.useEffect(() => {
@@ -56,13 +43,11 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
         ([, mapping]) => mapping[locale] === collectionSegment,
       )?.[1]?.collection
 
-      console.log('Determined collection:', foundCollection, 'from segment:', collectionSegment)
       return foundCollection
     }
 
     const collectionName = determineCollection()
     if (!collectionName) {
-      console.error('Could not determine collection from pathname:', pathname)
       setIsLoading(false)
       return
     }
@@ -76,10 +61,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
 
       try {
         setIsLoading(true)
-        setIsVisible(false) // Fade out current content
         const payload = getPayloadClient()
-
-        console.log('Fetching navigation items for collection:', collection)
 
         // Fetch all items from the collection
         const result = await payload.find({
@@ -90,8 +72,6 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
           locale,
         })
 
-        console.log('Fetched items:', result.docs.length)
-
         // Get the route segment for this collection
         const routeEntry = Object.entries(routeMappings).find(
           ([, mapping]) => mapping.collection === collection,
@@ -99,7 +79,6 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
         const routeSegment = routeEntry ? routeEntry[1][locale] : null
 
         if (!routeSegment) {
-          console.error(`No route segment found for collection: ${collection}`)
           return
         }
 
@@ -116,8 +95,6 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
         const currentItemIndex = items.findIndex((item) => item.slug === currentSlug)
         const currentItem = items[currentItemIndex]
 
-        console.log('Current item found:', currentItem, 'at index:', currentItemIndex)
-
         if (currentItem) {
           setCurrentTitle(currentItem.title)
         }
@@ -128,11 +105,8 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
         // Small delay to ensure smooth transition
         setTimeout(() => {
           setIsLoading(false)
-          // Fade in new content after a brief delay
-          setTimeout(() => setIsVisible(true), 50)
         }, 100)
-      } catch (error) {
-        console.error('Error fetching navigation items:', error)
+      } catch (_error) {
         setIsLoading(false)
       }
     }
@@ -142,49 +116,26 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
 
   // Always render something to confirm the component is working
   return (
-    <div className="w-full border-t border-border/50 bg-background/50 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-4">
-        <div
-          className={`transition-all duration-300 ease-in-out ${
-            isLoading ? 'opacity-100' : 'opacity-0'
-          }`}
+    <>
+      {/* Only show navigation when fully ready */}
+      {!isLoading && navigationItems.length > 0 && currentIndex !== -1 ? (
+        <motion.div
+          className="w-full border-t border-border/50 bg-background/50 backdrop-blur-sm"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
         >
-          {isLoading && (
-            <div className="flex justify-center items-center h-12">
-              <div className="animate-pulse w-1/2 h-4 bg-foreground/10 rounded" />
-            </div>
-          )}
-        </div>
-
-        <div
-          className={`transition-all duration-300 ease-in-out ${
-            !isLoading && (navigationItems.length === 0 || currentIndex === -1)
-              ? 'opacity-100'
-              : 'opacity-0'
-          }`}
-        >
-          {!isLoading && (navigationItems.length === 0 || currentIndex === -1) && (
-            <div className="text-center">
-              <div className="text-foreground/60">No navigation available</div>
-            </div>
-          )}
-        </div>
-
-        <div
-          className={`transition-all duration-300 ease-in-out ${
-            !isLoading && navigationItems.length > 0 && currentIndex !== -1 && isVisible
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-2'
-          }`}
-        >
-          {!isLoading && navigationItems.length > 0 && currentIndex !== -1 && (
+          <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4">
               {/* Previous Item */}
               <div className="flex-1 min-w-0">
                 {currentIndex > 0 ? (
-                  <Link
+                  <motion.a
                     href={navigationItems[currentIndex - 1].href}
-                    className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02]"
+                    className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform"
+                    whileHover={{ scale: 1.06, backgroundColor: 'rgba(0,0,0,0.04)' }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 24 }}
                   >
                     <div className="flex-shrink-0">
                       <svg
@@ -209,7 +160,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
                         {navigationItems[currentIndex - 1].title}
                       </div>
                     </div>
-                  </Link>
+                  </motion.a>
                 ) : (
                   <div className="p-3 text-foreground/30">
                     <div className="text-sm">{t('common.previous')}</div>
@@ -234,9 +185,12 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
               {/* Next Item */}
               <div className="flex-1 min-w-0">
                 {currentIndex < navigationItems.length - 1 ? (
-                  <Link
+                  <motion.a
                     href={navigationItems[currentIndex + 1].href}
-                    className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02] text-right"
+                    className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform text-right"
+                    whileHover={{ scale: 1.06, backgroundColor: 'rgba(0,0,0,0.04)' }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 24 }}
                   >
                     <div className="min-w-0 flex-1">
                       <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
@@ -261,7 +215,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
                         />
                       </svg>
                     </div>
-                  </Link>
+                  </motion.a>
                 ) : (
                   <div className="p-3 text-foreground/30 text-right">
                     <div className="text-sm">{t('common.next')}</div>
@@ -270,9 +224,9 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
                 )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+          </div>
+        </motion.div>
+      ) : null}
+    </>
   )
 }
