@@ -13,7 +13,8 @@
     "showing": "Prikazujem",
     "of": "od",
     "results": "rezultatov",
-    "noResults": "Ni najdenih rezultatov"
+    "noResults": "Ni najdenih rezultatov",
+    "page": "Stran"
   },
   "auth": {
     "login": "Prijava",
@@ -154,7 +155,7 @@
       "wines": "Vina"
     }
   },
-  "food": {
+  "dish": {
     "list": {
       "title": "Jedi",
       "description": "Odkrijte popolne kombinacije hrane in vina"

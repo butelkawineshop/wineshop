@@ -8,6 +8,7 @@ import slMessages from '../../../messages/sl.json'
 import enMessages from '../../../messages/en.json'
 import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'
+import { Pagination } from '../Layout/Pagination'
 
 // Helper function to get nested object values
 function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
@@ -129,29 +130,16 @@ export async function CollectionPage({
         'Fetching single item',
       )
 
-      // Workaround: Fetch all items and filter by slug since the API slug query is not working
+      // Fetch the current item
       const result = await payload.find({
         collection,
         depth: config.depth || 1,
         locale,
         limit: 100, // Fetch more items to ensure we get the one we need
       })
-
-      // Filter by slug on the client side
       const foundItem = result.docs.find(
         (doc: Record<string, unknown>) => doc.slug === itemSlug,
       ) as CollectionItem | undefined
-
-      logger.info(
-        {
-          collection,
-          itemSlug,
-          totalDocs: result.docs.length,
-          foundItem: foundItem?.title || foundItem?.slug,
-        },
-        'Single item fetch result',
-      )
-
       data = foundItem || null
       if (!data) {
         logger.warn({ collection, slug: itemSlug }, 'Item not found')
@@ -187,7 +175,7 @@ export async function CollectionPage({
   }
 
   return (
-    <div className="container-wide section-padding">
+    <div className="container-wide">
       {isSingleItem ? (
         <SingleItemView data={data} config={config} locale={locale} t={t} />
       ) : (
@@ -232,10 +220,7 @@ function SingleItemView({
 
   return (
     <article className="container-narrow">
-      <header className="space-y-content">
-        <h1 className="heading-1 text-center justify-center">{title}</h1>
-        {subtitle && <p className="subtitle">{subtitle}</p>}
-      </header>
+      <header className="space-y-content"></header>
 
       {/* InfoCarousel for field-by-field display */}
       <div className="my-8">
@@ -294,25 +279,21 @@ function ListView({
     return `${localePrefix}/${baseSegment}${queryString ? `?${queryString}` : ''}`
   }
 
+  const prevUrl = pagination?.hasPrevPage ? buildPageUrl(currentPage - 1) : null
+  const nextUrl = pagination?.hasNextPage ? buildPageUrl(currentPage + 1) : null
+
   return (
-    <div>
-      <header className="space-y-content">
-        <h1 className="heading-1">{t(`${config.titleField}.list.title`)}</h1>
-        {config.listDescription && (
-          <p className="subtitle">{t(`${config.titleField}.list.description`)}</p>
-        )}
-        {totalDocs > 0 && (
-          <p className="text-base text-gray-600">
-            {t('common.showing')} {(currentPage - 1) * (config.listLimit || 24) + 1}-
-            {Math.min(currentPage * (config.listLimit || 24), totalDocs)} {t('common.of')}{' '}
-            {totalDocs} {t('common.results')}
-          </p>
+    <div className="container-narrow">
+      <header>
+        {/* Pagination Top */}
+        {pagination && (
+          <Pagination pagination={pagination} prevUrl={prevUrl} nextUrl={nextUrl} position="top" />
         )}
       </header>
 
       {items.length > 0 ? (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 w-full min-h-0 min-w-0">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full min-h-0 min-w-0">
             {items.map((item) => {
               const title = item[config.titleField || 'title'] as string
               const media = config.mediaField
@@ -323,7 +304,7 @@ function ListView({
                 <a
                   key={item.id}
                   href={`${locale === 'en' ? '/en' : ''}/${baseSegment}/${item.slug}`}
-                  className="relative w-full aspect-square min-w-[120px] flex items-center justify-center group overflow-hidden"
+                  className="relative w-full aspect-square  flex items-center justify-center group overflow-hidden"
                 >
                   {media && media[0] ? (
                     <>
@@ -354,51 +335,13 @@ function ListView({
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-12">
-              {/* Previous Page */}
-              {pagination?.hasPrevPage && (
-                <a href={buildPageUrl(currentPage - 1)} className="btn-secondary">
-                  {t('common.previous')}
-                </a>
-              )}
-
-              {/* Page Numbers */}
-              <div className="flex space-x-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((page) => {
-                    // Show first page, last page, current page, and pages around current
-                    return page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1
-                  })
-                  .map((page, index, array) => {
-                    // Add ellipsis if there's a gap
-                    const showEllipsis = index > 0 && page - array[index - 1] > 1
-
-                    return (
-                      <React.Fragment key={page}>
-                        {showEllipsis && <span className="px-3 py-2 text-gray-500">...</span>}
-                        <a
-                          href={buildPageUrl(page)}
-                          className={`px-3 py-2 rounded ${
-                            page === currentPage
-                              ? 'bg-primary text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {page}
-                        </a>
-                      </React.Fragment>
-                    )
-                  })}
-              </div>
-
-              {/* Next Page */}
-              {pagination?.hasNextPage && (
-                <a href={buildPageUrl(currentPage + 1)} className="btn-secondary">
-                  {t('common.next')}
-                </a>
-              )}
-            </div>
+          {pagination && (
+            <Pagination
+              pagination={pagination}
+              prevUrl={prevUrl}
+              nextUrl={nextUrl}
+              position="bottom"
+            />
           )}
         </>
       ) : (

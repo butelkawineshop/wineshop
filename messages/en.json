@@ -13,7 +13,8 @@
     "showing": "Showing",
     "of": "of",
     "results": "results",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "page": "Page"
   },
   "auth": {
     "login": "Login",
@@ -154,9 +155,9 @@
       "wines": "Wines"
     }
   },
-  "food": {
+  "dish": {
     "list": {
-      "title": "Food Pairings",
+      "title": "Dish Pairings",
       "description": "Discover perfect food and wine pairings"
     },
     "fields": {

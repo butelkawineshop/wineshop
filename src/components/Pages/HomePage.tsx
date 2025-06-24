@@ -26,7 +26,7 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
       <section className="relative h-[80vh] flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <Media
-            src="9de8a83a-19aa-4ab7-1ce4-dae6ef427d00/hero"
+            src="/images/placeholder.jpg"
             alt={t('home.hero.alt')}
             className="w-full h-full"
             priority
@@ -52,7 +52,7 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
             <div className="card-hover">
               <div className="relative h-64">
                 <Media
-                  src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
+                  src="/images/placeholder.jpg"
                   alt={t('home.featured.wines.rebula.alt')}
                   className="h-full"
                   fill
@@ -71,7 +71,7 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
             <div className="card-hover">
               <div className="relative h-64">
                 <Media
-                  src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
+                  src="/images/placeholder.jpg"
                   alt={t('home.featured.wines.teran.alt')}
                   className="h-full"
                   fill
@@ -90,7 +90,7 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
             <div className="card-hover">
               <div className="relative h-64">
                 <Media
-                  src="654641b3-2a5b-4689-b9a3-2fd4c679b200/square"
+                  src="/images/placeholder.jpg"
                   alt={t('home.featured.wines.malvazija.alt')}
                   className="h-full"
                   fill

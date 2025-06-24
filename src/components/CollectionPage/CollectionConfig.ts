@@ -1,20 +1,20 @@
 // Constants for common limits
-const WINE_LIST_LIMIT = 24
-const WINERY_LIST_LIMIT = 20
-const REGION_LIST_LIMIT = 20
-const WINE_COUNTRY_LIST_LIMIT = 20
-const GRAPE_VARIETY_LIST_LIMIT = 30
-const STYLE_LIST_LIMIT = 20
-const AROMA_LIST_LIMIT = 30
-const CLIMATE_LIST_LIMIT = 20
-const MOOD_LIST_LIMIT = 20
-const FOOD_LIST_LIMIT = 30
-const TAG_LIST_LIMIT = 20
-const TASTING_LIST_LIMIT = 10
-const GIFT_CARD_LIST_LIMIT = 10
-const MERCH_LIST_LIMIT = 20
-const POST_LIST_LIMIT = 12
-const PAGE_LIST_LIMIT = 20
+const WINE_LIST_LIMIT = 18
+const WINERY_LIST_LIMIT = 18
+const REGION_LIST_LIMIT = 18
+const WINE_COUNTRY_LIST_LIMIT = 18
+const GRAPE_VARIETY_LIST_LIMIT = 18
+const STYLE_LIST_LIMIT = 18
+const AROMA_LIST_LIMIT = 18
+const CLIMATE_LIST_LIMIT = 18
+const MOOD_LIST_LIMIT = 18
+const DISH_LIST_LIMIT = 18
+const TAG_LIST_LIMIT = 18
+const TASTING_LIST_LIMIT = 18
+const GIFT_CARD_LIST_LIMIT = 18
+const MERCH_LIST_LIMIT = 18
+const POST_LIST_LIMIT = 18
+const PAGE_LIST_LIMIT = 18
 
 export interface FieldConfig {
   name: string
@@ -407,13 +407,13 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     ],
   },
 
-  foods: {
+  dishes: {
     titleField: 'title',
     descriptionField: 'description',
     mediaField: 'media',
-    listTitle: 'food.list.title',
-    listDescription: 'food.list.description',
-    listLimit: FOOD_LIST_LIMIT,
+    listTitle: 'dish.list.title',
+    listDescription: 'dish.list.description',
+    listLimit: DISH_LIST_LIMIT,
     sort: 'title',
     depth: 1,
     fields: [
@@ -421,14 +421,14 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
         name: 'description',
         type: 'textarea',
         showInDetail: true,
-        labelKey: 'food.fields.description',
+        labelKey: 'dish.fields.description',
       },
       {
         name: 'wines',
         type: 'relationship',
         showInDetail: true,
         relationshipConfig: { displayField: 'title', linkTo: 'wines' },
-        labelKey: 'food.fields.wines',
+        labelKey: 'dish.fields.wines',
       },
     ],
   },

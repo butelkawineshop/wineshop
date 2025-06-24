@@ -65,8 +65,8 @@ export const routeMappings = {
   filing: { sl: 'filing', en: 'moods', collection: 'moods' },
   moods: { sl: 'filing', en: 'moods', collection: 'moods' },
 
-  jedi: { sl: 'jedi', en: 'dishes', collection: 'foods' },
-  dishes: { sl: 'jedi', en: 'dishes', collection: 'foods' },
+  jedi: { sl: 'jedi', en: 'dishes', collection: 'dishes' },
+  dishes: { sl: 'jedi', en: 'dishes', collection: 'dishes' },
 
   iskanje: { sl: 'iskanje', en: 'search', collection: 'pages' },
   search: { sl: 'iskanje', en: 'search', collection: 'pages' },
