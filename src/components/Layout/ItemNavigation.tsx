@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { routeMappings, type Locale } from '@/utils/routeMappings'
@@ -130,37 +131,40 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
               {/* Previous Item */}
               <div className="flex-1 min-w-0">
                 {currentIndex > 0 ? (
-                  <motion.a
-                    href={navigationItems[currentIndex - 1].href}
-                    className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform"
+                  <motion.div
                     whileHover={{ scale: 1.06, backgroundColor: 'rgba(0,0,0,0.04)' }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 24 }}
                   >
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 19l-7-7 7-7"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
-                        {t('common.previous')}
+                    <Link
+                      href={navigationItems[currentIndex - 1].href}
+                      className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform"
+                    >
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
                       </div>
-                      <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
-                        {navigationItems[currentIndex - 1].title}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                          {t('common.previous')}
+                        </div>
+                        <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                          {navigationItems[currentIndex - 1].title}
+                        </div>
                       </div>
-                    </div>
-                  </motion.a>
+                    </Link>
+                  </motion.div>
                 ) : (
                   <div className="p-3 text-foreground/30">
                     <div className="text-sm">{t('common.previous')}</div>
@@ -185,37 +189,40 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
               {/* Next Item */}
               <div className="flex-1 min-w-0">
                 {currentIndex < navigationItems.length - 1 ? (
-                  <motion.a
-                    href={navigationItems[currentIndex + 1].href}
-                    className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform text-right"
+                  <motion.div
                     whileHover={{ scale: 1.06, backgroundColor: 'rgba(0,0,0,0.04)' }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 24 }}
                   >
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
-                        {t('common.next')}
+                    <Link
+                      href={navigationItems[currentIndex + 1].href}
+                      className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform text-right"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                          {t('common.next')}
+                        </div>
+                        <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                          {navigationItems[currentIndex + 1].title}
+                        </div>
                       </div>
-                      <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
-                        {navigationItems[currentIndex + 1].title}
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
                       </div>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </div>
-                  </motion.a>
+                    </Link>
+                  </motion.div>
                 ) : (
                   <div className="p-3 text-foreground/30 text-right">
                     <div className="text-sm">{t('common.next')}</div>
