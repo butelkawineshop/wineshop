@@ -1,281 +1,403 @@
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from 'payload'
 
-export function queueRelatedWineVariants(
-  lookupField: 'wine' | 'winery' | 'region' | 'country' | 'aroma' | 'tag' | 'mood' | 'grapeVariety',
-) {
-  const afterChange: CollectionAfterChangeHook = async ({ req, doc }) => {
-    if (!doc?.id) return
+// Constants
+const QUEUE_RELATED_CONSTANTS = {
+  TASK_NAME: 'syncFlatWineVariant',
+  DEFAULT_DEPTH: 0,
+  COLLECTIONS: {
+    WINES: 'wines',
+    REGIONS: 'regions',
+    WINE_VARIANTS: 'wine-variants',
+  },
+  LOOKUP_FIELDS: {
+    WINE: 'wine',
+    WINERY: 'winery',
+    REGION: 'region',
+    COUNTRY: 'country',
+    AROMA: 'aroma',
+    TAG: 'tag',
+    MOOD: 'mood',
+    GRAPE_VARIETY: 'grapeVariety',
+  },
+} as const
 
-    try {
-      let wineIds: string[] = []
+// Types
+type LookupField =
+  (typeof QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS)[keyof typeof QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS]
 
-      if (lookupField === 'wine') {
-        wineIds = [String(doc.id)]
-      } else if (lookupField === 'winery') {
-        const wines = await req.payload.find({
-          collection: 'wines',
-          where: { winery: { equals: doc.id } },
-          depth: 0,
-        })
-        wineIds = wines.docs.map((w) => String(w.id))
-      } else if (lookupField === 'region') {
-        const wines = await req.payload.find({
-          collection: 'wines',
-          where: { region: { equals: doc.id } },
-          depth: 0,
-        })
-        wineIds = wines.docs.map((w) => String(w.id))
-      } else if (lookupField === 'country') {
-        const regions = await req.payload.find({
-          collection: 'regions',
-          where: { country: { equals: doc.id } },
-          depth: 0,
-        })
-        const regionIds = regions.docs.map((r) => r.id)
+interface TaskInput {
+  wineVariantId: string
+}
 
-        const wines = await req.payload.find({
-          collection: 'wines',
-          where: { region: { in: regionIds } },
-          depth: 0,
-        })
-        wineIds = wines.docs.map((w) => String(w.id))
-      } else if (['aroma', 'tag', 'mood'].includes(lookupField)) {
-        // For aromas, tags, and moods, we need to find wine variants directly
-        const wineVariants = await req.payload.find({
-          collection: 'wine-variants',
-          where: {
-            [lookupField]: {
-              equals: doc.id,
-            },
-          },
-          depth: 0,
-        })
+interface WineVariantWithId {
+  id: number
+}
 
-        if (!wineVariants.totalDocs) {
-          req.payload.logger?.info?.(
-            `[queueRelatedWineVariants] No variants found for ${lookupField}:${doc.id}`,
-          )
-          return
-        }
+interface WineWithId {
+  id: number
+}
 
-        await Promise.allSettled(
-          wineVariants.docs.map((variant) =>
-            req.payload.jobs.queue({
-              task: 'syncFlatWineVariant',
-              input: {
-                wineVariantId: String(variant.id),
-              },
-            }),
-          ),
+// Helper functions
+async function findWineVariantsByWines(
+  req: PayloadRequest,
+  wineIds: string[],
+): Promise<WineVariantWithId[]> {
+  const result = await req.payload.find({
+    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    where: {
+      wine: {
+        in: wineIds,
+      },
+    },
+    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+  })
+
+  return result.docs as WineVariantWithId[]
+}
+
+async function findWinesByWinery(
+  req: PayloadRequest,
+  wineryId: string | number,
+): Promise<WineWithId[]> {
+  const result = await req.payload.find({
+    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINES,
+    where: {
+      winery: {
+        equals: wineryId,
+      },
+    },
+    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+  })
+
+  return result.docs as WineWithId[]
+}
+
+async function findWineVariantsByRegion(
+  req: PayloadRequest,
+  regionId: string | number,
+): Promise<WineVariantWithId[]> {
+  const wines = await findWinesByRegion(req, regionId)
+  const wineIds = wines.map((w: WineWithId) => String(w.id))
+
+  if (wineIds.length === 0) {
+    return []
+  }
+
+  return findWineVariantsByWines(req, wineIds)
+}
+
+async function findWinesByRegion(
+  req: PayloadRequest,
+  regionId: string | number,
+): Promise<WineWithId[]> {
+  const result = await req.payload.find({
+    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINES,
+    where: {
+      region: {
+        equals: regionId,
+      },
+    },
+    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+  })
+
+  return result.docs as WineWithId[]
+}
+
+async function findWineVariantsByCountry(
+  req: PayloadRequest,
+  countryId: string | number,
+): Promise<WineVariantWithId[]> {
+  const wines = await findWinesByCountry(req, countryId)
+  const wineIds = wines.map((w: WineWithId) => String(w.id))
+
+  if (wineIds.length === 0) {
+    return []
+  }
+
+  return findWineVariantsByWines(req, wineIds)
+}
+
+async function findWinesByCountry(
+  req: PayloadRequest,
+  countryId: string | number,
+): Promise<WineWithId[]> {
+  const result = await req.payload.find({
+    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINES,
+    where: {
+      'region.country': {
+        equals: countryId,
+      },
+    },
+    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+  })
+
+  return result.docs as WineWithId[]
+}
+
+async function findWineVariantsByDirectField(
+  req: PayloadRequest,
+  field: string,
+  docId: string | number,
+): Promise<WineVariantWithId[]> {
+  const result = await req.payload.find({
+    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    where: {
+      [field]: {
+        equals: docId,
+      },
+    },
+    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+  })
+
+  return result.docs as WineVariantWithId[]
+}
+
+async function findWineVariantsByGrapeVariety(
+  req: PayloadRequest,
+  grapeVarietyId: string | number,
+): Promise<WineVariantWithId[]> {
+  const result = await req.payload.find({
+    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    where: {
+      'grapeVarieties.variety': {
+        equals: grapeVarietyId,
+      },
+    },
+    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+  })
+
+  return result.docs as WineVariantWithId[]
+}
+
+async function queueWineVariantSyncJobs(
+  req: PayloadRequest,
+  variants: WineVariantWithId[],
+): Promise<void> {
+  await Promise.allSettled(
+    variants.map((variant) =>
+      req.payload.jobs.queue({
+        task: QUEUE_RELATED_CONSTANTS.TASK_NAME,
+        input: {
+          wineVariantId: String(variant.id),
+        } as TaskInput,
+      }),
+    ),
+  )
+}
+
+async function handleWineLookup(req: PayloadRequest, docId: string | number): Promise<void> {
+  const wineIds = [String(docId)]
+  const variants = await findWineVariantsByWines(req, wineIds)
+
+  if (variants.length === 0) {
+    req.payload.logger?.info?.(`[queueRelatedWineVariants] No variants found for wine:${docId}`)
+    return
+  }
+
+  await queueWineVariantSyncJobs(req, variants)
+}
+
+async function handleWineryLookup(req: PayloadRequest, docId: string | number): Promise<void> {
+  const wines = await findWinesByWinery(req, docId)
+  const wineIds = wines.map((w: WineWithId) => String(w.id))
+
+  if (wineIds.length === 0) {
+    req.payload.logger?.info?.(`[queueRelatedWineVariants] No wines found for winery:${docId}`)
+    return
+  }
+
+  const variants = await findWineVariantsByWines(req, wineIds)
+
+  if (variants.length === 0) {
+    req.payload.logger?.info?.(`[queueRelatedWineVariants] No variants found for winery:${docId}`)
+    return
+  }
+
+  await queueWineVariantSyncJobs(req, variants)
+}
+
+async function handleRegionLookup(req: PayloadRequest, docId: string | number): Promise<void> {
+  const variants = await findWineVariantsByRegion(req, docId)
+
+  if (variants.length === 0) {
+    req.payload.logger?.info?.(`[queueRelatedWineVariants] No variants found for region:${docId}`)
+    return
+  }
+
+  await queueWineVariantSyncJobs(req, variants)
+}
+
+async function handleCountryLookup(req: PayloadRequest, docId: string | number): Promise<void> {
+  const variants = await findWineVariantsByCountry(req, docId)
+
+  if (variants.length === 0) {
+    req.payload.logger?.info?.(`[queueRelatedWineVariants] No variants found for country:${docId}`)
+    return
+  }
+
+  await queueWineVariantSyncJobs(req, variants)
+}
+
+async function handleDirectFieldLookup(
+  req: PayloadRequest,
+  field: string,
+  docId: string | number,
+): Promise<void> {
+  const variants = await findWineVariantsByDirectField(req, field, docId)
+
+  if (variants.length === 0) {
+    req.payload.logger?.info?.(`[queueRelatedWineVariants] No variants found for ${field}:${docId}`)
+    return
+  }
+
+  await queueWineVariantSyncJobs(req, variants)
+}
+
+async function handleGrapeVarietyLookup(
+  req: PayloadRequest,
+  docId: string | number,
+): Promise<void> {
+  const variants = await findWineVariantsByGrapeVariety(req, docId)
+
+  if (variants.length === 0) {
+    req.payload.logger?.info?.(
+      `[queueRelatedWineVariants] No variants found for grapeVariety:${docId}`,
+    )
+    return
+  }
+
+  await queueWineVariantSyncJobs(req, variants)
+}
+
+async function processLookupField(
+  req: PayloadRequest,
+  lookupField: LookupField,
+  docId: string | number,
+): Promise<void> {
+  try {
+    switch (lookupField) {
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINE:
+        await handleWineLookup(req, docId)
+        break
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINERY:
+        await handleWineryLookup(req, docId)
+        break
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.REGION:
+        await handleRegionLookup(req, docId)
+        break
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.COUNTRY:
+        await handleCountryLookup(req, docId)
+        break
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.AROMA:
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.TAG:
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.MOOD:
+        await handleDirectFieldLookup(req, lookupField, docId)
+        break
+      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY:
+        await handleGrapeVarietyLookup(req, docId)
+        break
+      default:
+        req.payload.logger?.warn?.(
+          `[queueRelatedWineVariants] Unknown lookup field: ${lookupField}`,
         )
+    }
+  } catch (err) {
+    req.payload.logger?.error?.(
+      `[queueRelatedWineVariants] Failed to queue jobs for ${lookupField}:${docId}`,
+      err,
+    )
+  }
+}
+
+// Main hook functions
+export const queueRelatedWineVariants = (collection: string) => {
+  const afterChange: CollectionAfterChangeHook = async ({ doc, req }) => {
+    const docId = doc.id
+
+    if (!docId) {
+      req.payload.logger?.warn?.('[queueRelatedWineVariants] No document ID found')
+      return
+    }
+
+    // Determine the lookup field based on the collection
+    let lookupField: LookupField | null = null
+
+    switch (collection) {
+      case 'wines':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINE
+        break
+      case 'wineries':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINERY
+        break
+      case 'regions':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.REGION
+        break
+      case 'wineCountries':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.COUNTRY
+        break
+      case 'aromas':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.AROMA
+        break
+      case 'tags':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.TAG
+        break
+      case 'moods':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.MOOD
+        break
+      case 'grape-varieties':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY
+        break
+      default:
+        req.payload.logger?.warn?.(`[queueRelatedWineVariants] Unknown collection: ${collection}`)
         return
-      } else if (lookupField === 'grapeVariety') {
-        // For grape varieties, we need to find wine variants that have this variety in their grapeVarieties array
-        const wineVariants = await req.payload.find({
-          collection: 'wine-variants',
-          where: {
-            'grapeVarieties.variety': {
-              equals: doc.id,
-            },
-          },
-          depth: 0,
-        })
+    }
 
-        if (!wineVariants.totalDocs) {
-          req.payload.logger?.info?.(
-            `[queueRelatedWineVariants] No variants found for ${lookupField}:${doc.id}`,
-          )
-          return
-        }
-
-        await Promise.allSettled(
-          wineVariants.docs.map((variant) =>
-            req.payload.jobs.queue({
-              task: 'syncFlatWineVariant',
-              input: {
-                wineVariantId: String(variant.id),
-              },
-            }),
-          ),
-        )
-        return
-      }
-
-      if (!wineIds.length) {
-        req.payload.logger?.info?.(
-          `[queueRelatedWineVariants] No wines found for ${lookupField}:${doc.id}`,
-        )
-        return
-      }
-
-      const wineVariants = await req.payload.find({
-        collection: 'wine-variants',
-        where: {
-          wine: { in: wineIds },
-        },
-        depth: 0,
-      })
-
-      if (!wineVariants.totalDocs) {
-        req.payload.logger?.info?.(
-          `[queueRelatedWineVariants] No variants found for ${lookupField}:${doc.id}`,
-        )
-        return
-      }
-
-      await Promise.allSettled(
-        wineVariants.docs.map((variant) =>
-          req.payload.jobs.queue({
-            task: 'syncFlatWineVariant',
-            input: {
-              wineVariantId: String(variant.id),
-            },
-          }),
-        ),
-      )
-    } catch (err) {
-      req.payload.logger?.error?.(
-        `[queueRelatedWineVariants] Failed to queue jobs for ${lookupField}:${doc.id}`,
-        err,
-      )
+    if (lookupField) {
+      await processLookupField(req, lookupField, docId)
     }
   }
 
-  const afterDelete: CollectionAfterDeleteHook = async ({ req, id }) => {
-    if (!id) return
+  const afterDelete: CollectionAfterDeleteHook = async ({ id, req }) => {
+    if (!id) {
+      req.payload.logger?.warn?.('[queueRelatedWineVariants] No document ID found for deletion')
+      return
+    }
 
-    try {
-      let wineIds: string[] = []
+    // Determine the lookup field based on the collection
+    let lookupField: LookupField | null = null
 
-      if (lookupField === 'wine') {
-        wineIds = [String(id)]
-      } else if (lookupField === 'winery') {
-        const wines = await req.payload.find({
-          collection: 'wines',
-          where: { winery: { equals: id } },
-          depth: 0,
-        })
-        wineIds = wines.docs.map((w) => String(w.id))
-      } else if (lookupField === 'region') {
-        const wines = await req.payload.find({
-          collection: 'wines',
-          where: { region: { equals: id } },
-          depth: 0,
-        })
-        wineIds = wines.docs.map((w) => String(w.id))
-      } else if (lookupField === 'country') {
-        const regions = await req.payload.find({
-          collection: 'regions',
-          where: { country: { equals: id } },
-          depth: 0,
-        })
-        const regionIds = regions.docs.map((r) => r.id)
-
-        const wines = await req.payload.find({
-          collection: 'wines',
-          where: { region: { in: regionIds } },
-          depth: 0,
-        })
-        wineIds = wines.docs.map((w) => String(w.id))
-      } else if (['aroma', 'tag', 'mood'].includes(lookupField)) {
-        // For aromas, tags, and moods, we need to find wine variants directly
-        const wineVariants = await req.payload.find({
-          collection: 'wine-variants',
-          where: {
-            [lookupField]: {
-              equals: id,
-            },
-          },
-          depth: 0,
-        })
-
-        if (!wineVariants.totalDocs) {
-          req.payload.logger?.info?.(
-            `[queueRelatedWineVariants] No variants found for ${lookupField}:${id}`,
-          )
-          return
-        }
-
-        await Promise.allSettled(
-          wineVariants.docs.map((variant) =>
-            req.payload.jobs.queue({
-              task: 'syncFlatWineVariant',
-              input: {
-                wineVariantId: String(variant.id),
-              },
-            }),
-          ),
-        )
+    switch (collection) {
+      case 'wines':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINE
+        break
+      case 'wineries':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINERY
+        break
+      case 'regions':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.REGION
+        break
+      case 'wineCountries':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.COUNTRY
+        break
+      case 'aromas':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.AROMA
+        break
+      case 'tags':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.TAG
+        break
+      case 'moods':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.MOOD
+        break
+      case 'grape-varieties':
+        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY
+        break
+      default:
+        req.payload.logger?.warn?.(`[queueRelatedWineVariants] Unknown collection: ${collection}`)
         return
-      } else if (lookupField === 'grapeVariety') {
-        // For grape varieties, we need to find wine variants that have this variety in their grapeVarieties array
-        const wineVariants = await req.payload.find({
-          collection: 'wine-variants',
-          where: {
-            'grapeVarieties.variety': {
-              equals: id,
-            },
-          },
-          depth: 0,
-        })
+    }
 
-        if (!wineVariants.totalDocs) {
-          req.payload.logger?.info?.(
-            `[queueRelatedWineVariants] No variants found for ${lookupField}:${id}`,
-          )
-          return
-        }
-
-        await Promise.allSettled(
-          wineVariants.docs.map((variant) =>
-            req.payload.jobs.queue({
-              task: 'syncFlatWineVariant',
-              input: {
-                wineVariantId: String(variant.id),
-              },
-            }),
-          ),
-        )
-        return
-      }
-
-      if (!wineIds.length) {
-        req.payload.logger?.info?.(
-          `[queueRelatedWineVariants] No wines found for ${lookupField}:${id}`,
-        )
-        return
-      }
-
-      const wineVariants = await req.payload.find({
-        collection: 'wine-variants',
-        where: {
-          wine: { in: wineIds },
-        },
-        depth: 0,
-      })
-
-      if (!wineVariants.totalDocs) {
-        req.payload.logger?.info?.(
-          `[queueRelatedWineVariants] No variants found for ${lookupField}:${id}`,
-        )
-        return
-      }
-
-      await Promise.allSettled(
-        wineVariants.docs.map((variant) =>
-          req.payload.jobs.queue({
-            task: 'syncFlatWineVariant',
-            input: {
-              wineVariantId: String(variant.id),
-            },
-          }),
-        ),
-      )
-    } catch (err) {
-      req.payload.logger?.error?.(
-        `[queueRelatedWineVariants] Failed to queue jobs for ${lookupField}:${id}`,
-        err,
-      )
+    if (lookupField) {
+      await processLookupField(req, lookupField, id)
     }
   }
 
