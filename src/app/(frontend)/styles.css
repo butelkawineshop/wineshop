@@ -463,3 +463,53 @@ body {
 .text-pretty {
   text-wrap: pretty;
 }
+
+/* ===== WINE GRID SWIPER STYLES ===== */
+.wine-swiper {
+  --swiper-navigation-size: 24px;
+  --swiper-navigation-color: hsl(var(--primary));
+  height: var(--wine-swiper-height, 600px);
+  transition: height 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.wine-swiper .swiper-slide {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wine-swiper .swiper-wrapper {
+  height: 100%;
+}
+
+/* Ensure only one slide is visible at a time */
+.wine-swiper .swiper-slide-active {
+  height: 100%;
+}
+
+.wine-swiper .swiper-slide-prev,
+.wine-swiper .swiper-slide-next {
+  height: 100%;
+}
+
+/* Focus styles for keyboard navigation */
+.wine-swiper:focus-within {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Ensure proper spacing in wine slots */
+.wine-swiper .swiper-slide > div {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Slot indicator styling */
+.wine-swiper .swiper-slide .text-center {
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid hsl(var(--border));
+}

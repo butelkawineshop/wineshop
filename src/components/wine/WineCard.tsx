@@ -120,7 +120,7 @@ export function WineCard({
             )}
             {/* Fallback for missing or failed images */}
             {(!variant.primaryImageUrl || imageError) && (
-              <div className="w-full h-full bg-foreground/10 flex items-center justify-center">
+              <div className="aspect-square w-full bg-foreground/10 flex items-center justify-center">
                 <span className="text-foreground/40">{t('wine.fallbackAlt')}</span>
               </div>
             )}

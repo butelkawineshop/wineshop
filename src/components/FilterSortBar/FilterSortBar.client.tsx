@@ -54,7 +54,7 @@ export function FilterSortBarClient({
   // Handle loading state
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex flex-col gap-2 w-full">
         <WineFilters
           currentCollection={currentCollection}
           locale={locale}
@@ -71,7 +71,7 @@ export function FilterSortBarClient({
   // Handle error state
   if (error) {
     return (
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex flex-col gap-2 w-full">
         <WineFilters
           currentCollection={currentCollection}
           locale={locale}
@@ -86,7 +86,7 @@ export function FilterSortBarClient({
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-2 w-full">
       <WineFilters
         currentCollection={currentCollection}
         locale={locale}
@@ -101,12 +101,9 @@ export function FilterSortBarClient({
         </div>
       )}
 
-      {showWineGrid && <WineGrid variants={wineVariants} locale={locale} />}
-
-      {/* Results count */}
-      <div className="text-center text-sm text-muted-foreground">
-        {t('wine.showingWinesCount', { count: wineVariants.length })}
-      </div>
+      {showWineGrid && (
+        <WineGrid variants={wineVariants} locale={locale} totalCount={wineVariants.length} />
+      )}
     </div>
   )
 }
