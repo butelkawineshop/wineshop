@@ -15,7 +15,8 @@
     "results": "results",
     "noResults": "No results found",
     "page": "Page",
-    "logo": "Butelka logo"
+    "logo": "Butelka logo",
+    "reset": "Reset"
   },
   "auth": {
     "login": "Login",
@@ -54,6 +55,11 @@
     "unknownWine": "Unknown Wine",
     "unknownWinery": "Unknown Winery",
     "fallbackAlt": "Wine",
+    "loadingWines": "Loading wines...",
+    "unableToLoadWines": "Unable to load wines at the moment.",
+    "clearAllFilters": "Clear All Filters",
+    "showingWinesCount": "Showing {count} wines",
+    "fetchError": "Failed to fetch wine variants",
     "actions": {
       "like": "Like wine",
       "share": "Share wine",

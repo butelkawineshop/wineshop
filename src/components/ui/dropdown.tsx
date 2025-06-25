@@ -104,7 +104,6 @@ export function DropdownMenu({
               zIndex: UI_CONSTANTS.DROPDOWN_Z_INDEX,
             }}
             role="menu"
-            aria-expanded={isOpen}
             onMouseDown={(e) => e.stopPropagation()}
           >
             {children}

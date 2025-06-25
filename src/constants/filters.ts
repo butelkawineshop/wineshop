@@ -9,11 +9,39 @@ export const FILTER_CONSTANTS = {
   GRID_GAP: 'gap-4',
 
   // Pagination
-  DEFAULT_PAGE_LIMIT: 24,
+  DEFAULT_PAGE_LIMIT: 10000,
 
   // Search
   SEARCH_DEBOUNCE_MS: 300,
 } as const
+
+// Default tasting notes ranges
+export const DEFAULT_TASTING_NOTES: {
+  dry: [number, number]
+  ripe: [number, number]
+  creamy: [number, number]
+  oaky: [number, number]
+  complex: [number, number]
+  light: [number, number]
+  smooth: [number, number]
+  youthful: [number, number]
+  energetic: [number, number]
+  alcohol: [number, number]
+} = {
+  dry: [0, 10],
+  ripe: [0, 10],
+  creamy: [0, 10],
+  oaky: [0, 10],
+  complex: [0, 10],
+  light: [0, 10],
+  smooth: [0, 10],
+  youthful: [0, 10],
+  energetic: [0, 10],
+  alcohol: [0, 20],
+}
+
+// Default price range
+export const DEFAULT_PRICE_RANGE: [number, number] = [0, 1000]
 
 export const FILTER_COLLECTIONS = [
   { key: 'aromas', icon: 'aroma', translationKey: 'filters.aromas', collection: 'aromas' },

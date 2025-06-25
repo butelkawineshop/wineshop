@@ -1073,6 +1073,21 @@ export interface FlatWineVariant {
   servingTemp?: string | null
   decanting?: boolean | null
   tastingProfile?: string | null
+  /**
+   * Individual tasting note values for filtering
+   */
+  tastingNotes?: {
+    dry?: number | null
+    ripe?: number | null
+    creamy?: number | null
+    oaky?: number | null
+    complex?: number | null
+    light?: number | null
+    smooth?: number | null
+    youthful?: number | null
+    energetic?: number | null
+    alcohol?: number | null
+  }
   aromas?:
     | {
         title?: string | null
@@ -1104,6 +1119,36 @@ export interface FlatWineVariant {
       }[]
     | null
   grapeVarieties?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Grape variety percentage
+         */
+        percentage?: number | null
+      }[]
+    | null
+  /**
+   * Climate information for filtering
+   */
+  climates?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Food pairing dishes for filtering
+   */
+  dishes?:
     | {
         title?: string | null
         /**
@@ -1973,6 +2018,20 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   servingTemp?: T
   decanting?: T
   tastingProfile?: T
+  tastingNotes?:
+    | T
+    | {
+        dry?: T
+        ripe?: T
+        creamy?: T
+        oaky?: T
+        complex?: T
+        light?: T
+        smooth?: T
+        youthful?: T
+        energetic?: T
+        alcohol?: T
+      }
   aromas?:
     | T
     | {
@@ -1995,6 +2054,21 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         id?: T
       }
   grapeVarieties?:
+    | T
+    | {
+        title?: T
+        titleEn?: T
+        id?: T
+        percentage?: T
+      }
+  climates?:
+    | T
+    | {
+        title?: T
+        titleEn?: T
+        id?: T
+      }
+  dishes?:
     | T
     | {
         title?: T

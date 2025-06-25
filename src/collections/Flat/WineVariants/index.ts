@@ -178,6 +178,106 @@ export const FlatWineVariants: CollectionConfig = {
       },
     },
     {
+      name: 'tastingNotes',
+      type: 'group',
+      admin: {
+        readOnly: true,
+        description: 'Individual tasting note values for filtering',
+      },
+      fields: [
+        {
+          name: 'dry',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'ripe',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'creamy',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'oaky',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'complex',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'light',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'smooth',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'youthful',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'energetic',
+          type: 'number',
+          min: 1,
+          max: 10,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'alcohol',
+          type: 'number',
+          min: 1,
+          max: 20,
+          admin: {
+            readOnly: true,
+          },
+        },
+      ],
+    },
+    {
       name: 'aromas',
       type: 'array',
       admin: {
@@ -218,6 +318,33 @@ export const FlatWineVariants: CollectionConfig = {
       type: 'array',
       admin: {
         readOnly: true,
+      },
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
+        { name: 'percentage', type: 'number', admin: { description: 'Grape variety percentage' } },
+      ],
+    },
+    {
+      name: 'climates',
+      type: 'array',
+      admin: {
+        readOnly: true,
+        description: 'Climate information for filtering',
+      },
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
+      ],
+    },
+    {
+      name: 'dishes',
+      type: 'array',
+      admin: {
+        readOnly: true,
+        description: 'Food pairing dishes for filtering',
       },
       fields: [
         { name: 'title', type: 'text' },

@@ -1,8 +1,9 @@
 import React from 'react'
-import { headers } from 'next/headers'
 import { createPayloadService } from '@/lib/payload'
 import { logger } from '@/lib/logger'
+import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import type { Locale } from '@/i18n/locales'
+import type { FlatWineVariant } from '@/payload-types'
 import { FilterSortBarClient } from './FilterSortBar.client'
 
 type Props = {
@@ -25,7 +26,7 @@ export default async function FilterSortBar({
   const resolvedLocale = (locale || 'sl') as Locale
 
   // Fetch initial data server-side for SEO
-  let initialWineVariants: any[] = []
+  let initialWineVariants: FlatWineVariant[] = []
   let error: string | null = null
 
   try {
@@ -39,7 +40,7 @@ export default async function FilterSortBar({
     }
 
     if (currentCollection) {
-      const { type, id } = currentCollection
+      const { type } = currentCollection
 
       // Map collection types to field names
       const fieldMap: Record<string, string> = {
@@ -58,15 +59,21 @@ export default async function FilterSortBar({
 
     const response = await payload.find('flat-wine-variants', {
       where,
-      limit: 1000, // Fetch all for client-side filtering
+      limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
       sort: '-syncedAt',
       depth: 0,
     })
 
-    initialWineVariants = response.docs
+    initialWineVariants = response.docs as unknown as FlatWineVariant[]
 
     logger.info('Initial wine variants fetched successfully', {
       count: response.docs.length,
+      totalDocs: response.totalDocs,
+      totalPages: response.totalPages,
+      hasNextPage: response.hasNextPage,
+      hasPrevPage: response.hasPrevPage,
+      page: response.page,
+      limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
       locale: resolvedLocale,
       currentCollection: currentCollection?.type,
     })

@@ -99,22 +99,21 @@ export async function CollectionPage({
           locale={locale}
           collection={collection}
           collectionItems={collectionItems}
-          searchParams={resolvedSearchParams}
+          _searchParams={resolvedSearchParams}
         />
       ) : (
         <ListView
           items={collectionData.items}
           config={config}
           locale={locale}
-          baseSegment={baseSegment}
           pagination={collectionData.pagination}
-          searchParams={resolvedSearchParams}
+          _searchParams={resolvedSearchParams}
           t={t}
           collection={collection}
           collectionItems={collectionItems}
           prevUrl={paginationUrls.prevUrl}
           nextUrl={paginationUrls.nextUrl}
-          baseUrl={paginationUrls.baseUrl}
+          _baseUrl={paginationUrls.baseUrl}
         />
       )}
     </div>
@@ -127,14 +126,14 @@ function SingleItemView({
   locale,
   collection,
   collectionItems,
-  searchParams,
+  _searchParams,
 }: {
   data: CollectionItem | null
   config: CollectionDisplayConfig
   locale: Locale
   collection: string
   collectionItems: Record<string, CollectionItem[]>
-  searchParams: Record<string, string | string[] | undefined>
+  _searchParams: Record<string, string | string[] | undefined>
 }) {
   if (!data) return null
 
@@ -181,13 +180,10 @@ function SingleItemView({
       {collectionService.isWineCollection(collection) && (
         <div className="mt-12">
           <FilterSortBar
-            currentCollection={{ id: data.id, type: collection }}
-            searchParams={searchParams}
+            currentCollection={{ id: collection, type: collection }}
             collectionItems={collectionItems}
             locale={locale}
             showWineGrid={true}
-            showPagination={true}
-            baseUrl=""
           />
         </div>
       )}
@@ -199,28 +195,26 @@ function ListView({
   items,
   config,
   locale,
-  baseSegment,
   pagination,
-  searchParams,
+  _searchParams,
   t,
   collection,
   collectionItems,
   prevUrl,
   nextUrl,
-  baseUrl,
+  _baseUrl,
 }: {
   items: CollectionItem[]
   config: CollectionDisplayConfig
   locale: Locale
-  baseSegment: string
   pagination: PaginationInfo | null
-  searchParams: Record<string, string | string[] | undefined>
+  _searchParams: Record<string, string | string[] | undefined>
   t: (key: string) => string
   collection: string
   collectionItems: Record<string, CollectionItem[]>
   prevUrl: string | null
   nextUrl: string | null
-  baseUrl: string
+  _baseUrl: string
 }) {
   return (
     <div className="container-narrow">
@@ -372,13 +366,10 @@ function ListView({
       {collectionService.isWineCollection(collection) && (
         <div className="mt-12">
           <FilterSortBar
-            currentCollection={undefined}
-            searchParams={searchParams}
+            currentCollection={{ id: collection, type: collection }}
             collectionItems={collectionItems}
             locale={locale}
             showWineGrid={true}
-            showPagination={true}
-            baseUrl={baseUrl}
           />
         </div>
       )}

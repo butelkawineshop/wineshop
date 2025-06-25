@@ -1,5 +1,6 @@
 import { createLogger } from './logger'
 import type { PayloadRequest } from 'payload'
+import { COLLECTION_CONSTANTS } from '@/constants/collections'
 
 const PAYLOAD_API_URL = process.env.NEXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3000'
 
@@ -58,7 +59,7 @@ export class PayloadService {
       where = {},
       depth = 0,
       page = 1,
-      limit = 10,
+      limit = COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
       sort = '-createdAt',
       locale = 'all',
       fields = [],
@@ -203,6 +204,72 @@ export class PayloadService {
       this.logger.error(`Failed to fetch single document from ${collection}`, error as Error, {
         collection,
         params: JSON.parse(JSON.stringify(params)),
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Create a new document in a collection
+   * @param collection - Collection name
+   * @param data - Document data
+   * @returns Created document
+   */
+  async create<T = Record<string, unknown>>(
+    collection: string,
+    data: Record<string, unknown>,
+  ): Promise<T> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/${collection}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to create document in ${collection}: ${response.statusText}`)
+      }
+
+      const created = await response.json()
+      this.logger.info(`Successfully created document in ${collection}`)
+      return created as T
+    } catch (error) {
+      this.logger.error(`Failed to create document in ${collection}`, error as Error, {
+        collection,
+        data: JSON.stringify(data),
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Delete a document in a collection by ID
+   * @param collection - Collection name
+   * @param id - Document ID
+   * @returns Deleted document
+   */
+  async delete<T = Record<string, unknown>>(collection: string, id: string): Promise<T> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/${collection}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete document in ${collection}: ${response.statusText}`)
+      }
+
+      const deleted = await response.json()
+      this.logger.info(`Successfully deleted document in ${collection}`)
+      return deleted as T
+    } catch (error) {
+      this.logger.error(`Failed to delete document in ${collection}`, error as Error, {
+        collection,
+        id,
       })
       throw error
     }

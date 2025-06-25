@@ -56,6 +56,7 @@ export function Accordion({
         </div>
         <Icon
           name="chevron-left"
+          variant="color"
           className={cn(
             `${ACCORDION_CONSTANTS.ICON_SIZE} transition-transform duration-200 ease-in-out`,
             isOpen && 'rotate-[-90deg]',

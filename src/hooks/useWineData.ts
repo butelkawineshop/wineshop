@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useWineStore } from '@/store/wineStore'
 import { createPayloadService } from '@/lib/payload'
 import { logger } from '@/lib/logger'
+import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
 
@@ -20,32 +21,35 @@ export function useWineData(options: UseWineDataOptions = {}) {
     filteredVariants,
     isLoading,
     error,
-    currentPage,
-    itemsPerPage,
-    hasMore,
     setWineVariants,
     setLoading,
     setError,
-    loadMore,
   } = useWineStore()
 
-  const fetchWineVariants = async (): Promise<void> => {
+  const fetchWineVariants = useCallback(async (): Promise<void> => {
+    if (isLoading) return
+
+    setLoading(true)
+    setError(null)
+
     try {
-      setLoading(true)
-      setError(null)
+      logger.info('Fetching wine variants', {
+        locale: options.locale,
+        currentCollection: options.currentCollection?.type,
+      })
 
       const payload = createPayloadService()
-      const { locale = 'sl', currentCollection } = options
 
-      // Build where clause for current collection if specified
+      // Build where clause
       const where: Record<string, unknown> = {
         _status: {
           equals: 'published',
         },
       }
 
-      if (currentCollection) {
-        const { type, id } = currentCollection
+      // Add collection-specific filtering if we have a current collection
+      if (options.currentCollection) {
+        const { type } = options.currentCollection
 
         // Map collection types to field names
         const fieldMap: Record<string, string> = {
@@ -64,59 +68,71 @@ export function useWineData(options: UseWineDataOptions = {}) {
 
       const response = await payload.find('flat-wine-variants', {
         where,
-        limit: 1000, // Fetch all for client-side filtering
+        limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
         sort: '-syncedAt',
         depth: 0,
       })
 
-      setWineVariants(response.docs as unknown as FlatWineVariant[])
       logger.info('Wine variants fetched successfully', {
         count: response.docs.length,
-        locale,
-        currentCollection: currentCollection?.type,
+        totalDocs: response.totalDocs,
+        totalPages: response.totalPages,
+        hasNextPage: response.hasNextPage,
+        hasPrevPage: response.hasPrevPage,
+        page: response.page,
+        limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
+        locale: options.locale,
+        currentCollection: options.currentCollection?.type,
       })
+
+      setWineVariants(response.docs as unknown as FlatWineVariant[])
     } catch (error) {
       const errorMessage = 'Failed to fetch wine variants'
+      logger.error(errorMessage, { error, currentCollection: options.currentCollection?.type })
       setError(errorMessage)
-      logger.error(errorMessage, { error, options })
     } finally {
       setLoading(false)
     }
-  }
+  }, [isLoading, options.locale, options.currentCollection, setWineVariants, setLoading, setError])
 
   // Fetch data on mount
   useEffect(() => {
     // If we have initial data, use it instead of fetching
     if (options.initialData && options.initialData.length > 0) {
-      setWineVariants(options.initialData)
-      logger.info('Using initial wine data', {
+      logger.info('Setting initial wine data in store', {
         count: options.initialData.length,
         locale: options.locale,
         currentCollection: options.currentCollection?.type,
       })
+      setWineVariants(options.initialData)
       return
     }
 
+    logger.info('No initial data, fetching wines...')
     fetchWineVariants()
-  }, [options.locale, options.currentCollection?.id, options.initialData])
+  }, [
+    options.locale,
+    options.currentCollection?.id,
+    options.currentCollection?.type,
+    options.initialData,
+    setWineVariants,
+    fetchWineVariants,
+  ])
 
-  // Get paginated results
-  const paginatedVariants = filteredVariants.slice(0, currentPage * itemsPerPage)
+  // Debug logging
+  logger.info('useWineData debug', {
+    wineVariantsCount: wineVariants.length,
+    filteredVariantsCount: filteredVariants.length,
+  })
 
   return {
     // Data
-    wineVariants: paginatedVariants,
+    wineVariants: filteredVariants, // Return all filtered variants directly
     totalVariants: filteredVariants,
     isLoading,
     error,
 
-    // Pagination
-    hasMore,
-    currentPage,
-    itemsPerPage,
-
     // Actions
-    loadMore,
     refetch: fetchWineVariants,
   }
 }

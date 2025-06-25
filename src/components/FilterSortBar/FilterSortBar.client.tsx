@@ -5,10 +5,11 @@ import WineFilters from '@/components/WineFilters'
 import Sorting from '@/components/Sorting'
 import { WineGrid } from '@/components/wine/WineGrid'
 import { useWineData } from '@/hooks/useWineData'
-import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import type { Locale } from '@/i18n/locales'
 import type { FlatWineVariant } from '@/payload-types'
+import { useWineStore } from '@/store/wineStore'
+import { useTranslation } from '@/hooks/useTranslation'
+import { ResetFilterButton } from '../WineFilters/ResetFilterButton'
 
 type Props = {
   currentCollection?: {
@@ -31,19 +32,21 @@ export function FilterSortBarClient({
   initialWineVariants,
   error: initialError,
 }: Props): React.JSX.Element {
+  const { t } = useTranslation()
+
   // Use the wine data hook for client-side filtering
   const {
     wineVariants,
-    totalVariants,
     isLoading,
     error: clientError,
-    hasMore,
-    loadMore,
   } = useWineData({
     locale,
     currentCollection,
     initialData: initialWineVariants,
   })
+
+  // Get clearAllFilters from the store
+  const { clearAllFilters, hasActiveFilters } = useWineStore()
 
   // Use initial error if no client error
   const error = clientError || initialError
@@ -59,9 +62,7 @@ export function FilterSortBarClient({
         />
         <Sorting />
         <div className="text-center py-8">
-          <p className="text-muted-foreground">
-            {locale === 'en' ? 'Loading wines...' : 'Nalaganje vin...'}
-          </p>
+          <p className="text-muted-foreground">{t('wine.loadingWines')}</p>
         </div>
       </div>
     )
@@ -78,11 +79,7 @@ export function FilterSortBarClient({
         />
         <Sorting />
         <div className="text-center py-8">
-          <p className="text-muted-foreground">
-            {locale === 'en'
-              ? 'Unable to load wines at the moment.'
-              : 'Vina trenutno ni mogoče naložiti.'}
-          </p>
+          <p className="text-muted-foreground">{t('wine.unableToLoadWines')}</p>
         </div>
       </div>
     )
@@ -96,23 +93,19 @@ export function FilterSortBarClient({
         collectionItems={collectionItems || {}}
       />
       <Sorting />
-      {showWineGrid && <WineGrid variants={wineVariants} locale={locale} />}
 
-      {/* Load More Button */}
-      {hasMore && (
-        <div className="flex justify-center py-4">
-          <Button onClick={loadMore} variant="outline" className="flex items-center gap-2">
-            <Icon name="plus" className="w-4 h-4" />
-            {locale === 'en' ? 'Load More' : 'Naloži več'}
-          </Button>
+      {/* Clear All Filters Button - Only show when there are active filters */}
+      {hasActiveFilters() && (
+        <div className="flex justify-center">
+          <ResetFilterButton onReset={clearAllFilters} />
         </div>
       )}
 
+      {showWineGrid && <WineGrid variants={wineVariants} locale={locale} />}
+
       {/* Results count */}
       <div className="text-center text-sm text-muted-foreground">
-        {locale === 'en'
-          ? `Showing ${wineVariants.length} of ${totalVariants.length} wines`
-          : `Prikazano ${wineVariants.length} od ${totalVariants.length} vin`}
+        {t('wine.showingWinesCount', { count: wineVariants.length })}
       </div>
     </div>
   )

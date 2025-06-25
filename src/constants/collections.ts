@@ -21,7 +21,7 @@ export const COLLECTION_CONSTANTS = {
 
   // Default pagination settings
   PAGINATION: {
-    DEFAULT_LIMIT: 24,
+    DEFAULT_LIMIT: 10000,
     DEFAULT_PAGE: 1,
   },
 

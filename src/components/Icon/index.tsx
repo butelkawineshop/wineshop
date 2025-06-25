@@ -38,7 +38,7 @@ export function Icon({
           width={width}
           height={height}
           alt={name}
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full icon-container"
           draggable={false}
         />
       </div>

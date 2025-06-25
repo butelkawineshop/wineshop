@@ -50,10 +50,25 @@ interface FlatVariantData {
   servingTemp: string
   decanting: boolean
   tastingProfile: string
+  // Individual tasting notes for filtering
+  tastingNotes?: {
+    dry?: number | null
+    ripe?: number | null
+    creamy?: number | null
+    oaky?: number | null
+    complex?: number | null
+    light?: number | null
+    smooth?: number | null
+    youthful?: number | null
+    energetic?: number | null
+    alcohol?: number | null
+  }
   aromas?: MappedItemWithEnglish[]
   tags?: MappedItemWithEnglish[]
   moods?: MappedItemWithEnglish[]
-  grapeVarieties?: MappedItemWithEnglish[]
+  grapeVarieties?: (MappedItemWithEnglish & { percentage?: number | null })[]
+  climates?: MappedItemWithEnglish[]
+  dishes?: MappedItemWithEnglish[]
   primaryImageUrl?: string
   isPublished: boolean
   syncedAt: string
@@ -128,7 +143,7 @@ function mapTitleOnlyWithEnglish(
   })
 }
 
-function mapGrapeVarietiesWithEnglish(
+function _mapGrapeVarietiesWithEnglish(
   arr: GrapeVarietyItem[] | undefined,
   englishTitles: Record<string, string>,
 ): MappedItemWithEnglish[] | undefined {
@@ -442,6 +457,7 @@ function prepareFlatVariantData(
     servingTemp: wineVariant.servingTemp || '',
     decanting: wineVariant.decanting || false,
     tastingProfile: wineVariant.tastingProfile || '',
+    tastingNotes: wineVariant.tastingNotes,
     aromas: wineVariant.aromas
       ? mapTitleOnlyWithEnglish(wineVariant.aromas, englishTitles.englishAromaTitles)
       : undefined,
@@ -452,10 +468,43 @@ function prepareFlatVariantData(
       ? mapTitleOnlyWithEnglish(wineVariant.moods, englishTitles.englishMoodTitles)
       : undefined,
     grapeVarieties: wineVariant.grapeVarieties
-      ? mapGrapeVarietiesWithEnglish(
-          wineVariant.grapeVarieties,
-          englishTitles.englishGrapeVarietyTitles,
-        )
+      ? wineVariant.grapeVarieties.map((gv) => {
+          let title: string | null = null
+          let id: string | null = null
+          let titleEn: string | null = null
+          let percentage: number | null = null
+
+          if (gv && typeof gv === 'object') {
+            if (gv.variety && typeof gv.variety === 'object') {
+              title = typeof gv.variety.title === 'string' ? gv.variety.title : null
+              id = typeof gv.variety.id === 'string' ? gv.variety.id : String(gv.variety.id)
+            } else if (typeof gv.variety === 'string' || typeof gv.variety === 'number') {
+              title = String(gv.variety)
+              id = String(gv.variety)
+            }
+            percentage = gv.percentage || null
+          }
+
+          // Get English title if available
+          if (id && englishTitles.englishGrapeVarietyTitles[id]) {
+            titleEn = englishTitles.englishGrapeVarietyTitles[id]
+          }
+
+          return { title, titleEn, id, percentage }
+        })
+      : undefined,
+    climates:
+      region && typeof region.climate === 'object' && region.climate
+        ? [
+            {
+              title: region.climate.title,
+              titleEn: null, // Would need to fetch English climate title if needed
+              id: String(region.climate.id),
+            },
+          ]
+        : undefined,
+    dishes: wineVariant.foodPairing
+      ? mapTitleOnlyWithEnglish(wineVariant.foodPairing, englishTitles.englishTagTitles)
       : undefined,
     primaryImageUrl,
     isPublished: wineVariant._status === SYNC_CONSTANTS.PUBLISHED_STATUS,
