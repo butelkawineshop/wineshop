@@ -7,6 +7,8 @@ import { wineGrid, WineGridState, WineGridActions, WineGridSelectors } from './w
 import { language, LanguageState, LanguageActions, LanguageSelectors } from './language'
 import { STORE_CONSTANTS } from '@/constants/store'
 import type { DomainStore } from './types'
+import { LanguageService } from '@/services/LanguageService'
+import { logger } from '@/lib/logger'
 
 export interface RootStore {
   auth: DomainStore<AuthState, AuthActions, AuthSelectors>
@@ -276,8 +278,114 @@ export const useStore = create<RootStore>()(
               set((state) => ({
                 language: { ...state.language, state: { ...state.language.state, error: null } },
               })),
-            switchLanguage: async (_newLanguage, _pathname) => {}, // Implement as needed
-            toggleLanguage: async (_pathname) => {}, // Implement as needed
+            switchLanguage: async (newLanguage, pathname) => {
+              try {
+                set((state) => ({
+                  language: {
+                    ...state.language,
+                    state: { ...state.language.state, isSwitching: true, error: null },
+                  },
+                }))
+
+                logger.info({ newLanguage, pathname }, 'Starting language switch in store')
+
+                const { newPath } = await LanguageService.switchLanguage({
+                  currentPathname: pathname,
+                  newLanguage,
+                })
+
+                if (newPath) {
+                  // Set the locale cookie
+                  document.cookie = `NEXT_LOCALE=${newLanguage};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`
+
+                  // Update the store with new language
+                  set((state) => ({
+                    language: {
+                      ...state.language,
+                      state: { ...state.language.state, currentLanguage: newLanguage },
+                    },
+                  }))
+
+                  // Navigate to new path
+                  window.location.href = newPath
+                } else {
+                  throw new Error('LanguageService failed to calculate new path')
+                }
+              } catch (error) {
+                logger.error({ error, newLanguage, pathname }, 'Language switch failed in store')
+                set((state) => ({
+                  language: {
+                    ...state.language,
+                    state: {
+                      ...state.language.state,
+                      error: 'Failed to switch language. Please try again.',
+                    },
+                  },
+                }))
+              } finally {
+                set((state) => ({
+                  language: {
+                    ...state.language,
+                    state: { ...state.language.state, isSwitching: false },
+                  },
+                }))
+              }
+            },
+            toggleLanguage: async (pathname) => {
+              try {
+                const currentLanguage = get().language.state.currentLanguage
+                const newLanguage = currentLanguage === 'en' ? 'sl' : 'en'
+
+                // Use the switchLanguage action
+                set((state) => ({
+                  language: {
+                    ...state.language,
+                    state: { ...state.language.state, isSwitching: true, error: null },
+                  },
+                }))
+
+                const { newPath } = await LanguageService.switchLanguage({
+                  currentPathname: pathname,
+                  newLanguage,
+                })
+
+                if (newPath) {
+                  // Set the locale cookie
+                  document.cookie = `NEXT_LOCALE=${newLanguage};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`
+
+                  // Update the store with new language
+                  set((state) => ({
+                    language: {
+                      ...state.language,
+                      state: { ...state.language.state, currentLanguage: newLanguage },
+                    },
+                  }))
+
+                  // Navigate to new path
+                  window.location.href = newPath
+                } else {
+                  throw new Error('LanguageService failed to calculate new path')
+                }
+              } catch (error) {
+                logger.error({ error, pathname }, 'Language toggle failed in store')
+                set((state) => ({
+                  language: {
+                    ...state.language,
+                    state: {
+                      ...state.language.state,
+                      error: 'Failed to toggle language. Please try again.',
+                    },
+                  },
+                }))
+              } finally {
+                set((state) => ({
+                  language: {
+                    ...state.language,
+                    state: { ...state.language.state, isSwitching: false },
+                  },
+                }))
+              }
+            },
           },
           selectors: {
             getCurrentLanguage: () => get().language.state.currentLanguage,

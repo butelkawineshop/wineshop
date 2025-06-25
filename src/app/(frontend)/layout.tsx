@@ -2,6 +2,7 @@ import React from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
+import { headers } from 'next/headers'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -54,10 +55,11 @@ export const viewport: Viewport = {
 
 interface LayoutProps {
   children: React.ReactNode
-  locale: Locale
 }
 
-export default function Layout({ children, locale }: LayoutProps): React.ReactElement {
+export default async function Layout({ children }: LayoutProps): Promise<React.ReactElement> {
+  const headersList = await headers()
+  const locale = (headersList.get('x-locale') || 'sl') as Locale
   const messages = locale === 'en' ? enMessages : slMessages
 
   return (
