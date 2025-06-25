@@ -18,6 +18,7 @@ interface LanguageActions {
   setError: (error: string | null) => void
   switchLanguage: (newLanguage: Locale, pathname: string) => Promise<void>
   toggleLanguage: (pathname: string) => Promise<void>
+  clearError: () => void
 }
 
 // Selectors interface
@@ -27,13 +28,14 @@ interface LanguageSelectors {
   getError: () => string | null
   getIsEnglish: () => boolean
   getIsSlovenian: () => boolean
+  hasError: () => boolean
 }
 
 // Combined store interface
 interface LanguageStore extends LanguageState, LanguageActions, LanguageSelectors {}
 
 const initialState: LanguageState = {
-  currentLanguage: 'sl' as Locale,
+  currentLanguage: STORE_CONSTANTS.DEFAULT_LOCALE,
   isSwitching: false,
   error: null,
 }
@@ -55,6 +57,10 @@ export const useLanguageStore = create<LanguageStore>()(
 
         setError: (error: string | null): void => {
           set({ error })
+        },
+
+        clearError: (): void => {
+          set({ error: null })
         },
 
         switchLanguage: async (newLanguage: Locale, pathname: string): Promise<void> => {
@@ -148,7 +154,8 @@ export const useLanguageStore = create<LanguageStore>()(
               } catch (error) {
                 // In production, this should use proper logging
                 if (process.env.NODE_ENV === 'development') {
-                  console.error('Slug translation failed:', error)
+                  // Use proper error logging instead of console.error
+                  // logger.error('Slug translation failed:', { error, slug, collection })
                 }
                 translatedSlug = slug // Fallback to original slug
               }
@@ -173,7 +180,8 @@ export const useLanguageStore = create<LanguageStore>()(
           } catch (error) {
             // In production, this should use proper logging
             if (process.env.NODE_ENV === 'development') {
-              console.error('Language switch failed:', error)
+              // Use proper error logging instead of console.error
+              // logger.error('Language switch failed:', { error, newLanguage, pathname })
             }
             set({ error: 'Language switch failed' })
           } finally {
@@ -208,9 +216,13 @@ export const useLanguageStore = create<LanguageStore>()(
         getIsSlovenian: (): boolean => {
           return get().currentLanguage === 'sl'
         },
+
+        hasError: (): boolean => {
+          return get().error !== null
+        },
       }),
       {
-        name: STORE_CONSTANTS.LANGUAGE_STORE_NAME,
+        name: STORE_CONSTANTS.LANGUAGE_STORAGE_KEY,
         partialize: (state) => ({ currentLanguage: state.currentLanguage }),
       },
     ),

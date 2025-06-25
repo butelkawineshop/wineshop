@@ -12,6 +12,7 @@ interface WineGridState {
   hasNextPage: boolean
   hasPrevPage: boolean
   isLoading: boolean
+  error: string | null
 }
 
 // Actions interface
@@ -25,8 +26,10 @@ interface WineGridActions {
   }) => void
   setCurrentPage: (page: number) => void
   setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
   updatePage: (newPage: number) => void
   reset: () => void
+  clearError: () => void
 }
 
 // Selectors interface
@@ -38,9 +41,11 @@ interface WineGridSelectors {
   getHasNextPage: () => boolean
   getHasPrevPage: () => boolean
   getIsLoading: () => boolean
+  getError: () => string | null
   getIsEmpty: () => boolean
   getVariantCount: () => number
   getPageInfo: () => { current: number; total: number; hasNext: boolean; hasPrev: boolean }
+  hasError: () => boolean
 }
 
 // Combined store interface
@@ -50,10 +55,11 @@ const initialState: WineGridState = {
   variants: [],
   totalDocs: 0,
   totalPages: 0,
-  currentPage: 1,
+  currentPage: STORE_CONSTANTS.DEFAULT_PAGE,
   hasNextPage: false,
   hasPrevPage: false,
   isLoading: false,
+  error: null,
 }
 
 export const useWineGridStore = create<WineGridStore>()(
@@ -88,6 +94,10 @@ export const useWineGridStore = create<WineGridStore>()(
         set({ isLoading: loading })
       },
 
+      setError: (error: string | null): void => {
+        set({ error })
+      },
+
       updatePage: (newPage: number): void => {
         const state = get()
         if (state.isLoading || newPage === state.currentPage) return
@@ -97,6 +107,10 @@ export const useWineGridStore = create<WineGridStore>()(
 
       reset: (): void => {
         set(initialState)
+      },
+
+      clearError: (): void => {
+        set({ error: null })
       },
 
       // Selectors
@@ -128,6 +142,10 @@ export const useWineGridStore = create<WineGridStore>()(
         return get().isLoading
       },
 
+      getError: (): string | null => {
+        return get().error
+      },
+
       getIsEmpty: (): boolean => {
         return get().variants.length === 0
       },
@@ -144,6 +162,10 @@ export const useWineGridStore = create<WineGridStore>()(
           hasNext: state.hasNextPage,
           hasPrev: state.hasPrevPage,
         }
+      },
+
+      hasError: (): boolean => {
+        return get().error !== null
       },
     }),
     {

@@ -97,3 +97,13 @@ export const useStore = create<AppState>()(
     }),
   ),
 )
+
+// Export all stores
+export { useAuthStore } from './auth'
+export { useCartStore } from './cart'
+export { useUIStore } from './ui'
+export { useWineGridStore } from './wineGrid'
+export { useLanguageStore } from './language'
+
+// Export session service
+export { SessionService } from '@/services/SessionService'
