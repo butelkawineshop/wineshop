@@ -1,13 +1,28 @@
+/**
+ * Route mapping utilities for internationalization
+ * Handles translation of route segments between Slovenian and English
+ */
+
 export type Locale = 'sl' | 'en'
 
 export const localeNames: Record<Locale, string> = {
   sl: 'Slovenščina',
   en: 'English',
-}
+} as const
 
 export const defaultLocale: Locale = 'sl'
 
-export const routeMappings = {
+interface RouteMapping {
+  sl: string
+  en: string
+  collection: string
+}
+
+/**
+ * Route mappings for internationalization
+ * Maps route segments to their translations and associated collections
+ */
+export const routeMappings: Record<string, RouteMapping> = {
   vinoteka: { sl: 'vinoteka', en: 'wineshop', collection: 'wines' },
   wineshop: { sl: 'vinoteka', en: 'wineshop', collection: 'wines' },
 
@@ -78,64 +93,191 @@ export const routeMappings = {
   countries: { sl: 'drzave', en: 'countries', collection: 'wineCountries' },
 } as const
 
+/**
+ * Gets the translated segment for a given route segment and target locale
+ *
+ * @param segment - The route segment to translate
+ * @param targetLocale - The target locale for translation
+ * @returns The translated segment or null if not found
+ *
+ * @example
+ * ```typescript
+ * const translated = getTranslatedSegment('vinoteka', 'en')
+ * // Returns: 'wineshop'
+ * ```
+ */
 export function getTranslatedSegment(segment: string, targetLocale: Locale): string | null {
-  const mapping = routeMappings[segment as keyof typeof routeMappings]
+  if (!segment?.trim()) {
+    return null
+  }
+
+  const mapping = routeMappings[segment]
   return mapping?.[targetLocale] ?? null
 }
 
+/**
+ * Gets the collection name associated with a route segment
+ *
+ * @param segment - The route segment
+ * @returns The collection name or null if not found
+ *
+ * @example
+ * ```typescript
+ * const collection = getCollectionForRouteSegment('vinoteka')
+ * // Returns: 'wines'
+ * ```
+ */
 export function getCollectionForRouteSegment(segment: string): string | null {
-  const mapping = routeMappings[segment as keyof typeof routeMappings]
+  if (!segment?.trim()) {
+    return null
+  }
+
+  const mapping = routeMappings[segment]
   return mapping?.collection ?? null
 }
 
+/**
+ * Detects the locale from a URL path
+ *
+ * @param path - The URL path to analyze
+ * @returns The detected locale
+ *
+ * @example
+ * ```typescript
+ * const locale = detectLocaleFromPath('/en/wineshop')
+ * // Returns: 'en'
+ * ```
+ */
 export function detectLocaleFromPath(path: string): Locale {
+  if (!path?.trim()) {
+    return defaultLocale
+  }
+
   return path.startsWith('/en') ? 'en' : 'sl'
 }
 
+/**
+ * Gets the localized route segment for a given segment and locale
+ *
+ * @param segment - The route segment
+ * @param locale - The target locale
+ * @returns The localized segment or original if no translation found
+ *
+ * @example
+ * ```typescript
+ * const localized = getLocalizedRouteSegment('vinoteka', 'en')
+ * // Returns: 'wineshop'
+ * ```
+ */
 export function getLocalizedRouteSegment(segment: string, locale: Locale): string {
+  if (!segment?.trim()) {
+    return segment
+  }
+
   return getTranslatedSegment(segment, locale) ?? segment
 }
 
+/**
+ * Fetches slug translation function type
+ */
+type FetchSlugTranslation = (
+  slug: string,
+  sourceLocale: Locale,
+  targetLocale: Locale,
+  collection: string,
+) => Promise<string | null>
+
+/**
+ * Gets the alternate path with translated slug for a given path and target locale
+ *
+ * @param path - The current path
+ * @param targetLocale - The target locale
+ * @param fetchSlugTranslation - Function to fetch slug translations
+ * @returns Promise resolving to the alternate path or null if translation fails
+ *
+ * @example
+ * ```typescript
+ * const alternatePath = await getAlternatePathWithSlug(
+ *   '/vinoteka/chateau-margaux',
+ *   'en',
+ *   fetchSlugTranslation
+ * )
+ * // Returns: '/en/wineshop/chateau-margaux' (if translation exists)
+ * ```
+ */
 export async function getAlternatePathWithSlug(
   path: string,
   targetLocale: Locale,
-  fetchSlugTranslation: (
-    slug: string,
-    sourceLocale: Locale,
-    targetLocale: Locale,
-    collection: string,
-  ) => Promise<string | null>,
+  fetchSlugTranslation: FetchSlugTranslation,
 ): Promise<string | null> {
+  if (!path?.trim()) {
+    return null
+  }
+
   const segments = path.split('/').filter(Boolean)
-  if (segments.length === 0) return null
-
-  if (targetLocale === 'en') {
-    if (segments[0] === 'en') return path
-    const baseSegment = segments[0]
-    const mapping = routeMappings[baseSegment as keyof typeof routeMappings]
-    if (!mapping) return null
-    const newBase = mapping[targetLocale]
-    const collection = mapping.collection
-    const originalSlug = segments[1]
-    if (!originalSlug) return `/en/${newBase}`
-    const translatedSlug = await fetchSlugTranslation(originalSlug, 'sl', 'en', collection)
-    if (!translatedSlug) return null
-    return `/en/${newBase}/${translatedSlug}`
+  if (segments.length === 0) {
+    return null
   }
 
-  if (targetLocale === 'sl') {
-    if (segments[0] !== 'en') return path
-    const baseSegment = segments[1]
-    const mapping = routeMappings[baseSegment as keyof typeof routeMappings]
-    if (!mapping) return null
-    const newBase = mapping[targetLocale]
-    const collection = mapping.collection
-    const originalSlug = segments[2]
-    if (!originalSlug) return `/${newBase}`
-    const translatedSlug = await fetchSlugTranslation(originalSlug, 'en', 'sl', collection)
-    if (!translatedSlug) return null
-    return `/${newBase}/${translatedSlug}`
-  }
+  try {
+    if (targetLocale === 'en') {
+      if (segments[0] === 'en') {
+        return path
+      }
 
-  return null
+      const baseSegment = segments[0]
+      const mapping = routeMappings[baseSegment]
+      if (!mapping) {
+        return null
+      }
+
+      const newBase = mapping[targetLocale]
+      const collection = mapping.collection
+      const originalSlug = segments[1]
+
+      if (!originalSlug) {
+        return `/en/${newBase}`
+      }
+
+      const translatedSlug = await fetchSlugTranslation(originalSlug, 'sl', 'en', collection)
+      if (!translatedSlug) {
+        return null
+      }
+
+      return `/en/${newBase}/${translatedSlug}`
+    }
+
+    if (targetLocale === 'sl') {
+      if (segments[0] !== 'en') {
+        return path
+      }
+
+      const baseSegment = segments[1]
+      const mapping = routeMappings[baseSegment]
+      if (!mapping) {
+        return null
+      }
+
+      const newBase = mapping[targetLocale]
+      const collection = mapping.collection
+      const originalSlug = segments[2]
+
+      if (!originalSlug) {
+        return `/${newBase}`
+      }
+
+      const translatedSlug = await fetchSlugTranslation(originalSlug, 'en', 'sl', collection)
+      if (!translatedSlug) {
+        return null
+      }
+
+      return `/${newBase}/${translatedSlug}`
+    }
+
+    return null
+  } catch (error) {
+    throw new Error(
+      `Failed to get alternate path: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    )
+  }
 }
