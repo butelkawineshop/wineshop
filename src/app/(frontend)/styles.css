@@ -469,8 +469,13 @@ body {
   --swiper-navigation-size: 24px;
   --swiper-navigation-color: hsl(var(--primary));
   height: var(--wine-swiper-height, 600px);
-  transition: height 0.3s ease-in-out;
+  /* Optimized transition for smoother height changes */
+  transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  /* Hardware acceleration for smoother animations */
+  will-change: height;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .wine-swiper .swiper-slide {
@@ -478,20 +483,33 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Hardware acceleration for slides */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Prevent layout shifts */
+  contain: layout style paint;
 }
 
 .wine-swiper .swiper-wrapper {
   height: 100%;
+  /* Optimize wrapper for smooth transitions */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Ensure only one slide is visible at a time */
 .wine-swiper .swiper-slide-active {
   height: 100%;
+  /* Smooth transition for active slide */
+  transition: opacity 0.2s ease-out;
 }
 
 .wine-swiper .swiper-slide-prev,
 .wine-swiper .swiper-slide-next {
   height: 100%;
+  /* Reduce opacity for smoother visual transition */
+  opacity: 0.3;
+  transition: opacity 0.2s ease-out;
 }
 
 /* Focus styles for keyboard navigation */
@@ -505,6 +523,8 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* Prevent layout shifts during transitions */
+  contain: layout style paint;
 }
 
 /* Slot indicator styling */
@@ -512,4 +532,15 @@ body {
   margin-top: 0.5rem;
   padding-top: 0.25rem;
   border-top: 1px solid hsl(var(--border));
+  /* Smooth transition for indicator changes */
+  transition: opacity 0.15s ease-out;
+}
+
+/* Optimize Swiper transitions globally */
+.swiper-wrapper {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.swiper-slide {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
