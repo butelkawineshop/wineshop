@@ -85,6 +85,36 @@ export const FlatWineVariants: CollectionConfig = {
       },
     },
     {
+      name: 'styleTitle',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'styleTitleEn',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'English style title',
+      },
+    },
+    {
+      name: 'styleIconKey',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'styleSlug',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'Style slug for URL generation',
+      },
+    },
+    {
       name: 'size',
       type: 'text',
       admin: {

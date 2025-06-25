@@ -6,10 +6,11 @@ import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
 import { logger } from '@/lib/logger'
+import type { Locale } from '@/i18n/locales'
 
 interface WineGridProps {
   variants: FlatWineVariant[]
-  locale: string
+  locale: Locale
   className?: string
 }
 

@@ -14,6 +14,7 @@ import { collectionService } from '@/services/CollectionService'
 import { TranslationUtils } from '@/utils/translationUtils'
 import type { CollectionItem, PaginationInfo } from '@/services/CollectionService'
 import type { CollectionDisplayConfig } from '@/components/CollectionPage/CollectionConfig'
+import { CollectionLink } from '@/components/ui/CollectionLink'
 
 interface CollectionPageProps {
   params: {
@@ -294,12 +295,15 @@ function ListView({
                     transition: { duration: 0.1 },
                   }}
                 >
-                  <a
-                    href={`${locale === 'en' ? '/en' : ''}/${baseSegment}/${item.slug}`}
+                  <CollectionLink
+                    collection={collection}
+                    slug={String(item.slug)}
+                    locale={locale}
                     className="absolute inset-0 w-full h-full z-20"
-                    tabIndex={0}
                     aria-label={title}
-                  ></a>
+                  >
+                    <></>
+                  </CollectionLink>
                   {imageBase && (
                     <motion.div
                       className="absolute inset-0"

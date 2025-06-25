@@ -36,6 +36,10 @@ interface FlatVariantData {
   regionTitle: string
   countryTitle: string
   countryTitleEn?: string
+  styleTitle?: string
+  styleTitleEn?: string
+  styleIconKey?: string
+  styleSlug?: string
   vintage: string
   size: string
   sku: string
@@ -244,11 +248,53 @@ async function fetchEnglishCountryTitle(
       id: countryId,
       locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
     })
-    return englishCountry?.title
+
+    if (
+      englishCountry &&
+      typeof englishCountry === 'object' &&
+      'title' in englishCountry &&
+      typeof englishCountry.title === 'string'
+    ) {
+      return englishCountry.title
+    }
   } catch (error) {
-    logger.warn('Could not fetch English country title', { error: String(error) })
-    return undefined
+    logger.warn('Could not fetch English country title', {
+      countryId,
+      error: String(error),
+    })
   }
+
+  return undefined
+}
+
+async function fetchEnglishStyleTitle(
+  req: PayloadRequest,
+  styleId: string,
+  logger: ReturnType<typeof createLogger>,
+): Promise<string | undefined> {
+  try {
+    const englishStyle = await req.payload.findByID({
+      collection: 'styles',
+      id: styleId,
+      locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
+    })
+
+    if (
+      englishStyle &&
+      typeof englishStyle === 'object' &&
+      'title' in englishStyle &&
+      typeof englishStyle.title === 'string'
+    ) {
+      return englishStyle.title
+    }
+  } catch (error) {
+    logger.warn('Could not fetch English style title', {
+      styleId,
+      error: String(error),
+    })
+  }
+
+  return undefined
 }
 
 async function fetchEnglishTitlesForCollections(
@@ -352,6 +398,7 @@ function prepareFlatVariantData(
   wineVariant: WineVariant,
   wine: Wine,
   englishCountryTitle: string | undefined,
+  englishStyleTitle: string | undefined,
   englishTitles: EnglishTitles,
 ): FlatVariantData {
   const primaryImageUrl = extractPrimaryImageUrl(wineVariant.media)
@@ -360,6 +407,7 @@ function prepareFlatVariantData(
   const winery = typeof wine.winery === 'object' ? wine.winery : null
   const region = typeof wine.region === 'object' ? wine.region : null
   const country = region && typeof region.country === 'object' ? region.country : null
+  const style = typeof wine.style === 'object' ? wine.style : null
 
   if (!winery || !region || !country) {
     throw new ValidationError('Invalid wine data structure - missing resolved relationships')
@@ -373,6 +421,17 @@ function prepareFlatVariantData(
     regionTitle: region.title,
     countryTitle: country.title,
     countryTitleEn: englishCountryTitle,
+    styleTitle: style?.title,
+    styleTitleEn: englishStyleTitle,
+    styleIconKey: style?.iconKey,
+    styleSlug:
+      style?.slug && typeof style.slug === 'object'
+        ? (style.slug as Record<string, string>)[SYNC_CONSTANTS.DEFAULT_LOCALE] ||
+          (style.slug as Record<string, string>).en ||
+          (style.slug as Record<string, string>).sl
+        : typeof style?.slug === 'string'
+          ? style.slug
+          : undefined,
     vintage: wineVariant.vintage,
     size: wineVariant.size,
     sku: wineVariant.sku || '',
@@ -483,6 +542,12 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       ? await fetchEnglishCountryTitle(req, String(wineCountry.id), logger)
       : undefined
 
+    // Fetch English style title
+    const wineStyle = typeof wine.style === 'object' ? wine.style : null
+    const englishStyleTitle = wineStyle
+      ? await fetchEnglishStyleTitle(req, String(wineStyle.id), logger)
+      : undefined
+
     // Fetch English titles for localized collections
     const englishTitles = await fetchEnglishTitlesForCollections(req, wineVariant, logger)
 
@@ -491,6 +556,7 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       wineVariant,
       wine,
       englishCountryTitle,
+      englishStyleTitle,
       englishTitles,
     )
 

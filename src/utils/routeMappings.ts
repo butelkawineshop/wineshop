@@ -12,7 +12,7 @@ export const localeNames: Record<Locale, string> = {
 
 export const defaultLocale: Locale = 'sl'
 
-interface RouteMapping {
+export interface RouteMapping {
   sl: string
   en: string
   collection: string

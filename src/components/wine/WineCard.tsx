@@ -16,11 +16,12 @@ import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
 import { formatPrice } from '@/utils/formatters'
+import type { Locale } from '@/i18n/locales'
 
 interface WineCardProps {
   variant: FlatWineVariant
   discountedPrice?: number
-  locale: string
+  locale: Locale
   onShare?: (variant: FlatWineVariant) => void
   onLike?: (variant: FlatWineVariant) => void
 }

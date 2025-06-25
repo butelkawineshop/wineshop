@@ -1,41 +1,46 @@
 'use client'
 
 import React from 'react'
-import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
+import { CollectionLink } from '@/components/ui/CollectionLink'
+import type { Locale } from '@/i18n/locales'
 
 interface WineTitleBarProps {
   variant: FlatWineVariant
-  locale: string
+  locale: Locale
 }
 
 export function WineTitleBar({ variant, locale }: WineTitleBarProps): React.JSX.Element {
   const { t } = useTranslation()
-  const wineUrl = `/${locale}/wine/${variant.slug || variant.id}`
 
   return (
     <div className="flex w-full py-2 px-2 gap-2 items-center justify-start text-sm relative z-10 bg-background rounded-t-lg">
       <div className="interactive rounded-full group border border-foreground/40 bg-gradient-to-br from-background to-foreground/5 p-1">
-        <Link href={wineUrl}>
+        <CollectionLink collection="styles" slug={variant.styleSlug || 'red'} locale={locale}>
           <Icon
-            name="red"
+            name={variant.styleIconKey || 'red'}
             variant="color"
             width={WINE_CONSTANTS.TITLE_ICON_SIZE}
             height={WINE_CONSTANTS.TITLE_ICON_SIZE}
             className="w-10 h-10 flex"
           />
-        </Link>
+        </CollectionLink>
       </div>
 
       <div className="flex flex-col w-full">
-        <Link href={wineUrl} className="interactive-text">
+        <CollectionLink
+          collection="wines"
+          slug={variant.slug || String(variant.id)}
+          locale={locale}
+          className="interactive-text"
+        >
           <h3 className="line-clamp-2 text-left text-lg md:text-sm font-accent lowercase transition-colors">
             {variant.wineTitle || t('wine.unknownWine')}
           </h3>
-        </Link>
+        </CollectionLink>
 
         <div className="flex flex-row gap-1 justify-between w-full text-base md:text-xs text-foreground/90">
           <p className="interactive-text transition-colors">

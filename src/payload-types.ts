@@ -1054,6 +1054,16 @@ export interface FlatWineVariant {
    * English country title
    */
   countryTitleEn?: string | null
+  styleTitle?: string | null
+  /**
+   * English style title
+   */
+  styleTitleEn?: string | null
+  styleIconKey?: string | null
+  /**
+   * Style slug for URL generation
+   */
+  styleSlug?: string | null
   size?: string | null
   vintage?: string | null
   price?: number | null
@@ -1950,6 +1960,10 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   regionTitle?: T
   countryTitle?: T
   countryTitleEn?: T
+  styleTitle?: T
+  styleTitleEn?: T
+  styleIconKey?: T
+  styleSlug?: T
   size?: T
   vintage?: T
   price?: T
