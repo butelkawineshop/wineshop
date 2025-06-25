@@ -1,4 +1,5 @@
 import Redis from 'ioredis'
+import { logger } from '@/lib/logger'
 
 // Validate required environment variable
 if (!process.env.REDIS_URL) {
@@ -38,9 +39,9 @@ export const redis = new Redis(process.env.REDIS_URL, {
 
 // Event listeners for monitoring and debugging
 redis.on('error', (error) => {
-  console.error('Redis connection error:', error)
+  logger.error({ error }, 'Redis connection error')
 })
 
 redis.on('connect', () => {
-  console.log('Connected to Redis')
+  logger.info('Connected to Redis')
 })

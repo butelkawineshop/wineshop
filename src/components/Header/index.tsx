@@ -107,7 +107,7 @@ export const Header = () => {
                   className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
                 >
                   <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
-                    <Icon name={item.icon} width={32} height={32} />
+                    <Icon name={item.icon} width={32} height={32} variant="switch" />
                   </div>
                   {showLogo && (
                     <span className="text-[10px] text-foreground/60 subtitle">{item.title}</span>

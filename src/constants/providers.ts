@@ -39,7 +39,7 @@ export const PROVIDER_CONSTANTS = {
   // Language service
   LANGUAGE_SERVICE: {
     API_ENDPOINTS: {
-      COLLECTION_BASE: '/api',
+      COLLECTION_BASE: process.env.NEXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3000/api',
     },
     QUERY_PARAMS: {
       WHERE: 'where',

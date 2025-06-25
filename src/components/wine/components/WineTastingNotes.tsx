@@ -87,15 +87,25 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
   const currentPagePairs = TASTING_NOTE_PAIRS.slice(startIndex, endIndex)
 
   // Get tasting values from variant data
-  // In a real implementation, these would come from variant.tastingProfile or similar
-  const getTastingValue = (): number => {
-    // Default to middle value (5) if no data is available
-    // This should be replaced with actual data from the variant
-    const defaultValue = 5
+  const getTastingValue = (key: string): number => {
+    try {
+      // Check if variant has tastingProfile data
+      if (variant.tastingProfile && typeof variant.tastingProfile === 'object') {
+        const profile = variant.tastingProfile as Record<string, unknown>
+        const value = profile[key]
 
-    // TODO: Implement proper data fetching from variant.tastingProfile
-    // For now, return default value
-    return defaultValue
+        // Return the value if it's a number, otherwise return default
+        if (typeof value === 'number' && value >= 0) {
+          return value
+        }
+      }
+
+      // Fallback to default value if no data is available
+      return 5
+    } catch (_error) {
+      // Return default value if there's an error
+      return 5
+    }
   }
 
   return (
@@ -106,7 +116,7 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
 
       <div className="grid grid-cols-1 gap-4 px-2 sm:px-0">
         {currentPagePairs.map(({ key, left, right }) => {
-          const value = getTastingValue()
+          const value = getTastingValue(key)
           const maxValue =
             key === 'alcohol'
               ? WINE_CONSTANTS.ALCOHOL_MAX_VALUE

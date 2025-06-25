@@ -21,7 +21,7 @@ export function Icon({
   variant = 'white',
 }: IconProps): React.JSX.Element {
   const isSwitch = variant === 'switch'
-  const isActive = variant === 'active'
+  const isActiveVariant = variant === 'active'
   const isColor = variant === 'color'
   const isWhite = variant === 'white'
 
@@ -65,48 +65,62 @@ export function Icon({
     )
   }
 
-  // For switch and active variants, show transition behavior
-  const baseIconPath = isActive ? '/icons/Color/' : '/icons/White/'
-  const hoverIconPath = '/icons/Color/'
+  // --- SWITCH/ACTIVE LOGIC ---
+  // If active variant and active is true: always show color
+  if (isActiveVariant && active) {
+    return (
+      <div className={cn('relative inline-block', className, 'active')} style={{ width, height }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/icons/Color/${name}.svg`}
+          width={width}
+          height={height}
+          alt={name}
+          className="absolute inset-0 w-full h-full"
+          draggable={false}
+        />
+      </div>
+    )
+  }
 
-  const baseOpacity = isActive ? 'opacity-100' : 'opacity-100'
-  const hoverOpacity = isActive ? 'opacity-0' : 'opacity-0'
+  // If switch, or active variant but not active: white by default, color on hover
+  if (isSwitch || (isActiveVariant && !active)) {
+    return (
+      <div className={cn('relative inline-block group', className)} style={{ width, height }}>
+        {/* Base: white icon */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/icons/White/${name}.svg`}
+          width={width}
+          height={height}
+          alt={name}
+          className={cn(
+            'absolute inset-0 w-full h-full transition-opacity',
+            ICON_CONSTANTS.TRANSITION_DURATION,
+            'opacity-100',
+            'group-hover:opacity-0',
+          )}
+          draggable={false}
+        />
+        {/* Hover: color icon */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/icons/Color/${name}.svg`}
+          width={width}
+          height={height}
+          alt={name}
+          className={cn(
+            'absolute inset-0 w-full h-full transition-opacity',
+            ICON_CONSTANTS.TRANSITION_DURATION,
+            'opacity-0',
+            'group-hover:opacity-100',
+          )}
+          draggable={false}
+        />
+      </div>
+    )
+  }
 
-  return (
-    <div
-      className={cn('relative inline-block group', className, active && 'active')}
-      style={{ width, height }}
-    >
-      {/* Base version */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`${baseIconPath}${name}.svg`}
-        width={width}
-        height={height}
-        alt={name}
-        className={cn(
-          'absolute inset-0 w-full h-full transition-opacity',
-          ICON_CONSTANTS.TRANSITION_DURATION,
-          baseOpacity,
-          'group-hover:opacity-0 group-[.active]:opacity-0',
-        )}
-        draggable={false}
-      />
-      {/* Hover/Active version */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`${hoverIconPath}${name}.svg`}
-        width={width}
-        height={height}
-        alt={name}
-        className={cn(
-          'absolute inset-0 w-full h-full transition-opacity',
-          ICON_CONSTANTS.TRANSITION_DURATION,
-          hoverOpacity,
-          'group-hover:opacity-100 group-[.active]:opacity-100',
-        )}
-        draggable={false}
-      />
-    </div>
-  )
+  // fallback (should never hit)
+  return <></>
 }

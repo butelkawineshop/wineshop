@@ -56,6 +56,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   locale,
 }): React.JSX.Element => {
   const languageState = useLanguageStore()
+  const [isInitialized, setIsInitialized] = React.useState(false)
 
   // Initialize language state with provided locale
   React.useEffect(() => {
@@ -64,10 +65,23 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
         languageState.setLanguage(locale)
         logger.info({ locale }, 'Language initialized from props')
       }
+      setIsInitialized(true)
     } catch (error) {
       logger.error({ error, locale }, 'Failed to initialize language from props')
+      setIsInitialized(true) // Still set initialized to prevent infinite loading
     }
   }, [locale, languageState])
+
+  // Show loading state until language is initialized
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    )
+  }
 
   return <>{children}</>
 }

@@ -47,6 +47,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }): React.JSX.Element => {
   const themeState = useThemeStore()
+  const [isLoaded, setIsLoaded] = React.useState(false)
 
   useEffect(() => {
     try {
@@ -55,10 +56,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         themeState.theme,
       )
       logger.debug({ theme: themeState.theme }, 'Theme applied to document')
+      setIsLoaded(true)
     } catch (error) {
       logger.error({ error, theme: themeState.theme }, 'Failed to apply theme to document')
+      setIsLoaded(true) // Still set loaded to prevent infinite loading
     }
   }, [themeState.theme])
+
+  // Show loading state until theme is applied
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    )
+  }
 
   return <ThemeContext.Provider value={themeState}>{children}</ThemeContext.Provider>
 }

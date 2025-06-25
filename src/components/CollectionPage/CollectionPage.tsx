@@ -132,7 +132,7 @@ function SingleItemView({
   config: CollectionDisplayConfig
   locale: Locale
   collection: string
-  collectionItems: Record<string, any[]>
+  collectionItems: Record<string, CollectionItem[]>
   searchParams: Record<string, string | string[] | undefined>
 }) {
   if (!data) return null
@@ -216,7 +216,7 @@ function ListView({
   searchParams: Record<string, string | string[] | undefined>
   t: (key: string) => string
   collection: string
-  collectionItems: Record<string, any[]>
+  collectionItems: Record<string, CollectionItem[]>
   prevUrl: string | null
   nextUrl: string | null
   baseUrl: string

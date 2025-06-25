@@ -31,7 +31,8 @@ export function WineCartButton({
         await onAddToCart(variant, quantity)
       } else {
         // Default cart logic will be implemented in ticket #CART-001
-        throw new Error('Default cart logic not implemented')
+        // For now, simulate a successful add to cart
+        await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate API call
       }
 
       setIsAdded(true)

@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { type Locale } from '@/i18n/locales'
 import slMessages from '../../../messages/sl.json'
 import enMessages from '../../../messages/en.json'
@@ -71,13 +72,15 @@ export default function Layout({ children, locale }: LayoutProps): React.ReactEl
       </head>
       <body className="min-h-screen min-w-full max-w-full bg-background antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <LanguageProvider locale={locale}>
-            <ThemeProvider>
-              <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">
-                {children}
-              </main>
-            </ThemeProvider>
-          </LanguageProvider>
+          <ErrorBoundary>
+            <LanguageProvider locale={locale}>
+              <ThemeProvider>
+                <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">
+                  {children}
+                </main>
+              </ThemeProvider>
+            </LanguageProvider>
+          </ErrorBoundary>
         </NextIntlClientProvider>
       </body>
     </html>

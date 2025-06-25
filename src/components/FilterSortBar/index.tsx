@@ -173,43 +173,72 @@ export default async function FilterSortBar({
     const page = params.page ? Number(params.page) : 1
     const limit = FILTER_CONSTANTS.DEFAULT_PAGE_LIMIT
 
-    const {
-      docs: wineVariants,
-      totalDocs,
-      totalPages,
-    } = await payload.find('flat-wine-variants', {
-      where,
-      page,
-      limit,
-      sort: sort as string,
-      depth: 0,
-    })
+    try {
+      const {
+        docs: wineVariants,
+        totalDocs,
+        totalPages,
+      } = await payload.find('flat-wine-variants', {
+        where: {
+          ...where,
+          _status: {
+            equals: 'published',
+          },
+        },
+        page,
+        limit,
+        sort: sort as string,
+        depth: 0,
+      })
 
-    return (
-      <div className="flex flex-col gap-4 w-full">
-        <WineFilters
-          currentCollection={currentCollection}
-          locale={resolvedLocale}
-          collectionItems={collectionItems || {}}
-        />
-        <Sorting />
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {showWineGrid && <WineGrid variants={wineVariants as any} locale={resolvedLocale} />}
-        {showPagination && totalPages > 1 && (
-          <Pagination
-            pagination={{
-              page,
-              totalPages,
-              totalDocs,
-              hasNextPage: page < totalPages,
-              hasPrevPage: page > 1,
-            }}
-            prevUrl={page > 1 ? `${baseUrl}?page=${page - 1}` : null}
-            nextUrl={page < totalPages ? `${baseUrl}?page=${page + 1}` : null}
+      return (
+        <div className="flex flex-col gap-4 w-full">
+          <WineFilters
+            currentCollection={currentCollection}
+            locale={resolvedLocale}
+            collectionItems={collectionItems || {}}
           />
-        )}
-      </div>
-    )
+          <Sorting />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {showWineGrid && <WineGrid variants={wineVariants as any} locale={resolvedLocale} />}
+          {showPagination && totalPages > 1 && (
+            <Pagination
+              pagination={{
+                page,
+                totalPages,
+                totalDocs,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+              }}
+              prevUrl={page > 1 ? `${baseUrl}?page=${page - 1}` : null}
+              nextUrl={page < totalPages ? `${baseUrl}?page=${page + 1}` : null}
+              position="bottom"
+            />
+          )}
+        </div>
+      )
+    } catch (error) {
+      logger.error('Failed to fetch wine variants', { error, where, page, limit })
+
+      // Return a fallback UI if data fetching fails
+      return (
+        <div className="flex flex-col gap-4 w-full">
+          <WineFilters
+            currentCollection={currentCollection}
+            locale={resolvedLocale}
+            collectionItems={collectionItems || {}}
+          />
+          <Sorting />
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              {resolvedLocale === 'en'
+                ? 'Unable to load wines at the moment.'
+                : 'Vina trenutno ni mogoče naložiti.'}
+            </p>
+          </div>
+        </div>
+      )
+    }
   } catch (error) {
     logger.error('Failed to load wine filters and grid', {
       error,

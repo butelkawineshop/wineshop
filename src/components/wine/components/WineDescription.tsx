@@ -18,7 +18,10 @@ export function WineDescription({
   const { t } = useTranslation()
 
   // For flat variants, we might get description from tastingProfile or other field
-  const description = variant.tastingProfile || ''
+  const description =
+    variant.tastingProfile ||
+    (variant as FlatWineVariant & { description?: string }).description ||
+    ''
 
   if (!description) return null
 

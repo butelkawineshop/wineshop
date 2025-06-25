@@ -84,6 +84,11 @@ export class CollectionService {
       depth: config.depth || 1,
       locale,
       limit: 100,
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
     })
 
     const foundItem = result.docs.find((doc: Record<string, unknown>) => doc.slug === slug) as
@@ -122,6 +127,11 @@ export class CollectionService {
       page: currentPage,
       sort: config.sort || '-createdAt',
       fields: ['title', 'slug', 'media'],
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
     })
 
     return {
@@ -183,7 +193,7 @@ export class CollectionService {
   /**
    * Fetch collection items for filters
    */
-  async fetchCollectionItems(): Promise<Record<string, any[]>> {
+  async fetchCollectionItems(): Promise<Record<string, CollectionItem[]>> {
     const collections = [
       'aromas',
       'climates',
@@ -197,23 +207,29 @@ export class CollectionService {
       'wineries',
     ]
 
-    const results: Record<string, any[]> = {}
-
-    for (const collection of collections) {
+    // Use Promise.all for parallel requests instead of sequential
+    const collectionPromises = collections.map(async (collection) => {
       try {
         const response = await this.payload.find(collection, {
           limit: 100,
           depth: 0,
           fields: ['id', 'title', 'slug'],
+          where: {
+            _status: {
+              equals: 'published',
+            },
+          },
         })
-        results[collection] = response.docs
+        return [collection, response.docs]
       } catch (error) {
-        // Use proper logging instead of console.error
-        results[collection] = []
+        // Log error but don't break the entire page
+        console.warn(`Failed to fetch ${collection}:`, error)
+        return [collection, []]
       }
-    }
+    })
 
-    return results
+    const results = await Promise.all(collectionPromises)
+    return Object.fromEntries(results)
   }
 
   /**
@@ -227,7 +243,7 @@ export class CollectionService {
    * Check if collection is wine-related
    */
   isWineCollection(collection: string): boolean {
-    return COLLECTION_CONSTANTS.WINE_COLLECTIONS.includes(collection as any)
+    return (COLLECTION_CONSTANTS.WINE_COLLECTIONS as readonly string[]).includes(collection)
   }
 }
 
