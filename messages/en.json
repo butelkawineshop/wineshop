@@ -38,6 +38,34 @@
     "addToCart": "Add to Cart",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
+    "noWinesFound": "No wines found",
+    "relatedWines": "Related Wines",
+    "discoverWines": "Discover wines from {location}",
+    "showingWines": "Showing {showing} of {total} wines",
+    "unknownWine": "Unknown Wine",
+    "unknownWinery": "Unknown Winery",
+    "fallbackAlt": "Wine",
+    "actions": {
+      "like": "Like wine",
+      "share": "Share wine",
+      "goToSlide": "Go to slide {slideNumber}"
+    },
+    "cart": {
+      "loading": "...",
+      "success": "✓",
+      "outOfStock": "Out of Stock",
+      "addButton": "+",
+      "outOfStockAria": "Out of stock",
+      "addToCartAria": "Add {wineTitle} to cart"
+    },
+    "description": {
+      "showMore": "Show more",
+      "showLess": "Show less"
+    },
+    "tastingNotes": {
+      "tasteProfile": "Taste Profile",
+      "characterNotes": "Character Notes"
+    },
     "list": {
       "title": "Wines",
       "description": "Discover our curated selection of wines"
@@ -184,6 +212,28 @@
       "description": "Description",
       "date": "Date",
       "location": "Location"
+    },
+    "notes": {
+      "dry": "Dry",
+      "sweet": "Sweet",
+      "light": "Light",
+      "rich": "Rich",
+      "smooth": "Smooth",
+      "austere": "Austere",
+      "crisp": "Crisp",
+      "creamy": "Creamy",
+      "noAlcohol": "No Alcohol",
+      "highAlcohol": "High Alcohol",
+      "freshFruit": "Fresh Fruit",
+      "ripeFruit": "Ripe Fruit",
+      "noOak": "No Oak",
+      "oaky": "Oaky",
+      "simple": "Simple",
+      "complex": "Complex",
+      "youthful": "Youthful",
+      "mature": "Mature",
+      "restrained": "Restrained",
+      "energetic": "Energetic"
     }
   },
   "giftCard": {
@@ -310,6 +360,47 @@
     "theme": {
       "light": "Turn on the lights",
       "dark": "Turn off the lights"
+    }
+  },
+  "filters": {
+    "aromas": "Aromas",
+    "climates": "Climates",
+    "foods": "Foods",
+    "grapeVarieties": "Grape Varieties",
+    "moods": "Moods",
+    "regions": "Regions",
+    "styles": "Styles",
+    "tags": "Tags",
+    "countries": "Countries",
+    "wineries": "Wineries",
+    "price": "Price Range",
+    "tastingNotes": "Tasting Notes",
+    "apply": "Apply Filters",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "search": "Search...",
+    "collections": "Filters"
+  },
+  "sorting": {
+    "newest": {
+      "label": "Newest",
+      "asc": "Newest (ascending)",
+      "desc": "Newest (descending)"
+    },
+    "price": {
+      "label": "Price",
+      "asc": "Price (ascending)",
+      "desc": "Price (descending)"
+    },
+    "name": {
+      "label": "Name",
+      "asc": "Name (ascending)",
+      "desc": "Name (descending)"
+    },
+    "createdAt": {
+      "label": "Created At",
+      "asc": "Created At (ascending)",
+      "desc": "Created At (descending)"
     }
   }
 }

@@ -16,21 +16,31 @@ interface PaginationProps {
   prevUrl: string | null
   nextUrl: string | null
   position?: 'top' | 'bottom'
+  onPrevClick?: (e?: React.MouseEvent) => void
+  onNextClick?: (e?: React.MouseEvent) => void
 }
 
-export const Pagination: React.FC<PaginationProps> = ({
+const PAGINATION_CONSTANTS = {
+  CONTAINER_GAP: 'gap-4',
+  BUTTON_GAP: 'gap-3',
+  ICON_SIZE: 'w-5 h-5',
+} as const
+
+export function Pagination({
   pagination,
   prevUrl,
   nextUrl,
   position = 'bottom',
-}) => {
+  onPrevClick,
+  onNextClick,
+}: PaginationProps): React.JSX.Element | null {
   const { t } = useTranslation()
   const { page: currentPage, totalPages, hasNextPage, hasPrevPage } = pagination
 
   if (totalPages <= 1) return null
 
   // Keyboard navigation handler
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
     if (e.key === 'ArrowLeft' && hasPrevPage && prevUrl) {
       window.location.href = prevUrl
     } else if (e.key === 'ArrowRight' && hasNextPage && nextUrl) {
@@ -51,39 +61,71 @@ export const Pagination: React.FC<PaginationProps> = ({
       onKeyDown={handleKeyDown}
     >
       <div className={`container mx-auto px-4 ${position === 'top' ? 'py-2' : 'py-4'}`}>
-        <div className="flex items-center justify-between gap-4">
+        <div className={`flex items-center justify-between ${PAGINATION_CONSTANTS.CONTAINER_GAP}`}>
           {/* Previous Page */}
           <div className="flex-1 min-w-0">
-            {hasPrevPage && prevUrl ? (
-              <Link
-                href={prevUrl}
-                className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02]"
-                aria-label={t('common.previous') + ' ' + t('common.page')}
-              >
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
-                    {t('common.previous')}
+            {hasPrevPage && (prevUrl || onPrevClick) ? (
+              prevUrl ? (
+                <Link
+                  href={prevUrl}
+                  className={`group flex items-center ${PAGINATION_CONSTANTS.BUTTON_GAP} p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02] cursor-pointer`}
+                  aria-label={t('common.previous') + ' ' + t('common.page')}
+                >
+                  <div className="flex-shrink-0">
+                    <svg
+                      className={`${PAGINATION_CONSTANTS.ICON_SIZE} text-foreground/60 group-hover:text-foreground transition-colors duration-200`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
                   </div>
-                  <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
-                    {t('common.page')}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                      {t('common.previous')}
+                    </div>
+                    <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                      {t('common.page')}
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              ) : (
+                <button
+                  onClick={(e) => onPrevClick?.(e)}
+                  className={`group flex items-center ${PAGINATION_CONSTANTS.BUTTON_GAP} p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02] w-full text-left cursor-pointer`}
+                  aria-label={t('common.previous') + ' ' + t('common.page')}
+                >
+                  <div className="flex-shrink-0">
+                    <svg
+                      className={`${PAGINATION_CONSTANTS.ICON_SIZE} text-foreground/60 group-hover:text-foreground transition-colors duration-200`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                      {t('common.previous')}
+                    </div>
+                    <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                      {t('common.page')}
+                    </div>
+                  </div>
+                </button>
+              )
             ) : (
               <div className="p-3 text-foreground/30" aria-disabled="true">
                 <div className="text-sm">{t('common.previous')}</div>
@@ -109,36 +151,68 @@ export const Pagination: React.FC<PaginationProps> = ({
 
           {/* Next Page */}
           <div className="flex-1 min-w-0">
-            {hasNextPage && nextUrl ? (
-              <Link
-                href={nextUrl}
-                className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02] text-right"
-                aria-label={t('common.next') + ' ' + t('common.page')}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
-                    {t('common.next')}
+            {hasNextPage && (nextUrl || onNextClick) ? (
+              nextUrl ? (
+                <Link
+                  href={nextUrl}
+                  className={`group flex items-center ${PAGINATION_CONSTANTS.BUTTON_GAP} p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02] text-right cursor-pointer`}
+                  aria-label={t('common.next') + ' ' + t('common.page')}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                      {t('common.next')}
+                    </div>
+                    <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                      {t('common.page')}
+                    </div>
                   </div>
-                  <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
-                    {t('common.page')}
+                  <div className="flex-shrink-0">
+                    <svg
+                      className={`${PAGINATION_CONSTANTS.ICON_SIZE} text-foreground/60 group-hover:text-foreground transition-colors duration-200`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </div>
-                </div>
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              </Link>
+                </Link>
+              ) : (
+                <button
+                  onClick={(e) => onNextClick?.(e)}
+                  className={`group flex items-center ${PAGINATION_CONSTANTS.BUTTON_GAP} p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform hover:scale-[1.02] w-full text-right cursor-pointer`}
+                  aria-label={t('common.next') + ' ' + t('common.page')}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                      {t('common.next')}
+                    </div>
+                    <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                      {t('common.page')}
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <svg
+                      className={`${PAGINATION_CONSTANTS.ICON_SIZE} text-foreground/60 group-hover:text-foreground transition-colors duration-200`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </button>
+              )
             ) : (
               <div className="p-3 text-foreground/30 text-right" aria-disabled="true">
                 <div className="text-sm">{t('common.next')}</div>

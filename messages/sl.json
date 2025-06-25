@@ -38,6 +38,34 @@
     "addToCart": "Dodaj v košarico",
     "inStock": "Na zalogi",
     "outOfStock": "Ni na zalogi",
+    "noWinesFound": "Vina niso bila najdena",
+    "relatedWines": "Sorodna vina",
+    "discoverWines": "Odkrijte vina iz {location}",
+    "showingWines": "Prikazujem {showing} od {total} vin",
+    "unknownWine": "Neznano vino",
+    "unknownWinery": "Neznana klet",
+    "fallbackAlt": "Vino",
+    "actions": {
+      "like": "Všeč mi je vino",
+      "share": "Deli vino",
+      "goToSlide": "Pojdi na diapozitiv {slideNumber}"
+    },
+    "cart": {
+      "loading": "...",
+      "success": "✓",
+      "outOfStock": "Ni na zalogi",
+      "addButton": "+",
+      "outOfStockAria": "Ni na zalogi",
+      "addToCartAria": "Dodaj {wineTitle} v košarico"
+    },
+    "description": {
+      "showMore": "Prikaži več",
+      "showLess": "Prikaži manj"
+    },
+    "tastingNotes": {
+      "tasteProfile": "Okusni profil",
+      "characterNotes": "Značajne opombe"
+    },
     "list": {
       "title": "Vina",
       "description": "Odkrijte našo skrbno izbrano zbirko vin"
@@ -308,8 +336,73 @@
       "switch": "English"
     },
     "theme": {
-      "light": "Prižgi lučke",
-      "dark": "Ugasni lučke"
+      "light": "Vklopi luči",
+      "dark": "Izklopi luči"
+    }
+  },
+  "filters": {
+    "aromas": "Arome",
+    "climates": "Podnebja",
+    "foods": "Hrana",
+    "grapeVarieties": "Sorte Grozdja",
+    "moods": "Razpoloženja",
+    "regions": "Regije",
+    "styles": "Slogi",
+    "tags": "Oznake",
+    "countries": "Države",
+    "wineries": "Vinogradi",
+    "price": "Cenovni Razpon",
+    "tastingNotes": "Ocene Okusov",
+    "apply": "Uporabi Filtre",
+    "showMore": "Prikaži Več",
+    "showLess": "Prikaži Manj",
+    "search": "Išči...",
+    "collections": "Filtri"
+  },
+  "sorting": {
+    "newest": {
+      "label": "Najnovejše",
+      "asc": "Najnovejše (naraščajoče)",
+      "desc": "Najnovejše (padajoče)"
+    },
+    "price": {
+      "label": "Cena",
+      "asc": "Cena (naraščajoče)",
+      "desc": "Cena (padajoče)"
+    },
+    "name": {
+      "label": "Ime",
+      "asc": "Ime (naraščajoče)",
+      "desc": "Ime (padajoče)"
+    },
+    "createdAt": {
+      "label": "Datum",
+      "asc": "Datum (naraščajoče)",
+      "desc": "Datum (padajoče)"
+    }
+  },
+  "tasting": {
+    "notes": {
+      "dry": "Suho",
+      "sweet": "Sladko",
+      "light": "Lahko",
+      "rich": "Bogato",
+      "smooth": "Gladko",
+      "austere": "Strogo",
+      "crisp": "Sveže",
+      "creamy": "Kremasto",
+      "noAlcohol": "Brez Alkohola",
+      "highAlcohol": "Visok Alkohol",
+      "freshFruit": "Sveže Sadje",
+      "ripeFruit": "Zrelo Sadje",
+      "noOak": "Brez Hrasta",
+      "oaky": "Hrastovo",
+      "simple": "Preprosto",
+      "complex": "Kompleksno",
+      "youthful": "Mlado",
+      "mature": "Zrelo",
+      "restrained": "Zadržano",
+      "energetic": "Energetično"
     }
   }
 }

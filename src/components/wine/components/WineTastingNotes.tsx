@@ -1,0 +1,170 @@
+'use client'
+
+import React from 'react'
+import { IconColor } from '@/components/IconColor'
+import type { FlatWineVariant } from '@/payload-types'
+import { useTranslation } from '@/hooks/useTranslation'
+import { WINE_CONSTANTS } from '@/constants/wine'
+
+interface WineTastingNotesProps {
+  variant: FlatWineVariant
+  page?: 1 | 2
+}
+
+type TastingNotePair = {
+  key: string
+  left: {
+    key: string
+    icon: string
+    translationKey: string
+  }
+  right: {
+    key: string
+    icon: string
+    translationKey: string
+  }
+}
+
+const TASTING_NOTE_PAIRS: TastingNotePair[] = [
+  {
+    key: 'dry',
+    left: { key: 'dry', icon: 'dry', translationKey: 'tasting.notes.dry' },
+    right: { key: 'sweet', icon: 'sweetness', translationKey: 'tasting.notes.sweet' },
+  },
+  {
+    key: 'light',
+    left: { key: 'light', icon: 'skinny', translationKey: 'tasting.notes.light' },
+    right: { key: 'rich', icon: 'fat', translationKey: 'tasting.notes.rich' },
+  },
+  {
+    key: 'smooth',
+    left: { key: 'smooth', icon: 'soft', translationKey: 'tasting.notes.smooth' },
+    right: { key: 'austere', icon: 'sharp', translationKey: 'tasting.notes.austere' },
+  },
+  {
+    key: 'creamy',
+    left: { key: 'crisp', icon: 'crisp', translationKey: 'tasting.notes.crisp' },
+    right: { key: 'creamy', icon: 'cream', translationKey: 'tasting.notes.creamy' },
+  },
+  {
+    key: 'alcohol',
+    left: { key: 'lowAlcohol', icon: 'water', translationKey: 'tasting.notes.noAlcohol' },
+    right: { key: 'highAlcohol', icon: 'alcohol', translationKey: 'tasting.notes.highAlcohol' },
+  },
+  {
+    key: 'ripe',
+    left: { key: 'freshFruit', icon: 'fruit', translationKey: 'tasting.notes.freshFruit' },
+    right: { key: 'ripeFruit', icon: 'jam', translationKey: 'tasting.notes.ripeFruit' },
+  },
+  {
+    key: 'oaky',
+    left: { key: 'noOak', icon: 'steel', translationKey: 'tasting.notes.noOak' },
+    right: { key: 'oaky', icon: 'oak', translationKey: 'tasting.notes.oaky' },
+  },
+  {
+    key: 'complex',
+    left: { key: 'simple', icon: 'simple', translationKey: 'tasting.notes.simple' },
+    right: { key: 'complex', icon: 'complex', translationKey: 'tasting.notes.complex' },
+  },
+  {
+    key: 'youthful',
+    left: { key: 'youthful', icon: 'baby', translationKey: 'tasting.notes.youthful' },
+    right: { key: 'mature', icon: 'old', translationKey: 'tasting.notes.mature' },
+  },
+  {
+    key: 'energetic',
+    left: { key: 'restrained', icon: 'calm', translationKey: 'tasting.notes.restrained' },
+    right: { key: 'energetic', icon: 'energy', translationKey: 'tasting.notes.energetic' },
+  },
+]
+
+export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): React.JSX.Element {
+  const { t } = useTranslation()
+
+  // Get the appropriate slice of pairs based on the page
+  const startIndex = (page - 1) * WINE_CONSTANTS.TASTING_NOTES_PER_PAGE
+  const endIndex = startIndex + WINE_CONSTANTS.TASTING_NOTES_PER_PAGE
+  const currentPagePairs = TASTING_NOTE_PAIRS.slice(startIndex, endIndex)
+
+  // Mock values - in real implementation, these would come from variant.tastingProfile
+  const getTastingValue = (key: string): number => {
+    // Generate mock values for demonstration
+    const mockValues: Record<string, number> = {
+      dry: 7,
+      light: 4,
+      smooth: 6,
+      creamy: 3,
+      alcohol: 8,
+      ripe: 5,
+      oaky: 2,
+      complex: 7,
+      youthful: 6,
+      energetic: 4,
+    }
+    return mockValues[key] || 5
+  }
+
+  return (
+    <div className="bg-background flex flex-col w-full h-full pb-2 pt-2 gap-2 px-2">
+      <div className="text-center px-4 text-xl font-accent font-bold">
+        {page === 1 ? t('wine.tastingNotes.tasteProfile') : t('wine.tastingNotes.characterNotes')}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 px-2 sm:px-0">
+        {currentPagePairs.map(({ key, left, right }) => {
+          const value = getTastingValue(key)
+          const maxValue =
+            key === 'alcohol'
+              ? WINE_CONSTANTS.ALCOHOL_MAX_VALUE
+              : WINE_CONSTANTS.TASTING_NOTE_MAX_VALUE
+          const percentage = (value / maxValue) * 100
+
+          return (
+            <div key={key} className="flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs text-foreground/60">
+                <div className="flex items-center gap-2">
+                  <IconColor
+                    name={left.icon}
+                    theme="color"
+                    width={20}
+                    height={20}
+                    className="flex-shrink-0"
+                  />
+                  <span>{t(left.translationKey)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>{t(right.translationKey)}</span>
+                  <IconColor
+                    name={right.icon}
+                    theme="color"
+                    width={20}
+                    height={20}
+                    className="flex-shrink-0"
+                  />
+                </div>
+              </div>
+
+              <div className="h-2 w-full bg-foreground/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Show aromas on second page */}
+      {page === 2 && variant.aromas && variant.aromas.length > 0 && (
+        <div className="flex flex-wrap justify-center gap-1 text-xs text-foreground/60 px-4 mt-2">
+          {variant.aromas.map((aroma, index) => (
+            <span key={index} className="hashtag">
+              #{aroma.title}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

@@ -77,6 +77,14 @@ export const FlatWineVariants: CollectionConfig = {
       },
     },
     {
+      name: 'countryTitleEn',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'English country title',
+      },
+    },
+    {
       name: 'size',
       type: 'text',
       admin: {
@@ -145,7 +153,11 @@ export const FlatWineVariants: CollectionConfig = {
       admin: {
         readOnly: true,
       },
-      fields: [{ name: 'title', type: 'text' }],
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
+      ],
     },
     {
       name: 'tags',
@@ -153,7 +165,11 @@ export const FlatWineVariants: CollectionConfig = {
       admin: {
         readOnly: true,
       },
-      fields: [{ name: 'title', type: 'text' }],
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
+      ],
     },
     {
       name: 'moods',
@@ -161,7 +177,11 @@ export const FlatWineVariants: CollectionConfig = {
       admin: {
         readOnly: true,
       },
-      fields: [{ name: 'title', type: 'text' }],
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
+      ],
     },
     {
       name: 'grapeVarieties',
@@ -170,10 +190,9 @@ export const FlatWineVariants: CollectionConfig = {
         readOnly: true,
       },
       fields: [
-        {
-          name: 'title',
-          type: 'text',
-        },
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
       ],
     },
     {

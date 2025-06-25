@@ -1,0 +1,187 @@
+'use client'
+
+import React, { useState, useRef } from 'react'
+import Image from 'next/image'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import type { Swiper as SwiperType } from 'swiper'
+import 'swiper/css'
+
+import { IconActive } from '@/components/IconActive'
+import { WineTitleBar } from './components/WineTitleBar'
+import { WineTastingNotes } from './components/WineTastingNotes'
+import { WineCartButton } from './components/WineCartButton'
+import { WineDescription } from './components/WineDescription'
+import { WineCollectionTags } from './components/WineCollectionTags'
+import type { FlatWineVariant } from '@/payload-types'
+import { IconColor } from '../IconColor'
+import { useTranslation } from '@/hooks/useTranslation'
+import { WINE_CONSTANTS } from '@/constants/wine'
+
+interface WineCardProps {
+  variant: FlatWineVariant
+  discountedPrice?: number
+  locale: string
+  onShare?: (variant: FlatWineVariant) => void
+  onLike?: (variant: FlatWineVariant) => void
+}
+
+export function WineCard({
+  variant,
+  discountedPrice,
+  locale,
+  onShare,
+  onLike,
+}: WineCardProps): React.JSX.Element {
+  const { t } = useTranslation()
+  const swiperRef = useRef<{ swiper: SwiperType }>(null)
+  const [activeIndex, setActiveIndex] = useState<number>(WINE_CONSTANTS.INITIAL_SLIDE_INDEX)
+
+  const formattedPrice = variant.price?.toFixed(2).replace('.', ',') || '0,00'
+  const formattedDiscountedPrice = discountedPrice?.toFixed(2).replace('.', ',')
+  const hasDiscount = discountedPrice !== undefined && discountedPrice < (variant.price || 0)
+
+  const handleShareWine = (): void => {
+    onShare?.(variant)
+  }
+
+  const handleLikeWine = (): void => {
+    onLike?.(variant)
+  }
+
+  const handleSlideChange = (swiper: SwiperType): void => {
+    setActiveIndex(swiper.activeIndex)
+  }
+
+  const handleSlideIndicatorClick = (index: number): void => {
+    swiperRef.current?.swiper?.slideTo(index)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number): void => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleSlideIndicatorClick(index)
+    }
+  }
+
+  return (
+    <div className="flex flex-col w-full h-full">
+      <WineTitleBar variant={variant} locale={locale} />
+
+      <Swiper
+        ref={swiperRef}
+        nested={true}
+        onSlideChange={handleSlideChange}
+        className="w-full bg-background"
+        role="region"
+        aria-label="Wine details slideshow"
+      >
+        {/* Main wine image slide */}
+        <SwiperSlide>
+          <div className="w-full flex items-start relative">
+            {variant.primaryImageUrl && (
+              <div className="w-full overflow-hidden">
+                <Image
+                  src={variant.primaryImageUrl}
+                  alt={variant.wineTitle || t('wine.fallbackAlt')}
+                  width={WINE_CONSTANTS.IMAGE_WIDTH}
+                  height={WINE_CONSTANTS.IMAGE_HEIGHT}
+                  className="object-cover w-full h-full"
+                  priority={false}
+                />
+                {/* Price overlay */}
+                {hasDiscount ? (
+                  <div
+                    className={`absolute ${WINE_CONSTANTS.PRICE_OVERLAY_WIDTH} top-5 -right-20 rotate-30 z-50 items-center justify-center text-center transform border rounded px-4 py-1`}
+                  >
+                    <div className="flex flex-row items-center justify-center gap-1">
+                      <span className="text-3xl md:text-xl font-accent text-white z-50">
+                        {formattedDiscountedPrice} €
+                      </span>
+                      <span className="text-3xl md:text-xl font-accent text-red-300 z-50 line-through">
+                        {formattedPrice} €
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className={`absolute top-5 -right-20 ${WINE_CONSTANTS.PRICE_OVERLAY_WIDTH} items-center justify-center text-center transform rotate-30 bg-background border border-foreground px-4 py-1`}
+                  >
+                    <span className="text-3xl md:text-xl font-accent">{formattedPrice} €</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </SwiperSlide>
+
+        {/* First tasting notes page */}
+        <SwiperSlide>
+          <div className="w-full h-full flex">
+            <WineTastingNotes variant={variant} page={1} />
+          </div>
+        </SwiperSlide>
+
+        {/* Second tasting notes page */}
+        <SwiperSlide>
+          <div className="w-full h-full flex">
+            <WineTastingNotes variant={variant} page={2} />
+          </div>
+        </SwiperSlide>
+      </Swiper>
+
+      <div className="bg-background flex flex-col w-full">
+        {/* Action buttons */}
+        <div className="grid grid-cols-3 w-full py-2 px-1">
+          <div className="flex items-center">
+            <div className="flex gap-2">
+              <button
+                onClick={handleLikeWine}
+                className="interactive rounded-full p-1 focus-ring"
+                aria-label={t('wine.actions.like')}
+              >
+                <IconActive name="like" />
+              </button>
+              <button
+                onClick={handleShareWine}
+                className="interactive rounded-full p-1 focus-ring"
+                aria-label={t('wine.actions.share')}
+              >
+                <IconColor name="share" theme="light" />
+              </button>
+            </div>
+          </div>
+
+          {/* Slide indicators */}
+          <div className="flex justify-center items-center">
+            <div className="flex gap-2">
+              {WINE_CONSTANTS.SLIDE_INDICATORS.map((index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSlideIndicatorClick(index)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  className={`${WINE_CONSTANTS.INDICATOR_SIZE} rounded-full transition-colors duration-300 focus-ring ${
+                    activeIndex === index ? 'bg-primary' : 'bg-foreground/20'
+                  }`}
+                  aria-label={t('wine.actions.goToSlide', { slideNumber: index + 1 })}
+                  aria-pressed={activeIndex === index}
+                  tabIndex={0}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Cart button */}
+          <div className="flex justify-end items-center">
+            <WineCartButton variant={variant} />
+          </div>
+        </div>
+
+        {/* Wine description and tags */}
+        <div className="px-2 pb-2 w-full space-y-content">
+          <WineDescription variant={variant} />
+          <WineCollectionTags variant={variant} locale={locale} />
+        </div>
+      </div>
+    </div>
+  )
+}

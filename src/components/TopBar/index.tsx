@@ -1,29 +1,30 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { useTheme } from '@/providers/ThemeProvider'
 import { IconColor } from '@/components/IconColor'
-import { useLanguage } from '@/providers/LanguageProvider'
-import slMessages from '../../../messages/sl.json'
-import enMessages from '../../../messages/en.json'
+import { useLanguageStore } from '@/store/slices/languageSlice'
+import { useTranslation } from '@/hooks/useTranslation'
+import { type Locale } from '@/i18n/locales'
 
 export const TopBar: React.FC = (): React.ReactElement => {
+  const pathname = usePathname()
   const { theme, toggleTheme } = useTheme()
-  const { language, toggleLanguage } = useLanguage()
+  const { currentLanguage, isSwitching, toggleLanguage, setLanguage } = useLanguageStore()
+  const { t } = useTranslation()
 
-  // Use the same translation approach as HomePage
-  const messages = language === 'en' ? enMessages : slMessages
-  const t = (key: string): string => {
-    const keys = key.split('.')
-    let value: unknown = messages
-    for (const k of keys) {
-      value = (value as Record<string, unknown>)?.[k]
+  // Detect current locale from pathname and initialize store
+  useEffect(() => {
+    const detectedLocale: Locale = pathname.startsWith('/en') ? 'en' : 'sl'
+    if (detectedLocale !== currentLanguage) {
+      setLanguage(detectedLocale)
     }
-    return typeof value === 'string' ? value : key
-  }
+  }, [pathname, currentLanguage, setLanguage])
 
-  const handleLanguageClick = (): void => {
-    toggleLanguage()
+  const handleLanguageClick = async (): Promise<void> => {
+    if (isSwitching) return
+    await toggleLanguage(pathname)
   }
 
   return (
@@ -54,11 +55,14 @@ export const TopBar: React.FC = (): React.ReactElement => {
       {/* Right: Language and Theme Switcher - Fixed width, right-aligned */}
       <div className="w-1/3 flex items-center justify-end gap-4">
         <button
-          className="flex items-center gap-2 px-2 py-1 rounded button-secondary"
+          className={`flex items-center gap-2 px-2 py-1 rounded button-secondary ${
+            isSwitching ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           onClick={handleLanguageClick}
+          disabled={isSwitching}
         >
           <IconColor name="language" width={20} height={20} theme={theme} />
-          <span className="text-sm">{t('header.language.switch')}</span>
+          <span className="text-sm">{isSwitching ? '...' : t('header.language.switch')}</span>
         </button>
         <span className="text-sm">|</span>
         <button

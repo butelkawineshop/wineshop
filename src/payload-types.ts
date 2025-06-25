@@ -1050,6 +1050,10 @@ export interface FlatWineVariant {
   wineryCode?: string | null
   regionTitle?: string | null
   countryTitle?: string | null
+  /**
+   * English country title
+   */
+  countryTitleEn?: string | null
   size?: string | null
   vintage?: string | null
   price?: number | null
@@ -1062,24 +1066,40 @@ export interface FlatWineVariant {
   aromas?:
     | {
         title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
         id?: string | null
       }[]
     | null
   tags?:
     | {
         title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
         id?: string | null
       }[]
     | null
   moods?:
     | {
         title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
         id?: string | null
       }[]
     | null
   grapeVarieties?:
     | {
         title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
         id?: string | null
       }[]
     | null
@@ -1929,6 +1949,7 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   wineryCode?: T
   regionTitle?: T
   countryTitle?: T
+  countryTitleEn?: T
   size?: T
   vintage?: T
   price?: T
@@ -1942,24 +1963,28 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
     | T
     | {
         title?: T
+        titleEn?: T
         id?: T
       }
   tags?:
     | T
     | {
         title?: T
+        titleEn?: T
         id?: T
       }
   moods?:
     | T
     | {
         title?: T
+        titleEn?: T
         id?: T
       }
   grapeVarieties?:
     | T
     | {
         title?: T
+        titleEn?: T
         id?: T
       }
   primaryImageUrl?: T

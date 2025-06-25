@@ -13,12 +13,15 @@ import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'
 import { Pagination } from '../Layout/Pagination'
 import * as motion from 'motion/react-client'
+import { headers } from 'next/headers'
+import { getTranslations } from 'next-intl/server'
+import FilterSortBar from '@/components/FilterSortBar'
 
 // Helper function to get nested object values
 function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
   return path.split('.').reduce((current: unknown, key: string) => {
     if (current && typeof current === 'object' && key in current) {
-      return (current as Record<string, unknown>)[key]
+      return (current as Record<string, unknown>)[key] as string | undefined
     }
     return undefined
   }, obj) as string | undefined
@@ -81,6 +84,9 @@ export async function CollectionPage({
   if (!config) {
     notFound()
   }
+
+  // Fetch collection items for filters
+  const collectionItems = await fetchCollectionItems()
 
   // Load translations
   const t = (key: string): string => {
@@ -150,7 +156,14 @@ export async function CollectionPage({
   return (
     <div className="container-wide">
       {isSingleItem ? (
-        <SingleItemView data={data} config={config} locale={locale} />
+        <SingleItemView
+          data={data}
+          config={config}
+          locale={locale}
+          collection={collection}
+          collectionItems={collectionItems}
+          searchParams={resolvedSearchParams}
+        />
       ) : (
         <ListView
           items={items}
@@ -160,6 +173,8 @@ export async function CollectionPage({
           pagination={pagination}
           searchParams={resolvedSearchParams}
           t={t}
+          collection={collection}
+          collectionItems={collectionItems}
         />
       )}
     </div>
@@ -170,12 +185,21 @@ function SingleItemView({
   data,
   config,
   locale,
+  collection,
+  collectionItems,
+  searchParams,
 }: {
   data: CollectionItem | null
   config: CollectionDisplayConfig
   locale: Locale
+  collection: string
+  collectionItems: Record<string, any[]>
+  searchParams: Record<string, string | string[] | undefined>
 }) {
   if (!data) return null
+
+  console.log('🔍 Debug - SingleItemView collection:', collection)
+  console.log('🔍 Debug - SingleItemView collectionItems keys:', Object.keys(collectionItems))
 
   return (
     <article className="container-narrow">
@@ -215,6 +239,32 @@ function SingleItemView({
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Show FilterSortBar for wine-related collections */}
+      {[
+        'regions',
+        'wineries',
+        'wineCountries',
+        'aromas',
+        'moods',
+        'climates',
+        'dishes',
+        'grape-varieties',
+        'styles',
+        'tags',
+      ].includes(collection) && (
+        <div className="mt-12">
+          <FilterSortBar
+            currentCollection={{ id: data.id, type: collection }}
+            searchParams={searchParams}
+            collectionItems={collectionItems}
+            locale={locale}
+            showWineGrid={true}
+            showPagination={true}
+            baseUrl=""
+          />
+        </div>
+      )}
     </article>
   )
 }
@@ -227,6 +277,8 @@ function ListView({
   pagination,
   searchParams,
   t,
+  collection,
+  collectionItems,
 }: {
   items: CollectionItem[]
   config: CollectionDisplayConfig
@@ -235,9 +287,15 @@ function ListView({
   pagination: PaginationInfo | null
   searchParams: Record<string, string | string[] | undefined>
   t: (key: string) => string
+  collection: string
+  collectionItems: Record<string, any[]>
 }) {
   // TEMP: Log media field for debugging
   // (Debug log removed)
+
+  console.log('🔍 Debug - ListView collection:', collection)
+  console.log('🔍 Debug - ListView baseSegment:', baseSegment)
+  console.log('🔍 Debug - ListView collectionItems keys:', Object.keys(collectionItems))
 
   const currentPage = pagination?.page || 1
 
@@ -408,6 +466,68 @@ function ListView({
           <p className="text-lg text-gray-600">{t('common.noResults')}</p>
         </div>
       )}
+
+      {/* Show FilterSortBar for wine-related collections at the bottom */}
+      {[
+        'regions',
+        'wineries',
+        'wineCountries',
+        'aromas',
+        'moods',
+        'climates',
+        'dishes',
+        'grape-varieties',
+        'styles',
+        'tags',
+      ].includes(collection) && (
+        <div className="mt-12">
+          <FilterSortBar
+            currentCollection={undefined}
+            searchParams={searchParams}
+            collectionItems={collectionItems}
+            locale={locale}
+            showWineGrid={true}
+            showPagination={true}
+            baseUrl={buildPageUrl(1).replace('?page=1', '').replace('&page=1', '')}
+          />
+        </div>
+      )}
     </div>
   )
+}
+
+// Helper function to fetch collection items for filters
+const fetchCollectionItems = async () => {
+  const payloadClient = getPayloadClient()
+  const collections = [
+    'aromas',
+    'climates',
+    'dishes', // Changed from 'foods' to 'dishes'
+    'grape-varieties',
+    'moods',
+    'regions',
+    'styles',
+    'tags',
+    'wineCountries', // Changed from 'wineCountries' to 'wine-countries'
+    'wineries',
+  ]
+
+  const results: Record<string, any[]> = {}
+
+  for (const collection of collections) {
+    try {
+      const response = await payloadClient.find({
+        collection,
+        limit: 100,
+        depth: 0,
+        fields: ['id', 'title', 'slug'],
+      })
+      results[collection] = response.docs
+    } catch (error) {
+      console.error(`Error fetching collection items:`, error)
+      results[collection] = []
+    }
+  }
+
+  return results
 }
