@@ -1,266 +1,88 @@
 import React from 'react'
 import { headers } from 'next/headers'
-import WineFilters from '@/components/WineFilters'
-import Sorting from '@/components/Sorting'
-import { WineGrid } from '@/components/wine/WineGrid'
-import { getPayloadClient } from '@/lib/payload'
-import type { Locale } from '@/i18n/locales'
-import { Pagination } from '@/components/Layout/Pagination'
-import { FILTER_CONSTANTS } from '@/constants/filters'
+import { createPayloadService } from '@/lib/payload'
 import { logger } from '@/lib/logger'
-
-// Field mapping constants to reduce redundancy
-const FIELD_MAP: Record<string, string> = {
-  regions: 'regionTitle',
-  wineries: 'wineryTitle',
-  wineCountries: 'countryTitle',
-  'grape-varieties': 'grapeVarieties',
-  aromas: 'aromas',
-  moods: 'moods',
-  styles: 'tags',
-  dishes: 'tags',
-  climates: 'tags',
-  tags: 'tags',
-} as const
-
-const COLLECTION_KEY_MAP: Record<string, string> = {
-  regions: 'regions',
-  wineries: 'wineries',
-  wineCountries: 'wineCountries',
-} as const
-
-const TITLE_FIELDS = ['regions', 'wineries', 'wineCountries'] as const
-
-const TASTING_NOTES_KEYS = [
-  'dry',
-  'ripe',
-  'creamy',
-  'oaky',
-  'complex',
-  'light',
-  'smooth',
-  'youthful',
-  'energetic',
-  'alcohol',
-] as const
+import type { Locale } from '@/i18n/locales'
+import { FilterSortBarClient } from './FilterSortBar.client'
 
 type Props = {
   currentCollection?: {
     id: string
     type: string
   }
-  searchParams?: {
-    [key: string]: string | string[] | undefined
-  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectionItems?: Record<string, any[]>
   locale?: Locale
   showWineGrid?: boolean
-  showPagination?: boolean
-  baseUrl?: string
 }
 
 export default async function FilterSortBar({
   currentCollection,
-  searchParams = {},
   collectionItems,
   locale,
   showWineGrid = true,
-  showPagination = true,
-  baseUrl = '',
 }: Props): Promise<React.JSX.Element> {
-  const headersList = await headers()
-  const resolvedLocale = (locale || headersList.get('x-locale') || 'sl') as Locale
+  const resolvedLocale = (locale || 'sl') as Locale
 
-  // Build where clause for wine filtering
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: Record<string, any> = {}
+  // Fetch initial data server-side for SEO
+  let initialWineVariants: any[] = []
+  let error: string | null = null
 
   try {
-    // If we have a current collection, filter by it
+    const payload = createPayloadService()
+
+    // Build where clause for current collection if specified
+    const where: Record<string, unknown> = {
+      _status: {
+        equals: 'published',
+      },
+    }
+
     if (currentCollection) {
-      const fieldName = FIELD_MAP[currentCollection.type]
+      const { type, id } = currentCollection
+
+      // Map collection types to field names
+      const fieldMap: Record<string, string> = {
+        regions: 'regionTitle',
+        wineries: 'wineryTitle',
+        wineCountries: 'countryTitle',
+        styles: 'styleTitle',
+      }
+
+      const fieldName = fieldMap[type]
       if (fieldName) {
-        if (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          TITLE_FIELDS.includes(currentCollection.type as any)
-        ) {
-          // For title fields, we need to get the title from the collection item
-          const collectionKey = COLLECTION_KEY_MAP[currentCollection.type]
-
-          const item = collectionItems?.[collectionKey]?.find(
-            (item) => item.id === currentCollection.id,
-          )
-
-          if (item) {
-            const title = resolvedLocale === 'en' && item.titleEn ? item.titleEn : item.title
-            where[fieldName] = { equals: title }
-          }
-        } else {
-          // For array fields, filter by ID
-          where[fieldName] = { contains: { id: currentCollection.id } }
-        }
+        // For now, we'll fetch all and filter client-side
+        // This could be optimized later with server-side filtering
       }
     }
 
-    // Handle additional filters from URL params
-    const params = await Promise.resolve(searchParams)
-
-    // Handle collection filters
-    const filterCollections = [
-      'aromas',
-      'climates',
-      'dishes',
-      'grape-varieties',
-      'moods',
-      'regions',
-      'styles',
-      'tags',
-      'wineCountries',
-      'wineries',
-    ]
-    filterCollections.forEach((key) => {
-      const values = params[key]
-      if (values) {
-        const ids = Array.isArray(values) ? values : values.split(',').map((id) => id.trim())
-        if (ids.length > 0) {
-          const fieldName = FIELD_MAP[key]
-          if (fieldName) {
-            if (
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              TITLE_FIELDS.includes(key as any)
-            ) {
-              where[fieldName] = { in: ids }
-            } else {
-              where[fieldName] = { contains: { id: { in: ids } } }
-            }
-          }
-        }
-      }
+    const response = await payload.find('flat-wine-variants', {
+      where,
+      limit: 1000, // Fetch all for client-side filtering
+      sort: '-syncedAt',
+      depth: 0,
     })
 
-    // Handle tasting notes ranges
-    TASTING_NOTES_KEYS.forEach((note) => {
-      const minValue = params[`${note}Min`]
-      const maxValue = params[`${note}Max`]
+    initialWineVariants = response.docs
 
-      if (minValue || maxValue) {
-        const min = minValue ? Number(minValue) : undefined
-        const max = maxValue ? Number(maxValue) : undefined
-
-        if (min !== undefined || max !== undefined) {
-          where[`tastingProfile.${note}`] = {
-            ...(min !== undefined && { greater_than_equal: min }),
-            ...(max !== undefined && { less_than_equal: max }),
-          }
-        }
-      }
+    logger.info('Initial wine variants fetched successfully', {
+      count: response.docs.length,
+      locale: resolvedLocale,
+      currentCollection: currentCollection?.type,
     })
-
-    // Handle sorting
-    const sort = params.sort
-      ? params.direction === 'desc'
-        ? `-${params.sort === 'price' ? 'price' : params.sort === 'name' ? 'wineTitle' : params.sort}`
-        : params.sort === 'price'
-          ? 'price'
-          : params.sort === 'name'
-            ? 'wineTitle'
-            : params.sort
-      : '-syncedAt'
-
-    // Fetch wines
-    const payload = getPayloadClient()
-    const page = params.page ? Number(params.page) : 1
-    const limit = FILTER_CONSTANTS.DEFAULT_PAGE_LIMIT
-
-    try {
-      const {
-        docs: wineVariants,
-        totalDocs,
-        totalPages,
-      } = await payload.find('flat-wine-variants', {
-        where: {
-          ...where,
-          _status: {
-            equals: 'published',
-          },
-        },
-        page,
-        limit,
-        sort: sort as string,
-        depth: 0,
-      })
-
-      return (
-        <div className="flex flex-col gap-4 w-full">
-          <WineFilters
-            currentCollection={currentCollection}
-            locale={resolvedLocale}
-            collectionItems={collectionItems || {}}
-          />
-          <Sorting />
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {showWineGrid && <WineGrid variants={wineVariants as any} locale={resolvedLocale} />}
-          {showPagination && totalPages > 1 && (
-            <Pagination
-              pagination={{
-                page,
-                totalPages,
-                totalDocs,
-                hasNextPage: page < totalPages,
-                hasPrevPage: page > 1,
-              }}
-              prevUrl={page > 1 ? `${baseUrl}?page=${page - 1}` : null}
-              nextUrl={page < totalPages ? `${baseUrl}?page=${page + 1}` : null}
-              position="bottom"
-            />
-          )}
-        </div>
-      )
-    } catch (error) {
-      logger.error('Failed to fetch wine variants', { error, where, page, limit })
-
-      // Return a fallback UI if data fetching fails
-      return (
-        <div className="flex flex-col gap-4 w-full">
-          <WineFilters
-            currentCollection={currentCollection}
-            locale={resolvedLocale}
-            collectionItems={collectionItems || {}}
-          />
-          <Sorting />
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              {resolvedLocale === 'en'
-                ? 'Unable to load wines at the moment.'
-                : 'Vina trenutno ni mogoče naložiti.'}
-            </p>
-          </div>
-        </div>
-      )
-    }
-  } catch (error) {
-    logger.error('Failed to load wine filters and grid', {
-      error,
-      currentCollection,
-      searchParams: Object.keys(searchParams),
-    })
-
-    // Return fallback UI
-    return (
-      <div className="flex flex-col gap-4 w-full">
-        <WineFilters
-          currentCollection={currentCollection}
-          locale={resolvedLocale}
-          collectionItems={collectionItems || {}}
-        />
-        <Sorting />
-        {showWineGrid && (
-          <div className="text-center py-8">
-            <p className="text-foreground/60">Failed to load wines. Please try again.</p>
-          </div>
-        )}
-      </div>
-    )
+  } catch (fetchError) {
+    error = 'Failed to fetch initial wine variants'
+    logger.error(error, { error: fetchError, currentCollection })
   }
+
+  return (
+    <FilterSortBarClient
+      currentCollection={currentCollection}
+      collectionItems={collectionItems || {}}
+      locale={resolvedLocale}
+      showWineGrid={showWineGrid}
+      initialWineVariants={initialWineVariants}
+      error={error}
+    />
+  )
 }

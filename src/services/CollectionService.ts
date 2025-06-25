@@ -1,4 +1,4 @@
-import { getPayloadClient } from '@/lib/payload'
+import { createPayloadService } from '@/lib/payload'
 import {
   CollectionConfig,
   type CollectionDisplayConfig,
@@ -39,7 +39,7 @@ export interface PaginationUrls {
  * Handles data fetching, pagination, and URL building
  */
 export class CollectionService {
-  private payload = getPayloadClient()
+  private payload = createPayloadService()
 
   /**
    * Fetch collection data (single item or list)

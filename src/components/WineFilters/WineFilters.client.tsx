@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -12,7 +11,7 @@ import { Accordion } from '@/components/Accordion'
 import type { Locale } from '@/i18n/locales'
 import { useTranslation } from '@/hooks/useTranslation'
 import { FILTER_CONSTANTS, FILTER_COLLECTIONS, TASTING_NOTES } from '@/constants/filters'
-import { logger } from '@/lib/logger'
+import { useWineStore } from '@/store/wineStore'
 
 interface WineFiltersClientProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,96 +29,24 @@ export default function WineFiltersClient({
   locale,
 }: WineFiltersClientProps): React.JSX.Element {
   const { t } = useTranslation()
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const { filters, setFilter, clearFilter, isFilterActive, hasActiveFilters } = useWineStore()
 
   const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
 
-  const updateURL = (updates: Record<string, string | null>): void => {
-    try {
-      const params = new URLSearchParams(searchParams)
-
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value === null) {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-
-      // Reset to page 1 when filters change
-      params.delete('page')
-
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
-    } catch (error) {
-      logger.error('Failed to update URL with filter changes', { error, updates })
-    }
-  }
-
   const toggleFilter = (key: string, value: string): void => {
-    try {
-      const currentValues = searchParams.get(key)?.split(',').filter(Boolean) || []
+    const currentValues = filters[key as keyof typeof filters] || []
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value]
 
-      // For title fields, we need to get the title from the collection item
-      const titleFields = ['regions', 'wineries', 'wineCountries']
-      const isTitleField = titleFields.includes(key)
-
-      // Find the collection name from the key
-      const filterCollection = FILTER_COLLECTIONS.find((fc) => fc.key === key)
-      const collectionName = filterCollection?.collection || key
-
-      let filterValue = value
-      if (isTitleField) {
-        // Find the item and get its title
-        const item = collectionItems[collectionName]?.find((item) => item.id === value)
-        if (item) {
-          const title =
-            typeof item.title === 'object'
-              ? locale === 'en' && item.title.en
-                ? item.title.en
-                : item.title.sl || item.title.en
-              : item.title
-          filterValue = title
-        }
-      }
-
-      const newValues = currentValues.includes(filterValue)
-        ? currentValues.filter((v) => v !== filterValue)
-        : [...currentValues, filterValue]
-
-      updateURL({
-        [key]: newValues.length > 0 ? newValues.join(',') : null,
-      })
-    } catch (error) {
-      logger.error('Failed to toggle filter', { error, key, value })
-    }
+    setFilter(key as keyof typeof filters, newValues)
   }
 
   const updateTastingNoteRange = (key: string, value: [number, number]): void => {
-    try {
-      const [min, max] = value
-      const updates: Record<string, string | null> = {}
-      const tastingNote = TASTING_NOTES.find((note) => note.key === key)
-      const maxValue = tastingNote?.maxValue || 10
-
-      if (min > 0) {
-        updates[`${key}Min`] = min.toString()
-      } else {
-        updates[`${key}Min`] = null
-      }
-
-      if (max < maxValue) {
-        updates[`${key}Max`] = max.toString()
-      } else {
-        updates[`${key}Max`] = null
-      }
-
-      updateURL(updates)
-    } catch (error) {
-      logger.error('Failed to update tasting note range', { error, key, value })
-    }
+    // TODO: Implement tasting notes filtering
+    // For now, this is disabled as the flat collection stores tastingProfile as a string
+    console.log('Tasting note range update:', { key, value })
   }
 
   const handleSearchChange = (collection: string, value: string): void => {
@@ -131,30 +58,25 @@ export default function WineFiltersClient({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getFilteredItems = (collection: string): any[] => {
-    try {
-      const items = collectionItems[collection] || []
-      const searchQuery = searchQueries[collection] || ''
+    const items = collectionItems[collection] || []
+    const searchQuery = searchQueries[collection] || ''
 
-      if (!searchQuery) return items
+    if (!searchQuery) return items
 
-      return items.filter((item) => {
-        const title =
-          typeof item.title === 'object'
-            ? locale === 'en' && item.title.en
-              ? item.title.en
-              : item.title.sl || item.title.en
-            : item.title || ''
-        const titleEn =
-          typeof item.titleEn === 'object'
-            ? item.titleEn.en || item.titleEn.sl || ''
-            : item.titleEn || ''
-        const query = searchQuery.toLowerCase()
-        return title.toLowerCase().includes(query) || titleEn.toLowerCase().includes(query)
-      })
-    } catch (error) {
-      logger.error('Failed to filter items', { error, collection })
-      return []
-    }
+    return items.filter((item) => {
+      const title =
+        typeof item.title === 'object'
+          ? locale === 'en' && item.title.en
+            ? item.title.en
+            : item.title.sl || item.title.en
+          : item.title || ''
+      const titleEn =
+        typeof item.titleEn === 'object'
+          ? item.titleEn.en || item.titleEn.sl || ''
+          : item.titleEn || ''
+      const query = searchQuery.toLowerCase()
+      return title.toLowerCase().includes(query) || titleEn.toLowerCase().includes(query)
+    })
   }
 
   const toggleAccordion = (key: string): void => {
@@ -162,53 +84,14 @@ export default function WineFiltersClient({
   }
 
   const getActiveFilters = (key: string): string[] => {
-    try {
-      const values = searchParams.get(key)?.split(',').filter(Boolean) || []
-
-      // For title fields, we need to check if the stored titles match the item titles
-      const titleFields = ['regions', 'wineries', 'wineCountries']
-      const isTitleField = titleFields.includes(key)
-
-      if (isTitleField) {
-        // Find the collection name from the key
-        const filterCollection = FILTER_COLLECTIONS.find((fc) => fc.key === key)
-        const collectionName = filterCollection?.collection || key
-
-        // Return IDs of items whose titles match the stored values
-        return (
-          collectionItems[collectionName]
-            ?.filter((item) => {
-              const itemTitle =
-                typeof item.title === 'object'
-                  ? locale === 'en' && item.title.en
-                    ? item.title.en
-                    : item.title.sl || item.title.en
-                  : item.title
-              return values.includes(itemTitle)
-            })
-            .map((item) => item.id) || []
-        )
-      }
-
-      return values
-    } catch (error) {
-      logger.error('Failed to get active filters', { error, key })
-      return []
-    }
+    return filters[key as keyof typeof filters] || []
   }
 
   const getTastingNoteRange = (key: string): [number, number] => {
-    try {
-      const min = searchParams.get(`${key}Min`)
-      const max = searchParams.get(`${key}Max`)
-      const tastingNote = TASTING_NOTES.find((note) => note.key === key)
-      const maxValue = tastingNote?.maxValue || 10
-
-      return [min ? Number(min) : 0, max ? Number(max) : maxValue] as [number, number]
-    } catch (error) {
-      logger.error('Failed to get tasting note range', { error, key })
-      return [0, 10]
-    }
+    // TODO: Implement tasting notes range
+    const tastingNote = TASTING_NOTES.find((note) => note.key === key)
+    const maxValue = tastingNote?.maxValue || 10
+    return [0, maxValue] as [number, number]
   }
 
   return (
@@ -252,7 +135,24 @@ export default function WineFiltersClient({
                       />
                       <div className={`${FILTER_CONSTANTS.DROPDOWN_MAX_HEIGHT} overflow-y-auto`}>
                         {filteredItems.map((item) => {
-                          const isSelected = activeFilters.includes(item.id)
+                          // Get the appropriate value based on filter type
+                          const getFilterValue = (filterKey: string) => {
+                            // String-based filters use titles
+                            if (
+                              ['regions', 'wineries', 'wineCountries', 'styles'].includes(filterKey)
+                            ) {
+                              return typeof item.title === 'object'
+                                ? locale === 'en' && item.title.en
+                                  ? item.title.en
+                                  : item.title.sl || item.title.en
+                                : item.title || ''
+                            }
+                            // Array-based filters use IDs
+                            return item.id
+                          }
+
+                          const filterValue = getFilterValue(key)
+                          const isSelected = activeFilters.includes(filterValue)
                           const isLocked = isCurrentCollection && item.id === currentCollection.id
 
                           return (
@@ -263,7 +163,7 @@ export default function WineFiltersClient({
                               <Checkbox
                                 id={`${key}-${item.id}`}
                                 checked={isSelected}
-                                onChange={() => !isLocked && toggleFilter(key, item.id)}
+                                onChange={() => !isLocked && toggleFilter(key, filterValue)}
                                 disabled={isLocked}
                               />
                               <label

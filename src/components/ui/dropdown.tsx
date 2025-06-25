@@ -103,8 +103,9 @@ export function DropdownMenu({
               minWidth: Math.max(position.width, UI_CONSTANTS.DROPDOWN_MIN_WIDTH_PX),
               zIndex: UI_CONSTANTS.DROPDOWN_Z_INDEX,
             }}
-            role="button"
+            role="menu"
             aria-expanded={isOpen}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             {children}
           </div>,
