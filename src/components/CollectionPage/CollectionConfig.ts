@@ -1,20 +1,4 @@
-// Constants for common limits
-const WINE_LIST_LIMIT = 18
-const WINERY_LIST_LIMIT = 18
-const REGION_LIST_LIMIT = 18
-const WINE_COUNTRY_LIST_LIMIT = 18
-const GRAPE_VARIETY_LIST_LIMIT = 18
-const STYLE_LIST_LIMIT = 18
-const AROMA_LIST_LIMIT = 18
-const CLIMATE_LIST_LIMIT = 18
-const MOOD_LIST_LIMIT = 18
-const DISH_LIST_LIMIT = 18
-const TAG_LIST_LIMIT = 18
-const TASTING_LIST_LIMIT = 18
-const GIFT_CARD_LIST_LIMIT = 18
-const MERCH_LIST_LIMIT = 18
-const POST_LIST_LIMIT = 18
-const PAGE_LIST_LIMIT = 18
+import { COLLECTION_CONSTANTS } from '@/constants/collections'
 
 export interface FieldConfig {
   name: string
@@ -56,7 +40,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'wine.list.title',
     listDescription: 'wine.list.description',
-    listLimit: WINE_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.WINE,
     sort: '-createdAt',
     depth: 2,
     fields: [
@@ -103,7 +87,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'winery.list.title',
     listDescription: 'winery.list.description',
-    listLimit: WINERY_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.WINERY,
     sort: 'title',
     depth: 1,
     fields: [
@@ -138,7 +122,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'region.list.title',
     listDescription: 'region.list.description',
-    listLimit: REGION_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.REGION,
     sort: 'title',
     depth: 2,
     fields: [
@@ -171,7 +155,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'wineCountry.list.title',
     listDescription: 'wineCountry.list.description',
-    listLimit: WINE_COUNTRY_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.WINE_COUNTRY,
     sort: 'title',
     depth: 2,
     fields: [
@@ -236,7 +220,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'grapeVariety.list.title',
     listDescription: 'grapeVariety.list.description',
-    listLimit: GRAPE_VARIETY_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.GRAPE_VARIETY,
     sort: 'title',
     depth: 2,
     fields: [
@@ -309,7 +293,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'style.list.title',
     listDescription: 'style.list.description',
-    listLimit: STYLE_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.STYLE,
     sort: 'title',
     depth: 1,
     fields: [
@@ -335,7 +319,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'aroma.list.title',
     listDescription: 'aroma.list.description',
-    listLimit: AROMA_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.AROMA,
     sort: 'title',
     depth: 1,
     fields: [
@@ -361,7 +345,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'climate.list.title',
     listDescription: 'climate.list.description',
-    listLimit: CLIMATE_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.CLIMATE,
     sort: 'title',
     depth: 1,
     fields: [
@@ -387,7 +371,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'mood.list.title',
     listDescription: 'mood.list.description',
-    listLimit: MOOD_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.MOOD,
     sort: 'title',
     depth: 1,
     fields: [
@@ -413,7 +397,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'dish.list.title',
     listDescription: 'dish.list.description',
-    listLimit: DISH_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.DISH,
     sort: 'title',
     depth: 1,
     fields: [
@@ -439,7 +423,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'tag.list.title',
     listDescription: 'tag.list.description',
-    listLimit: TAG_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.TAG,
     sort: 'title',
     depth: 1,
     fields: [
@@ -465,7 +449,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'tasting.list.title',
     listDescription: 'tasting.list.description',
-    listLimit: TASTING_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.TASTING,
     sort: '-date',
     depth: 1,
     fields: [
@@ -486,7 +470,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'giftCard.list.title',
     listDescription: 'giftCard.list.description',
-    listLimit: GIFT_CARD_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.GIFT_CARD,
     sort: 'title',
     depth: 1,
     fields: [
@@ -506,7 +490,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'media',
     listTitle: 'merch.list.title',
     listDescription: 'merch.list.description',
-    listLimit: MERCH_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.MERCH,
     sort: 'title',
     depth: 1,
     fields: [
@@ -526,7 +510,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'featuredImage',
     listTitle: 'post.list.title',
     listDescription: 'post.list.description',
-    listLimit: POST_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.POST,
     sort: '-publishedAt',
     depth: 1,
     fields: [
@@ -555,7 +539,7 @@ export const CollectionConfig: Record<string, CollectionDisplayConfig> = {
     mediaField: 'featuredImage',
     listTitle: 'page.list.title',
     listDescription: 'page.list.description',
-    listLimit: PAGE_LIST_LIMIT,
+    listLimit: COLLECTION_CONSTANTS.LIST_LIMITS.PAGE,
     sort: 'title',
     depth: 1,
     fields: [

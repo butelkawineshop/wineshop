@@ -14,3 +14,89 @@ export const FILTER_CONSTANTS = {
   // Search
   SEARCH_DEBOUNCE_MS: 300,
 } as const
+
+export const FILTER_COLLECTIONS = [
+  { key: 'aromas', icon: 'aroma', translationKey: 'filters.aromas', collection: 'aromas' },
+  { key: 'climates', icon: 'climate', translationKey: 'filters.climates', collection: 'climates' },
+  { key: 'dishes', icon: 'pairing', translationKey: 'filters.foods', collection: 'dishes' },
+  {
+    key: 'grape-varieties',
+    icon: 'grape',
+    translationKey: 'filters.grapeVarieties',
+    collection: 'grape-varieties',
+  },
+  { key: 'moods', icon: 'mood', translationKey: 'filters.moods', collection: 'moods' },
+  { key: 'regions', icon: 'region', translationKey: 'filters.regions', collection: 'regions' },
+  { key: 'styles', icon: 'style', translationKey: 'filters.styles', collection: 'styles' },
+  { key: 'tags', icon: 'tags', translationKey: 'filters.tags', collection: 'tags' },
+  {
+    key: 'wineCountries',
+    icon: 'country',
+    translationKey: 'filters.countries',
+    collection: 'wineCountries',
+  },
+  { key: 'wineries', icon: 'winery', translationKey: 'filters.wineries', collection: 'wineries' },
+] as const
+
+export const TASTING_NOTES = [
+  {
+    key: 'dry',
+    left: { icon: 'dry', translationKey: 'dry' },
+    right: { icon: 'sweetness', translationKey: 'sweet' },
+    maxValue: 10,
+  },
+  {
+    key: 'light',
+    left: { icon: 'skinny', translationKey: 'light' },
+    right: { icon: 'fat', translationKey: 'rich' },
+    maxValue: 10,
+  },
+  {
+    key: 'smooth',
+    left: { icon: 'soft', translationKey: 'smooth' },
+    right: { icon: 'sharp', translationKey: 'austere' },
+    maxValue: 10,
+  },
+  {
+    key: 'creamy',
+    left: { icon: 'crisp', translationKey: 'crisp' },
+    right: { icon: 'cream', translationKey: 'creamy' },
+    maxValue: 10,
+  },
+  {
+    key: 'alcohol',
+    left: { icon: 'water', translationKey: 'noAlcohol' },
+    right: { icon: 'alcohol', translationKey: 'highAlcohol' },
+    maxValue: 20,
+  },
+  {
+    key: 'ripe',
+    left: { icon: 'fruit', translationKey: 'freshFruit' },
+    right: { icon: 'jam', translationKey: 'ripeFruit' },
+    maxValue: 10,
+  },
+  {
+    key: 'oaky',
+    left: { icon: 'steel', translationKey: 'noOak' },
+    right: { icon: 'oak', translationKey: 'oaky' },
+    maxValue: 10,
+  },
+  {
+    key: 'complex',
+    left: { icon: 'simple', translationKey: 'simple' },
+    right: { icon: 'complex', translationKey: 'complex' },
+    maxValue: 10,
+  },
+  {
+    key: 'youthful',
+    left: { icon: 'baby', translationKey: 'youthful' },
+    right: { icon: 'old', translationKey: 'mature' },
+    maxValue: 10,
+  },
+  {
+    key: 'energetic',
+    left: { icon: 'calm', translationKey: 'restrained' },
+    right: { icon: 'energy', translationKey: 'energetic' },
+    maxValue: 10,
+  },
+] as const

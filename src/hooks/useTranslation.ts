@@ -1,14 +1,11 @@
 import { useTranslations } from 'next-intl'
 import { logger } from '@/lib/logger'
 
-type TranslationKey = string
-type TranslationValues = Record<string, string | number>
-
 export function useTranslation() {
   const t = useTranslations()
 
   return {
-    t: (key: TranslationKey, values?: TranslationValues) => {
+    t: (key: string, values?: Record<string, string | number>) => {
       try {
         return t(key, values)
       } catch (_error) {

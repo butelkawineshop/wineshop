@@ -1,47 +1,19 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { getPayloadClient } from '@/lib/payload'
 import {
   routeMappings as _routeMappings,
   type Locale,
   getCollectionForRouteSegment,
 } from '@/utils/routeMappings'
-import { CollectionConfig, type CollectionDisplayConfig } from './CollectionConfig'
-import slMessages from '../../../messages/sl.json'
-import enMessages from '../../../messages/en.json'
 import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'
 import { Pagination } from '../Layout/Pagination'
 import * as motion from 'motion/react-client'
-import { headers } from 'next/headers'
-import { getTranslations } from 'next-intl/server'
 import FilterSortBar from '@/components/FilterSortBar'
-
-// Helper function to get nested object values
-function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
-  return path.split('.').reduce((current: unknown, key: string) => {
-    if (current && typeof current === 'object' && key in current) {
-      return (current as Record<string, unknown>)[key] as string | undefined
-    }
-    return undefined
-  }, obj) as string | undefined
-}
-
-// TypeScript interfaces for better type safety
-interface CollectionItem {
-  id: string
-  title: string
-  slug: string
-  [key: string]: unknown
-}
-
-interface PaginationInfo {
-  page: number
-  totalPages: number
-  totalDocs: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
+import { collectionService } from '@/services/CollectionService'
+import { TranslationUtils } from '@/utils/translationUtils'
+import type { CollectionItem, PaginationInfo } from '@/services/CollectionService'
+import type { CollectionDisplayConfig } from '@/components/CollectionPage/CollectionConfig'
 
 interface CollectionPageProps {
   params: {
@@ -63,11 +35,8 @@ export async function CollectionPage({
   const resolvedSearchParams = await searchParams
 
   // Determine the base segment from props or URL
-  // For list pages: use propBaseSegment (e.g., "drzave")
-  // For item pages: use propBaseSegment since we pass it explicitly
   let baseSegment: string
   if (propBaseSegment) {
-    // Both list and item pages use the provided base segment
     baseSegment = propBaseSegment
   } else {
     notFound()
@@ -80,84 +49,51 @@ export async function CollectionPage({
   }
 
   // Get collection configuration
-  const config = CollectionConfig[collection]
+  const config = collectionService.getCollectionConfig(collection)
   if (!config) {
     notFound()
   }
 
   // Fetch collection items for filters
-  const collectionItems = await fetchCollectionItems()
+  const collectionItems = await collectionService.fetchCollectionItems()
 
-  // Load translations
-  const t = (key: string): string => {
-    try {
-      const messages = locale === 'sl' ? slMessages : enMessages
-      return getNestedValue(messages, key) || key
-    } catch (_error) {
-      return key
-    }
-  }
+  // Create translation function
+  const t = TranslationUtils.createTranslator(locale)
 
-  const payload = getPayloadClient()
+  // Extract parameters for data fetching
+  const slug = resolvedParams.slug as string | undefined
+  const page =
+    typeof resolvedSearchParams.page === 'string'
+      ? parseInt(resolvedSearchParams.page, 10)
+      : undefined
 
-  let data: CollectionItem | null = null
-  let items: CollectionItem[] = []
-  let pagination: PaginationInfo | null = null
-  const isSingleItem = resolvedParams.slug && resolvedParams.slug !== ''
+  // Fetch collection data using service
+  const collectionData = await collectionService.fetchCollectionData({
+    collection,
+    config,
+    locale,
+    slug,
+    page,
+  })
 
-  try {
-    if (isSingleItem) {
-      // Fetch single item - the slug is a string
-      const itemSlug = resolvedParams.slug as string
-
-      // Fetch the current item (fetch all fields for detail view)
-      const result = await payload.find({
-        collection,
-        depth: config.depth || 1,
-        locale,
-        limit: 100, // Fetch more items to ensure we get the one we need
-      })
-      const foundItem = result.docs.find(
-        (doc: Record<string, unknown>) => doc.slug === itemSlug,
-      ) as CollectionItem | undefined
-      data = foundItem || null
-      if (!data) {
-        notFound()
-      }
-    } else {
-      // Fetch list of items with pagination (fetch only minimal fields for list view)
-      const page =
-        typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page, 10) : 1
-      const limit = config.listLimit || 24 // Default to 24 items per page (6x4 grid)
-
-      const result = await payload.find({
-        collection,
-        depth: 1,
-        locale,
-        limit,
-        page,
-        sort: config.sort || '-createdAt',
-        fields: ['title', 'slug', 'media'], // Only fetch needed fields
-      })
-
-      items = result.docs as CollectionItem[]
-      pagination = {
-        page: result.page,
-        totalPages: result.totalPages,
-        totalDocs: result.totalDocs,
-        hasNextPage: result.hasNextPage,
-        hasPrevPage: result.hasPrevPage,
-      }
-    }
-  } catch (_error) {
+  // Handle not found for single items
+  if (collectionData.isSingleItem && !collectionData.data) {
     notFound()
   }
 
+  // Build pagination URLs using service
+  const paginationUrls = collectionService.buildPaginationUrls({
+    pagination: collectionData.pagination,
+    searchParams: resolvedSearchParams,
+    locale,
+    baseSegment,
+  })
+
   return (
     <div className="container-wide">
-      {isSingleItem ? (
+      {collectionData.isSingleItem ? (
         <SingleItemView
-          data={data}
+          data={collectionData.data}
           config={config}
           locale={locale}
           collection={collection}
@@ -166,15 +102,18 @@ export async function CollectionPage({
         />
       ) : (
         <ListView
-          items={items}
+          items={collectionData.items}
           config={config}
           locale={locale}
           baseSegment={baseSegment}
-          pagination={pagination}
+          pagination={collectionData.pagination}
           searchParams={resolvedSearchParams}
           t={t}
           collection={collection}
           collectionItems={collectionItems}
+          prevUrl={paginationUrls.prevUrl}
+          nextUrl={paginationUrls.nextUrl}
+          baseUrl={paginationUrls.baseUrl}
         />
       )}
     </div>
@@ -197,9 +136,6 @@ function SingleItemView({
   searchParams: Record<string, string | string[] | undefined>
 }) {
   if (!data) return null
-
-  console.log('🔍 Debug - SingleItemView collection:', collection)
-  console.log('🔍 Debug - SingleItemView collectionItems keys:', Object.keys(collectionItems))
 
   return (
     <article className="container-narrow">
@@ -234,25 +170,14 @@ function SingleItemView({
               fields={config.fields}
               mediaField={config.mediaField || 'media'}
               locale={locale}
-              messages={locale === 'sl' ? slMessages : enMessages}
+              messages={TranslationUtils.getMessages(locale)}
             />
           </motion.div>
         </motion.div>
       </div>
 
       {/* Show FilterSortBar for wine-related collections */}
-      {[
-        'regions',
-        'wineries',
-        'wineCountries',
-        'aromas',
-        'moods',
-        'climates',
-        'dishes',
-        'grape-varieties',
-        'styles',
-        'tags',
-      ].includes(collection) && (
+      {collectionService.isWineCollection(collection) && (
         <div className="mt-12">
           <FilterSortBar
             currentCollection={{ id: data.id, type: collection }}
@@ -279,6 +204,9 @@ function ListView({
   t,
   collection,
   collectionItems,
+  prevUrl,
+  nextUrl,
+  baseUrl,
 }: {
   items: CollectionItem[]
   config: CollectionDisplayConfig
@@ -289,41 +217,10 @@ function ListView({
   t: (key: string) => string
   collection: string
   collectionItems: Record<string, any[]>
+  prevUrl: string | null
+  nextUrl: string | null
+  baseUrl: string
 }) {
-  // TEMP: Log media field for debugging
-  // (Debug log removed)
-
-  console.log('🔍 Debug - ListView collection:', collection)
-  console.log('🔍 Debug - ListView baseSegment:', baseSegment)
-  console.log('🔍 Debug - ListView collectionItems keys:', Object.keys(collectionItems))
-
-  const currentPage = pagination?.page || 1
-
-  // Build pagination URLs
-  const buildPageUrl = (page: number) => {
-    const params = new URLSearchParams()
-    if (page > 1) params.set('page', page.toString())
-
-    // Preserve other search params (for future filtering)
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (key !== 'page' && value !== undefined) {
-        if (Array.isArray(value)) {
-          value.forEach((v) => params.append(key, v))
-        } else {
-          params.set(key, value)
-        }
-      }
-    })
-
-    const queryString = params.toString()
-    // Add locale prefix for English routes
-    const localePrefix = locale === 'en' ? '/en' : ''
-    return `${localePrefix}/${baseSegment}${queryString ? `?${queryString}` : ''}`
-  }
-
-  const prevUrl = pagination?.hasPrevPage ? buildPageUrl(currentPage - 1) : null
-  const nextUrl = pagination?.hasNextPage ? buildPageUrl(currentPage + 1) : null
-
   return (
     <div className="container-narrow">
       <header>
@@ -468,18 +365,7 @@ function ListView({
       )}
 
       {/* Show FilterSortBar for wine-related collections at the bottom */}
-      {[
-        'regions',
-        'wineries',
-        'wineCountries',
-        'aromas',
-        'moods',
-        'climates',
-        'dishes',
-        'grape-varieties',
-        'styles',
-        'tags',
-      ].includes(collection) && (
+      {collectionService.isWineCollection(collection) && (
         <div className="mt-12">
           <FilterSortBar
             currentCollection={undefined}
@@ -488,46 +374,10 @@ function ListView({
             locale={locale}
             showWineGrid={true}
             showPagination={true}
-            baseUrl={buildPageUrl(1).replace('?page=1', '').replace('&page=1', '')}
+            baseUrl={baseUrl}
           />
         </div>
       )}
     </div>
   )
-}
-
-// Helper function to fetch collection items for filters
-const fetchCollectionItems = async () => {
-  const payloadClient = getPayloadClient()
-  const collections = [
-    'aromas',
-    'climates',
-    'dishes', // Changed from 'foods' to 'dishes'
-    'grape-varieties',
-    'moods',
-    'regions',
-    'styles',
-    'tags',
-    'wineCountries', // Changed from 'wineCountries' to 'wine-countries'
-    'wineries',
-  ]
-
-  const results: Record<string, any[]> = {}
-
-  for (const collection of collections) {
-    try {
-      const response = await payloadClient.find({
-        collection,
-        limit: 100,
-        depth: 0,
-        fields: ['id', 'title', 'slug'],
-      })
-      results[collection] = response.docs
-    } catch (error) {
-      console.error(`Error fetching collection items:`, error)
-      results[collection] = []
-    }
-  }
-
-  return results
 }

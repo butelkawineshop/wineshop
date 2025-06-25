@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { routeMappings, type Locale } from '@/utils/routeMappings'
-import { getPayloadClient } from '@/lib/payload'
+import { createPayloadService } from '@/lib/payload'
+import { NAVIGATION_CONSTANTS } from '@/constants/navigation'
 import * as motion from 'motion/react-client'
 
 interface NavigationItem {
@@ -62,13 +63,12 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
 
       try {
         setIsLoading(true)
-        const payload = getPayloadClient()
+        const payload = createPayloadService()
 
         // Fetch all items from the collection
-        const result = await payload.find({
-          collection,
+        const result = await payload.find(collection, {
           depth: 0,
-          limit: 1000, // Fetch all items for navigation
+          limit: NAVIGATION_CONSTANTS.MAX_NAVIGATION_ITEMS,
           sort: 'title', // Sort by title for consistent ordering
           locale,
         })
@@ -106,7 +106,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
         // Small delay to ensure smooth transition
         setTimeout(() => {
           setIsLoading(false)
-        }, 100)
+        }, NAVIGATION_CONSTANTS.LOADING_DELAY)
       } catch (_error) {
         setIsLoading(false)
       }
@@ -121,28 +121,40 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
       {/* Only show navigation when fully ready */}
       {!isLoading && navigationItems.length > 0 && currentIndex !== -1 ? (
         <motion.div
-          className="w-full border-t border-border/50 bg-background/50 backdrop-blur-sm"
+          className={`w-full ${NAVIGATION_CONSTANTS.BORDER_STYLE} ${NAVIGATION_CONSTANTS.BACKGROUND_STYLE}`}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+          transition={{
+            duration: NAVIGATION_CONSTANTS.ANIMATION_DURATION / 1000,
+            ease: [0.4, 0, 0.2, 1],
+          }}
         >
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between gap-4">
+          <div className={`container mx-auto ${NAVIGATION_CONSTANTS.CONTAINER_PADDING}`}>
+            <div
+              className={`flex items-center justify-between ${NAVIGATION_CONSTANTS.CONTAINER_GAP}`}
+            >
               {/* Previous Item */}
-              <div className="flex-1 min-w-0">
+              <div className={`${NAVIGATION_CONSTANTS.FLEX_1} ${NAVIGATION_CONSTANTS.MIN_WIDTH}`}>
                 {currentIndex > 0 ? (
                   <motion.div
-                    whileHover={{ scale: 1.06, backgroundColor: 'rgba(0,0,0,0.04)' }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 24 }}
+                    whileHover={{
+                      scale: NAVIGATION_CONSTANTS.HOVER_SCALE,
+                      backgroundColor: 'rgba(0,0,0,0.04)',
+                    }}
+                    whileTap={{ scale: NAVIGATION_CONSTANTS.TAP_SCALE }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: NAVIGATION_CONSTANTS.MOTION_STIFFNESS,
+                      damping: NAVIGATION_CONSTANTS.MOTION_DAMPING,
+                    }}
                   >
                     <Link
                       href={navigationItems[currentIndex - 1].href}
-                      className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform"
+                      className={`group flex items-center ${NAVIGATION_CONSTANTS.BUTTON_GAP} p-3 rounded-lg ${NAVIGATION_CONSTANTS.HOVER_BACKGROUND} ${NAVIGATION_CONSTANTS.HOVER_TEXT} ${NAVIGATION_CONSTANTS.TRANSITION_CLASSES}`}
                     >
-                      <div className="flex-shrink-0">
+                      <div className={NAVIGATION_CONSTANTS.FLEX_SHRINK}>
                         <svg
-                          className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
+                          className={`${NAVIGATION_CONSTANTS.ICON_SIZE} ${NAVIGATION_CONSTANTS.TEXT_OPACITY} group-hover:text-foreground transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -155,18 +167,24 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
                           />
                         </svg>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                      <div
+                        className={`${NAVIGATION_CONSTANTS.MIN_WIDTH} ${NAVIGATION_CONSTANTS.FLEX_1}`}
+                      >
+                        <div
+                          className={`text-sm ${NAVIGATION_CONSTANTS.TEXT_OPACITY} group-hover:text-foreground transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
+                        >
                           {t('common.previous')}
                         </div>
-                        <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                        <div
+                          className={`text-sm font-medium truncate group-hover:text-foreground transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
+                        >
                           {navigationItems[currentIndex - 1].title}
                         </div>
                       </div>
                     </Link>
                   </motion.div>
                 ) : (
-                  <div className="p-3 text-foreground/30">
+                  <div className={`p-3 ${NAVIGATION_CONSTANTS.DISABLED_OPACITY}`}>
                     <div className="text-sm">{t('common.previous')}</div>
                     <div className="text-sm font-medium">—</div>
                   </div>
@@ -174,41 +192,60 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
               </div>
 
               {/* Current Item */}
-              <div className="flex-shrink-0 px-4">
+              <div
+                className={`${NAVIGATION_CONSTANTS.FLEX_SHRINK} ${NAVIGATION_CONSTANTS.CENTER_PADDING}`}
+              >
                 <div className="text-center">
-                  <div className="text-xs text-foreground/60 mb-1 transition-colors duration-200">
+                  <div
+                    className={`text-xs ${NAVIGATION_CONSTANTS.TEXT_OPACITY} mb-1 transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
+                  >
                     {t('common.showing')} {currentIndex + 1} {t('common.of')}{' '}
                     {navigationItems.length}
                   </div>
-                  <h3 className="heading-3 font-medium text-foreground max-w-xs truncate transition-colors duration-200">
+                  <h3
+                    className={`heading-3 font-medium text-foreground max-w-xs truncate transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
+                  >
                     {currentTitle}
                   </h3>
                 </div>
               </div>
 
               {/* Next Item */}
-              <div className="flex-1 min-w-0">
+              <div className={`${NAVIGATION_CONSTANTS.FLEX_1} ${NAVIGATION_CONSTANTS.MIN_WIDTH}`}>
                 {currentIndex < navigationItems.length - 1 ? (
                   <motion.div
-                    whileHover={{ scale: 1.06, backgroundColor: 'rgba(0,0,0,0.04)' }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 24 }}
+                    whileHover={{
+                      scale: NAVIGATION_CONSTANTS.HOVER_SCALE,
+                      backgroundColor: 'rgba(0,0,0,0.04)',
+                    }}
+                    whileTap={{ scale: NAVIGATION_CONSTANTS.TAP_SCALE }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: NAVIGATION_CONSTANTS.MOTION_STIFFNESS,
+                      damping: NAVIGATION_CONSTANTS.MOTION_DAMPING,
+                    }}
                   >
                     <Link
                       href={navigationItems[currentIndex + 1].href}
-                      className="group flex items-center gap-3 p-3 rounded-lg hover:bg-foreground/10 hover:text-background transition-all duration-200 ease-in-out transform text-right"
+                      className={`group flex items-center ${NAVIGATION_CONSTANTS.BUTTON_GAP} p-3 rounded-lg ${NAVIGATION_CONSTANTS.HOVER_BACKGROUND} ${NAVIGATION_CONSTANTS.HOVER_TEXT} ${NAVIGATION_CONSTANTS.TRANSITION_CLASSES} text-right`}
                     >
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm text-foreground/60 group-hover:text-foreground transition-colors duration-200">
+                      <div
+                        className={`${NAVIGATION_CONSTANTS.MIN_WIDTH} ${NAVIGATION_CONSTANTS.FLEX_1}`}
+                      >
+                        <div
+                          className={`text-sm ${NAVIGATION_CONSTANTS.TEXT_OPACITY} group-hover:text-foreground transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
+                        >
                           {t('common.next')}
                         </div>
-                        <div className="text-sm font-medium truncate group-hover:text-foreground transition-colors duration-200">
+                        <div
+                          className={`text-sm font-medium truncate group-hover:text-foreground transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
+                        >
                           {navigationItems[currentIndex + 1].title}
                         </div>
                       </div>
-                      <div className="flex-shrink-0">
+                      <div className={NAVIGATION_CONSTANTS.FLEX_SHRINK}>
                         <svg
-                          className="w-5 h-5 text-foreground/60 group-hover:text-foreground transition-colors duration-200"
+                          className={`${NAVIGATION_CONSTANTS.ICON_SIZE} ${NAVIGATION_CONSTANTS.TEXT_OPACITY} group-hover:text-foreground transition-colors duration-${NAVIGATION_CONSTANTS.TRANSITION_DURATION}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -224,7 +261,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
                     </Link>
                   </motion.div>
                 ) : (
-                  <div className="p-3 text-foreground/30 text-right">
+                  <div className={`p-3 ${NAVIGATION_CONSTANTS.DISABLED_OPACITY} text-right`}>
                     <div className="text-sm">{t('common.next')}</div>
                     <div className="text-sm font-medium">—</div>
                   </div>

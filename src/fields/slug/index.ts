@@ -1,5 +1,6 @@
 import type { Field } from 'payload'
 import { generateSlug } from '@/lib/slug'
+import { getLocalizedValue, FIELD_CONSTANTS } from '@/utils/localizedFields'
 
 interface SlugFieldOptions {
   /**
@@ -30,7 +31,7 @@ interface SlugFieldOptions {
  * Creates a slug field that automatically generates a URL-safe slug from a source field
  */
 export const slugField = ({
-  sourceField = 'title',
+  sourceField = FIELD_CONSTANTS.DEFAULT_FIELDS.TITLE,
   localized = true,
   required = false,
   admin = {
@@ -38,7 +39,7 @@ export const slugField = ({
     description: 'Automatically generated from title',
   },
 }: SlugFieldOptions = {}): Field => ({
-  name: 'slug',
+  name: FIELD_CONSTANTS.DEFAULT_FIELDS.SLUG,
   type: 'text',
   required,
   localized,
@@ -50,15 +51,7 @@ export const slugField = ({
     beforeChange: [
       ({ data, value }) => {
         if (data?.[sourceField]) {
-          // Handle localized fields by using the Slovenian value
-          const sourceValue = data[sourceField]
-          const title =
-            typeof sourceValue === 'object' && sourceValue?.sl
-              ? sourceValue.sl
-              : typeof sourceValue === 'string'
-                ? sourceValue
-                : null
-
+          const title = getLocalizedValue(data[sourceField])
           if (title) {
             return generateSlug(title)
           }
@@ -69,15 +62,7 @@ export const slugField = ({
     beforeValidate: [
       ({ data, value }) => {
         if (data?.[sourceField] && !value) {
-          // Handle localized fields by using the Slovenian value
-          const sourceValue = data[sourceField]
-          const title =
-            typeof sourceValue === 'object' && sourceValue?.sl
-              ? sourceValue.sl
-              : typeof sourceValue === 'string'
-                ? sourceValue
-                : null
-
+          const title = getLocalizedValue(data[sourceField])
           if (title) {
             return generateSlug(title)
           }

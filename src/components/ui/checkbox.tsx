@@ -5,6 +5,19 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
   id: string
 }
 
+/**
+ * Checkbox component with proper accessibility and styling
+ *
+ * @param id - Unique identifier for the checkbox
+ * @param className - Additional CSS classes
+ * @param props - Additional input attributes
+ *
+ * @example
+ * ```tsx
+ * <Checkbox id="terms" onChange={handleChange} />
+ * <label htmlFor="terms">I agree to the terms</label>
+ * ```
+ */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, id, ...props }, ref): React.JSX.Element => {
     return (

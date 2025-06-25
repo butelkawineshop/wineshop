@@ -17,11 +17,17 @@ export const WINE_CONSTANTS = {
   MAX_TAGS: 2,
   MAX_MOODS: 1,
 
+  // Icon sizes
+  ICON_SIZE: 20,
+  TITLE_ICON_SIZE: 40,
+
   // Wine card
   INITIAL_SLIDE_INDEX: 0,
   IMAGE_WIDTH: 400,
   IMAGE_HEIGHT: 400,
   PRICE_OVERLAY_WIDTH: 'w-[300px]',
+  PRICE_OVERLAY_POSITION: 'top-5 -right-20',
+  PRICE_OVERLAY_ROTATION: 'rotate-30',
   SLIDE_INDICATORS: [0, 1, 2],
   INDICATOR_SIZE: 'w-2 h-2',
 

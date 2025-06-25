@@ -9,6 +9,41 @@ import { Pagination } from '@/components/Layout/Pagination'
 import { FILTER_CONSTANTS } from '@/constants/filters'
 import { logger } from '@/lib/logger'
 
+// Field mapping constants to reduce redundancy
+const FIELD_MAP: Record<string, string> = {
+  regions: 'regionTitle',
+  wineries: 'wineryTitle',
+  wineCountries: 'countryTitle',
+  'grape-varieties': 'grapeVarieties',
+  aromas: 'aromas',
+  moods: 'moods',
+  styles: 'tags',
+  dishes: 'tags',
+  climates: 'tags',
+  tags: 'tags',
+} as const
+
+const COLLECTION_KEY_MAP: Record<string, string> = {
+  regions: 'regions',
+  wineries: 'wineries',
+  wineCountries: 'wineCountries',
+} as const
+
+const TITLE_FIELDS = ['regions', 'wineries', 'wineCountries'] as const
+
+const TASTING_NOTES_KEYS = [
+  'dry',
+  'ripe',
+  'creamy',
+  'oaky',
+  'complex',
+  'light',
+  'smooth',
+  'youthful',
+  'energetic',
+  'alcohol',
+] as const
+
 type Props = {
   currentCollection?: {
     id: string
@@ -17,6 +52,7 @@ type Props = {
   searchParams?: {
     [key: string]: string | string[] | undefined
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectionItems?: Record<string, any[]>
   locale?: Locale
   showWineGrid?: boolean
@@ -37,38 +73,20 @@ export default async function FilterSortBar({
   const resolvedLocale = (locale || headersList.get('x-locale') || 'sl') as Locale
 
   // Build where clause for wine filtering
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: Record<string, any> = {}
 
   try {
     // If we have a current collection, filter by it
     if (currentCollection) {
-      const fieldMap: Record<string, string> = {
-        regions: 'regionTitle',
-        wineries: 'wineryTitle',
-        wineCountries: 'countryTitle',
-        'grape-varieties': 'grapeVarieties',
-        aromas: 'aromas',
-        moods: 'moods',
-        styles: 'tags',
-        dishes: 'tags',
-        climates: 'tags',
-        tags: 'tags',
-      }
-
-      const fieldName = fieldMap[currentCollection.type]
+      const fieldName = FIELD_MAP[currentCollection.type]
       if (fieldName) {
         if (
-          fieldName === 'regionTitle' ||
-          fieldName === 'wineryTitle' ||
-          fieldName === 'countryTitle'
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          TITLE_FIELDS.includes(currentCollection.type as any)
         ) {
           // For title fields, we need to get the title from the collection item
-          const collectionKeyMap: Record<string, string> = {
-            regions: 'regions',
-            wineries: 'wineries',
-            wineCountries: 'wineCountries',
-          }
-          const collectionKey = collectionKeyMap[currentCollection.type]
+          const collectionKey = COLLECTION_KEY_MAP[currentCollection.type]
 
           const item = collectionItems?.[collectionKey]?.find(
             (item) => item.id === currentCollection.id,
@@ -106,25 +124,11 @@ export default async function FilterSortBar({
       if (values) {
         const ids = Array.isArray(values) ? values : values.split(',').map((id) => id.trim())
         if (ids.length > 0) {
-          const fieldMap: Record<string, string> = {
-            aromas: 'aromas',
-            climates: 'tags',
-            dishes: 'tags',
-            'grape-varieties': 'grapeVarieties',
-            moods: 'moods',
-            regions: 'regionTitle',
-            styles: 'tags',
-            tags: 'tags',
-            wineCountries: 'countryTitle',
-            wineries: 'wineryTitle',
-          }
-
-          const fieldName = fieldMap[key]
+          const fieldName = FIELD_MAP[key]
           if (fieldName) {
             if (
-              fieldName === 'regionTitle' ||
-              fieldName === 'wineryTitle' ||
-              fieldName === 'countryTitle'
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              TITLE_FIELDS.includes(key as any)
             ) {
               where[fieldName] = { in: ids }
             } else {
@@ -136,19 +140,7 @@ export default async function FilterSortBar({
     })
 
     // Handle tasting notes ranges
-    const tastingNotes = [
-      'dry',
-      'ripe',
-      'creamy',
-      'oaky',
-      'complex',
-      'light',
-      'smooth',
-      'youthful',
-      'energetic',
-      'alcohol',
-    ]
-    tastingNotes.forEach((note) => {
+    TASTING_NOTES_KEYS.forEach((note) => {
       const minValue = params[`${note}Min`]
       const maxValue = params[`${note}Max`]
 
@@ -185,8 +177,7 @@ export default async function FilterSortBar({
       docs: wineVariants,
       totalDocs,
       totalPages,
-    } = await payload.find({
-      collection: 'flat-wine-variants',
+    } = await payload.find('flat-wine-variants', {
       where,
       page,
       limit,
@@ -202,6 +193,7 @@ export default async function FilterSortBar({
           collectionItems={collectionItems || {}}
         />
         <Sorting />
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {showWineGrid && <WineGrid variants={wineVariants as any} locale={resolvedLocale} />}
         {showPagination && totalPages > 1 && (
           <Pagination

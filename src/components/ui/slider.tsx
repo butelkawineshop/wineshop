@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { UI_CONSTANTS } from '@/constants/ui'
 
@@ -15,6 +15,30 @@ interface SliderProps {
   'aria-labelledby'?: string
 }
 
+/**
+ * Range slider component with dual handles for minimum and maximum values
+ *
+ * @param value - Current slider values [min, max]
+ * @param onValueChange - Callback when values change
+ * @param min - Minimum allowed value
+ * @param max - Maximum allowed value
+ * @param step - Step increment (default: 1)
+ * @param className - Additional CSS classes
+ * @param aria-label - Accessibility label for the slider
+ * @param aria-labelledby - ID of element that labels the slider
+ *
+ * @example
+ * ```tsx
+ * <Slider
+ *   value={[20, 80]}
+ *   onValueChange={setValue}
+ *   min={0}
+ *   max={100}
+ *   step={5}
+ *   aria-label="Price range"
+ * />
+ * ```
+ */
 export function Slider({
   value,
   onValueChange,
@@ -32,10 +56,13 @@ export function Slider({
   // Validate input values
   const validatedMin = Math.min(min, max)
   const validatedMax = Math.max(min, max)
-  const validatedValue: [number, number] = [
-    Math.max(validatedMin, Math.min(value[0], validatedMax)),
-    Math.max(validatedMin, Math.min(value[1], validatedMax)),
-  ]
+  const validatedValue: [number, number] = useMemo(
+    () => [
+      Math.max(validatedMin, Math.min(value[0], validatedMax)),
+      Math.max(validatedMin, Math.min(value[1], validatedMax)),
+    ],
+    [validatedMin, validatedMax, value],
+  )
 
   const handleMouseDown = useCallback((e: React.MouseEvent, type: 'min' | 'max'): void => {
     setIsDragging(true)
@@ -129,7 +156,10 @@ export function Slider({
   return (
     <div
       ref={sliderRef}
-      className={cn('relative h-2 bg-gray-200 rounded-full cursor-pointer', className)}
+      className={cn(
+        `relative ${UI_CONSTANTS.SLIDER_TRACK_HEIGHT} bg-gray-200 rounded-full cursor-pointer`,
+        className,
+      )}
       role="group"
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
@@ -144,7 +174,7 @@ export function Slider({
       />
       <div
         id={minHandleId}
-        className="absolute top-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white transform -translate-y-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className={`absolute top-1/2 ${UI_CONSTANTS.SLIDER_HANDLE_SIZE} bg-primary rounded-full border-2 border-white transform -translate-y-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
         style={{ left: `${minPercentage}%` }}
         role="slider"
         aria-label="Minimum value"
@@ -157,7 +187,7 @@ export function Slider({
       />
       <div
         id={maxHandleId}
-        className="absolute top-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white transform -translate-y-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className={`absolute top-1/2 ${UI_CONSTANTS.SLIDER_HANDLE_SIZE} bg-primary rounded-full border-2 border-white transform -translate-y-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
         style={{ left: `${maxPercentage}%` }}
         role="slider"
         aria-label="Maximum value"
@@ -171,3 +201,5 @@ export function Slider({
     </div>
   )
 }
+
+Slider.displayName = 'Slider'

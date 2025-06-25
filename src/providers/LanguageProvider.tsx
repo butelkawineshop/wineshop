@@ -1,149 +1,107 @@
 'use client'
 
-import React, { createContext, useContext, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
-import { type Locale } from '@/i18n/locales'
-import { routeMappings, getCollectionForRouteSegment } from '@/utils/routeMappings'
+import React from 'react'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { logger } from '@/lib/logger'
+import { useLanguageSwitch } from '@/hooks/useLanguageSwitch'
+import { PROVIDER_CONSTANTS } from '@/constants/providers'
+import type { Locale } from '@/i18n/locales'
 
+// Language store using Zustand
 interface LanguageState {
   language: Locale
   setLanguage: (lang: Locale) => void
   toggleLanguage: () => void
 }
 
-const LanguageContext = createContext<LanguageState | undefined>(undefined)
+const useLanguageStore = create<LanguageState>()(
+  persist(
+    (set, get) => ({
+      language: PROVIDER_CONSTANTS.LANGUAGE.DEFAULT_LOCALE,
+      setLanguage: (language) => {
+        try {
+          set({ language })
+          logger.info({ language }, 'Language changed in store')
+        } catch (error) {
+          logger.error({ error, language }, 'Failed to set language in store')
+        }
+      },
+      toggleLanguage: () => {
+        try {
+          const currentLanguage = get().language
+          const newLanguage = currentLanguage === 'en' ? 'sl' : 'en'
+          set({ language: newLanguage })
+          logger.info({ from: currentLanguage, to: newLanguage }, 'Language toggled in store')
+        } catch (error) {
+          logger.error({ error }, 'Failed to toggle language in store')
+        }
+      },
+    }),
+    { name: PROVIDER_CONSTANTS.LANGUAGE.STORAGE_KEY },
+  ),
+)
 
 interface LanguageProviderProps {
   children: React.ReactNode
   locale: Locale
 }
 
+/**
+ * LanguageProvider component that manages language state using Zustand
+ * Follows separation of concerns by delegating navigation logic to custom hook
+ */
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,
   locale,
-}): React.ReactElement => {
-  const pathname = usePathname()
+}): React.JSX.Element => {
+  const languageState = useLanguageStore()
 
-  const handleLanguageChange = useCallback(
-    async (newLanguage: Locale): Promise<void> => {
-      try {
-        // Handle root path
-        if (pathname === '/' || pathname === '/en') {
-          const newPath = newLanguage === 'en' ? '/en' : '/'
-          window.location.href = newPath
-          return
-        }
-
-        const segments = pathname.split('/').filter(Boolean)
-        const validSegments = segments.filter(
-          (segment) => !segment.startsWith('(') && !segment.endsWith(')'),
-        )
-
-        if (validSegments.length === 0) {
-          return
-        }
-
-        const currentLocale = pathname.startsWith('/en') ? 'en' : 'sl'
-        const base = currentLocale === 'en' ? validSegments[1] : validSegments[0]
-        const slug = currentLocale === 'en' ? validSegments[2] : validSegments[1]
-        const route = base
-
-        if (!route) {
-          return
-        }
-
-        const collection =
-          route === 'wine' || route === 'vino' ? 'wines' : getCollectionForRouteSegment(route)
-        if (!collection) {
-          return
-        }
-
-        let translatedSlug: string | null = null
-
-        if (slug) {
-          try {
-            const where = {
-              [`slug.${currentLocale}`]: { equals: slug },
-            }
-
-            const params = new URLSearchParams()
-            params.set('where', JSON.stringify(where))
-            params.set('depth', '1')
-            params.set('locale', 'all')
-            params.set('sort', '-createdAt')
-            const url = `/api/${collection}?${params.toString()}`
-
-            const res = await fetch(url)
-            if (!res.ok) {
-              throw new Error(`API request failed with status ${res.status}`)
-            }
-
-            const data = await res.json()
-
-            if (!data.docs || data.docs.length === 0) {
-              return
-            }
-
-            const doc = data.docs.find((doc: unknown) => {
-              const docSlug =
-                typeof doc === 'object' && doc !== null && 'slug' in doc
-                  ? typeof doc.slug === 'string'
-                    ? doc.slug
-                    : (doc.slug as Record<string, string>)?.[currentLocale]
-                  : null
-              return docSlug?.toLowerCase?.() === slug.toLowerCase()
-            })
-
-            if (!doc) {
-              return
-            }
-
-            const slugs = (doc as { slug: Record<string, string> }).slug
-            if (!slugs) {
-              return
-            }
-
-            translatedSlug = slugs[newLanguage] || slug
-          } catch {
-            translatedSlug = slug
-          }
-        }
-
-        const newBase = Object.entries(routeMappings).find(
-          ([, val]) => val[currentLocale] === base && val.collection === collection,
-        )?.[1]?.[newLanguage]
-
-        if (!newBase) {
-          return
-        }
-
-        const newPath = `/${newLanguage === 'en' ? 'en/' : ''}${newBase}${translatedSlug ? '/' + translatedSlug : ''}`
-
-        window.location.href = newPath
-      } catch {
-        // Silent fail - fallback to current page
+  // Initialize language state with provided locale
+  React.useEffect(() => {
+    try {
+      if (locale !== languageState.language) {
+        languageState.setLanguage(locale)
+        logger.info({ locale }, 'Language initialized from props')
       }
-    },
-    [pathname],
-  )
+    } catch (error) {
+      logger.error({ error, locale }, 'Failed to initialize language from props')
+    }
+  }, [locale, languageState])
 
-  const toggleLanguage = useCallback((): void => {
-    const currentLocale = pathname.startsWith('/en') ? 'en' : 'sl'
-    const next = currentLocale === 'en' ? 'sl' : 'en'
-    handleLanguageChange(next)
-  }, [pathname, handleLanguageChange])
-
-  const languageState: LanguageState = {
-    language: locale,
-    setLanguage: handleLanguageChange,
-    toggleLanguage,
-  }
-
-  return <LanguageContext.Provider value={languageState}>{children}</LanguageContext.Provider>
+  return <>{children}</>
 }
 
-export function useLanguage(): LanguageState {
-  const ctx = useContext(LanguageContext)
-  if (!ctx) throw new Error('useLanguage must be used within LanguageProvider')
-  return ctx
+/**
+ * Hook to access language state and actions
+ * Uses Zustand store instead of React Context as per conventions
+ */
+export function useLanguage(): LanguageState & {
+  switchLanguage: (newLanguage: Locale) => Promise<void>
+} {
+  const languageState = useLanguageStore()
+  const { switchLanguage } = useLanguageSwitch()
+
+  return {
+    ...languageState,
+    setLanguage: async (newLanguage: Locale) => {
+      try {
+        languageState.setLanguage(newLanguage)
+        await switchLanguage(newLanguage)
+      } catch (error) {
+        logger.error({ error, newLanguage }, 'Failed to set and switch language')
+      }
+    },
+    toggleLanguage: async () => {
+      try {
+        const currentLanguage = languageState.language
+        const newLanguage = currentLanguage === 'en' ? 'sl' : 'en'
+        languageState.setLanguage(newLanguage)
+        await switchLanguage(newLanguage)
+      } catch (error) {
+        logger.error({ error }, 'Failed to toggle language')
+      }
+    },
+    switchLanguage,
+  }
 }

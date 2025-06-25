@@ -14,7 +14,8 @@
     "of": "of",
     "results": "results",
     "noResults": "No results found",
-    "page": "Page"
+    "page": "Page",
+    "logo": "Butelka logo"
   },
   "auth": {
     "login": "Login",
@@ -26,7 +27,15 @@
     "resetPassword": "Reset Password",
     "verifyEmail": "Verify Email",
     "magicLink": "Send Magic Link",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "emailVerification": {
+      "title": "Verify your email address",
+      "description": "Please click the button below to verify your email address:",
+      "button": "Verify Email",
+      "buttonAria": "Verify email address",
+      "ignoreMessage": "If you didn't request this email, you can safely ignore it.",
+      "preview": "Verify your email address"
+    }
   },
   "wine": {
     "title": "Wines",

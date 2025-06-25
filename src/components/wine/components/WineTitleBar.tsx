@@ -2,9 +2,10 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { IconColor } from '@/components/IconColor'
+import { Icon } from '@/components/Icon'
 import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
+import { WINE_CONSTANTS } from '@/constants/wine'
 
 interface WineTitleBarProps {
   variant: FlatWineVariant
@@ -19,7 +20,13 @@ export function WineTitleBar({ variant, locale }: WineTitleBarProps): React.JSX.
     <div className="flex w-full py-2 px-2 gap-2 items-center justify-start text-sm relative z-10 bg-background rounded-t-lg">
       <div className="interactive rounded-full group border border-foreground/40 bg-gradient-to-br from-background to-foreground/5 p-1">
         <Link href={wineUrl}>
-          <IconColor name="red" theme="color" className="w-10 h-10 flex" />
+          <Icon
+            name="red"
+            variant="color"
+            width={WINE_CONSTANTS.TITLE_ICON_SIZE}
+            height={WINE_CONSTANTS.TITLE_ICON_SIZE}
+            className="w-10 h-10 flex"
+          />
         </Link>
       </div>
 

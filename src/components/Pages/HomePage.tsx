@@ -1,24 +1,62 @@
 import React from 'react'
 import Link from 'next/link'
 import { Media } from '@/components/Media'
-import { type Locale } from '@/i18n/locales'
-import slMessages from '../../../messages/sl.json'
-import enMessages from '../../../messages/en.json'
+import { useTranslation } from '@/hooks/useTranslation'
+import { UI_CONSTANTS } from '@/constants/ui'
 
 interface HomePageProps {
-  locale: Locale
+  locale: string
 }
 
-export function HomePage({ locale }: HomePageProps): React.ReactElement {
-  const messages = locale === 'en' ? enMessages : slMessages
-  const t = (key: string): string => {
-    const keys = key.split('.')
-    let value: unknown = messages
-    for (const k of keys) {
-      value = (value as Record<string, unknown>)?.[k]
-    }
-    return typeof value === 'string' ? value : key
-  }
+interface WineCardProps {
+  nameKey: string
+  regionKey: string
+  altKey: string
+  href: string
+}
+
+function WineCard({ nameKey, regionKey, altKey, href }: WineCardProps): React.JSX.Element {
+  const { t } = useTranslation()
+
+  return (
+    <div className="card-hover">
+      <div className={`relative ${UI_CONSTANTS.WINE_CARD_HEIGHT}`}>
+        <Media src="/images/placeholder.jpg" alt={t(altKey)} className="h-full" fill />
+      </div>
+      <div className="p-6">
+        <h3 className="heading-3 mb-2">{t(nameKey)}</h3>
+        <p className="subtitle mb-4">{t(regionKey)}</p>
+        <Link href={href} className="interactive-text">
+          {t('home.featured.wines.learnMore')} →
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+export function HomePage({ locale: _locale }: HomePageProps): React.JSX.Element {
+  const { t } = useTranslation()
+
+  const featuredWines = [
+    {
+      nameKey: 'home.featured.wines.rebula.name',
+      regionKey: 'home.featured.wines.rebula.region',
+      altKey: 'home.featured.wines.rebula.alt',
+      href: '/wineshop/rebula',
+    },
+    {
+      nameKey: 'home.featured.wines.teran.name',
+      regionKey: 'home.featured.wines.teran.region',
+      altKey: 'home.featured.wines.teran.alt',
+      href: '/wineshop/teran',
+    },
+    {
+      nameKey: 'home.featured.wines.malvazija.name',
+      regionKey: 'home.featured.wines.malvazija.region',
+      altKey: 'home.featured.wines.malvazija.alt',
+      href: '/wineshop/malvazija',
+    },
+  ]
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -48,62 +86,9 @@ export function HomePage({ locale }: HomePageProps): React.ReactElement {
         <div className="container-wide">
           <h2 className="heading-2 text-center mb-12">{t('home.featured.title')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Wine Card 1 */}
-            <div className="card-hover">
-              <div className="relative h-64">
-                <Media
-                  src="/images/placeholder.jpg"
-                  alt={t('home.featured.wines.rebula.alt')}
-                  className="h-full"
-                  fill
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="heading-3 mb-2">{t('home.featured.wines.rebula.name')}</h3>
-                <p className="subtitle mb-4">{t('home.featured.wines.rebula.region')}</p>
-                <Link href="/wineshop/rebula" className="interactive-text">
-                  {t('home.featured.wines.learnMore')} →
-                </Link>
-              </div>
-            </div>
-
-            {/* Wine Card 2 */}
-            <div className="card-hover">
-              <div className="relative h-64">
-                <Media
-                  src="/images/placeholder.jpg"
-                  alt={t('home.featured.wines.teran.alt')}
-                  className="h-full"
-                  fill
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="heading-3 mb-2">{t('home.featured.wines.teran.name')}</h3>
-                <p className="subtitle mb-4">{t('home.featured.wines.teran.region')}</p>
-                <Link href="/wineshop/teran" className="interactive-text">
-                  {t('home.featured.wines.learnMore')} →
-                </Link>
-              </div>
-            </div>
-
-            {/* Wine Card 3 */}
-            <div className="card-hover">
-              <div className="relative h-64">
-                <Media
-                  src="/images/placeholder.jpg"
-                  alt={t('home.featured.wines.malvazija.alt')}
-                  className="h-full"
-                  fill
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="heading-3 mb-2">{t('home.featured.wines.malvazija.name')}</h3>
-                <p className="subtitle mb-4">{t('home.featured.wines.malvazija.region')}</p>
-                <Link href="/wineshop/malvazija" className="interactive-text">
-                  {t('home.featured.wines.learnMore')} →
-                </Link>
-              </div>
-            </div>
+            {featuredWines.map((wine) => (
+              <WineCard key={wine.nameKey} {...wine} />
+            ))}
           </div>
         </div>
       </section>

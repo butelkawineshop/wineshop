@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { IconColor } from '@/components/IconColor'
+import { Icon } from '@/components/Icon'
 import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
@@ -86,22 +86,16 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
   const endIndex = startIndex + WINE_CONSTANTS.TASTING_NOTES_PER_PAGE
   const currentPagePairs = TASTING_NOTE_PAIRS.slice(startIndex, endIndex)
 
-  // Mock values - in real implementation, these would come from variant.tastingProfile
-  const getTastingValue = (key: string): number => {
-    // Generate mock values for demonstration
-    const mockValues: Record<string, number> = {
-      dry: 7,
-      light: 4,
-      smooth: 6,
-      creamy: 3,
-      alcohol: 8,
-      ripe: 5,
-      oaky: 2,
-      complex: 7,
-      youthful: 6,
-      energetic: 4,
-    }
-    return mockValues[key] || 5
+  // Get tasting values from variant data
+  // In a real implementation, these would come from variant.tastingProfile or similar
+  const getTastingValue = (): number => {
+    // Default to middle value (5) if no data is available
+    // This should be replaced with actual data from the variant
+    const defaultValue = 5
+
+    // TODO: Implement proper data fetching from variant.tastingProfile
+    // For now, return default value
+    return defaultValue
   }
 
   return (
@@ -112,7 +106,7 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
 
       <div className="grid grid-cols-1 gap-4 px-2 sm:px-0">
         {currentPagePairs.map(({ key, left, right }) => {
-          const value = getTastingValue(key)
+          const value = getTastingValue()
           const maxValue =
             key === 'alcohol'
               ? WINE_CONSTANTS.ALCOHOL_MAX_VALUE
@@ -123,22 +117,22 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
             <div key={key} className="flex flex-col gap-2">
               <div className="flex items-center justify-between text-xs text-foreground/60">
                 <div className="flex items-center gap-2">
-                  <IconColor
+                  <Icon
                     name={left.icon}
-                    theme="color"
-                    width={20}
-                    height={20}
+                    variant="color"
+                    width={WINE_CONSTANTS.ICON_SIZE}
+                    height={WINE_CONSTANTS.ICON_SIZE}
                     className="flex-shrink-0"
                   />
                   <span>{t(left.translationKey)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>{t(right.translationKey)}</span>
-                  <IconColor
+                  <Icon
                     name={right.icon}
-                    theme="color"
-                    width={20}
-                    height={20}
+                    variant="color"
+                    width={WINE_CONSTANTS.ICON_SIZE}
+                    height={WINE_CONSTANTS.ICON_SIZE}
                     className="flex-shrink-0"
                   />
                 </div>

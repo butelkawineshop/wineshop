@@ -3,6 +3,7 @@ import Image from 'next/image'
 import type { FieldConfig } from './CollectionConfig'
 import type { Locale } from '@/utils/routeMappings'
 import { getTranslatedSegment } from '@/utils/routeMappings'
+import { COLLECTION_CONSTANTS } from '@/constants/collections'
 
 interface FieldRendererProps {
   field: FieldConfig
@@ -17,11 +18,11 @@ export function FieldRenderer({ field, data, locale, t }: FieldRendererProps) {
   if (!value) return null
 
   switch (field.type) {
-    case 'text':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.TEXT:
       return <TextField value={value as string} field={field} t={t} />
-    case 'textarea':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.TEXTAREA:
       return <TextareaField value={value as string} field={field} t={t} />
-    case 'relationship':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.RELATIONSHIP:
       return (
         <RelationshipField
           value={getNestedValue(data, field.name, 'object') as Record<string, unknown> | null}
@@ -30,7 +31,7 @@ export function FieldRenderer({ field, data, locale, t }: FieldRendererProps) {
           t={t}
         />
       )
-    case 'array':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.ARRAY:
       return (
         <ArrayField
           value={getNestedValue(data, field.name, 'array') as unknown[] | null}
@@ -39,9 +40,9 @@ export function FieldRenderer({ field, data, locale, t }: FieldRendererProps) {
           t={t}
         />
       )
-    case 'select':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.SELECT:
       return <SelectField value={value as string} field={field} t={t} />
-    case 'group':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.GROUP:
       return (
         <GroupField
           value={getNestedValue(data, field.name, 'object') as Record<string, unknown> | null}
@@ -50,7 +51,7 @@ export function FieldRenderer({ field, data, locale, t }: FieldRendererProps) {
           t={t}
         />
       )
-    case 'media':
+    case COLLECTION_CONSTANTS.FIELD_TYPES.MEDIA:
       return (
         <MediaField
           value={getNestedValue(data, field.name, 'object') as Record<string, unknown> | null}

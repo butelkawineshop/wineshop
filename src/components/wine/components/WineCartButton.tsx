@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import type { FlatWineVariant } from '@/payload-types'
-import { IconColor } from '@/components/IconColor'
+import { Icon } from '@/components/Icon'
 import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
 
@@ -41,6 +41,7 @@ export function WineCartButton({
       if (process.env.NODE_ENV === 'development') {
         console.error('Failed to add to cart:', error)
       }
+      // Could add user-facing error handling here in the future
     } finally {
       setIsLoading(false)
     }
@@ -77,7 +78,12 @@ export function WineCartButton({
       aria-label={getAriaLabel()}
     >
       {getButtonText() === t('wine.cart.addButton') ? (
-        <IconColor name="cart" theme="light" />
+        <Icon
+          name="cart"
+          variant="color"
+          width={WINE_CONSTANTS.ICON_SIZE}
+          height={WINE_CONSTANTS.ICON_SIZE}
+        />
       ) : (
         <span className="w-4 h-4 flex items-center justify-center text-sm font-bold">
           {getButtonText()}

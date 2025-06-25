@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { IconColor } from '@/components/IconColor'
+import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { DropdownMenu, DropdownMenuContent } from '@/components/ui/dropdown'
@@ -11,116 +11,11 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Accordion } from '@/components/Accordion'
 import type { Locale } from '@/i18n/locales'
 import { useTranslation } from '@/hooks/useTranslation'
-import { FILTER_CONSTANTS } from '@/constants/filters'
+import { FILTER_CONSTANTS, FILTER_COLLECTIONS, TASTING_NOTES } from '@/constants/filters'
 import { logger } from '@/lib/logger'
 
-type FilterCollection = {
-  key: string
-  icon: string
-  translationKey: string
-  collection: string
-}
-
-const FILTER_COLLECTIONS: FilterCollection[] = [
-  { key: 'aromas', icon: 'aroma', translationKey: 'filters.aromas', collection: 'aromas' },
-  { key: 'climates', icon: 'climate', translationKey: 'filters.climates', collection: 'climates' },
-  { key: 'dishes', icon: 'pairing', translationKey: 'filters.foods', collection: 'dishes' },
-  {
-    key: 'grape-varieties',
-    icon: 'grape',
-    translationKey: 'filters.grapeVarieties',
-    collection: 'grape-varieties',
-  },
-  { key: 'moods', icon: 'mood', translationKey: 'filters.moods', collection: 'moods' },
-  { key: 'regions', icon: 'region', translationKey: 'filters.regions', collection: 'regions' },
-  { key: 'styles', icon: 'style', translationKey: 'filters.styles', collection: 'styles' },
-  { key: 'tags', icon: 'tags', translationKey: 'filters.tags', collection: 'tags' },
-  {
-    key: 'wineCountries',
-    icon: 'country',
-    translationKey: 'filters.countries',
-    collection: 'wineCountries',
-  },
-  { key: 'wineries', icon: 'winery', translationKey: 'filters.wineries', collection: 'wineries' },
-]
-
-type TastingNote = {
-  key: string
-  left: {
-    icon: string
-    translationKey: string
-  }
-  right: {
-    icon: string
-    translationKey: string
-  }
-  maxValue: number
-}
-
-const TASTING_NOTES: TastingNote[] = [
-  {
-    key: 'dry',
-    left: { icon: 'dry', translationKey: 'dry' },
-    right: { icon: 'sweetness', translationKey: 'sweet' },
-    maxValue: 10,
-  },
-  {
-    key: 'light',
-    left: { icon: 'skinny', translationKey: 'light' },
-    right: { icon: 'fat', translationKey: 'rich' },
-    maxValue: 10,
-  },
-  {
-    key: 'smooth',
-    left: { icon: 'soft', translationKey: 'smooth' },
-    right: { icon: 'sharp', translationKey: 'austere' },
-    maxValue: 10,
-  },
-  {
-    key: 'creamy',
-    left: { icon: 'crisp', translationKey: 'crisp' },
-    right: { icon: 'cream', translationKey: 'creamy' },
-    maxValue: 10,
-  },
-  {
-    key: 'alcohol',
-    left: { icon: 'water', translationKey: 'noAlcohol' },
-    right: { icon: 'alcohol', translationKey: 'highAlcohol' },
-    maxValue: 20,
-  },
-  {
-    key: 'ripe',
-    left: { icon: 'fruit', translationKey: 'freshFruit' },
-    right: { icon: 'jam', translationKey: 'ripeFruit' },
-    maxValue: 10,
-  },
-  {
-    key: 'oaky',
-    left: { icon: 'steel', translationKey: 'noOak' },
-    right: { icon: 'oak', translationKey: 'oaky' },
-    maxValue: 10,
-  },
-  {
-    key: 'complex',
-    left: { icon: 'simple', translationKey: 'simple' },
-    right: { icon: 'complex', translationKey: 'complex' },
-    maxValue: 10,
-  },
-  {
-    key: 'youthful',
-    left: { icon: 'baby', translationKey: 'youthful' },
-    right: { icon: 'old', translationKey: 'mature' },
-    maxValue: 10,
-  },
-  {
-    key: 'energetic',
-    left: { icon: 'calm', translationKey: 'restrained' },
-    right: { icon: 'energy', translationKey: 'energetic' },
-    maxValue: 10,
-  },
-]
-
 interface WineFiltersClientProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectionItems: Record<string, any[]>
   currentCollection?: {
     id: string
@@ -234,6 +129,7 @@ export default function WineFiltersClient({
     }))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getFilteredItems = (collection: string): any[] => {
     try {
       const items = collectionItems[collection] || []
@@ -336,7 +232,7 @@ export default function WineFiltersClient({
                   key={key}
                   trigger={
                     <Button variant="outline" className="w-full justify-start gap-2">
-                      <IconColor name={icon} className="w-5 h-5" theme="color" />
+                      <Icon name={icon} className="w-5 h-5" variant="color" />
                       <span className="flex-1 text-left">{t(translationKey)}</span>
                       {activeFilters.length > 0 && (
                         <span className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
@@ -381,10 +277,10 @@ export default function WineFiltersClient({
                                   : item.title}
                               </label>
                               {isLocked && (
-                                <IconColor
+                                <Icon
                                   name="lock"
                                   className="w-4 h-4 text-muted-foreground"
-                                  theme="color"
+                                  variant="color"
                                 />
                               )}
                             </div>
@@ -413,23 +309,23 @@ export default function WineFiltersClient({
               <div key={key} className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-xs text-foreground/60">
                   <div className="flex items-center gap-2">
-                    <IconColor
+                    <Icon
                       name={left.icon}
                       width={20}
                       height={20}
                       className="flex-shrink-0"
-                      theme="color"
+                      variant="color"
                     />
                     <span>{t(`tasting.notes.${left.translationKey}`)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span>{t(`tasting.notes.${right.translationKey}`)}</span>
-                    <IconColor
+                    <Icon
                       name={right.icon}
                       width={20}
                       height={20}
                       className="flex-shrink-0"
-                      theme="color"
+                      variant="color"
                     />
                   </div>
                 </div>

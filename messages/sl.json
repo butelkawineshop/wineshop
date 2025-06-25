@@ -14,7 +14,8 @@
     "of": "od",
     "results": "rezultatov",
     "noResults": "Ni najdenih rezultatov",
-    "page": "Stran"
+    "page": "Stran",
+    "logo": "Butelka logo"
   },
   "auth": {
     "login": "Prijava",
@@ -26,7 +27,15 @@
     "resetPassword": "Ponastavi geslo",
     "verifyEmail": "Potrdi e-pošto",
     "magicLink": "Pošlji čarobno povezavo",
-    "continueWithGoogle": "Nadaljuj z Google"
+    "continueWithGoogle": "Nadaljuj z Google",
+    "emailVerification": {
+      "title": "Potrdite svoj e-poštni naslov",
+      "description": "Prosimo, kliknite spodnji gumb za potrditev vašega e-poštnega naslova:",
+      "button": "Potrdi e-pošto",
+      "buttonAria": "Potrdite e-poštni naslov",
+      "ignoreMessage": "Če niste zahtevali te e-pošte, jo lahko varno prezgodite.",
+      "preview": "Potrdite svoj e-poštni naslov"
+    }
   },
   "wine": {
     "title": "Vina",
@@ -212,6 +221,28 @@
       "description": "Opis",
       "date": "Datum",
       "location": "Lokacija"
+    },
+    "notes": {
+      "dry": "Suho",
+      "sweet": "Sladko",
+      "light": "Lahko",
+      "rich": "Bogato",
+      "smooth": "Gladko",
+      "austere": "Strogo",
+      "crisp": "Sveže",
+      "creamy": "Kremasto",
+      "noAlcohol": "Brez Alkohola",
+      "highAlcohol": "Visok Alkohol",
+      "freshFruit": "Sveže Sadje",
+      "ripeFruit": "Zrelo Sadje",
+      "noOak": "Brez Hrasta",
+      "oaky": "Hrastovo",
+      "simple": "Preprosto",
+      "complex": "Kompleksno",
+      "youthful": "Mlado",
+      "mature": "Zrelo",
+      "restrained": "Zadržano",
+      "energetic": "Energetično"
     }
   },
   "giftCard": {
@@ -379,30 +410,6 @@
       "label": "Datum",
       "asc": "Datum (naraščajoče)",
       "desc": "Datum (padajoče)"
-    }
-  },
-  "tasting": {
-    "notes": {
-      "dry": "Suho",
-      "sweet": "Sladko",
-      "light": "Lahko",
-      "rich": "Bogato",
-      "smooth": "Gladko",
-      "austere": "Strogo",
-      "crisp": "Sveže",
-      "creamy": "Kremasto",
-      "noAlcohol": "Brez Alkohola",
-      "highAlcohol": "Visok Alkohol",
-      "freshFruit": "Sveže Sadje",
-      "ripeFruit": "Zrelo Sadje",
-      "noOak": "Brez Hrasta",
-      "oaky": "Hrastovo",
-      "simple": "Preprosto",
-      "complex": "Kompleksno",
-      "youthful": "Mlado",
-      "mature": "Zrelo",
-      "restrained": "Zadržano",
-      "energetic": "Energetično"
     }
   }
 }

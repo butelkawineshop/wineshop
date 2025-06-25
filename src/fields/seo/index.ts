@@ -1,4 +1,5 @@
 import type { Field } from 'payload'
+import { getLocalizedValueWithFallback, FIELD_CONSTANTS } from '@/utils/localizedFields'
 
 interface SEOFieldOptions {
   /**
@@ -43,9 +44,9 @@ interface SEOData {
  */
 export const seoField = ({
   localized = true,
-  titleField = 'title',
-  descriptionField = 'description',
-  imageField = 'image',
+  titleField = FIELD_CONSTANTS.DEFAULT_FIELDS.TITLE,
+  descriptionField = FIELD_CONSTANTS.DEFAULT_FIELDS.DESCRIPTION,
+  imageField = FIELD_CONSTANTS.DEFAULT_FIELDS.IMAGE,
   imageSize = 'og',
 }: SEOFieldOptions = {}): Field => ({
   name: 'seo',
@@ -59,15 +60,15 @@ export const seoField = ({
       ({ data }) => {
         if (data?.seo?.manualOverride) return data
 
-        const fallbackImage = '/logo-square.jpg'
-
         // Handle both single and array media fields
-        let imageUrl = fallbackImage
+        let imageUrl: string = FIELD_CONSTANTS.DEFAULT_VALUES.FALLBACK_IMAGE
         const mediaData = data?.[imageField]
         if (mediaData) {
           if (Array.isArray(mediaData) && mediaData.length > 0) {
             // If it's an array, take the first image
-            imageUrl = mediaData[0]?.url ? `${mediaData[0].url}/${imageSize}` : fallbackImage
+            imageUrl = mediaData[0]?.url
+              ? `${mediaData[0].url}/${imageSize}`
+              : FIELD_CONSTANTS.DEFAULT_VALUES.FALLBACK_IMAGE
           } else if (mediaData.url) {
             // If it's a single image
             imageUrl = `${mediaData.url}/${imageSize}`
@@ -75,24 +76,12 @@ export const seoField = ({
         }
 
         const seo: SEOData = {
-          title: (() => {
-            const titleValue = data?.[titleField]
-            if (typeof titleValue === 'object' && titleValue?.sl) {
-              return titleValue.sl
-            }
-            return titleValue || ''
-          })(),
-          description: (() => {
-            const descValue = data?.[descriptionField]
-            if (typeof descValue === 'object' && descValue?.sl) {
-              return descValue.sl
-            }
-            return descValue || ''
-          })(),
+          title: getLocalizedValueWithFallback(data?.[titleField]),
+          description: getLocalizedValueWithFallback(data?.[descriptionField]),
           image: imageUrl,
-          ogType: 'website',
-          twitterCard: 'summary_large_image',
-          robots: 'index,follow',
+          ogType: FIELD_CONSTANTS.DEFAULT_VALUES.OG_TYPE,
+          twitterCard: FIELD_CONSTANTS.DEFAULT_VALUES.TWITTER_CARD,
+          robots: FIELD_CONSTANTS.DEFAULT_VALUES.ROBOTS,
         }
 
         if (data?.price) {
@@ -102,8 +91,8 @@ export const seoField = ({
           seo.structuredData = {
             '@context': 'https://schema.org',
             '@type': 'Product',
-            name: typeof titleValue === 'object' && titleValue?.sl ? titleValue.sl : titleValue,
-            description: typeof descValue === 'object' && descValue?.sl ? descValue.sl : descValue,
+            name: getLocalizedValueWithFallback(titleValue),
+            description: getLocalizedValueWithFallback(descValue),
             image: imageUrl,
             offers: {
               '@type': 'Offer',
@@ -134,19 +123,19 @@ export const seoField = ({
       },
     },
     {
-      name: 'title',
+      name: FIELD_CONSTANTS.DEFAULT_FIELDS.TITLE,
       type: 'text',
       required: false,
       localized,
     },
     {
-      name: 'description',
+      name: FIELD_CONSTANTS.DEFAULT_FIELDS.DESCRIPTION,
       type: 'textarea',
       required: false,
       localized,
     },
     {
-      name: 'image',
+      name: FIELD_CONSTANTS.DEFAULT_FIELDS.IMAGE,
       type: 'text',
       required: false,
     },

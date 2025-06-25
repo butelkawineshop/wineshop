@@ -11,6 +11,32 @@ interface DropdownMenuProps {
   className?: string
 }
 
+interface DropdownMenuTriggerProps {
+  children: ReactNode
+}
+
+interface DropdownMenuContentProps {
+  children: ReactNode
+  className?: string
+}
+
+/**
+ * Dropdown menu component with portal positioning and keyboard navigation
+ *
+ * @param children - Dropdown menu content
+ * @param trigger - Element that triggers the dropdown
+ * @param className - Additional CSS classes
+ *
+ * @example
+ * ```tsx
+ * <DropdownMenu trigger={<Button>Open Menu</Button>}>
+ *   <DropdownMenuContent>
+ *     <div>Menu Item 1</div>
+ *     <div>Menu Item 2</div>
+ *   </DropdownMenuContent>
+ * </DropdownMenu>
+ * ```
+ */
 export function DropdownMenu({
   children,
   trigger,
@@ -77,7 +103,7 @@ export function DropdownMenu({
               minWidth: Math.max(position.width, UI_CONSTANTS.DROPDOWN_MIN_WIDTH_PX),
               zIndex: UI_CONSTANTS.DROPDOWN_Z_INDEX,
             }}
-            role="menu"
+            role="button"
             aria-expanded={isOpen}
           >
             {children}
@@ -88,26 +114,43 @@ export function DropdownMenu({
   )
 }
 
-interface DropdownMenuTriggerProps {
-  children: ReactNode
-  asChild?: boolean
-}
-
-export function DropdownMenuTrigger({
-  children,
-  asChild,
-}: DropdownMenuTriggerProps): React.JSX.Element {
+/**
+ * Dropdown menu trigger component
+ *
+ * @param children - Trigger content
+ *
+ * @example
+ * ```tsx
+ * <DropdownMenuTrigger>
+ *   <Button>Open Menu</Button>
+ * </DropdownMenuTrigger>
+ * ```
+ */
+export function DropdownMenuTrigger({ children }: DropdownMenuTriggerProps): React.JSX.Element {
   return <>{children}</>
 }
 
-interface DropdownMenuContentProps {
-  children: ReactNode
-  className?: string
-}
-
+/**
+ * Dropdown menu content wrapper component
+ *
+ * @param children - Menu content
+ * @param className - Additional CSS classes
+ *
+ * @example
+ * ```tsx
+ * <DropdownMenuContent className="p-2">
+ *   <div>Menu Item 1</div>
+ *   <div>Menu Item 2</div>
+ * </DropdownMenuContent>
+ * ```
+ */
 export function DropdownMenuContent({
   children,
   className,
 }: DropdownMenuContentProps): React.JSX.Element {
   return <div className={cn('p-2 bg-background', className)}>{children}</div>
 }
+
+DropdownMenu.displayName = 'DropdownMenu'
+DropdownMenuTrigger.displayName = 'DropdownMenuTrigger'
+DropdownMenuContent.displayName = 'DropdownMenuContent'

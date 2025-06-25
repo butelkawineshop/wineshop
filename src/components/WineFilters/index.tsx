@@ -8,6 +8,7 @@ type Props = {
     type: string
   }
   locale?: Locale
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectionItems?: Record<string, any[]>
 }
 

@@ -4,43 +4,14 @@ import React from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/hooks/useTranslation'
-import { IconColor } from '../IconColor'
-
-type SortOption = {
-  value: string
-  icon: string
-  tooltipKey: string
-}
-
-const SORT_CONSTANTS = {
-  BUTTON_GAP: 'gap-4',
-  ICON_GAP: 'gap-1',
-  ICON_SIZE: 'w-5 h-5',
-} as const
+import { Icon } from '@/components/Icon'
+import { SORT_CONSTANTS, SORT_OPTIONS } from '@/constants/sorting'
 
 export default function Sorting(): React.JSX.Element {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { t } = useTranslation()
-
-  const sortOptions: SortOption[] = [
-    {
-      value: 'createdAt',
-      icon: 'date',
-      tooltipKey: 'sorting.newest',
-    },
-    {
-      value: 'price',
-      icon: 'price',
-      tooltipKey: 'sorting.price',
-    },
-    {
-      value: 'name',
-      icon: 'alphabet',
-      tooltipKey: 'sorting.name',
-    },
-  ]
 
   const currentSort = searchParams.get('sort') || 'createdAt'
   const currentDirection = searchParams.get('direction') || 'desc'
@@ -73,7 +44,7 @@ export default function Sorting(): React.JSX.Element {
       role="toolbar"
       aria-label="Sorting options"
     >
-      {sortOptions.map((option) => (
+      {SORT_OPTIONS.map((option) => (
         <button
           key={option.value}
           onClick={() => handleSort(option.value)}
@@ -87,7 +58,7 @@ export default function Sorting(): React.JSX.Element {
           aria-label={t(`sorting.${option.value}.label`)}
           tabIndex={0}
         >
-          <IconColor name={option.icon} className={SORT_CONSTANTS.ICON_SIZE} theme="color" />
+          <Icon name={option.icon} className={SORT_CONSTANTS.ICON_SIZE} variant="color" />
           <span className="text-xs">
             {currentSort === option.value
               ? t(`sorting.${option.value}.${currentDirection}`)

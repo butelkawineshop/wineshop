@@ -1,9 +1,19 @@
 import React, { InputHTMLAttributes, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {}
-
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+/**
+ * Input component with consistent styling and accessibility
+ *
+ * @param className - Additional CSS classes
+ * @param type - Input type (text, email, password, etc.)
+ * @param props - Additional input attributes
+ *
+ * @example
+ * ```tsx
+ * <Input type="email" placeholder="Enter your email" />
+ * ```
+ */
+export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   ({ className, type, ...props }, ref): React.JSX.Element => {
     return (
       <input

@@ -19,14 +19,28 @@ export function WineGrid({ variants, locale, className = '' }: WineGridProps): R
   const handleShare = async (variant: FlatWineVariant): Promise<void> => {
     try {
       const url = `${window.location.origin}/${locale}/wine/${variant.slug || variant.id}`
-      await navigator.clipboard.writeText(url)
+
+      // Check if clipboard API is available
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url)
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement('textarea')
+        textArea.value = url
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+      }
+
       // TODO: BUTELKA-123 - Add toast notification for share success
     } catch (error) {
       logger.error('Failed to share wine URL', { error, variantId: variant.id })
+      // TODO: BUTELKA-125 - Add user-facing error notification
     }
   }
 
-  const handleLike = (_variant: FlatWineVariant): void => {
+  const handleLike = (): void => {
     // TODO: BUTELKA-124 - Implement like functionality with backend integration
   }
 

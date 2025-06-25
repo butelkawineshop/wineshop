@@ -6,16 +6,16 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 
-import { IconActive } from '@/components/IconActive'
+import { Icon } from '@/components/Icon'
 import { WineTitleBar } from './components/WineTitleBar'
 import { WineTastingNotes } from './components/WineTastingNotes'
 import { WineCartButton } from './components/WineCartButton'
 import { WineDescription } from './components/WineDescription'
 import { WineCollectionTags } from './components/WineCollectionTags'
 import type { FlatWineVariant } from '@/payload-types'
-import { IconColor } from '../IconColor'
 import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
+import { formatPrice } from '@/utils/formatters'
 
 interface WineCardProps {
   variant: FlatWineVariant
@@ -35,9 +35,10 @@ export function WineCard({
   const { t } = useTranslation()
   const swiperRef = useRef<{ swiper: SwiperType }>(null)
   const [activeIndex, setActiveIndex] = useState<number>(WINE_CONSTANTS.INITIAL_SLIDE_INDEX)
+  const [imageError, setImageError] = useState(false)
 
-  const formattedPrice = variant.price?.toFixed(2).replace('.', ',') || '0,00'
-  const formattedDiscountedPrice = discountedPrice?.toFixed(2).replace('.', ',')
+  const formattedPrice = formatPrice(variant.price)
+  const formattedDiscountedPrice = formatPrice(discountedPrice)
   const hasDiscount = discountedPrice !== undefined && discountedPrice < (variant.price || 0)
 
   const handleShareWine = (): void => {
@@ -63,6 +64,10 @@ export function WineCard({
     }
   }
 
+  const handleImageError = (): void => {
+    setImageError(true)
+  }
+
   return (
     <div className="flex flex-col w-full h-full">
       <WineTitleBar variant={variant} locale={locale} />
@@ -78,7 +83,7 @@ export function WineCard({
         {/* Main wine image slide */}
         <SwiperSlide>
           <div className="w-full flex items-start relative">
-            {variant.primaryImageUrl && (
+            {variant.primaryImageUrl && !imageError && (
               <div className="w-full overflow-hidden">
                 <Image
                   src={variant.primaryImageUrl}
@@ -87,11 +92,12 @@ export function WineCard({
                   height={WINE_CONSTANTS.IMAGE_HEIGHT}
                   className="object-cover w-full h-full"
                   priority={false}
+                  onError={handleImageError}
                 />
                 {/* Price overlay */}
                 {hasDiscount ? (
                   <div
-                    className={`absolute ${WINE_CONSTANTS.PRICE_OVERLAY_WIDTH} top-5 -right-20 rotate-30 z-50 items-center justify-center text-center transform border rounded px-4 py-1`}
+                    className={`absolute ${WINE_CONSTANTS.PRICE_OVERLAY_WIDTH} ${WINE_CONSTANTS.PRICE_OVERLAY_POSITION} ${WINE_CONSTANTS.PRICE_OVERLAY_ROTATION} z-50 items-center justify-center text-center transform border rounded px-4 py-1`}
                   >
                     <div className="flex flex-row items-center justify-center gap-1">
                       <span className="text-3xl md:text-xl font-accent text-white z-50">
@@ -104,11 +110,17 @@ export function WineCard({
                   </div>
                 ) : (
                   <div
-                    className={`absolute top-5 -right-20 ${WINE_CONSTANTS.PRICE_OVERLAY_WIDTH} items-center justify-center text-center transform rotate-30 bg-background border border-foreground px-4 py-1`}
+                    className={`absolute ${WINE_CONSTANTS.PRICE_OVERLAY_POSITION} ${WINE_CONSTANTS.PRICE_OVERLAY_WIDTH} items-center justify-center text-center transform ${WINE_CONSTANTS.PRICE_OVERLAY_ROTATION} bg-background border border-foreground px-4 py-1`}
                   >
                     <span className="text-3xl md:text-xl font-accent">{formattedPrice} €</span>
                   </div>
                 )}
+              </div>
+            )}
+            {/* Fallback for missing or failed images */}
+            {(!variant.primaryImageUrl || imageError) && (
+              <div className="w-full h-full bg-foreground/10 flex items-center justify-center">
+                <span className="text-foreground/40">{t('wine.fallbackAlt')}</span>
               </div>
             )}
           </div>
@@ -139,14 +151,19 @@ export function WineCard({
                 className="interactive rounded-full p-1 focus-ring"
                 aria-label={t('wine.actions.like')}
               >
-                <IconActive name="like" />
+                <Icon name="like" variant="active" />
               </button>
               <button
                 onClick={handleShareWine}
                 className="interactive rounded-full p-1 focus-ring"
                 aria-label={t('wine.actions.share')}
               >
-                <IconColor name="share" theme="light" />
+                <Icon
+                  name="share"
+                  variant="white"
+                  width={WINE_CONSTANTS.ICON_SIZE}
+                  height={WINE_CONSTANTS.ICON_SIZE}
+                />
               </button>
             </div>
           </div>

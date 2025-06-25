@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback } from 'react'
-import { IconColor } from '@/components/IconColor'
+import { Icon } from '@/components/Icon'
 import { cn } from '@/lib/utils'
 
 interface AccordionProps {
@@ -51,18 +51,15 @@ export function Accordion({
         tabIndex={0}
       >
         <div className={`icon-container flex items-center ${ACCORDION_CONSTANTS.ICON_GAP}`}>
-          {icon && (
-            <IconColor name={icon} className={ACCORDION_CONSTANTS.ICON_SIZE} theme="color" />
-          )}
+          {icon && <Icon name={icon} className={ACCORDION_CONSTANTS.ICON_SIZE} variant="color" />}
           <h2 className="font-semibold">{title}</h2>
         </div>
-        <IconColor
+        <Icon
           name="chevron-left"
           className={cn(
             `${ACCORDION_CONSTANTS.ICON_SIZE} transition-transform duration-200 ease-in-out`,
             isOpen && 'rotate-[-90deg]',
           )}
-          theme="color"
           aria-hidden="true"
         />
       </button>

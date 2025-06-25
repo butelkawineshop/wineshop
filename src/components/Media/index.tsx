@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/logger'
+import { UI_CONSTANTS } from '@/constants/ui'
 
 interface MediaProps {
   src?: string | null
@@ -33,7 +35,9 @@ const getImageUrl = (src: string | null | undefined, size?: string): string => {
 
   // If we don't have a Cloudflare URL, return the placeholder
   if (!CLOUDFLARE_IMAGES_URL) {
-    console.warn('NEXT_PUBLIC_CLOUDFLARE_IMAGES_URL is not set')
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('NEXT_PUBLIC_CLOUDFLARE_IMAGES_URL is not set')
+    }
     return ''
   }
 
@@ -53,11 +57,11 @@ export const Media: React.FC<MediaProps> = ({
   height,
   className,
   priority = false,
-  quality = 75,
+  quality = UI_CONSTANTS.DEFAULT_IMAGE_QUALITY,
   placeholder = '/images/placeholder.jpg',
   fill = false,
   size,
-}) => {
+}): React.JSX.Element | null => {
   const [error, setError] = useState(false)
 
   // If no src or error occurred, use placeholder
@@ -79,7 +83,9 @@ export const Media: React.FC<MediaProps> = ({
         priority={priority}
         quality={quality}
         onError={() => {
-          console.warn(`Failed to load image: ${imageSrc}`)
+          if (process.env.NODE_ENV === 'development') {
+            logger.warn(`Failed to load image: ${imageSrc}`)
+          }
           setError(true)
         }}
         fill={fill}

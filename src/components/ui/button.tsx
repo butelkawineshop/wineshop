@@ -7,6 +7,22 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg'
 }
 
+/**
+ * Button component with multiple variants and sizes
+ *
+ * @param children - Button content
+ * @param variant - Visual variant of the button (default, outline, ghost)
+ * @param size - Size of the button (sm, md, lg)
+ * @param className - Additional CSS classes
+ * @param props - Additional button attributes
+ *
+ * @example
+ * ```tsx
+ * <Button variant="default" size="md" onClick={handleClick}>
+ *   Click me
+ * </Button>
+ * ```
+ */
 export function Button({
   children,
   variant = 'default',
@@ -38,3 +54,5 @@ export function Button({
     </button>
   )
 }
+
+Button.displayName = 'Button'
