@@ -25,7 +25,7 @@ export default async function FilterSortBar({
 }: Props): Promise<React.JSX.Element> {
   const resolvedLocale = (locale || 'sl') as Locale
 
-  // Fetch initial data server-side for SEO
+  // Fetch initial data server-side for SEO - but with reduced limit for performance
   let initialWineVariants: FlatWineVariant[] = []
   let error: string | null = null
 
@@ -57,11 +57,13 @@ export default async function FilterSortBar({
       }
     }
 
+    // Reduce initial fetch limit for better performance
     const response = await payload.find('flat-wine-variants', {
       where,
-      limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
+      limit: Math.min(50, COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT), // Reduced from 100 to 50
       sort: '-syncedAt',
       depth: 0,
+      locale: resolvedLocale, // Use specific locale for better performance
     })
 
     initialWineVariants = response.docs as unknown as FlatWineVariant[]
@@ -73,7 +75,7 @@ export default async function FilterSortBar({
       hasNextPage: response.hasNextPage,
       hasPrevPage: response.hasPrevPage,
       page: response.page,
-      limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
+      limit: Math.min(50, COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT),
       locale: resolvedLocale,
       currentCollection: currentCollection?.type,
     })

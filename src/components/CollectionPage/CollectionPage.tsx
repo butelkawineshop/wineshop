@@ -56,7 +56,7 @@ export async function CollectionPage({
   }
 
   // Fetch collection items for filters
-  const collectionItems = await collectionService.fetchCollectionItems()
+  const collectionItems = await collectionService.fetchCollectionItems(locale)
 
   // Create translation function
   const t = TranslationUtils.createTranslator(locale)
@@ -234,7 +234,7 @@ function ListView({
             variants={{
               visible: {
                 transition: {
-                  staggerChildren: 0.08,
+                  staggerChildren: 0.05, // Reduced from 0.08 for better performance
                   delayChildren: 0.1,
                 },
               },
@@ -256,28 +256,23 @@ function ListView({
                   variants={{
                     hidden: {
                       opacity: 0,
-                      y: 50,
-                      scale: 0.8,
-                      rotateY: -15,
-                      filter: 'blur(4px)',
+                      y: 30, // Reduced from 50 for smoother animation
+                      scale: 0.9, // Reduced from 0.8 for less dramatic effect
                     },
                     visible: {
                       opacity: 1,
                       y: 0,
                       scale: 1,
-                      rotateY: 0,
-                      filter: 'blur(0px)',
                       transition: {
                         type: 'spring',
                         stiffness: 300,
                         damping: 25,
-                        duration: 0.6,
+                        duration: 0.5, // Reduced from 0.6
                       },
                     },
                   }}
                   whileHover={{
                     scale: 1.05,
-                    rotateY: 5,
                     transition: {
                       type: 'spring',
                       stiffness: 400,
@@ -312,7 +307,7 @@ function ListView({
                         fill
                         size="square"
                         className="object-cover w-full h-full"
-                        priority={false}
+                        priority={idx < 12} // Only prioritize first 12 images
                       />
                     </motion.div>
                   )}

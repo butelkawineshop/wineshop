@@ -64,6 +64,7 @@ export const Aromas: CollectionConfig = {
       name: 'title',
       type: 'text',
       localized: true,
+      index: true,
       admin: {
         readOnly: true,
         description: 'Automatically generated from adjective and flavour',
@@ -73,6 +74,7 @@ export const Aromas: CollectionConfig = {
       name: 'slug',
       type: 'text',
       localized: true,
+      index: true,
       admin: {
         readOnly: true,
         description: 'Automatically generated from adjective and flavour slugs',
@@ -84,6 +86,7 @@ export const Aromas: CollectionConfig = {
       relationTo: 'adjectives',
       required: true,
       hasMany: false,
+      index: true,
     },
     {
       name: 'flavour',
@@ -91,6 +94,7 @@ export const Aromas: CollectionConfig = {
       relationTo: 'flavours',
       required: true,
       hasMany: false,
+      index: true,
     },
     {
       name: 'media',

@@ -29,6 +29,7 @@ export const WineCountries: CollectionConfig = {
       type: 'text',
       required: true,
       localized: true,
+      index: true,
     },
     slugField(),
     {
@@ -44,10 +45,12 @@ export const WineCountries: CollectionConfig = {
     {
       name: 'landArea',
       type: 'number',
+      index: true,
     },
     {
       name: 'wineriesCount',
       type: 'number',
+      index: true,
     },
     {
       name: 'regions',

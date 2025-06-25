@@ -29,6 +29,7 @@ export const Moods: CollectionConfig = {
       type: 'text',
       required: true,
       localized: true,
+      index: true,
     },
     slugField(),
     {

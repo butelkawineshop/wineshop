@@ -30,6 +30,7 @@ export const FlatWineVariants: CollectionConfig = {
       type: 'relationship',
       relationTo: 'wine-variants',
       required: true,
+      index: true,
       admin: {
         position: 'sidebar',
       },
@@ -37,6 +38,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'sku',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -44,6 +46,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'wineTitle',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -51,6 +54,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'wineryTitle',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -58,6 +62,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'wineryCode',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -65,6 +70,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'regionTitle',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -72,6 +78,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'countryTitle',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -79,6 +86,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'countryTitleEn',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
         description: 'English country title',
@@ -87,6 +95,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'styleTitle',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -94,6 +103,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'styleTitleEn',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
         description: 'English style title',
@@ -102,6 +112,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'styleIconKey',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -109,6 +120,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'styleSlug',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
         description: 'Style slug for URL generation',
@@ -117,6 +129,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'size',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -124,6 +137,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'vintage',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -131,6 +145,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'price',
       type: 'number',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -138,6 +153,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'stockOnHand',
       type: 'number',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -145,6 +161,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'canBackorder',
       type: 'checkbox',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -152,6 +169,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'maxBackorderQuantity',
       type: 'number',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -159,6 +177,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'servingTemp',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -166,6 +185,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'decanting',
       type: 'checkbox',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -173,6 +193,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'tastingProfile',
       type: 'text',
+      index: true,
       admin: {
         readOnly: true,
       },
@@ -190,6 +211,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -199,6 +221,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -208,6 +231,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -217,6 +241,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -226,6 +251,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -235,6 +261,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -244,6 +271,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -253,6 +281,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -262,6 +291,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -271,6 +301,7 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 20,
+          index: true,
           admin: {
             readOnly: true,
           },
@@ -360,6 +391,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'slug',
       type: 'text',
+      index: true,
       admin: {
         position: 'sidebar',
         readOnly: true,
@@ -368,6 +400,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'syncedAt',
       type: 'date',
+      index: true,
       admin: {
         position: 'sidebar',
         readOnly: true,
@@ -376,6 +409,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'isPublished',
       type: 'checkbox',
+      index: true,
       admin: {
         readOnly: true,
         position: 'sidebar',

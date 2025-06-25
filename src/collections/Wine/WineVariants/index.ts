@@ -66,12 +66,14 @@ export const WineVariants: CollectionConfig = {
           relationTo: 'wines' as CollectionSlug,
           required: true,
           maxDepth: 3,
+          index: true,
           admin: { width: '50%' },
         },
         {
           name: 'size',
           type: 'select',
           required: true,
+          index: true,
           options: [
             { label: '187ml (Split)', value: '187' },
             { label: '375ml (Half)', value: '375' },
@@ -92,11 +94,13 @@ export const WineVariants: CollectionConfig = {
           name: 'vintage',
           type: 'text',
           required: true,
+          index: true,
           admin: { description: 'Use "NV" for Non-Vintage wines', width: '50%' },
         },
         {
           name: 'sku',
           type: 'text',
+          index: true,
           admin: { readOnly: true, width: '50%' },
         },
       ],
@@ -109,6 +113,7 @@ export const WineVariants: CollectionConfig = {
           type: 'number',
           required: true,
           min: 0,
+          index: true,
           admin: { width: '50%' },
         },
         {
@@ -117,6 +122,7 @@ export const WineVariants: CollectionConfig = {
           min: 0,
           required: true,
           defaultValue: 0,
+          index: true,
           admin: { width: '50%', description: 'Current stock level' },
         },
       ],
@@ -129,6 +135,7 @@ export const WineVariants: CollectionConfig = {
           type: 'checkbox',
           label: 'Can Backorder',
           defaultValue: true,
+          index: true,
           admin: { width: '50%', description: 'Allow unlimited orders (max 100 bottles)' },
         },
         {
@@ -137,6 +144,7 @@ export const WineVariants: CollectionConfig = {
           min: 1,
           max: 100,
           defaultValue: 100,
+          index: true,
           admin: {
             width: '50%',
             condition: (data) => data?.canBackorder === true,
@@ -151,6 +159,7 @@ export const WineVariants: CollectionConfig = {
         {
           name: 'servingTemp',
           type: 'select',
+          index: true,
           options: [
             { label: '6-8°C (43-46°F)', value: '6-8' },
             { label: '8-10°C (46-50°F)', value: '8-10' },
@@ -168,6 +177,7 @@ export const WineVariants: CollectionConfig = {
       type: 'checkbox',
       label: 'Requires Decanting',
       defaultValue: false,
+      index: true,
     },
     {
       name: 'foodPairing',
@@ -205,36 +215,85 @@ export const WineVariants: CollectionConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'dry', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
-            { name: 'ripe', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
+            { name: 'dry', type: 'number', min: 1, max: 10, index: true, admin: { width: '50%' } },
+            { name: 'ripe', type: 'number', min: 1, max: 10, index: true, admin: { width: '50%' } },
           ],
         },
         {
           type: 'row',
           fields: [
-            { name: 'creamy', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
-            { name: 'oaky', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
+            {
+              name: 'creamy',
+              type: 'number',
+              min: 1,
+              max: 10,
+              index: true,
+              admin: { width: '50%' },
+            },
+            { name: 'oaky', type: 'number', min: 1, max: 10, index: true, admin: { width: '50%' } },
           ],
         },
         {
           type: 'row',
           fields: [
-            { name: 'complex', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
-            { name: 'light', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
+            {
+              name: 'complex',
+              type: 'number',
+              min: 1,
+              max: 10,
+              index: true,
+              admin: { width: '50%' },
+            },
+            {
+              name: 'light',
+              type: 'number',
+              min: 1,
+              max: 10,
+              index: true,
+              admin: { width: '50%' },
+            },
           ],
         },
         {
           type: 'row',
           fields: [
-            { name: 'smooth', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
-            { name: 'youthful', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
+            {
+              name: 'smooth',
+              type: 'number',
+              min: 1,
+              max: 10,
+              index: true,
+              admin: { width: '50%' },
+            },
+            {
+              name: 'youthful',
+              type: 'number',
+              min: 1,
+              max: 10,
+              index: true,
+              admin: { width: '50%' },
+            },
           ],
         },
         {
           type: 'row',
           fields: [
-            { name: 'energetic', type: 'number', min: 1, max: 10, admin: { width: '50%' } },
-            { name: 'alcohol', type: 'number', min: 1, max: 20, admin: { width: '50%' } },
+            {
+              name: 'energetic',
+              type: 'number',
+              min: 1,
+              max: 10,
+              index: true,
+              admin: { width: '50%' },
+            },
+            {
+              name: 'alcohol',
+              type: 'number',
+              min: 1,
+              max: 20,
+              index: true,
+              admin: { width: '50%' },
+            },
           ],
         },
       ],
@@ -278,6 +337,7 @@ export const WineVariants: CollectionConfig = {
     {
       name: 'slug',
       type: 'text',
+      index: true,
       admin: {
         position: 'sidebar',
         readOnly: true,

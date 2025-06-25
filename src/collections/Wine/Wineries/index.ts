@@ -28,6 +28,7 @@ export const Wineries: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      index: true,
     },
     slugField(),
     {
@@ -37,6 +38,7 @@ export const Wineries: CollectionConfig = {
       unique: true,
       minLength: 4,
       maxLength: 4,
+      index: true,
       admin: {
         position: 'sidebar',
       },

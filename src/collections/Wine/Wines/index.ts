@@ -32,12 +32,14 @@ export const Wines: CollectionConfig = {
           type: 'relationship',
           relationTo: 'wineries',
           required: true,
+          index: true,
           admin: { width: '50%' },
         },
         {
           name: 'title',
           type: 'text',
           required: true,
+          index: true,
           admin: { width: '50%' },
         },
       ],
@@ -50,6 +52,7 @@ export const Wines: CollectionConfig = {
           type: 'relationship',
           relationTo: 'regions',
           required: true,
+          index: true,
           admin: { width: '50%' },
         },
         {
@@ -57,6 +60,7 @@ export const Wines: CollectionConfig = {
           type: 'relationship',
           relationTo: 'styles',
           required: true,
+          index: true,
           admin: { width: '50%' },
         },
       ],
@@ -88,6 +92,7 @@ export const Wines: CollectionConfig = {
     {
       name: 'slug',
       type: 'text',
+      index: true,
       admin: {
         position: 'sidebar',
         readOnly: true,

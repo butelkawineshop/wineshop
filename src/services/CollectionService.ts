@@ -193,7 +193,7 @@ export class CollectionService {
   /**
    * Fetch collection items for filters
    */
-  async fetchCollectionItems(): Promise<Record<string, CollectionItem[]>> {
+  async fetchCollectionItems(locale: Locale): Promise<Record<string, CollectionItem[]>> {
     const collections = [
       'aromas',
       'climates',
@@ -213,6 +213,7 @@ export class CollectionService {
         const response = await this.payload.find(collection, {
           limit: 100,
           depth: 0,
+          locale,
           fields: ['id', 'title', 'slug'],
           where: {
             _status: {

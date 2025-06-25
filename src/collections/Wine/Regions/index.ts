@@ -28,6 +28,7 @@ export const Regions: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      index: true,
     },
     slugField(),
     {
@@ -48,12 +49,14 @@ export const Regions: CollectionConfig = {
         { label: '40-50€', value: '40-50' },
         { label: '50-60€', value: '50-60' },
       ],
+      index: true,
     },
     {
       name: 'climate',
       label: 'Climate',
       type: 'relationship',
       relationTo: 'climates',
+      index: true,
     },
     {
       name: 'description',
@@ -65,6 +68,7 @@ export const Regions: CollectionConfig = {
       type: 'relationship',
       relationTo: 'wineCountries',
       required: true,
+      index: true,
     },
     {
       name: 'neighbours',

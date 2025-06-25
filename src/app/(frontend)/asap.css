@@ -126,3 +126,8 @@
   font-style: italic;
 }
 
+/* Utility classes for performance optimizations */
+.text-shadow-lg {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+

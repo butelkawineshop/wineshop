@@ -22,6 +22,7 @@ export const Styles: CollectionConfig = {
       type: 'text',
       localized: true,
       required: true,
+      index: true,
     },
     slugField(),
     {
@@ -33,6 +34,7 @@ export const Styles: CollectionConfig = {
       name: 'iconKey',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'media',

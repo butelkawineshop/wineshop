@@ -71,6 +71,7 @@ export function useWineData(options: UseWineDataOptions = {}) {
         limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
         sort: '-syncedAt',
         depth: 0,
+        locale: options.locale, // Use specific locale for better performance
       })
 
       logger.info('Wine variants fetched successfully', {
@@ -95,7 +96,7 @@ export function useWineData(options: UseWineDataOptions = {}) {
     }
   }, [isLoading, options.locale, options.currentCollection, setWineVariants, setLoading, setError])
 
-  // Fetch data on mount
+  // Fetch data on mount - but only if we don't have initial data
   useEffect(() => {
     // If we have initial data, use it instead of fetching
     if (options.initialData && options.initialData.length > 0) {
@@ -105,25 +106,35 @@ export function useWineData(options: UseWineDataOptions = {}) {
         currentCollection: options.currentCollection?.type,
       })
       setWineVariants(options.initialData)
-      return
+      return // Don't fetch if we have initial data
     }
 
-    logger.info('No initial data, fetching wines...')
-    fetchWineVariants()
+    // Only fetch if we don't have any data in the store
+    if (wineVariants.length === 0) {
+      logger.info('No initial data and no store data, fetching wines...')
+      fetchWineVariants()
+    } else {
+      logger.info('Using existing store data, skipping fetch', {
+        storeDataCount: wineVariants.length,
+      })
+    }
   }, [
     options.locale,
     options.currentCollection?.id,
     options.currentCollection?.type,
     options.initialData,
+    wineVariants.length, // Add this dependency to check store state
     setWineVariants,
     fetchWineVariants,
   ])
 
-  // Debug logging
-  logger.info('useWineData debug', {
-    wineVariantsCount: wineVariants.length,
-    filteredVariantsCount: filteredVariants.length,
-  })
+  // Debug logging - only in development
+  if (process.env.NODE_ENV === 'development') {
+    logger.info('useWineData debug', {
+      wineVariantsCount: wineVariants.length,
+      filteredVariantsCount: filteredVariants.length,
+    })
+  }
 
   return {
     // Data

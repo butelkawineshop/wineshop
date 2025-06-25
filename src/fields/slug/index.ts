@@ -43,6 +43,7 @@ export const slugField = ({
   type: 'text',
   required,
   localized,
+  index: true,
   admin: {
     ...admin,
     readOnly: true,

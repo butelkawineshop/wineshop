@@ -22,6 +22,7 @@ export const Climates: CollectionConfig = {
       type: 'text',
       required: true,
       localized: true,
+      index: true,
     },
     slugField(),
     {
@@ -39,6 +40,7 @@ export const Climates: CollectionConfig = {
         { label: 'Continental', value: 'continental' },
         { label: 'Alpine', value: 'alpine' },
       ],
+      index: true,
     },
     {
       name: 'climateTemperature',
@@ -49,6 +51,7 @@ export const Climates: CollectionConfig = {
         { label: 'Warm', value: 'warm' },
         { label: 'Hot', value: 'hot' },
       ],
+      index: true,
     },
     {
       name: 'diurnalTemperatureRange',
@@ -58,6 +61,7 @@ export const Climates: CollectionConfig = {
         { label: 'Medium', value: 'medium' },
         { label: 'High', value: 'high' },
       ],
+      index: true,
     },
     {
       name: 'climateHumidity',
@@ -67,6 +71,7 @@ export const Climates: CollectionConfig = {
         { label: 'Moderate', value: 'moderate' },
         { label: 'Humid', value: 'humid' },
       ],
+      index: true,
     },
     {
       name: 'bestRegions',

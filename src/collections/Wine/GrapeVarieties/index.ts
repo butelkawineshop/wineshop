@@ -29,6 +29,7 @@ export const GrapeVarieties: CollectionConfig = {
       type: 'text',
       required: true,
       localized: true,
+      index: true,
     },
     slugField(),
     {
@@ -69,6 +70,7 @@ export const GrapeVarieties: CollectionConfig = {
         { label: 'Red', value: 'red' },
         { label: 'White', value: 'white' },
       ],
+      index: true,
     },
     {
       name: 'distinctiveAromas',
