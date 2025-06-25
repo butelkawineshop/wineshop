@@ -6,6 +6,7 @@ interface WineVariantSyncParams {
   doc: { id: string | number }
   req: PayloadRequest
   operation: 'create' | 'update'
+  previousDoc?: DocumentData
 }
 
 interface DocumentData {
@@ -33,7 +34,12 @@ export class WineVariantSyncService {
   /**
    * Determines if a wine variant sync job should be queued
    */
-  static async shouldQueueSync({ doc, req, operation }: WineVariantSyncParams): Promise<boolean> {
+  static async shouldQueueSync({
+    doc,
+    req,
+    operation,
+    previousDoc,
+  }: WineVariantSyncParams): Promise<boolean> {
     const logger = createLogger(req, {
       task: 'WineVariantSyncService.shouldQueueSync',
       operation,
@@ -49,7 +55,7 @@ export class WineVariantSyncService {
 
     // For update operations, check for changes
     if (operation === 'update') {
-      const hasChanges = await this.detectChanges({ doc, req, logger })
+      const hasChanges = await this.detectChanges({ doc, req, logger, previousDoc })
       if (!hasChanges) {
         logger.info('No changes detected, skipping sync')
         return false
@@ -67,10 +73,12 @@ export class WineVariantSyncService {
     doc,
     req,
     logger,
+    previousDoc,
   }: {
     doc: { id: string | number }
     req: PayloadRequest
     logger: ReturnType<typeof createLogger>
+    previousDoc?: DocumentData
   }): Promise<boolean> {
     const currentDoc = (await req.payload.findByID({
       collection: 'wine-variants',
@@ -82,14 +90,11 @@ export class WineVariantSyncService {
       throw new ValidationError('Current document not found', { id: doc.id })
     }
 
-    const previousDoc = (await req.payload.findByID({
-      collection: 'wine-variants',
-      id: doc.id,
-      depth: 3,
-    })) as unknown as DocumentData | null
-
+    // If we don't have previous document data, assume there are changes
+    // This is a fallback to ensure sync happens
     if (!previousDoc) {
-      throw new ValidationError('Previous document not found', { id: doc.id })
+      logger.info('No previous document data available, assuming changes exist')
+      return true
     }
 
     // Check for related field changes

@@ -6,6 +6,7 @@ export const queueFlatWineVariantSync: CollectionAfterChangeHook = async ({
   doc,
   req,
   operation,
+  previousDoc,
 }) => {
   const logger = createLogger(req, {
     task: 'queueFlatWineVariantSync',
@@ -21,6 +22,7 @@ export const queueFlatWineVariantSync: CollectionAfterChangeHook = async ({
       doc,
       req,
       operation,
+      previousDoc,
     })
 
     if (shouldQueue) {

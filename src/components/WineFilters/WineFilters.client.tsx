@@ -134,12 +134,8 @@ export default function WineFiltersClient({
             ? item.title.en
             : item.title.sl || item.title.en
           : item.title || ''
-      const titleEn =
-        typeof item.titleEn === 'object'
-          ? item.titleEn.en || item.titleEn.sl || ''
-          : item.titleEn || ''
-      const query = searchQuery.toLowerCase()
-      return title.toLowerCase().includes(query) || titleEn.toLowerCase().includes(query)
+
+      return title.toLowerCase().includes(searchQuery.toLowerCase())
     })
   }
 
@@ -225,8 +221,12 @@ export default function WineFiltersClient({
                                   : item.title.sl || item.title.en
                                 : item.title || ''
                             }
-                            // Array-based filters use IDs
-                            return item.id
+                            // Array-based filters use titles (not IDs) for consistency with flat variants
+                            return typeof item.title === 'object'
+                              ? locale === 'en' && item.title.en
+                                ? item.title.en
+                                : item.title.sl || item.title.en
+                              : item.title || ''
                           }
 
                           const filterValue = getFilterValue(key)

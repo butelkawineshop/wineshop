@@ -194,10 +194,18 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
 
     for (const { key, field } of arrayFilters) {
       if (filters[key].length > 0 && field) {
-        const filterIds = filters[key]
-        const fieldIds = field.map((item) => item.id).filter(Boolean)
-        const hasMatch = filterIds.some((filterId) => fieldIds.includes(filterId))
-        if (!hasMatch) return false
+        // For array filters, we now use titles for both filter values and matching
+        const filterTitles = filters[key] // These are now titles, not IDs
+        const fieldTitles = field.map((item) => item.title).filter(Boolean)
+
+        // Match by title
+        const hasMatch = filterTitles.some((filterTitle) => {
+          return fieldTitles.some((title) => title === filterTitle)
+        })
+
+        if (!hasMatch) {
+          return false
+        }
       }
     }
 
@@ -274,6 +282,35 @@ export const useWineStore = create<WineStore>()(
             }`,
           )
 
+          // Log sample wine variant data structure for debugging
+          if (variants.length > 0) {
+            const sampleVariant = variants[0]
+            console.log('🔍 Sample wine variant data structure:', {
+              id: sampleVariant.id,
+              wineTitle: sampleVariant.wineTitle,
+              aromas: sampleVariant.aromas,
+              moods: sampleVariant.moods,
+              tags: sampleVariant.tags,
+              grapeVarieties: sampleVariant.grapeVarieties,
+              climates: sampleVariant.climates,
+              dishes: sampleVariant.dishes,
+            })
+
+            // Check if array fields are populated
+            const arrayFields = ['aromas', 'moods', 'tags', 'grapeVarieties', 'climates', 'dishes']
+            const populatedFields = arrayFields.filter((field) => {
+              const value = sampleVariant[field as keyof FlatWineVariant]
+              return value && Array.isArray(value) && value.length > 0
+            })
+
+            console.log('🔍 Array fields status:', {
+              totalFields: arrayFields.length,
+              populatedFields: populatedFields.length,
+              populatedFieldNames: populatedFields,
+              emptyFields: arrayFields.filter((field) => !populatedFields.includes(field)),
+            })
+          }
+
           // Log which specific filters are active
           const activeFilters = Object.entries(filters).filter(([key, value]) => {
             if (Array.isArray(value)) return value.length > 0
@@ -307,6 +344,11 @@ export const useWineStore = create<WineStore>()(
             )
           } else {
             console.log('🍷 No active filters')
+          }
+
+          // Log success message when all wines are loaded
+          if (variants.length > 0) {
+            console.log(`✅ Successfully loaded ${variants.length} wines for filtering`)
           }
 
           set({

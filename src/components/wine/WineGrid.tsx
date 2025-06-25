@@ -18,11 +18,11 @@ interface WineGridProps {
   totalCount?: number
 }
 
-// Simplified responsive configuration
+// Responsive configuration for cards per row
 const RESPONSIVE_CONFIG = {
-  desktop: { columns: 4, rows: 1 },
-  tablet: { columns: 3, rows: 1 },
-  mobile: { columns: 1, rows: 1 },
+  desktop: { cardsPerRow: 4 },
+  tablet: { cardsPerRow: 2 },
+  mobile: { cardsPerRow: 1 },
 } as const
 
 // Debounce utility
@@ -48,37 +48,35 @@ export function WineGrid({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [swiperHeight, setSwiperHeight] = useState<number>(600)
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1024,
+  )
 
-  // Memoized responsive config to prevent unnecessary recalculations
+  // Reactive responsive config that updates with window size
   const responsiveConfig = useMemo(() => {
-    if (typeof window === 'undefined') return RESPONSIVE_CONFIG.desktop
-
-    const width = window.innerWidth
-    if (width < 768) return RESPONSIVE_CONFIG.mobile
-    if (width < 1024) return RESPONSIVE_CONFIG.tablet
+    if (windowWidth < 768) return RESPONSIVE_CONFIG.mobile
+    if (windowWidth < 1024) return RESPONSIVE_CONFIG.tablet
     return RESPONSIVE_CONFIG.desktop
-  }, [])
+  }, [windowWidth])
 
-  // Memoized wine slots creation
-  const wineSlots = useMemo(() => {
-    const { columns, rows } = responsiveConfig
-    const winesPerSlot = columns * rows
-    const slots = []
+  // Update cards per row when responsive config changes
+  const cardsPerRow = responsiveConfig.cardsPerRow
 
-    for (let i = 0; i < variants.length; i += winesPerSlot) {
-      slots.push(variants.slice(i, i + winesPerSlot))
+  // Memoized wine rows creation - each row is one slide
+  const wineRows = useMemo(() => {
+    const rows = []
+    for (let i = 0; i < variants.length; i += cardsPerRow) {
+      rows.push(variants.slice(i, i + cardsPerRow))
     }
-
-    return slots
-  }, [variants, responsiveConfig])
+    return rows
+  }, [variants, cardsPerRow])
 
   // Memoized grid classes
   const gridClasses = useMemo(() => {
-    const { columns } = responsiveConfig
-    if (columns === 1) return 'grid-cols-1'
-    if (columns === 3) return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+    if (cardsPerRow === 1) return 'grid-cols-1'
+    if (cardsPerRow === 2) return 'grid-cols-1 sm:grid-cols-2'
     return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-  }, [responsiveConfig])
+  }, [cardsPerRow])
 
   // Optimized height calculation with debouncing
   const calculateSwiperHeight = useCallback(
@@ -100,15 +98,16 @@ export function WineGrid({
           return heightDiff > 5 ? calculatedHeight : currentHeight
         })
       }
-    }, 200), // Increased debounce time for more stability
+    }, 100), // Reduced from 200ms to 100ms
     [],
   )
 
-  // Single resize handler with debouncing
+  // Window resize handler
   useEffect(() => {
     const handleResize = debounce(() => {
+      setWindowWidth(window.innerWidth)
       calculateSwiperHeight()
-    }, 150)
+    }, 50) // Reduced from 150ms to 50ms for more responsive behavior
 
     window.addEventListener('resize', handleResize, { passive: true })
     return () => window.removeEventListener('resize', handleResize)
@@ -130,11 +129,11 @@ export function WineGrid({
   // Optimized keyboard navigation
   const handleKeyDown = useCallback(
     (event: KeyboardEvent): void => {
-      if (!swiperRef.current || wineSlots.length === 0) return
+      if (!swiperRef.current || wineRows.length === 0) return
 
       const { key } = event
       const currentIndex = currentSlide
-      const totalSlots = wineSlots.length
+      const totalRows = wineRows.length
 
       let newIndex = currentIndex
 
@@ -145,7 +144,7 @@ export function WineGrid({
           break
         case 'ArrowDown':
           event.preventDefault()
-          newIndex = Math.min(totalSlots - 1, currentIndex + 1)
+          newIndex = Math.min(totalRows - 1, currentIndex + 1)
           break
         case 'Home':
           event.preventDefault()
@@ -153,7 +152,7 @@ export function WineGrid({
           break
         case 'End':
           event.preventDefault()
-          newIndex = totalSlots - 1
+          newIndex = totalRows - 1
           break
         case 'PageUp':
           event.preventDefault()
@@ -161,7 +160,7 @@ export function WineGrid({
           break
         case 'PageDown':
           event.preventDefault()
-          newIndex = Math.min(totalSlots - 1, currentIndex + 3)
+          newIndex = Math.min(totalRows - 1, currentIndex + 3)
           break
         default:
           return
@@ -172,7 +171,7 @@ export function WineGrid({
         setCurrentSlide(newIndex)
       }
     },
-    [currentSlide, wineSlots.length],
+    [currentSlide, wineRows.length],
   )
 
   // Single keyboard event listener
@@ -211,13 +210,13 @@ export function WineGrid({
     // TODO: BUTELKA-124 - Implement like functionality with backend integration
   }, [])
 
-  // Memoized wine slot renderer
-  const renderWineSlot = useCallback(
-    (wines: FlatWineVariant[], slotIndex: number): React.JSX.Element => (
+  // Memoized wine row renderer
+  const renderWineRow = useCallback(
+    (wines: FlatWineVariant[], rowIndex: number): React.JSX.Element => (
       <div
         className={`grid ${gridClasses} ${WINE_CONSTANTS.GRID_GAP} justify-center`}
         role="grid"
-        aria-label={t('wine.slotGridLabel', { slot: slotIndex + 1 })}
+        aria-label={t('wine.rowGridLabel', { row: rowIndex + 1 })}
       >
         {wines.map((variant) => (
           <div key={variant.id} className="w-full h-full" role="gridcell">
@@ -235,18 +234,18 @@ export function WineGrid({
     [gridClasses, t, locale, handleShare, handleLike],
   )
 
-  // Memoized slot indicator
-  const renderSlotIndicator = useCallback(
-    (index: number, total: number, winesInSlot: number): React.JSX.Element => (
+  // Memoized row indicator
+  const renderRowIndicator = useCallback(
+    (index: number, total: number, winesInRow: number): React.JSX.Element => (
       <div
         className="text-center mt-4 text-sm text-muted-foreground"
         aria-live="polite"
         aria-atomic="true"
       >
-        {t('wine.slotIndicator', {
+        {t('wine.rowIndicator', {
           current: index + 1,
           total,
-          winesInSlot,
+          winesInRow,
         })}
       </div>
     ),
@@ -277,16 +276,17 @@ export function WineGrid({
       {/* Hidden content for height calculation - simplified */}
       <div className="sr-only absolute top-0 left-0 w-full">
         <div className="w-full">
-          {renderWineSlot(variants.slice(0, responsiveConfig.columns * responsiveConfig.rows), 0)}
-          {renderSlotIndicator(
+          {renderWineRow(variants.slice(0, cardsPerRow), 0)}
+          {renderRowIndicator(
             0,
-            Math.ceil(variants.length / (responsiveConfig.columns * responsiveConfig.rows)),
-            Math.min(responsiveConfig.columns * responsiveConfig.rows, variants.length),
+            Math.ceil(variants.length / cardsPerRow),
+            Math.min(cardsPerRow, variants.length),
           )}
         </div>
       </div>
 
       <Swiper
+        key={`wine-swiper-${cardsPerRow}`}
         direction="vertical"
         onSwiper={(swiper) => {
           swiperRef.current = swiper
@@ -301,18 +301,18 @@ export function WineGrid({
         allowTouchMove={true}
         aria-label={t('wine.sliderLabel')}
       >
-        {wineSlots.map((slot, index) => (
+        {wineRows.map((row, index) => (
           <SwiperSlide key={index}>
             <div
               className="w-full h-full flex flex-col"
               role="group"
-              aria-label={t('wine.slotLabel', {
+              aria-label={t('wine.rowLabel', {
                 current: index + 1,
-                total: wineSlots.length,
+                total: wineRows.length,
               })}
             >
-              {renderWineSlot(slot, index)}
-              {renderSlotIndicator(index, wineSlots.length, slot.length)}
+              {renderWineRow(row, index)}
+              {renderRowIndicator(index, wineRows.length, row.length)}
             </div>
           </SwiperSlide>
         ))}
@@ -322,8 +322,8 @@ export function WineGrid({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {t('wine.accessibilityStatus', {
           current: currentSlide + 1,
-          total: wineSlots.length,
-          winesInSlot: wineSlots[currentSlide]?.length || 0,
+          total: wineRows.length,
+          winesInRow: wineRows[currentSlide]?.length || 0,
         })}
       </div>
     </div>

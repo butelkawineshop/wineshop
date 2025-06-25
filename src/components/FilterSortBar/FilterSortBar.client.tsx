@@ -93,17 +93,13 @@ export function FilterSortBarClient({
         collectionItems={collectionItems || {}}
       />
       <Sorting />
-
-      {/* Clear All Filters Button - Only show when there are active filters */}
-      {hasActiveFilters() && (
-        <div className="flex justify-center">
-          <ResetFilterButton onReset={clearAllFilters} />
-        </div>
-      )}
-
-      {showWineGrid && (
-        <WineGrid variants={wineVariants} locale={locale} totalCount={wineVariants.length} />
-      )}
+      <WineGrid variants={wineVariants} locale={locale} />
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">
+          {t('wine.showingWinesCount', { count: wineVariants.length })}
+        </span>
+        {hasActiveFilters() && <ResetFilterButton onReset={clearAllFilters} />}
+      </div>
     </div>
   )
 }

@@ -57,10 +57,10 @@ export default async function FilterSortBar({
       }
     }
 
-    // Reduce initial fetch limit for better performance
+    // Fetch all wines for proper filtering - no artificial limits
     const response = await payload.find('flat-wine-variants', {
       where,
-      limit: Math.min(50, COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT), // Reduced from 100 to 50
+      limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT, // Use full limit to get all wines
       sort: '-syncedAt',
       depth: 0,
       locale: resolvedLocale, // Use specific locale for better performance
@@ -75,7 +75,7 @@ export default async function FilterSortBar({
       hasNextPage: response.hasNextPage,
       hasPrevPage: response.hasPrevPage,
       page: response.page,
-      limit: Math.min(50, COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT),
+      limit: COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
       locale: resolvedLocale,
       currentCollection: currentCollection?.type,
     })
