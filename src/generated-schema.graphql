@@ -1958,7 +1958,7 @@ type Tag {
   title: String
   slug: String
   description: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: Tag_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -2112,7 +2112,7 @@ type Aroma {
   slug: String
   adjective(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Adjective
   flavour(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Flavour
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: Aroma_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -2546,7 +2546,7 @@ type Style {
   slug: String
   description: String
   iconKey: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: Style_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -3131,7 +3131,7 @@ type Dish {
   title: String
   slug: String
   description: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: Dish_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -3156,7 +3156,7 @@ type Mood {
   title: String
   slug: String
   description: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: Mood_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -14572,7 +14572,7 @@ type TagVersion_Version {
   title: String
   slug: String
   description: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: TagVersion_Version_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -15477,7 +15477,7 @@ type AromaVersion_Version {
   slug: String
   adjective(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Adjective
   flavour(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Flavour
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: AromaVersion_Version_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -17838,7 +17838,7 @@ type StyleVersion_Version {
   slug: String
   description: String
   iconKey: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: StyleVersion_Version_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -19962,7 +19962,7 @@ type MoodVersion_Version {
   title: String
   slug: String
   description: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: MoodVersion_Version_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -20830,7 +20830,7 @@ type DishVersion_Version {
   title: String
   slug: String
   description: String
-  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Media
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
   seo: DishVersion_Version_Seo
   updatedAt: DateTime
   createdAt: DateTime
@@ -21151,6 +21151,10 @@ type FlatWineVariant {
   servingTemp: String
   decanting: Boolean
   tastingProfile: String
+  description: String
+  descriptionEn: String
+  relatedWineries: [FlatWineVariant_RelatedWineries!]
+  relatedRegions: [FlatWineVariant_RelatedRegions!]
   tastingNotes: FlatWineVariant_TastingNotes
   aromas: [FlatWineVariant_Aromas!]
   tags: [FlatWineVariant_Tags!]
@@ -21165,6 +21169,14 @@ type FlatWineVariant {
   updatedAt: DateTime
   createdAt: DateTime
   _status: FlatWineVariant__status
+}
+
+type FlatWineVariant_RelatedWineries {
+  id: String
+}
+
+type FlatWineVariant_RelatedRegions {
+  id: String
 }
 
 type FlatWineVariant_TastingNotes {
@@ -21258,6 +21270,10 @@ input FlatWineVariant_where {
   servingTemp: FlatWineVariant_servingTemp_operator
   decanting: FlatWineVariant_decanting_operator
   tastingProfile: FlatWineVariant_tastingProfile_operator
+  description: FlatWineVariant_description_operator
+  descriptionEn: FlatWineVariant_descriptionEn_operator
+  relatedWineries__id: FlatWineVariant_relatedWineries__id_operator
+  relatedRegions__id: FlatWineVariant_relatedRegions__id_operator
   tastingNotes__dry: FlatWineVariant_tastingNotes__dry_operator
   tastingNotes__ripe: FlatWineVariant_tastingNotes__ripe_operator
   tastingNotes__creamy: FlatWineVariant_tastingNotes__creamy_operator
@@ -21504,6 +21520,44 @@ input FlatWineVariant_decanting_operator {
 }
 
 input FlatWineVariant_tastingProfile_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_description_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input FlatWineVariant_descriptionEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input FlatWineVariant_relatedWineries__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_relatedRegions__id_operator {
   equals: String
   not_equals: String
   like: String
@@ -21929,6 +21983,10 @@ input FlatWineVariant_where_and {
   servingTemp: FlatWineVariant_servingTemp_operator
   decanting: FlatWineVariant_decanting_operator
   tastingProfile: FlatWineVariant_tastingProfile_operator
+  description: FlatWineVariant_description_operator
+  descriptionEn: FlatWineVariant_descriptionEn_operator
+  relatedWineries__id: FlatWineVariant_relatedWineries__id_operator
+  relatedRegions__id: FlatWineVariant_relatedRegions__id_operator
   tastingNotes__dry: FlatWineVariant_tastingNotes__dry_operator
   tastingNotes__ripe: FlatWineVariant_tastingNotes__ripe_operator
   tastingNotes__creamy: FlatWineVariant_tastingNotes__creamy_operator
@@ -21992,6 +22050,10 @@ input FlatWineVariant_where_or {
   servingTemp: FlatWineVariant_servingTemp_operator
   decanting: FlatWineVariant_decanting_operator
   tastingProfile: FlatWineVariant_tastingProfile_operator
+  description: FlatWineVariant_description_operator
+  descriptionEn: FlatWineVariant_descriptionEn_operator
+  relatedWineries__id: FlatWineVariant_relatedWineries__id_operator
+  relatedRegions__id: FlatWineVariant_relatedRegions__id_operator
   tastingNotes__dry: FlatWineVariant_tastingNotes__dry_operator
   tastingNotes__ripe: FlatWineVariant_tastingNotes__ripe_operator
   tastingNotes__creamy: FlatWineVariant_tastingNotes__creamy_operator
@@ -22068,6 +22130,10 @@ type FlatWineVariantsDocAccessFields {
   servingTemp: FlatWineVariantsDocAccessFields_servingTemp
   decanting: FlatWineVariantsDocAccessFields_decanting
   tastingProfile: FlatWineVariantsDocAccessFields_tastingProfile
+  description: FlatWineVariantsDocAccessFields_description
+  descriptionEn: FlatWineVariantsDocAccessFields_descriptionEn
+  relatedWineries: FlatWineVariantsDocAccessFields_relatedWineries
+  relatedRegions: FlatWineVariantsDocAccessFields_relatedRegions
   tastingNotes: FlatWineVariantsDocAccessFields_tastingNotes
   aromas: FlatWineVariantsDocAccessFields_aromas
   tags: FlatWineVariantsDocAccessFields_tags
@@ -22564,6 +22630,154 @@ type FlatWineVariantsDocAccessFields_tastingProfile_Update {
 }
 
 type FlatWineVariantsDocAccessFields_tastingProfile_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_description {
+  create: FlatWineVariantsDocAccessFields_description_Create
+  read: FlatWineVariantsDocAccessFields_description_Read
+  update: FlatWineVariantsDocAccessFields_description_Update
+  delete: FlatWineVariantsDocAccessFields_description_Delete
+}
+
+type FlatWineVariantsDocAccessFields_description_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_description_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_description_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_description_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_descriptionEn {
+  create: FlatWineVariantsDocAccessFields_descriptionEn_Create
+  read: FlatWineVariantsDocAccessFields_descriptionEn_Read
+  update: FlatWineVariantsDocAccessFields_descriptionEn_Update
+  delete: FlatWineVariantsDocAccessFields_descriptionEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_descriptionEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_descriptionEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_descriptionEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_descriptionEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries {
+  create: FlatWineVariantsDocAccessFields_relatedWineries_Create
+  read: FlatWineVariantsDocAccessFields_relatedWineries_Read
+  update: FlatWineVariantsDocAccessFields_relatedWineries_Update
+  delete: FlatWineVariantsDocAccessFields_relatedWineries_Delete
+  fields: FlatWineVariantsDocAccessFields_relatedWineries_Fields
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_Fields {
+  id: FlatWineVariantsDocAccessFields_relatedWineries_id
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_id {
+  create: FlatWineVariantsDocAccessFields_relatedWineries_id_Create
+  read: FlatWineVariantsDocAccessFields_relatedWineries_id_Read
+  update: FlatWineVariantsDocAccessFields_relatedWineries_id_Update
+  delete: FlatWineVariantsDocAccessFields_relatedWineries_id_Delete
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_id_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_id_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_id_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedWineries_id_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions {
+  create: FlatWineVariantsDocAccessFields_relatedRegions_Create
+  read: FlatWineVariantsDocAccessFields_relatedRegions_Read
+  update: FlatWineVariantsDocAccessFields_relatedRegions_Update
+  delete: FlatWineVariantsDocAccessFields_relatedRegions_Delete
+  fields: FlatWineVariantsDocAccessFields_relatedRegions_Fields
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_Fields {
+  id: FlatWineVariantsDocAccessFields_relatedRegions_id
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_id {
+  create: FlatWineVariantsDocAccessFields_relatedRegions_id_Create
+  read: FlatWineVariantsDocAccessFields_relatedRegions_id_Read
+  update: FlatWineVariantsDocAccessFields_relatedRegions_id_Update
+  delete: FlatWineVariantsDocAccessFields_relatedRegions_id_Delete
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_id_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_id_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_id_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_relatedRegions_id_Delete {
   permission: Boolean!
 }
 
@@ -23671,6 +23885,10 @@ type FlatWineVariantVersion_Version {
   servingTemp: String
   decanting: Boolean
   tastingProfile: String
+  description: String
+  descriptionEn: String
+  relatedWineries: [FlatWineVariantVersion_Version_RelatedWineries!]
+  relatedRegions: [FlatWineVariantVersion_Version_RelatedRegions!]
   tastingNotes: FlatWineVariantVersion_Version_TastingNotes
   aromas: [FlatWineVariantVersion_Version_Aromas!]
   tags: [FlatWineVariantVersion_Version_Tags!]
@@ -23685,6 +23903,14 @@ type FlatWineVariantVersion_Version {
   updatedAt: DateTime
   createdAt: DateTime
   _status: FlatWineVariantVersion_Version__status
+}
+
+type FlatWineVariantVersion_Version_RelatedWineries {
+  id: String
+}
+
+type FlatWineVariantVersion_Version_RelatedRegions {
+  id: String
 }
 
 type FlatWineVariantVersion_Version_TastingNotes {
@@ -23784,6 +24010,10 @@ input versionsFlatWineVariant_where {
   version__servingTemp: versionsFlatWineVariant_version__servingTemp_operator
   version__decanting: versionsFlatWineVariant_version__decanting_operator
   version__tastingProfile: versionsFlatWineVariant_version__tastingProfile_operator
+  version__description: versionsFlatWineVariant_version__description_operator
+  version__descriptionEn: versionsFlatWineVariant_version__descriptionEn_operator
+  version__relatedWineries__id: versionsFlatWineVariant_version__relatedWineries__id_operator
+  version__relatedRegions__id: versionsFlatWineVariant_version__relatedRegions__id_operator
   version__tastingNotes__dry: versionsFlatWineVariant_version__tastingNotes__dry_operator
   version__tastingNotes__ripe: versionsFlatWineVariant_version__tastingNotes__ripe_operator
   version__tastingNotes__creamy: versionsFlatWineVariant_version__tastingNotes__creamy_operator
@@ -24044,6 +24274,44 @@ input versionsFlatWineVariant_version__decanting_operator {
 }
 
 input versionsFlatWineVariant_version__tastingProfile_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__description_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__descriptionEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__relatedWineries__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__relatedRegions__id_operator {
   equals: String
   not_equals: String
   like: String
@@ -24518,6 +24786,10 @@ input versionsFlatWineVariant_where_and {
   version__servingTemp: versionsFlatWineVariant_version__servingTemp_operator
   version__decanting: versionsFlatWineVariant_version__decanting_operator
   version__tastingProfile: versionsFlatWineVariant_version__tastingProfile_operator
+  version__description: versionsFlatWineVariant_version__description_operator
+  version__descriptionEn: versionsFlatWineVariant_version__descriptionEn_operator
+  version__relatedWineries__id: versionsFlatWineVariant_version__relatedWineries__id_operator
+  version__relatedRegions__id: versionsFlatWineVariant_version__relatedRegions__id_operator
   version__tastingNotes__dry: versionsFlatWineVariant_version__tastingNotes__dry_operator
   version__tastingNotes__ripe: versionsFlatWineVariant_version__tastingNotes__ripe_operator
   version__tastingNotes__creamy: versionsFlatWineVariant_version__tastingNotes__creamy_operator
@@ -24587,6 +24859,10 @@ input versionsFlatWineVariant_where_or {
   version__servingTemp: versionsFlatWineVariant_version__servingTemp_operator
   version__decanting: versionsFlatWineVariant_version__decanting_operator
   version__tastingProfile: versionsFlatWineVariant_version__tastingProfile_operator
+  version__description: versionsFlatWineVariant_version__description_operator
+  version__descriptionEn: versionsFlatWineVariant_version__descriptionEn_operator
+  version__relatedWineries__id: versionsFlatWineVariant_version__relatedWineries__id_operator
+  version__relatedRegions__id: versionsFlatWineVariant_version__relatedRegions__id_operator
   version__tastingNotes__dry: versionsFlatWineVariant_version__tastingNotes__dry_operator
   version__tastingNotes__ripe: versionsFlatWineVariant_version__tastingNotes__ripe_operator
   version__tastingNotes__creamy: versionsFlatWineVariant_version__tastingNotes__creamy_operator
@@ -35747,6 +36023,10 @@ type FlatWineVariantsFields {
   servingTemp: FlatWineVariantsFields_servingTemp
   decanting: FlatWineVariantsFields_decanting
   tastingProfile: FlatWineVariantsFields_tastingProfile
+  description: FlatWineVariantsFields_description
+  descriptionEn: FlatWineVariantsFields_descriptionEn
+  relatedWineries: FlatWineVariantsFields_relatedWineries
+  relatedRegions: FlatWineVariantsFields_relatedRegions
   tastingNotes: FlatWineVariantsFields_tastingNotes
   aromas: FlatWineVariantsFields_aromas
   tags: FlatWineVariantsFields_tags
@@ -36243,6 +36523,154 @@ type FlatWineVariantsFields_tastingProfile_Update {
 }
 
 type FlatWineVariantsFields_tastingProfile_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_description {
+  create: FlatWineVariantsFields_description_Create
+  read: FlatWineVariantsFields_description_Read
+  update: FlatWineVariantsFields_description_Update
+  delete: FlatWineVariantsFields_description_Delete
+}
+
+type FlatWineVariantsFields_description_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_description_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_description_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_description_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_descriptionEn {
+  create: FlatWineVariantsFields_descriptionEn_Create
+  read: FlatWineVariantsFields_descriptionEn_Read
+  update: FlatWineVariantsFields_descriptionEn_Update
+  delete: FlatWineVariantsFields_descriptionEn_Delete
+}
+
+type FlatWineVariantsFields_descriptionEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_descriptionEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_descriptionEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_descriptionEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries {
+  create: FlatWineVariantsFields_relatedWineries_Create
+  read: FlatWineVariantsFields_relatedWineries_Read
+  update: FlatWineVariantsFields_relatedWineries_Update
+  delete: FlatWineVariantsFields_relatedWineries_Delete
+  fields: FlatWineVariantsFields_relatedWineries_Fields
+}
+
+type FlatWineVariantsFields_relatedWineries_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_Fields {
+  id: FlatWineVariantsFields_relatedWineries_id
+}
+
+type FlatWineVariantsFields_relatedWineries_id {
+  create: FlatWineVariantsFields_relatedWineries_id_Create
+  read: FlatWineVariantsFields_relatedWineries_id_Read
+  update: FlatWineVariantsFields_relatedWineries_id_Update
+  delete: FlatWineVariantsFields_relatedWineries_id_Delete
+}
+
+type FlatWineVariantsFields_relatedWineries_id_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_id_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_id_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedWineries_id_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions {
+  create: FlatWineVariantsFields_relatedRegions_Create
+  read: FlatWineVariantsFields_relatedRegions_Read
+  update: FlatWineVariantsFields_relatedRegions_Update
+  delete: FlatWineVariantsFields_relatedRegions_Delete
+  fields: FlatWineVariantsFields_relatedRegions_Fields
+}
+
+type FlatWineVariantsFields_relatedRegions_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_Fields {
+  id: FlatWineVariantsFields_relatedRegions_id
+}
+
+type FlatWineVariantsFields_relatedRegions_id {
+  create: FlatWineVariantsFields_relatedRegions_id_Create
+  read: FlatWineVariantsFields_relatedRegions_id_Read
+  update: FlatWineVariantsFields_relatedRegions_id_Update
+  delete: FlatWineVariantsFields_relatedRegions_id_Delete
+}
+
+type FlatWineVariantsFields_relatedRegions_id_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_id_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_id_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_relatedRegions_id_Delete {
   permission: Boolean!
 }
 
@@ -39296,7 +39724,7 @@ input mutationTagInput {
   title: String
   slug: String
   description: String
-  media: Int
+  media: [Int]
   seo: mutationTag_SeoInput
   updatedAt: String
   createdAt: String
@@ -39320,7 +39748,7 @@ input mutationTagUpdateInput {
   title: String
   slug: String
   description: String
-  media: Int
+  media: [Int]
   seo: mutationTagUpdate_SeoInput
   updatedAt: String
   createdAt: String
@@ -39345,7 +39773,7 @@ input mutationAromaInput {
   slug: String
   adjective: Int
   flavour: Int
-  media: Int
+  media: [Int]
   seo: mutationAroma_SeoInput
   updatedAt: String
   createdAt: String
@@ -39370,7 +39798,7 @@ input mutationAromaUpdateInput {
   slug: String
   adjective: Int
   flavour: Int
-  media: Int
+  media: [Int]
   seo: mutationAromaUpdate_SeoInput
   updatedAt: String
   createdAt: String
@@ -39505,7 +39933,7 @@ input mutationStyleInput {
   slug: String
   description: String
   iconKey: String!
-  media: Int
+  media: [Int]
   seo: mutationStyle_SeoInput
   updatedAt: String
   createdAt: String
@@ -39530,7 +39958,7 @@ input mutationStyleUpdateInput {
   slug: String
   description: String
   iconKey: String
-  media: Int
+  media: [Int]
   seo: mutationStyleUpdate_SeoInput
   updatedAt: String
   createdAt: String
@@ -39668,7 +40096,7 @@ input mutationMoodInput {
   title: String
   slug: String
   description: String
-  media: Int
+  media: [Int]
   seo: mutationMood_SeoInput
   updatedAt: String
   createdAt: String
@@ -39692,7 +40120,7 @@ input mutationMoodUpdateInput {
   title: String
   slug: String
   description: String
-  media: Int
+  media: [Int]
   seo: mutationMoodUpdate_SeoInput
   updatedAt: String
   createdAt: String
@@ -39716,7 +40144,7 @@ input mutationDishInput {
   title: String
   slug: String
   description: String
-  media: Int
+  media: [Int]
   seo: mutationDish_SeoInput
   updatedAt: String
   createdAt: String
@@ -39740,7 +40168,7 @@ input mutationDishUpdateInput {
   title: String
   slug: String
   description: String
-  media: Int
+  media: [Int]
   seo: mutationDishUpdate_SeoInput
   updatedAt: String
   createdAt: String
@@ -39782,6 +40210,10 @@ input mutationFlatWineVariantInput {
   servingTemp: String
   decanting: Boolean
   tastingProfile: String
+  description: String
+  descriptionEn: String
+  relatedWineries: [mutationFlatWineVariant_RelatedWineriesInput]
+  relatedRegions: [mutationFlatWineVariant_RelatedRegionsInput]
   tastingNotes: mutationFlatWineVariant_TastingNotesInput
   aromas: [mutationFlatWineVariant_AromasInput]
   tags: [mutationFlatWineVariant_TagsInput]
@@ -39796,6 +40228,14 @@ input mutationFlatWineVariantInput {
   updatedAt: String
   createdAt: String
   _status: FlatWineVariant__status_MutationInput
+}
+
+input mutationFlatWineVariant_RelatedWineriesInput {
+  id: String
+}
+
+input mutationFlatWineVariant_RelatedRegionsInput {
+  id: String
 }
 
 input mutationFlatWineVariant_TastingNotesInput {
@@ -39875,6 +40315,10 @@ input mutationFlatWineVariantUpdateInput {
   servingTemp: String
   decanting: Boolean
   tastingProfile: String
+  description: String
+  descriptionEn: String
+  relatedWineries: [mutationFlatWineVariantUpdate_RelatedWineriesInput]
+  relatedRegions: [mutationFlatWineVariantUpdate_RelatedRegionsInput]
   tastingNotes: mutationFlatWineVariantUpdate_TastingNotesInput
   aromas: [mutationFlatWineVariantUpdate_AromasInput]
   tags: [mutationFlatWineVariantUpdate_TagsInput]
@@ -39889,6 +40333,14 @@ input mutationFlatWineVariantUpdateInput {
   updatedAt: String
   createdAt: String
   _status: FlatWineVariantUpdate__status_MutationInput
+}
+
+input mutationFlatWineVariantUpdate_RelatedWineriesInput {
+  id: String
+}
+
+input mutationFlatWineVariantUpdate_RelatedRegionsInput {
+  id: String
 }
 
 input mutationFlatWineVariantUpdate_TastingNotesInput {

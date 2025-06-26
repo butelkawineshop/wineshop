@@ -41,6 +41,7 @@ export const Moods: CollectionConfig = {
       name: 'media',
       type: 'upload',
       relationTo: 'media',
+      hasMany: true,
     },
     seoField({
       titleField: 'title',

@@ -493,7 +493,7 @@ export interface Tag {
    */
   slug?: string | null
   description?: string | null
-  media?: (number | null) | Media
+  media?: (number | Media)[] | null
   /**
    * Automatically generated SEO data
    */
@@ -691,7 +691,7 @@ export interface Aroma {
   slug?: string | null
   adjective: number | Adjective
   flavour: number | Flavour
-  media?: (number | null) | Media
+  media?: (number | Media)[] | null
   /**
    * Automatically generated SEO data
    */
@@ -820,7 +820,7 @@ export interface Style {
   slug?: string | null
   description?: string | null
   iconKey: string
-  media?: (number | null) | Media
+  media?: (number | Media)[] | null
   /**
    * Automatically generated SEO data
    */
@@ -858,7 +858,7 @@ export interface Dish {
    */
   slug?: string | null
   description?: string | null
-  media?: (number | null) | Media
+  media?: (number | Media)[] | null
   /**
    * Automatically generated SEO data
    */
@@ -896,7 +896,7 @@ export interface Mood {
    */
   slug?: string | null
   description?: string | null
-  media?: (number | null) | Media
+  media?: (number | Media)[] | null
   /**
    * Automatically generated SEO data
    */

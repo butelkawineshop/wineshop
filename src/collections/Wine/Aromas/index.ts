@@ -100,6 +100,7 @@ export const Aromas: CollectionConfig = {
       name: 'media',
       type: 'upload',
       relationTo: 'media',
+      hasMany: true,
     },
     seoField({
       titleField: 'title',
