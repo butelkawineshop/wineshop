@@ -464,83 +464,48 @@ body {
   text-wrap: pretty;
 }
 
-/* ===== WINE GRID SWIPER STYLES ===== */
-.wine-swiper {
-  --swiper-navigation-size: 24px;
-  --swiper-navigation-color: hsl(var(--primary));
-  height: var(--wine-swiper-height, 600px);
-  /* Optimized transition for smoother height changes */
-  transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  /* Hardware acceleration for smoother animations */
-  will-change: height;
+/* ===== WINE GRID SCROLL CONTAINER STYLES ===== */
+.wine-scroll-container {
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  /* Hardware acceleration for smoother scrolling */
+  will-change: scroll-position;
   transform: translateZ(0);
   backface-visibility: hidden;
+  /* Allow page scrolling when needed */
+  overscroll-behavior: contain;
 }
 
-.wine-swiper .swiper-slide {
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  /* Hardware acceleration for slides */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  /* Prevent layout shifts */
-  contain: layout style paint;
+.wine-scroll-container::-webkit-scrollbar {
+  width: 6px;
 }
 
-.wine-swiper .swiper-wrapper {
-  height: 100%;
-  /* Optimize wrapper for smooth transitions */
-  transform: translateZ(0);
-  backface-visibility: hidden;
+.wine-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Ensure only one slide is visible at a time */
-.wine-swiper .swiper-slide-active {
-  height: 100%;
-  /* Smooth transition for active slide */
-  transition: opacity 0.2s ease-out;
+.wine-scroll-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
 }
 
-.wine-swiper .swiper-slide-prev,
-.wine-swiper .swiper-slide-next {
-  height: 100%;
-  /* Reduce opacity for smoother visual transition */
-  opacity: 0.3;
-  transition: opacity 0.2s ease-out;
+.wine-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }
 
-/* Focus styles for keyboard navigation */
-.wine-swiper:focus-within {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
+/* Ensure snap-start works properly */
+.wine-scroll-container .snap-start {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-/* Ensure proper spacing in wine slots */
-.wine-swiper .swiper-slide > div {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  /* Prevent layout shifts during transitions */
-  contain: layout style paint;
-}
-
-/* Slot indicator styling */
-.wine-swiper .swiper-slide .text-center {
-  margin-top: 0.5rem;
-  padding-top: 0.25rem;
-  border-top: 1px solid hsl(var(--border));
-  /* Smooth transition for indicator changes */
-  transition: opacity 0.15s ease-out;
-}
-
-/* Optimize Swiper transitions globally */
-.swiper-wrapper {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.swiper-slide {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+/* Optimize for mobile touch scrolling */
+@media (max-width: 768px) {
+  .wine-scroll-container {
+    /* Enable momentum scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Allow page scrolling when at boundaries */
+    overscroll-behavior: auto;
+  }
 }

@@ -24,11 +24,12 @@ export function useWineData(options: UseWineDataOptions = {}) {
     setWineVariants,
     setLoading,
     setError,
+    hasFetched,
+    setHasFetched,
   } = useWineStore()
 
   const fetchWineVariants = useCallback(async (): Promise<void> => {
-    if (isLoading) return
-
+    if (isLoading || hasFetched) return
     setLoading(true)
     setError(null)
 
@@ -93,8 +94,18 @@ export function useWineData(options: UseWineDataOptions = {}) {
       setError(errorMessage)
     } finally {
       setLoading(false)
+      setHasFetched(true)
     }
-  }, [isLoading, options.locale, options.currentCollection, setWineVariants, setLoading, setError])
+  }, [
+    isLoading,
+    hasFetched,
+    options.locale,
+    options.currentCollection,
+    setWineVariants,
+    setLoading,
+    setError,
+    setHasFetched,
+  ])
 
   // Fetch data on mount - but only if we don't have initial data
   useEffect(() => {
@@ -106,11 +117,12 @@ export function useWineData(options: UseWineDataOptions = {}) {
         currentCollection: options.currentCollection?.type,
       })
       setWineVariants(options.initialData)
+      setHasFetched(true)
       return // Don't fetch if we have initial data
     }
 
     // Only fetch if we don't have any data in the store
-    if (wineVariants.length === 0) {
+    if (wineVariants.length === 0 && !hasFetched) {
       logger.info('No initial data and no store data, fetching wines...')
       fetchWineVariants()
     } else {
@@ -126,6 +138,8 @@ export function useWineData(options: UseWineDataOptions = {}) {
     wineVariants.length, // Add this dependency to check store state
     setWineVariants,
     fetchWineVariants,
+    hasFetched,
+    setHasFetched,
   ])
 
   // Debug logging - only in development

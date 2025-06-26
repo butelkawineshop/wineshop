@@ -37,7 +37,7 @@ interface WineState {
   filteredVariants: FlatWineVariant[]
   isLoading: boolean
   error: string | null
-
+  hasFetched: boolean
   // Filters
   filters: WineFilters
 }
@@ -47,6 +47,7 @@ interface WineActions {
   setWineVariants: (variants: FlatWineVariant[]) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
+  setHasFetched: (hasFetched: boolean) => void
 
   // Filter actions
   setFilter: <K extends keyof WineFilters>(key: K, values: WineFilters[K]) => void
@@ -74,6 +75,7 @@ const initialState: WineState = {
   filteredVariants: [],
   isLoading: false,
   error: null,
+  hasFetched: false,
   filters: {
     regions: [],
     wineries: [],
@@ -354,12 +356,15 @@ export const useWineStore = create<WineStore>()(
           set({
             wineVariants: variants,
             filteredVariants,
+            hasFetched: true,
           })
         },
 
         setLoading: (loading) => set({ isLoading: loading }),
 
         setError: (error) => set({ error }),
+
+        setHasFetched: (hasFetched: boolean) => set({ hasFetched }),
 
         // Filter actions
         setFilter: (key, values) => {

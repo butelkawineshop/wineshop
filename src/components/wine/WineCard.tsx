@@ -67,14 +67,14 @@ export function WineCard({
   }
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full max-h-[600px]">
       <WineTitleBar variant={variant} locale={locale} />
 
       <Swiper
         ref={swiperRef}
         nested={true}
         onSlideChange={handleSlideChange}
-        className="w-full bg-background"
+        className="w-full bg-background flex-shrink-0"
         role="region"
         aria-label="Wine details slideshow"
       >
