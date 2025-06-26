@@ -14,14 +14,12 @@ type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectionItems?: Record<string, any[]>
   locale?: Locale
-  showWineGrid?: boolean
 }
 
 export default async function FilterSortBar({
   currentCollection,
   collectionItems,
   locale,
-  showWineGrid = true,
 }: Props): Promise<React.JSX.Element> {
   const resolvedLocale = (locale || 'sl') as Locale
 
@@ -89,7 +87,6 @@ export default async function FilterSortBar({
       currentCollection={currentCollection}
       collectionItems={collectionItems || {}}
       locale={resolvedLocale}
-      showWineGrid={showWineGrid}
       initialWineVariants={initialWineVariants}
       error={error}
     />

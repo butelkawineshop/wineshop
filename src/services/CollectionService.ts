@@ -200,7 +200,7 @@ export class CollectionService {
       const result = await fetchAllCollectionItemsForFilters(locale)
 
       // Helper function to extract slug string from localized slug object
-      const extractSlug = (slug: any): string => {
+      const extractSlug = (slug: string | Record<string, string> | null | undefined): string => {
         if (typeof slug === 'string') return slug
         if (slug && typeof slug === 'object') {
           return slug[locale] || slug.sl || slug.en || ''

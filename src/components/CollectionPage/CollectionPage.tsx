@@ -183,7 +183,6 @@ function SingleItemView({
             currentCollection={{ id: collection, type: collection }}
             collectionItems={collectionItems}
             locale={locale}
-            showWineGrid={true}
           />
         </div>
       )}
@@ -364,7 +363,6 @@ function ListView({
             currentCollection={{ id: collection, type: collection }}
             collectionItems={collectionItems}
             locale={locale}
-            showWineGrid={true}
           />
         </div>
       )}

@@ -13,17 +13,10 @@ interface WineGridProps {
   variants: FlatWineVariant[]
   locale: Locale
   className?: string
-  totalCount?: number
 }
 
-export function WineGrid({
-  variants,
-  locale,
-  className = '',
-  totalCount,
-}: WineGridProps): React.JSX.Element {
+export function WineGrid({ variants, locale, className = '' }: WineGridProps): React.JSX.Element {
   const t = useTranslations('wine')
-  const [currentRow, setCurrentRow] = useState(0)
   const [collectionItemsLoaded, setCollectionItemsLoaded] = useState(false)
   const [loadedRows, setLoadedRows] = useState(5) // Start with 5 rows
   const containerRef = useRef<HTMLDivElement>(null)
@@ -54,13 +47,11 @@ export function WineGrid({
   }, [variants, locale])
 
   // Responsive grid configuration
-  const { cardsPerRow, gridClasses, spaceBetween, rowHeight, containerHeight } = useMemo(() => {
+  const { cardsPerRow, gridClasses, containerHeight } = useMemo(() => {
     if (typeof window === 'undefined') {
       return {
         cardsPerRow: 4,
         gridClasses: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-        spaceBetween: 24,
-        rowHeight: 620,
         containerHeight: 600,
       }
     }
@@ -72,24 +63,18 @@ export function WineGrid({
       return {
         cardsPerRow: 1,
         gridClasses: 'grid-cols-1',
-        spaceBetween: 16,
-        rowHeight: 520,
         containerHeight: Math.min(height * 0.8, 800), // 80% of viewport height, max 800px
       }
     } else if (width < 1024) {
       return {
         cardsPerRow: 2,
         gridClasses: 'grid-cols-2',
-        spaceBetween: 20,
-        rowHeight: 570,
         containerHeight: 600,
       }
     } else {
       return {
         cardsPerRow: 4,
         gridClasses: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-        spaceBetween: 24,
-        rowHeight: 620,
         containerHeight: 600,
       }
     }
@@ -173,20 +158,7 @@ export function WineGrid({
         </div>
       </div>
     ),
-    [gridClasses, t, locale, handleShare, handleLike, collectionItemsLoaded, wineRows.length],
-  )
-
-  // Memoized row indicator
-  const renderRowIndicator = useCallback(
-    (index: number, total: number, winesInRow: number) => (
-      <div className="text-center mt-4 text-sm text-muted-foreground">
-        {t('rowIndicator', {
-          current: index + 1,
-          total,
-        })}
-      </div>
-    ),
-    [t],
+    [gridClasses, t, locale, handleShare, handleLike, collectionItemsLoaded],
   )
 
   // Empty state
@@ -230,15 +202,6 @@ export function WineGrid({
             <div className="text-sm">Loading more wines...</div>
           </div>
         )}
-      </div>
-
-      {/* Accessibility status */}
-      <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {t('accessibilityStatus', {
-          current: currentRow + 1,
-          total: wineRows.length,
-          winesInRow: wineRows[currentRow]?.length || 0,
-        })}
       </div>
     </div>
   )

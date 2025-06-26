@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TaskHandler } from 'payload'
 import type { PayloadRequest } from 'payload'
 import type { WineVariant, Wine, FlatWineVariant } from '@/payload-types'
@@ -32,7 +33,6 @@ function mapItemsWithEnglish(
       let id: string | null = null
 
       if (typeof item === 'object' && item !== null) {
-        // Handle aromas specially - they need to resolve adjective and flavour
         if ('adjective' in item && 'flavour' in item) {
           if (item.title) {
             title = item.title
@@ -59,7 +59,6 @@ function mapItemsWithEnglish(
         id = String(item)
       }
 
-      // Get English title if available
       if (typeof item === 'object' && item !== null && item.id) {
         const itemId = typeof item.id === 'string' ? item.id : String(item.id)
         if (englishTitles[itemId]) {
@@ -102,7 +101,6 @@ function mapGrapeVarietiesWithEnglish(
 
         percentage = typeof item.percentage === 'number' ? item.percentage : null
 
-        // Get English title if available
         if (item.variety && typeof item.variety === 'object' && item.variety.id) {
           const varietyId =
             typeof item.variety.id === 'string' ? item.variety.id : String(item.variety.id)
@@ -175,7 +173,7 @@ async function fetchWineVariant(
     })
 
     return wineVariant
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error && typeof error === 'object' && 'name' in error && error.name === 'NotFound') {
       logger.info('Wine variant not found, deleting flat variant if exists')
       return null
@@ -397,18 +395,15 @@ function prepareFlatVariantData(
     englishClimateTitles: Record<string, string>
   },
 ): Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'> {
-  // Extract region and country info
   const wineRegion = typeof wine.region === 'object' ? wine.region : null
   const wineCountry =
     wineRegion && typeof wineRegion.country === 'object' ? wineRegion.country : null
   const style = typeof wine.style === 'object' ? wine.style : null
   const winery = typeof wine.winery === 'object' ? wine.winery : null
 
-  // Extract climate from region
   const regionClimate =
     wineRegion && typeof wineRegion.climate === 'object' ? wineRegion.climate : null
 
-  // Generate slug for the flat variant
   const slug = generateWineVariantSlug({
     wineryName: winery?.title || '',
     wineName: wine.title,
@@ -418,7 +413,6 @@ function prepareFlatVariantData(
     size: wineVariant.size,
   })
 
-  // Extract primary image URL
   const primaryImageUrl = extractPrimaryImageUrl(wineVariant.media)
 
   return {
@@ -451,7 +445,6 @@ function prepareFlatVariantData(
       const notes = wineVariant.tastingNotes
       if (!notes || typeof notes !== 'object') return undefined
 
-      // Check if all values are null
       const allNull = Object.values(notes).every((value) => value === null)
       if (allNull) return undefined
 
@@ -484,7 +477,6 @@ async function createOrUpdateFlatVariant(
   flatVariantData: Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'>,
   logger: ReturnType<typeof createLogger>,
 ): Promise<void> {
-  // Remove empty arrays and nested id fields from flatVariantData
   const cleanedData = removeNestedIds(flatVariantData)
   Object.keys(cleanedData).forEach((key) => {
     const value = (cleanedData as Record<string, any>)[key]
@@ -501,7 +493,6 @@ async function createOrUpdateFlatVariant(
   })
 
   try {
-    // Try to update first (upsert behavior) - use originalVariant to find existing
     const existingFlatVariants = await req.payload.find({
       collection: 'flat-wine-variants',
       where: {
@@ -513,7 +504,6 @@ async function createOrUpdateFlatVariant(
     })
 
     if (existingFlatVariants.docs.length > 0) {
-      // Update existing flat variant
       const existingId = existingFlatVariants.docs[0].id
       const updateResult = await req.payload.update({
         collection: 'flat-wine-variants',
@@ -526,7 +516,6 @@ async function createOrUpdateFlatVariant(
         success: true,
       })
     } else {
-      // Create new flat variant
       logger.info('Creating new flat variant')
 
       const createResult = await req.payload.create({
@@ -578,7 +567,6 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
   try {
     logger.debug('Input to task:', input)
 
-    // Fetch wine variant
     const wineVariant = await fetchWineVariant(req, input.wineVariantId, logger)
 
     if (!wineVariant) {
@@ -591,11 +579,9 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       }
     }
 
-    // Validate wine data structure
     const wine = wineVariant.wine as Wine
     validateWineData(wine)
 
-    // Fetch English country title
     const wineRegion = typeof wine.region === 'object' ? wine.region : null
     const wineCountry =
       wineRegion && typeof wineRegion.country === 'object' ? wineRegion.country : null
@@ -603,16 +589,13 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       ? await fetchEnglishCountryTitle(req, String(wineCountry.id), logger)
       : undefined
 
-    // Fetch English style title
     const wineStyle = typeof wine.style === 'object' ? wine.style : null
     const englishStyleTitle = wineStyle
       ? await fetchEnglishStyleTitle(req, String(wineStyle.id), logger)
       : undefined
 
-    // Fetch English description
     const englishDescription = await fetchEnglishDescription(req, String(wine.id), logger)
 
-    // Fetch related data
     const wineWinery = typeof wine.winery === 'object' ? wine.winery : null
     const relatedWineries = wineWinery
       ? await fetchRelatedWineries(req, String(wineWinery.id), logger)
@@ -623,7 +606,6 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       ? await fetchRelatedRegions(req, String(wineRegionForRelated.id), logger)
       : undefined
 
-    // Fetch English titles for localized collections
     const englishTitles = {
       englishAromaTitles: await fetchEnglishTitles(
         req,
@@ -667,7 +649,6 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       ),
     }
 
-    // Prepare flat variant data
     const flatVariantData = prepareFlatVariantData(
       wineVariant,
       wine,
@@ -685,7 +666,6 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       size: flatVariantData.size,
     })
 
-    // Create or update flat variant
     await createOrUpdateFlatVariant(req, flatVariantData, logger)
 
     logger.info('Successfully synced flat wine variant')

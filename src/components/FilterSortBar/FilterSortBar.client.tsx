@@ -19,7 +19,6 @@ type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectionItems?: Record<string, any[]>
   locale: Locale
-  showWineGrid?: boolean
   initialWineVariants: FlatWineVariant[]
   error: string | null
 }
@@ -28,7 +27,6 @@ export function FilterSortBarClient({
   currentCollection,
   collectionItems,
   locale,
-  showWineGrid = true,
   initialWineVariants,
   error: initialError,
 }: Props): React.JSX.Element {

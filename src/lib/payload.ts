@@ -29,6 +29,11 @@ export interface CollectionQueryParams {
   fields?: string[]
 }
 
+interface ExtendedError extends Error {
+  status?: number
+  responseData?: string
+}
+
 /**
  * Service class for interacting with Payload CMS API
  * Follows the layer architecture pattern for data access
@@ -241,8 +246,8 @@ export class PayloadService {
         const error = new Error(
           `Failed to create ${collection}: ${response.statusText}\nResponse status: ${response.status}\nResponse data: ${errorDetails}`,
         )
-        ;(error as any).status = response.status
-        ;(error as any).responseData = errorDetails
+        ;(error as ExtendedError).status = response.status
+        ;(error as ExtendedError).responseData = errorDetails
         throw error
       }
 
@@ -296,8 +301,8 @@ export class PayloadService {
         const error = new Error(
           `Failed to update ${collection}: ${response.statusText}\nResponse status: ${response.status}\nResponse data: ${errorDetails}`,
         )
-        ;(error as any).status = response.status
-        ;(error as any).responseData = errorDetails
+        ;(error as ExtendedError).status = response.status
+        ;(error as ExtendedError).responseData = errorDetails
         throw error
       }
 
