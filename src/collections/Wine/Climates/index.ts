@@ -54,24 +54,30 @@ export const Climates: CollectionConfig = {
       index: true,
     },
     {
-      name: 'diurnalTemperatureRange',
-      type: 'select',
-      options: [
-        { label: 'Low', value: 'low' },
-        { label: 'Medium', value: 'medium' },
-        { label: 'High', value: 'high' },
+      name: 'climateConditions',
+      type: 'group',
+      fields: [
+        {
+          name: 'diurnalRange',
+          type: 'select',
+          options: [
+            { label: 'Low', value: 'low' },
+            { label: 'Medium', value: 'medium' },
+            { label: 'High', value: 'high' },
+          ],
+          index: true,
+        },
+        {
+          name: 'humidity',
+          type: 'select',
+          options: [
+            { label: 'Dry', value: 'dry' },
+            { label: 'Moderate', value: 'moderate' },
+            { label: 'Humid', value: 'humid' },
+          ],
+          index: true,
+        },
       ],
-      index: true,
-    },
-    {
-      name: 'climateHumidity',
-      type: 'select',
-      options: [
-        { label: 'Dry', value: 'dry' },
-        { label: 'Moderate', value: 'moderate' },
-        { label: 'Humid', value: 'humid' },
-      ],
-      index: true,
     },
     {
       name: 'bestRegions',

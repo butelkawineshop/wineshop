@@ -581,8 +581,10 @@ export interface Climate {
   description?: string | null
   climate?: ('desert' | 'maritime' | 'mediterranean' | 'continental' | 'alpine') | null
   climateTemperature?: ('cool' | 'moderate' | 'warm' | 'hot') | null
-  diurnalTemperatureRange?: ('low' | 'medium' | 'high') | null
-  climateHumidity?: ('dry' | 'moderate' | 'humid') | null
+  climateConditions?: {
+    diurnalRange?: ('low' | 'medium' | 'high') | null
+    humidity?: ('dry' | 'moderate' | 'humid') | null
+  }
   bestRegions?: (number | Region)[] | null
   bestGrapes?: (number | GrapeVariety)[] | null
   media?: (number | Media)[] | null
@@ -771,8 +773,10 @@ export interface WineCountry {
   slug?: string | null
   description?: string | null
   whyCool?: string | null
-  landArea?: number | null
-  wineriesCount?: number | null
+  statistics?: {
+    landArea?: number | null
+    wineriesCount?: number | null
+  }
   regions?: {
     docs?: (number | Region)[]
     hasNextPage?: boolean
@@ -1793,8 +1797,12 @@ export interface WineCountriesSelect<T extends boolean = true> {
   slug?: T
   description?: T
   whyCool?: T
-  landArea?: T
-  wineriesCount?: T
+  statistics?:
+    | T
+    | {
+        landArea?: T
+        wineriesCount?: T
+      }
   regions?: T
   bestRegions?: T
   bestGrapes?: T
@@ -1957,8 +1965,12 @@ export interface ClimatesSelect<T extends boolean = true> {
   description?: T
   climate?: T
   climateTemperature?: T
-  diurnalTemperatureRange?: T
-  climateHumidity?: T
+  climateConditions?:
+    | T
+    | {
+        diurnalRange?: T
+        humidity?: T
+      }
   bestRegions?: T
   bestGrapes?: T
   media?: T

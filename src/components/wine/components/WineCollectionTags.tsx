@@ -42,15 +42,7 @@ export function WineCollectionTags({
   useEffect(() => {
     if (collectionItemsLoaded) {
       const items = getCollectionItemsForVariant(variant)
-      console.log('WineCollectionTags: Collection items for variant', {
-        variantId: variant.id,
-        variantTitle: variant.wineTitle,
-        items,
-        aromasCount: items.aromas.length,
-        tagsCount: items.tags.length,
-        moodsCount: items.moods.length,
-        grapeVarietiesCount: items.grapeVarieties.length,
-      })
+
       setCollectionItems(items)
     }
   }, [variant, collectionItemsLoaded])
@@ -154,14 +146,6 @@ export function WineCollectionTags({
     <div className="flex flex-wrap gap-1">
       {displayTags.map((tag, index) => {
         if (tag.slug && tag.collection) {
-          // Debug logging
-          console.log('WineCollectionTags: Creating link for', {
-            collection: tag.collection,
-            slug: tag.slug,
-            text: tag.text,
-            locale,
-          })
-
           return (
             <CollectionLink
               key={`${tag.type}-${index}`}
@@ -174,14 +158,6 @@ export function WineCollectionTags({
             </CollectionLink>
           )
         } else {
-          // Debug logging for non-clickable tags
-          console.log('WineCollectionTags: Non-clickable tag', {
-            collection: tag.collection,
-            slug: tag.slug,
-            text: tag.text,
-            type: tag.type,
-          })
-
           return (
             <span key={`${tag.type}-${index}`} className="hashtag">
               #{tag.text.toLowerCase()}

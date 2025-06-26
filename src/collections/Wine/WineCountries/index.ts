@@ -43,14 +43,22 @@ export const WineCountries: CollectionConfig = {
       localized: true,
     },
     {
-      name: 'landArea',
-      type: 'number',
-      index: true,
-    },
-    {
-      name: 'wineriesCount',
-      type: 'number',
-      index: true,
+      name: 'statistics',
+      type: 'group',
+      fields: [
+        {
+          name: 'landArea',
+          type: 'number',
+          label: 'Land Area (km²)',
+          index: true,
+        },
+        {
+          name: 'wineriesCount',
+          type: 'number',
+          label: 'Number of Wineries',
+          index: true,
+        },
+      ],
     },
     {
       name: 'regions',

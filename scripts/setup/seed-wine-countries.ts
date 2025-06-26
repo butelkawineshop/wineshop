@@ -35,8 +35,8 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker so Praslovani  tisočletja nazaj zbrali ravno naše področje za svoje prve kampe, ker je bil njihov cilj "se ustavit kjer rastejo trte".',
       en: 'Because the ancient Slavic peoples decided this was the land to settle after following their credo of "we will settle where the vines will grow".',
     },
-    landArea: 20273,
-    wineriesCount: 28000,
+    landArea: 15261,
+    wineriesCount: 28481,
   },
   // Italija / Italy
   {
@@ -52,8 +52,8 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker je vino za delit in ni je države, ki bi to bolj resno vzela kot Italijani. In ker je za njih vino hrana, nujen spremljeavelc vsakega obeda in ker so komplicirani.',
       en: 'Because wine is made for sharing, and noone takes that more seriously than the Italians. Because wine is food to them and it belongs with every meal. How can you not love them!',
     },
-    landArea: 301340,
-    wineriesCount: 310000,
+    landArea: 702000,
+    wineriesCount: 32000,
   },
   // Francija / France
   {
@@ -69,7 +69,7 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker so preprosto stoletja pred vsemi z razumevanjem njihove zemlje. A zavist nam ne bo pomagala, le trdno delo in skrbno varovanje zapiskov.',
       en: 'Because they know what they are doing. They have managed to make the whole world look up to them, and their wines are the ONLY references we need when communicating about wine. How cool is that?!',
     },
-    landArea: 551695,
+    landArea: 747000,
     wineriesCount: 270000,
   },
   // Madžarska / Hungary
@@ -86,8 +86,8 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker, če ne bi bilo turkov, si upamo trditi, da bi bila Madžarska to kar je danes Francija. Referenca svetonih vin!',
       en: 'Because we firmly believe they would be a reference for world wine, if they were not slowed down in their prime. They would be what France is today!',
     },
-    landArea: 93028,
-    wineriesCount: 22000,
+    landArea: 61000,
+    wineriesCount: 1600,
   },
   // Argentina
   {
@@ -103,8 +103,8 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker se je njihov predsednik leta 1884 odločil, da oni bodo pa znani po Malbecu. Sicer so potrebovali 100 let, ampak evo jih tu!',
       en: 'Because their president decided back in 1884 that they shall be famous for Malbec. And look at them now. Took them 100 years, but who cares!',
     },
-    landArea: 2780400,
-    wineriesCount: 1200,
+    landArea: 220000,
+    wineriesCount: 2000,
   },
   // Avstrija / Austria
   {
@@ -120,7 +120,7 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Brez pogrevanja zgodovine, njihova vina so noro dobra. Slovijo po svežini in kdo si ne želi osvežitve ko pije vino??',
       en: 'Because of their wines. I mean the freshness is something we crave for as wine people, and Austrians deliver it in heaps!',
     },
-    landArea: 83879,
+    landArea: 44913,
     wineriesCount: 23000,
   },
   // Avstralija / Australia
@@ -137,7 +137,7 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker so vina super preprosta za pit, niso zategnjena, prevsem pa so mehka. Aja pa, zato ker ko so dobri valovi, gredo raje surfat, kot pa v vinograd. Work-life balance? Check!',
       en: 'Anyone that will drop everything and go surfing when the waves are up instead of working in the searing heat in the vineyards is our kind of person. Work-life balance? Check.',
     },
-    landArea: 7692024,
+    landArea: 170000,
     wineriesCount: 2400,
   },
   // Španija / Spain
@@ -154,8 +154,8 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Za razliko od Italijanov, so veliko bolj preprosti za razumet. To mislimo seveda v vinskem smislu (a ne?).',
       en: 'Because they are huge, but much easier to learn and understand than Italians. Wines are made for Sangria and for thousands and thousands. The choice is yours!',
     },
-    landArea: 505990,
-    wineriesCount: 4000000,
+    landArea: 961000,
+    wineriesCount: 4000,
   },
   // ZDA / USA
   {
@@ -171,8 +171,8 @@ const wineCountriesData: WineCountryData[] = [
       sl: 'Ker niso tako tradicionalni, kot smo v Evropi. Riskirajo, eksperimentirajo in ustvarjajo super vina. Ok so malce na slajši strani, ampak to ni nujno slabo!',
       en: "Because they are bold risk takers and are not afraid to experiment. Us Europeans are waaaay too traditional and we tend to fight over stupid little things. They don't care. And this makes the wines super fun!",
     },
-    landArea: 9833517,
-    wineriesCount: 11000,
+    landArea: 420000,
+    wineriesCount: 7221,
   },
 ]
 
@@ -209,8 +209,10 @@ async function seedWineCountries(): Promise<void> {
             title: countryData.title.sl,
             description: countryData.description?.sl || '',
             whyCool: countryData.whyCool?.sl || '',
-            landArea: countryData.landArea,
-            wineriesCount: countryData.wineriesCount,
+            statistics: {
+              landArea: countryData.landArea || null,
+              wineriesCount: countryData.wineriesCount || null,
+            },
           },
           locale: 'sl',
         })

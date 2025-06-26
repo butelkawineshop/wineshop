@@ -127,29 +127,39 @@
   },
   "region": {
     "list": {
-      "title": "Regions",
-      "description": "Discover wine regions around the world"
+      "title": "Wine Regions",
+      "description": "Explore wine regions and their characteristics"
     },
     "fields": {
+      "whyCool": "Why Cool",
+      "priceRange": "Price Range",
+      "climate": "Climate",
       "description": "Description",
       "country": "Country",
-      "wines": "Wines"
+      "neighbours": "Neighbouring Regions",
+      "bestGrapes": "Best Grapes",
+      "legends": "Legends"
     }
   },
   "wineCountry": {
     "list": {
       "title": "Wine Countries",
-      "description": "Explore wine-producing countries and their traditions"
+      "description": "Explore wine countries and their traditions"
     },
     "fields": {
       "description": "Description",
-      "whyCool": "Why it's cool",
+      "whyCool": "Why Cool",
+      "statistics": "Statistics",
       "landArea": "Land Area",
       "wineriesCount": "Wineries Count",
       "regions": "Regions",
       "bestRegions": "Best Regions",
       "bestGrapes": "Best Grapes",
       "legends": "Legends"
+    },
+    "units": {
+      "landArea": "hectares",
+      "wineries": "wineries"
     }
   },
   "grapeVariety": {
@@ -197,7 +207,39 @@
     },
     "fields": {
       "description": "Description",
+      "climate": "Climate Type",
+      "climateTemperature": "Temperature",
+      "climateConditions": "Climate Conditions",
+      "diurnalRange": "Diurnal Temperature Range",
+      "humidity": "Humidity",
+      "bestRegions": "Best Regions",
+      "bestGrapes": "Best Grapes",
       "regions": "Regions"
+    },
+    "values": {
+      "diurnalRange": {
+        "low": "Low",
+        "moderate": "Moderate",
+        "high": "High"
+      },
+      "humidity": {
+        "dry": "Dry",
+        "moderate": "Moderate",
+        "high": "High"
+      },
+      "climate": {
+        "desert": "Desert",
+        "maritime": "Maritime",
+        "mediterranean": "Mediterranean",
+        "continental": "Continental",
+        "alpine": "Alpine"
+      },
+      "climateTemperature": {
+        "cool": "Cool",
+        "moderate": "Moderate",
+        "warm": "Warm",
+        "hot": "Hot"
+      }
     }
   },
   "mood": {

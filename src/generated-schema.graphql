@@ -2037,8 +2037,7 @@ type Climate {
   description: String
   climate: Climate_climate
   climateTemperature: Climate_climateTemperature
-  diurnalTemperatureRange: Climate_diurnalTemperatureRange
-  climateHumidity: Climate_climateHumidity
+  climateConditions: Climate_ClimateConditions
   bestRegions(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Region!]
   bestGrapes(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [GrapeVariety!]
   media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
@@ -2063,13 +2062,18 @@ enum Climate_climateTemperature {
   hot
 }
 
-enum Climate_diurnalTemperatureRange {
+type Climate_ClimateConditions {
+  diurnalRange: Climate_ClimateConditions_diurnalRange
+  humidity: Climate_ClimateConditions_humidity
+}
+
+enum Climate_ClimateConditions_diurnalRange {
   low
   medium
   high
 }
 
-enum Climate_climateHumidity {
+enum Climate_ClimateConditions_humidity {
   dry
   moderate
   humid
@@ -2221,8 +2225,7 @@ type WineCountry {
   slug: String
   description: String
   whyCool: String
-  landArea: Float
-  wineriesCount: Float
+  statistics: WineCountry_Statistics
   regions(limit: Int, page: Int, sort: String, where: Region_where): WineCountry_Regions
   bestRegions(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Region!]
   bestGrapes(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [GrapeVariety!]
@@ -2232,6 +2235,11 @@ type WineCountry {
   updatedAt: DateTime
   createdAt: DateTime
   _status: WineCountry__status
+}
+
+type WineCountry_Statistics {
+  landArea: Float
+  wineriesCount: Float
 }
 
 type WineCountry_Regions {
@@ -11420,8 +11428,8 @@ input WineCountry_where {
   slug: WineCountry_slug_operator
   description: WineCountry_description_operator
   whyCool: WineCountry_whyCool_operator
-  landArea: WineCountry_landArea_operator
-  wineriesCount: WineCountry_wineriesCount_operator
+  statistics__landArea: WineCountry_statistics__landArea_operator
+  statistics__wineriesCount: WineCountry_statistics__wineriesCount_operator
   bestRegions: WineCountry_bestRegions_operator
   bestGrapes: WineCountry_bestGrapes_operator
   legends: WineCountry_legends_operator
@@ -11476,7 +11484,7 @@ input WineCountry_whyCool_operator {
   exists: Boolean
 }
 
-input WineCountry_landArea_operator {
+input WineCountry_statistics__landArea_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -11486,7 +11494,7 @@ input WineCountry_landArea_operator {
   exists: Boolean
 }
 
-input WineCountry_wineriesCount_operator {
+input WineCountry_statistics__wineriesCount_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -11629,8 +11637,8 @@ input WineCountry_where_and {
   slug: WineCountry_slug_operator
   description: WineCountry_description_operator
   whyCool: WineCountry_whyCool_operator
-  landArea: WineCountry_landArea_operator
-  wineriesCount: WineCountry_wineriesCount_operator
+  statistics__landArea: WineCountry_statistics__landArea_operator
+  statistics__wineriesCount: WineCountry_statistics__wineriesCount_operator
   bestRegions: WineCountry_bestRegions_operator
   bestGrapes: WineCountry_bestGrapes_operator
   legends: WineCountry_legends_operator
@@ -11653,8 +11661,8 @@ input WineCountry_where_or {
   slug: WineCountry_slug_operator
   description: WineCountry_description_operator
   whyCool: WineCountry_whyCool_operator
-  landArea: WineCountry_landArea_operator
-  wineriesCount: WineCountry_wineriesCount_operator
+  statistics__landArea: WineCountry_statistics__landArea_operator
+  statistics__wineriesCount: WineCountry_statistics__wineriesCount_operator
   bestRegions: WineCountry_bestRegions_operator
   bestGrapes: WineCountry_bestGrapes_operator
   legends: WineCountry_legends_operator
@@ -11690,8 +11698,7 @@ type WineCountriesDocAccessFields {
   slug: WineCountriesDocAccessFields_slug
   description: WineCountriesDocAccessFields_description
   whyCool: WineCountriesDocAccessFields_whyCool
-  landArea: WineCountriesDocAccessFields_landArea
-  wineriesCount: WineCountriesDocAccessFields_wineriesCount
+  statistics: WineCountriesDocAccessFields_statistics
   regions: WineCountriesDocAccessFields_regions
   bestRegions: WineCountriesDocAccessFields_bestRegions
   bestGrapes: WineCountriesDocAccessFields_bestGrapes
@@ -11795,49 +11802,78 @@ type WineCountriesDocAccessFields_whyCool_Delete {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_landArea {
-  create: WineCountriesDocAccessFields_landArea_Create
-  read: WineCountriesDocAccessFields_landArea_Read
-  update: WineCountriesDocAccessFields_landArea_Update
-  delete: WineCountriesDocAccessFields_landArea_Delete
+type WineCountriesDocAccessFields_statistics {
+  create: WineCountriesDocAccessFields_statistics_Create
+  read: WineCountriesDocAccessFields_statistics_Read
+  update: WineCountriesDocAccessFields_statistics_Update
+  delete: WineCountriesDocAccessFields_statistics_Delete
+  fields: WineCountriesDocAccessFields_statistics_Fields
 }
 
-type WineCountriesDocAccessFields_landArea_Create {
+type WineCountriesDocAccessFields_statistics_Create {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_landArea_Read {
+type WineCountriesDocAccessFields_statistics_Read {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_landArea_Update {
+type WineCountriesDocAccessFields_statistics_Update {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_landArea_Delete {
+type WineCountriesDocAccessFields_statistics_Delete {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_wineriesCount {
-  create: WineCountriesDocAccessFields_wineriesCount_Create
-  read: WineCountriesDocAccessFields_wineriesCount_Read
-  update: WineCountriesDocAccessFields_wineriesCount_Update
-  delete: WineCountriesDocAccessFields_wineriesCount_Delete
+type WineCountriesDocAccessFields_statistics_Fields {
+  landArea: WineCountriesDocAccessFields_statistics_landArea
+  wineriesCount: WineCountriesDocAccessFields_statistics_wineriesCount
 }
 
-type WineCountriesDocAccessFields_wineriesCount_Create {
+type WineCountriesDocAccessFields_statistics_landArea {
+  create: WineCountriesDocAccessFields_statistics_landArea_Create
+  read: WineCountriesDocAccessFields_statistics_landArea_Read
+  update: WineCountriesDocAccessFields_statistics_landArea_Update
+  delete: WineCountriesDocAccessFields_statistics_landArea_Delete
+}
+
+type WineCountriesDocAccessFields_statistics_landArea_Create {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_wineriesCount_Read {
+type WineCountriesDocAccessFields_statistics_landArea_Read {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_wineriesCount_Update {
+type WineCountriesDocAccessFields_statistics_landArea_Update {
   permission: Boolean!
 }
 
-type WineCountriesDocAccessFields_wineriesCount_Delete {
+type WineCountriesDocAccessFields_statistics_landArea_Delete {
+  permission: Boolean!
+}
+
+type WineCountriesDocAccessFields_statistics_wineriesCount {
+  create: WineCountriesDocAccessFields_statistics_wineriesCount_Create
+  read: WineCountriesDocAccessFields_statistics_wineriesCount_Read
+  update: WineCountriesDocAccessFields_statistics_wineriesCount_Update
+  delete: WineCountriesDocAccessFields_statistics_wineriesCount_Delete
+}
+
+type WineCountriesDocAccessFields_statistics_wineriesCount_Create {
+  permission: Boolean!
+}
+
+type WineCountriesDocAccessFields_statistics_wineriesCount_Read {
+  permission: Boolean!
+}
+
+type WineCountriesDocAccessFields_statistics_wineriesCount_Update {
+  permission: Boolean!
+}
+
+type WineCountriesDocAccessFields_statistics_wineriesCount_Delete {
   permission: Boolean!
 }
 
@@ -12213,8 +12249,7 @@ type WineCountryVersion_Version {
   slug: String
   description: String
   whyCool: String
-  landArea: Float
-  wineriesCount: Float
+  statistics: WineCountryVersion_Version_Statistics
   regions(limit: Int, page: Int, sort: String, where: Region_where): WineCountryVersion_Version_Regions
   bestRegions(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Region!]
   bestGrapes(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [GrapeVariety!]
@@ -12224,6 +12259,11 @@ type WineCountryVersion_Version {
   updatedAt: DateTime
   createdAt: DateTime
   _status: WineCountryVersion_Version__status
+}
+
+type WineCountryVersion_Version_Statistics {
+  landArea: Float
+  wineriesCount: Float
 }
 
 type WineCountryVersion_Version_Regions {
@@ -12269,8 +12309,8 @@ input versionsWineCountry_where {
   version__slug: versionsWineCountry_version__slug_operator
   version__description: versionsWineCountry_version__description_operator
   version__whyCool: versionsWineCountry_version__whyCool_operator
-  version__landArea: versionsWineCountry_version__landArea_operator
-  version__wineriesCount: versionsWineCountry_version__wineriesCount_operator
+  version__statistics__landArea: versionsWineCountry_version__statistics__landArea_operator
+  version__statistics__wineriesCount: versionsWineCountry_version__statistics__wineriesCount_operator
   version__bestRegions: versionsWineCountry_version__bestRegions_operator
   version__bestGrapes: versionsWineCountry_version__bestGrapes_operator
   version__legends: versionsWineCountry_version__legends_operator
@@ -12339,7 +12379,7 @@ input versionsWineCountry_version__whyCool_operator {
   exists: Boolean
 }
 
-input versionsWineCountry_version__landArea_operator {
+input versionsWineCountry_version__statistics__landArea_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -12349,7 +12389,7 @@ input versionsWineCountry_version__landArea_operator {
   exists: Boolean
 }
 
-input versionsWineCountry_version__wineriesCount_operator {
+input versionsWineCountry_version__statistics__wineriesCount_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -12541,8 +12581,8 @@ input versionsWineCountry_where_and {
   version__slug: versionsWineCountry_version__slug_operator
   version__description: versionsWineCountry_version__description_operator
   version__whyCool: versionsWineCountry_version__whyCool_operator
-  version__landArea: versionsWineCountry_version__landArea_operator
-  version__wineriesCount: versionsWineCountry_version__wineriesCount_operator
+  version__statistics__landArea: versionsWineCountry_version__statistics__landArea_operator
+  version__statistics__wineriesCount: versionsWineCountry_version__statistics__wineriesCount_operator
   version__bestRegions: versionsWineCountry_version__bestRegions_operator
   version__bestGrapes: versionsWineCountry_version__bestGrapes_operator
   version__legends: versionsWineCountry_version__legends_operator
@@ -12571,8 +12611,8 @@ input versionsWineCountry_where_or {
   version__slug: versionsWineCountry_version__slug_operator
   version__description: versionsWineCountry_version__description_operator
   version__whyCool: versionsWineCountry_version__whyCool_operator
-  version__landArea: versionsWineCountry_version__landArea_operator
-  version__wineriesCount: versionsWineCountry_version__wineriesCount_operator
+  version__statistics__landArea: versionsWineCountry_version__statistics__landArea_operator
+  version__statistics__wineriesCount: versionsWineCountry_version__statistics__wineriesCount_operator
   version__bestRegions: versionsWineCountry_version__bestRegions_operator
   version__bestGrapes: versionsWineCountry_version__bestGrapes_operator
   version__legends: versionsWineCountry_version__legends_operator
@@ -18169,8 +18209,8 @@ input Climate_where {
   description: Climate_description_operator
   climate: Climate_climate_operator
   climateTemperature: Climate_climateTemperature_operator
-  diurnalTemperatureRange: Climate_diurnalTemperatureRange_operator
-  climateHumidity: Climate_climateHumidity_operator
+  climateConditions__diurnalRange: Climate_climateConditions__diurnalRange_operator
+  climateConditions__humidity: Climate_climateConditions__humidity_operator
   bestRegions: Climate_bestRegions_operator
   bestGrapes: Climate_bestGrapes_operator
   media: Climate_media_operator
@@ -18249,31 +18289,31 @@ enum Climate_climateTemperature_Input {
   hot
 }
 
-input Climate_diurnalTemperatureRange_operator {
-  equals: Climate_diurnalTemperatureRange_Input
-  not_equals: Climate_diurnalTemperatureRange_Input
-  in: [Climate_diurnalTemperatureRange_Input]
-  not_in: [Climate_diurnalTemperatureRange_Input]
-  all: [Climate_diurnalTemperatureRange_Input]
+input Climate_climateConditions__diurnalRange_operator {
+  equals: Climate_climateConditions__diurnalRange_Input
+  not_equals: Climate_climateConditions__diurnalRange_Input
+  in: [Climate_climateConditions__diurnalRange_Input]
+  not_in: [Climate_climateConditions__diurnalRange_Input]
+  all: [Climate_climateConditions__diurnalRange_Input]
   exists: Boolean
 }
 
-enum Climate_diurnalTemperatureRange_Input {
+enum Climate_climateConditions__diurnalRange_Input {
   low
   medium
   high
 }
 
-input Climate_climateHumidity_operator {
-  equals: Climate_climateHumidity_Input
-  not_equals: Climate_climateHumidity_Input
-  in: [Climate_climateHumidity_Input]
-  not_in: [Climate_climateHumidity_Input]
-  all: [Climate_climateHumidity_Input]
+input Climate_climateConditions__humidity_operator {
+  equals: Climate_climateConditions__humidity_Input
+  not_equals: Climate_climateConditions__humidity_Input
+  in: [Climate_climateConditions__humidity_Input]
+  not_in: [Climate_climateConditions__humidity_Input]
+  all: [Climate_climateConditions__humidity_Input]
   exists: Boolean
 }
 
-enum Climate_climateHumidity_Input {
+enum Climate_climateConditions__humidity_Input {
   dry
   moderate
   humid
@@ -18404,8 +18444,8 @@ input Climate_where_and {
   description: Climate_description_operator
   climate: Climate_climate_operator
   climateTemperature: Climate_climateTemperature_operator
-  diurnalTemperatureRange: Climate_diurnalTemperatureRange_operator
-  climateHumidity: Climate_climateHumidity_operator
+  climateConditions__diurnalRange: Climate_climateConditions__diurnalRange_operator
+  climateConditions__humidity: Climate_climateConditions__humidity_operator
   bestRegions: Climate_bestRegions_operator
   bestGrapes: Climate_bestGrapes_operator
   media: Climate_media_operator
@@ -18428,8 +18468,8 @@ input Climate_where_or {
   description: Climate_description_operator
   climate: Climate_climate_operator
   climateTemperature: Climate_climateTemperature_operator
-  diurnalTemperatureRange: Climate_diurnalTemperatureRange_operator
-  climateHumidity: Climate_climateHumidity_operator
+  climateConditions__diurnalRange: Climate_climateConditions__diurnalRange_operator
+  climateConditions__humidity: Climate_climateConditions__humidity_operator
   bestRegions: Climate_bestRegions_operator
   bestGrapes: Climate_bestGrapes_operator
   media: Climate_media_operator
@@ -18465,8 +18505,7 @@ type ClimatesDocAccessFields {
   description: ClimatesDocAccessFields_description
   climate: ClimatesDocAccessFields_climate
   climateTemperature: ClimatesDocAccessFields_climateTemperature
-  diurnalTemperatureRange: ClimatesDocAccessFields_diurnalTemperatureRange
-  climateHumidity: ClimatesDocAccessFields_climateHumidity
+  climateConditions: ClimatesDocAccessFields_climateConditions
   bestRegions: ClimatesDocAccessFields_bestRegions
   bestGrapes: ClimatesDocAccessFields_bestGrapes
   media: ClimatesDocAccessFields_media
@@ -18591,49 +18630,78 @@ type ClimatesDocAccessFields_climateTemperature_Delete {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_diurnalTemperatureRange {
-  create: ClimatesDocAccessFields_diurnalTemperatureRange_Create
-  read: ClimatesDocAccessFields_diurnalTemperatureRange_Read
-  update: ClimatesDocAccessFields_diurnalTemperatureRange_Update
-  delete: ClimatesDocAccessFields_diurnalTemperatureRange_Delete
+type ClimatesDocAccessFields_climateConditions {
+  create: ClimatesDocAccessFields_climateConditions_Create
+  read: ClimatesDocAccessFields_climateConditions_Read
+  update: ClimatesDocAccessFields_climateConditions_Update
+  delete: ClimatesDocAccessFields_climateConditions_Delete
+  fields: ClimatesDocAccessFields_climateConditions_Fields
 }
 
-type ClimatesDocAccessFields_diurnalTemperatureRange_Create {
+type ClimatesDocAccessFields_climateConditions_Create {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_diurnalTemperatureRange_Read {
+type ClimatesDocAccessFields_climateConditions_Read {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_diurnalTemperatureRange_Update {
+type ClimatesDocAccessFields_climateConditions_Update {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_diurnalTemperatureRange_Delete {
+type ClimatesDocAccessFields_climateConditions_Delete {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_climateHumidity {
-  create: ClimatesDocAccessFields_climateHumidity_Create
-  read: ClimatesDocAccessFields_climateHumidity_Read
-  update: ClimatesDocAccessFields_climateHumidity_Update
-  delete: ClimatesDocAccessFields_climateHumidity_Delete
+type ClimatesDocAccessFields_climateConditions_Fields {
+  diurnalRange: ClimatesDocAccessFields_climateConditions_diurnalRange
+  humidity: ClimatesDocAccessFields_climateConditions_humidity
 }
 
-type ClimatesDocAccessFields_climateHumidity_Create {
+type ClimatesDocAccessFields_climateConditions_diurnalRange {
+  create: ClimatesDocAccessFields_climateConditions_diurnalRange_Create
+  read: ClimatesDocAccessFields_climateConditions_diurnalRange_Read
+  update: ClimatesDocAccessFields_climateConditions_diurnalRange_Update
+  delete: ClimatesDocAccessFields_climateConditions_diurnalRange_Delete
+}
+
+type ClimatesDocAccessFields_climateConditions_diurnalRange_Create {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_climateHumidity_Read {
+type ClimatesDocAccessFields_climateConditions_diurnalRange_Read {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_climateHumidity_Update {
+type ClimatesDocAccessFields_climateConditions_diurnalRange_Update {
   permission: Boolean!
 }
 
-type ClimatesDocAccessFields_climateHumidity_Delete {
+type ClimatesDocAccessFields_climateConditions_diurnalRange_Delete {
+  permission: Boolean!
+}
+
+type ClimatesDocAccessFields_climateConditions_humidity {
+  create: ClimatesDocAccessFields_climateConditions_humidity_Create
+  read: ClimatesDocAccessFields_climateConditions_humidity_Read
+  update: ClimatesDocAccessFields_climateConditions_humidity_Update
+  delete: ClimatesDocAccessFields_climateConditions_humidity_Delete
+}
+
+type ClimatesDocAccessFields_climateConditions_humidity_Create {
+  permission: Boolean!
+}
+
+type ClimatesDocAccessFields_climateConditions_humidity_Read {
+  permission: Boolean!
+}
+
+type ClimatesDocAccessFields_climateConditions_humidity_Update {
+  permission: Boolean!
+}
+
+type ClimatesDocAccessFields_climateConditions_humidity_Delete {
   permission: Boolean!
 }
 
@@ -18964,8 +19032,7 @@ type ClimateVersion_Version {
   description: String
   climate: ClimateVersion_Version_climate
   climateTemperature: ClimateVersion_Version_climateTemperature
-  diurnalTemperatureRange: ClimateVersion_Version_diurnalTemperatureRange
-  climateHumidity: ClimateVersion_Version_climateHumidity
+  climateConditions: ClimateVersion_Version_ClimateConditions
   bestRegions(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Region!]
   bestGrapes(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [GrapeVariety!]
   media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
@@ -18990,13 +19057,18 @@ enum ClimateVersion_Version_climateTemperature {
   hot
 }
 
-enum ClimateVersion_Version_diurnalTemperatureRange {
+type ClimateVersion_Version_ClimateConditions {
+  diurnalRange: ClimateVersion_Version_ClimateConditions_diurnalRange
+  humidity: ClimateVersion_Version_ClimateConditions_humidity
+}
+
+enum ClimateVersion_Version_ClimateConditions_diurnalRange {
   low
   medium
   high
 }
 
-enum ClimateVersion_Version_climateHumidity {
+enum ClimateVersion_Version_ClimateConditions_humidity {
   dry
   moderate
   humid
@@ -19041,8 +19113,8 @@ input versionsClimate_where {
   version__description: versionsClimate_version__description_operator
   version__climate: versionsClimate_version__climate_operator
   version__climateTemperature: versionsClimate_version__climateTemperature_operator
-  version__diurnalTemperatureRange: versionsClimate_version__diurnalTemperatureRange_operator
-  version__climateHumidity: versionsClimate_version__climateHumidity_operator
+  version__climateConditions__diurnalRange: versionsClimate_version__climateConditions__diurnalRange_operator
+  version__climateConditions__humidity: versionsClimate_version__climateConditions__humidity_operator
   version__bestRegions: versionsClimate_version__bestRegions_operator
   version__bestGrapes: versionsClimate_version__bestGrapes_operator
   version__media: versionsClimate_version__media_operator
@@ -19135,31 +19207,31 @@ enum versionsClimate_version__climateTemperature_Input {
   hot
 }
 
-input versionsClimate_version__diurnalTemperatureRange_operator {
-  equals: versionsClimate_version__diurnalTemperatureRange_Input
-  not_equals: versionsClimate_version__diurnalTemperatureRange_Input
-  in: [versionsClimate_version__diurnalTemperatureRange_Input]
-  not_in: [versionsClimate_version__diurnalTemperatureRange_Input]
-  all: [versionsClimate_version__diurnalTemperatureRange_Input]
+input versionsClimate_version__climateConditions__diurnalRange_operator {
+  equals: versionsClimate_version__climateConditions__diurnalRange_Input
+  not_equals: versionsClimate_version__climateConditions__diurnalRange_Input
+  in: [versionsClimate_version__climateConditions__diurnalRange_Input]
+  not_in: [versionsClimate_version__climateConditions__diurnalRange_Input]
+  all: [versionsClimate_version__climateConditions__diurnalRange_Input]
   exists: Boolean
 }
 
-enum versionsClimate_version__diurnalTemperatureRange_Input {
+enum versionsClimate_version__climateConditions__diurnalRange_Input {
   low
   medium
   high
 }
 
-input versionsClimate_version__climateHumidity_operator {
-  equals: versionsClimate_version__climateHumidity_Input
-  not_equals: versionsClimate_version__climateHumidity_Input
-  in: [versionsClimate_version__climateHumidity_Input]
-  not_in: [versionsClimate_version__climateHumidity_Input]
-  all: [versionsClimate_version__climateHumidity_Input]
+input versionsClimate_version__climateConditions__humidity_operator {
+  equals: versionsClimate_version__climateConditions__humidity_Input
+  not_equals: versionsClimate_version__climateConditions__humidity_Input
+  in: [versionsClimate_version__climateConditions__humidity_Input]
+  not_in: [versionsClimate_version__climateConditions__humidity_Input]
+  all: [versionsClimate_version__climateConditions__humidity_Input]
   exists: Boolean
 }
 
-enum versionsClimate_version__climateHumidity_Input {
+enum versionsClimate_version__climateConditions__humidity_Input {
   dry
   moderate
   humid
@@ -19339,8 +19411,8 @@ input versionsClimate_where_and {
   version__description: versionsClimate_version__description_operator
   version__climate: versionsClimate_version__climate_operator
   version__climateTemperature: versionsClimate_version__climateTemperature_operator
-  version__diurnalTemperatureRange: versionsClimate_version__diurnalTemperatureRange_operator
-  version__climateHumidity: versionsClimate_version__climateHumidity_operator
+  version__climateConditions__diurnalRange: versionsClimate_version__climateConditions__diurnalRange_operator
+  version__climateConditions__humidity: versionsClimate_version__climateConditions__humidity_operator
   version__bestRegions: versionsClimate_version__bestRegions_operator
   version__bestGrapes: versionsClimate_version__bestGrapes_operator
   version__media: versionsClimate_version__media_operator
@@ -19369,8 +19441,8 @@ input versionsClimate_where_or {
   version__description: versionsClimate_version__description_operator
   version__climate: versionsClimate_version__climate_operator
   version__climateTemperature: versionsClimate_version__climateTemperature_operator
-  version__diurnalTemperatureRange: versionsClimate_version__diurnalTemperatureRange_operator
-  version__climateHumidity: versionsClimate_version__climateHumidity_operator
+  version__climateConditions__diurnalRange: versionsClimate_version__climateConditions__diurnalRange_operator
+  version__climateConditions__humidity: versionsClimate_version__climateConditions__humidity_operator
   version__bestRegions: versionsClimate_version__bestRegions_operator
   version__bestGrapes: versionsClimate_version__bestGrapes_operator
   version__media: versionsClimate_version__media_operator
@@ -32048,8 +32120,7 @@ type WineCountriesFields {
   slug: WineCountriesFields_slug
   description: WineCountriesFields_description
   whyCool: WineCountriesFields_whyCool
-  landArea: WineCountriesFields_landArea
-  wineriesCount: WineCountriesFields_wineriesCount
+  statistics: WineCountriesFields_statistics
   regions: WineCountriesFields_regions
   bestRegions: WineCountriesFields_bestRegions
   bestGrapes: WineCountriesFields_bestGrapes
@@ -32153,49 +32224,78 @@ type WineCountriesFields_whyCool_Delete {
   permission: Boolean!
 }
 
-type WineCountriesFields_landArea {
-  create: WineCountriesFields_landArea_Create
-  read: WineCountriesFields_landArea_Read
-  update: WineCountriesFields_landArea_Update
-  delete: WineCountriesFields_landArea_Delete
+type WineCountriesFields_statistics {
+  create: WineCountriesFields_statistics_Create
+  read: WineCountriesFields_statistics_Read
+  update: WineCountriesFields_statistics_Update
+  delete: WineCountriesFields_statistics_Delete
+  fields: WineCountriesFields_statistics_Fields
 }
 
-type WineCountriesFields_landArea_Create {
+type WineCountriesFields_statistics_Create {
   permission: Boolean!
 }
 
-type WineCountriesFields_landArea_Read {
+type WineCountriesFields_statistics_Read {
   permission: Boolean!
 }
 
-type WineCountriesFields_landArea_Update {
+type WineCountriesFields_statistics_Update {
   permission: Boolean!
 }
 
-type WineCountriesFields_landArea_Delete {
+type WineCountriesFields_statistics_Delete {
   permission: Boolean!
 }
 
-type WineCountriesFields_wineriesCount {
-  create: WineCountriesFields_wineriesCount_Create
-  read: WineCountriesFields_wineriesCount_Read
-  update: WineCountriesFields_wineriesCount_Update
-  delete: WineCountriesFields_wineriesCount_Delete
+type WineCountriesFields_statistics_Fields {
+  landArea: WineCountriesFields_statistics_landArea
+  wineriesCount: WineCountriesFields_statistics_wineriesCount
 }
 
-type WineCountriesFields_wineriesCount_Create {
+type WineCountriesFields_statistics_landArea {
+  create: WineCountriesFields_statistics_landArea_Create
+  read: WineCountriesFields_statistics_landArea_Read
+  update: WineCountriesFields_statistics_landArea_Update
+  delete: WineCountriesFields_statistics_landArea_Delete
+}
+
+type WineCountriesFields_statistics_landArea_Create {
   permission: Boolean!
 }
 
-type WineCountriesFields_wineriesCount_Read {
+type WineCountriesFields_statistics_landArea_Read {
   permission: Boolean!
 }
 
-type WineCountriesFields_wineriesCount_Update {
+type WineCountriesFields_statistics_landArea_Update {
   permission: Boolean!
 }
 
-type WineCountriesFields_wineriesCount_Delete {
+type WineCountriesFields_statistics_landArea_Delete {
+  permission: Boolean!
+}
+
+type WineCountriesFields_statistics_wineriesCount {
+  create: WineCountriesFields_statistics_wineriesCount_Create
+  read: WineCountriesFields_statistics_wineriesCount_Read
+  update: WineCountriesFields_statistics_wineriesCount_Update
+  delete: WineCountriesFields_statistics_wineriesCount_Delete
+}
+
+type WineCountriesFields_statistics_wineriesCount_Create {
+  permission: Boolean!
+}
+
+type WineCountriesFields_statistics_wineriesCount_Read {
+  permission: Boolean!
+}
+
+type WineCountriesFields_statistics_wineriesCount_Update {
+  permission: Boolean!
+}
+
+type WineCountriesFields_statistics_wineriesCount_Delete {
   permission: Boolean!
 }
 
@@ -34804,8 +34904,7 @@ type ClimatesFields {
   description: ClimatesFields_description
   climate: ClimatesFields_climate
   climateTemperature: ClimatesFields_climateTemperature
-  diurnalTemperatureRange: ClimatesFields_diurnalTemperatureRange
-  climateHumidity: ClimatesFields_climateHumidity
+  climateConditions: ClimatesFields_climateConditions
   bestRegions: ClimatesFields_bestRegions
   bestGrapes: ClimatesFields_bestGrapes
   media: ClimatesFields_media
@@ -34930,49 +35029,78 @@ type ClimatesFields_climateTemperature_Delete {
   permission: Boolean!
 }
 
-type ClimatesFields_diurnalTemperatureRange {
-  create: ClimatesFields_diurnalTemperatureRange_Create
-  read: ClimatesFields_diurnalTemperatureRange_Read
-  update: ClimatesFields_diurnalTemperatureRange_Update
-  delete: ClimatesFields_diurnalTemperatureRange_Delete
+type ClimatesFields_climateConditions {
+  create: ClimatesFields_climateConditions_Create
+  read: ClimatesFields_climateConditions_Read
+  update: ClimatesFields_climateConditions_Update
+  delete: ClimatesFields_climateConditions_Delete
+  fields: ClimatesFields_climateConditions_Fields
 }
 
-type ClimatesFields_diurnalTemperatureRange_Create {
+type ClimatesFields_climateConditions_Create {
   permission: Boolean!
 }
 
-type ClimatesFields_diurnalTemperatureRange_Read {
+type ClimatesFields_climateConditions_Read {
   permission: Boolean!
 }
 
-type ClimatesFields_diurnalTemperatureRange_Update {
+type ClimatesFields_climateConditions_Update {
   permission: Boolean!
 }
 
-type ClimatesFields_diurnalTemperatureRange_Delete {
+type ClimatesFields_climateConditions_Delete {
   permission: Boolean!
 }
 
-type ClimatesFields_climateHumidity {
-  create: ClimatesFields_climateHumidity_Create
-  read: ClimatesFields_climateHumidity_Read
-  update: ClimatesFields_climateHumidity_Update
-  delete: ClimatesFields_climateHumidity_Delete
+type ClimatesFields_climateConditions_Fields {
+  diurnalRange: ClimatesFields_climateConditions_diurnalRange
+  humidity: ClimatesFields_climateConditions_humidity
 }
 
-type ClimatesFields_climateHumidity_Create {
+type ClimatesFields_climateConditions_diurnalRange {
+  create: ClimatesFields_climateConditions_diurnalRange_Create
+  read: ClimatesFields_climateConditions_diurnalRange_Read
+  update: ClimatesFields_climateConditions_diurnalRange_Update
+  delete: ClimatesFields_climateConditions_diurnalRange_Delete
+}
+
+type ClimatesFields_climateConditions_diurnalRange_Create {
   permission: Boolean!
 }
 
-type ClimatesFields_climateHumidity_Read {
+type ClimatesFields_climateConditions_diurnalRange_Read {
   permission: Boolean!
 }
 
-type ClimatesFields_climateHumidity_Update {
+type ClimatesFields_climateConditions_diurnalRange_Update {
   permission: Boolean!
 }
 
-type ClimatesFields_climateHumidity_Delete {
+type ClimatesFields_climateConditions_diurnalRange_Delete {
+  permission: Boolean!
+}
+
+type ClimatesFields_climateConditions_humidity {
+  create: ClimatesFields_climateConditions_humidity_Create
+  read: ClimatesFields_climateConditions_humidity_Read
+  update: ClimatesFields_climateConditions_humidity_Update
+  delete: ClimatesFields_climateConditions_humidity_Delete
+}
+
+type ClimatesFields_climateConditions_humidity_Create {
+  permission: Boolean!
+}
+
+type ClimatesFields_climateConditions_humidity_Read {
+  permission: Boolean!
+}
+
+type ClimatesFields_climateConditions_humidity_Update {
+  permission: Boolean!
+}
+
+type ClimatesFields_climateConditions_humidity_Delete {
   permission: Boolean!
 }
 
@@ -39579,8 +39707,7 @@ input mutationWineCountryInput {
   slug: String
   description: String
   whyCool: String
-  landArea: Float
-  wineriesCount: Float
+  statistics: mutationWineCountry_StatisticsInput
   bestRegions: [Int]
   bestGrapes: [Int]
   legends: [Int]
@@ -39589,6 +39716,11 @@ input mutationWineCountryInput {
   updatedAt: String
   createdAt: String
   _status: WineCountry__status_MutationInput
+}
+
+input mutationWineCountry_StatisticsInput {
+  landArea: Float
+  wineriesCount: Float
 }
 
 input mutationWineCountry_SeoInput {
@@ -39609,8 +39741,7 @@ input mutationWineCountryUpdateInput {
   slug: String
   description: String
   whyCool: String
-  landArea: Float
-  wineriesCount: Float
+  statistics: mutationWineCountryUpdate_StatisticsInput
   bestRegions: [Int]
   bestGrapes: [Int]
   legends: [Int]
@@ -39619,6 +39750,11 @@ input mutationWineCountryUpdateInput {
   updatedAt: String
   createdAt: String
   _status: WineCountryUpdate__status_MutationInput
+}
+
+input mutationWineCountryUpdate_StatisticsInput {
+  landArea: Float
+  wineriesCount: Float
 }
 
 input mutationWineCountryUpdate_SeoInput {
@@ -39984,8 +40120,7 @@ input mutationClimateInput {
   description: String
   climate: Climate_climate_MutationInput
   climateTemperature: Climate_climateTemperature_MutationInput
-  diurnalTemperatureRange: Climate_diurnalTemperatureRange_MutationInput
-  climateHumidity: Climate_climateHumidity_MutationInput
+  climateConditions: mutationClimate_ClimateConditionsInput
   bestRegions: [Int]
   bestGrapes: [Int]
   media: [Int]
@@ -40010,13 +40145,18 @@ enum Climate_climateTemperature_MutationInput {
   hot
 }
 
-enum Climate_diurnalTemperatureRange_MutationInput {
+input mutationClimate_ClimateConditionsInput {
+  diurnalRange: Climate_ClimateConditions_diurnalRange_MutationInput
+  humidity: Climate_ClimateConditions_humidity_MutationInput
+}
+
+enum Climate_ClimateConditions_diurnalRange_MutationInput {
   low
   medium
   high
 }
 
-enum Climate_climateHumidity_MutationInput {
+enum Climate_ClimateConditions_humidity_MutationInput {
   dry
   moderate
   humid
@@ -40041,8 +40181,7 @@ input mutationClimateUpdateInput {
   description: String
   climate: ClimateUpdate_climate_MutationInput
   climateTemperature: ClimateUpdate_climateTemperature_MutationInput
-  diurnalTemperatureRange: ClimateUpdate_diurnalTemperatureRange_MutationInput
-  climateHumidity: ClimateUpdate_climateHumidity_MutationInput
+  climateConditions: mutationClimateUpdate_ClimateConditionsInput
   bestRegions: [Int]
   bestGrapes: [Int]
   media: [Int]
@@ -40067,13 +40206,18 @@ enum ClimateUpdate_climateTemperature_MutationInput {
   hot
 }
 
-enum ClimateUpdate_diurnalTemperatureRange_MutationInput {
+input mutationClimateUpdate_ClimateConditionsInput {
+  diurnalRange: ClimateUpdate_ClimateConditions_diurnalRange_MutationInput
+  humidity: ClimateUpdate_ClimateConditions_humidity_MutationInput
+}
+
+enum ClimateUpdate_ClimateConditions_diurnalRange_MutationInput {
   low
   medium
   high
 }
 
-enum ClimateUpdate_climateHumidity_MutationInput {
+enum ClimateUpdate_ClimateConditions_humidity_MutationInput {
   dry
   moderate
   humid

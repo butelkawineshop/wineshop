@@ -127,13 +127,18 @@
   },
   "region": {
     "list": {
-      "title": "Regije",
-      "description": "Odkrijte vinske regije po vsem svetu"
+      "title": "Vinske Regije",
+      "description": "Raziskujte vinske regije in njihove značilnosti"
     },
     "fields": {
+      "whyCool": "Zakaj je kul",
+      "priceRange": "Cenovni razpon",
+      "climate": "Podnebje",
       "description": "Opis",
       "country": "Država",
-      "wines": "Vina"
+      "neighbours": "Sosednje regije",
+      "bestGrapes": "Najboljše sorte",
+      "legends": "Legende"
     }
   },
   "wineCountry": {
@@ -144,12 +149,17 @@
     "fields": {
       "description": "Opis",
       "whyCool": "Zakaj je kul",
+      "statistics": "Statistike",
       "landArea": "Površina",
       "wineriesCount": "Število kleti",
       "regions": "Regije",
       "bestRegions": "Najboljše regije",
       "bestGrapes": "Najboljše sorte",
       "legends": "Legende"
+    },
+    "units": {
+      "landArea": "hektarjev",
+      "wineries": "kleti"
     }
   },
   "grapeVariety": {
@@ -197,7 +207,39 @@
     },
     "fields": {
       "description": "Opis",
+      "climate": "Tip Podnebja",
+      "climateTemperature": "Temperatura",
+      "climateConditions": "Podnebne Razmere",
+      "diurnalRange": "Dnevni Temperaturni Razpon",
+      "humidity": "Vlažnost",
+      "bestRegions": "Najboljše Regije",
+      "bestGrapes": "Najboljše Grozdje",
       "regions": "Regije"
+    },
+    "values": {
+      "diurnalRange": {
+        "low": "Nizka",
+        "moderate": "Zmerna",
+        "high": "Visoka"
+      },
+      "humidity": {
+        "dry": "Suha",
+        "moderate": "Zmerna",
+        "high": "Visoka"
+      },
+      "climate": {
+        "desert": "Puščavsko",
+        "maritime": "Morsko",
+        "mediterranean": "Sredozemsko",
+        "continental": "Kontinentalno",
+        "alpine": "Alpsko"
+      },
+      "climateTemperature": {
+        "cool": "Hladno",
+        "moderate": "Zmerno",
+        "warm": "Toplo",
+        "hot": "Vroče"
+      }
     }
   },
   "mood": {

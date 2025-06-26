@@ -81,8 +81,11 @@ export class CollectionService {
     locale: Locale
     slug: string
   }): Promise<CollectionData> {
+    // Ensure minimum depth of 2 to populate relationship fields properly
+    const depth = Math.max(config.depth || 1, 2)
+
     const result = await this.payload.find(collection, {
-      depth: config.depth || 1,
+      depth,
       locale,
       limit: 100,
       where: {
@@ -95,6 +98,15 @@ export class CollectionService {
     const foundItem = result.docs.find((doc: Record<string, unknown>) => doc.slug === slug) as
       | CollectionItem
       | undefined
+
+    if (foundItem) {
+      // Log relationship fields specifically
+      config.fields.forEach((field) => {
+        if (field.type === 'relationship') {
+          const value = foundItem[field.name]
+        }
+      })
+    }
 
     return {
       data: foundItem || null,
