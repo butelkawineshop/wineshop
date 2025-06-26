@@ -104,6 +104,23 @@ export function WineCollectionTags({
     })
   }
 
+  // Add winery tags with proper links
+  if (variant.wineryTags) {
+    variant.wineryTags.slice(0, WINE_CONSTANTS.MAX_WINERY_TAGS).forEach((tag) => {
+      if (tag?.title) {
+        const collectionItem = collectionItems.tags.find((item) => item.id === String(tag.id))
+        // Use localized title based on current locale
+        const displayTitle = locale === 'en' && tag.titleEn ? tag.titleEn : tag.title
+        tags.push({
+          text: displayTitle,
+          type: 'winery-tag',
+          slug: collectionItem?.slug || undefined,
+          collection: 'tags',
+        })
+      }
+    })
+  }
+
   // Add moods with proper links
   if (variant.moods) {
     variant.moods.slice(0, WINE_CONSTANTS.MAX_MOODS).forEach((mood) => {

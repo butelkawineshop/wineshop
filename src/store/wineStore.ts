@@ -189,16 +189,29 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       { key: 'aromas' as const, field: variant.aromas },
       { key: 'moods' as const, field: variant.moods },
       { key: 'grape-varieties' as const, field: variant.grapeVarieties },
-      { key: 'tags' as const, field: variant.tags },
+      { key: 'tags' as const, field: variant.tags, additionalField: variant.wineryTags },
       { key: 'climates' as const, field: variant.climates },
       { key: 'dishes' as const, field: variant.dishes },
     ]
 
-    for (const { key, field } of arrayFilters) {
-      if (filters[key].length > 0 && field) {
+    for (const { key, field, additionalField } of arrayFilters) {
+      if (filters[key].length > 0 && (field || additionalField)) {
         // For array filters, we now use titles for both filter values and matching
         const filterTitles = filters[key] // These are now titles, not IDs
-        const fieldTitles = field.map((item) => item.title).filter(Boolean)
+
+        // For tags, also include winery tags
+        let fieldTitles: string[] = []
+        if (field) {
+          fieldTitles = field
+            .map((item) => item.title)
+            .filter((title): title is string => Boolean(title))
+        }
+        if (additionalField && key === 'tags') {
+          const wineryTagTitles = additionalField
+            .map((item) => item.title)
+            .filter((title): title is string => Boolean(title))
+          fieldTitles = [...fieldTitles, ...wineryTagTitles]
+        }
 
         // Match by title
         const hasMatch = filterTitles.some((filterTitle) => {

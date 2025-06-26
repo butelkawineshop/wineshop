@@ -59,23 +59,11 @@ export const Climates: CollectionConfig = {
       fields: [
         {
           name: 'diurnalRange',
-          type: 'select',
-          options: [
-            { label: 'Low', value: 'low' },
-            { label: 'Medium', value: 'medium' },
-            { label: 'High', value: 'high' },
-          ],
-          index: true,
+          type: 'text',
         },
         {
           name: 'humidity',
-          type: 'select',
-          options: [
-            { label: 'Dry', value: 'dry' },
-            { label: 'Moderate', value: 'moderate' },
-            { label: 'Humid', value: 'humid' },
-          ],
-          index: true,
+          type: 'text',
         },
       ],
     },

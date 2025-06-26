@@ -110,6 +110,22 @@
       "region": "Regija",
       "style": "Stil",
       "variants": "Različice"
+    },
+    "detail": {
+      "recommended": "Priporočeno",
+      "notRecommended": "Ni priporočeno",
+      "description": "Opis",
+      "tastingProfile": "Okusni profil",
+      "foodPairing": "Spojitev s hrano",
+      "save": "Shrani",
+      "share": "Deli",
+      "inStock": "Na voljo",
+      "priceWithVAT": "Cena z DDV",
+      "relatedWines": "Podobna vina",
+      "noRelatedByWinery": "Ni podobnih vin iz te kleti",
+      "noRelatedByRegion": "Ni podobnih vin iz te regije",
+      "noRelatedByGrapeVariety": "Ni podobnih vin s to sorto grozdja",
+      "noRelatedByPrice": "Ni vin v podobnem cenovnem razponu"
     }
   },
   "winery": {

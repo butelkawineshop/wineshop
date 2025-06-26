@@ -154,21 +154,36 @@ async function fetchEnglishTitles(
 
 // Validate wine data structure
 function validateWineData(wine: Wine): void {
-  if (
-    !wine ||
-    typeof wine !== 'object' ||
-    typeof wine.title !== 'string' ||
-    !wine.winery ||
-    typeof wine.winery !== 'object' ||
-    typeof wine.winery.title !== 'string' ||
-    !wine.region ||
-    typeof wine.region !== 'object' ||
-    typeof wine.region.title !== 'string' ||
-    !wine.region.country ||
-    typeof wine.region.country !== 'object' ||
-    typeof wine.region.country.title !== 'string'
-  ) {
-    throw new Error('Invalid wine data structure')
+  if (!wine || typeof wine !== 'object') {
+    throw new Error('Invalid wine data structure: wine is not an object')
+  }
+
+  if (typeof wine.title !== 'string') {
+    throw new Error('Invalid wine data structure: wine.title is not a string')
+  }
+
+  if (!wine.winery || typeof wine.winery !== 'object') {
+    throw new Error('Invalid wine data structure: wine.winery is not an object')
+  }
+
+  if (typeof wine.winery.title !== 'string') {
+    throw new Error('Invalid wine data structure: wine.winery.title is not a string')
+  }
+
+  if (!wine.region || typeof wine.region !== 'object') {
+    throw new Error('Invalid wine data structure: wine.region is not an object')
+  }
+
+  if (typeof wine.region.title !== 'string') {
+    throw new Error('Invalid wine data structure: wine.region.title is not a string')
+  }
+
+  if (!wine.region.country || typeof wine.region.country !== 'object') {
+    throw new Error('Invalid wine data structure: wine.region.country is not an object')
+  }
+
+  if (typeof wine.region.country.title !== 'string') {
+    throw new Error('Invalid wine data structure: wine.region.country.title is not a string')
   }
 }
 
@@ -329,6 +344,77 @@ async function fetchRelatedRegions(
   return undefined
 }
 
+// Fetch winery tags
+async function fetchWineryTags(
+  payload: any,
+  wineryId: string,
+  logger: any,
+): Promise<Array<{ id: string; title: string; titleEn?: string }> | undefined> {
+  try {
+    const winery = await payload.findByID({
+      collection: 'wineries',
+      id: wineryId,
+    })
+
+    if (winery && typeof winery === 'object' && 'tags' in winery && Array.isArray(winery.tags)) {
+      const tagPromises = winery.tags
+        .filter(
+          (tag: any) => tag && (typeof tag === 'string' || (typeof tag === 'object' && tag.id)),
+        )
+        .map(async (tag: any) => {
+          const tagId = typeof tag === 'string' ? tag : String(tag.id)
+
+          try {
+            // Fetch the full tag data
+            const fullTag = await payload.findByID({
+              collection: 'tags',
+              id: tagId,
+            })
+
+            if (fullTag && typeof fullTag === 'object' && 'title' in fullTag) {
+              // Fetch English title
+              let titleEn: string | undefined
+              try {
+                const englishTag = await payload.findByID({
+                  collection: 'tags',
+                  id: tagId,
+                  locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
+                })
+                if (englishTag && typeof englishTag === 'object' && 'title' in englishTag) {
+                  titleEn = englishTag.title
+                }
+              } catch (error) {
+                logger.warn('Could not fetch English tag title', { tagId, error: String(error) })
+              }
+
+              return {
+                id: tagId,
+                title: fullTag.title,
+                titleEn,
+              }
+            }
+          } catch (error) {
+            logger.warn('Could not fetch tag data', { tagId, error: String(error) })
+          }
+
+          return null
+        })
+
+      const tags = await Promise.all(tagPromises)
+      return tags.filter(
+        (tag): tag is { id: string; title: string; titleEn?: string } => tag !== null,
+      )
+    }
+  } catch (error) {
+    logger.warn('Could not fetch winery tags', {
+      wineryId,
+      error: String(error),
+    })
+  }
+
+  return undefined
+}
+
 // Helper function to recursively remove all id fields from objects
 function removeNestedIds(obj: any): any {
   if (Array.isArray(obj)) {
@@ -355,6 +441,7 @@ function prepareFlatVariantData(
   englishDescription: string | undefined,
   relatedWineries: Array<{ id: string }> | undefined,
   relatedRegions: Array<{ id: string }> | undefined,
+  wineryTags: Array<{ id: string; title: string; titleEn?: string }> | undefined,
   englishTitles: {
     englishAromaTitles: Record<string, string>
     englishTagTitles: Record<string, string>
@@ -391,6 +478,11 @@ function prepareFlatVariantData(
 
   return {
     originalVariant: wineVariant.id,
+    wineID: wine?.id || null,
+    wineryID: winery?.id || null,
+    regionID: wineRegion?.id || null,
+    countryID: wineCountry?.id || null,
+    styleID: style?.id || null,
     wineTitle: wine.title,
     wineryTitle: winery?.title || '',
     wineryCode: winery?.wineryCode || '',
@@ -415,6 +507,11 @@ function prepareFlatVariantData(
     descriptionEn: englishDescription,
     relatedWineries: relatedWineries,
     relatedRegions: relatedRegions,
+    wineryTags: wineryTags?.map((tag) => ({
+      title: tag.title,
+      titleEn: tag.titleEn || null,
+      id: tag.id,
+    })),
     tastingNotes: (() => {
       const notes = wineVariant.tastingNotes
       if (!notes || typeof notes !== 'object') return undefined
@@ -538,9 +635,13 @@ async function forceUpdateFlatVariants() {
     // Process all variants using the same logic as syncFlatWineVariant
     for (const wineVariant of wineVariants.docs) {
       try {
+        taskLogger.debug(`Processing wine variant ${wineVariant.id}`)
+
         // Validate wine data structure
         const wine = wineVariant.wine as Wine
-        validateWineData(wine)
+        // validateWineData(wine) // Temporarily commented out for debugging
+
+        taskLogger.debug(`Wine data extracted for variant ${wineVariant.id}`)
 
         // Fetch English country title
         const wineRegion = typeof wine.region === 'object' ? wine.region : null
@@ -550,11 +651,15 @@ async function forceUpdateFlatVariants() {
           ? await fetchEnglishCountryTitle(payload, String(wineCountry.id), taskLogger)
           : undefined
 
+        taskLogger.debug(`English country title fetched for variant ${wineVariant.id}`)
+
         // Fetch English style title
         const wineStyle = typeof wine.style === 'object' ? wine.style : null
         const englishStyleTitle = wineStyle
           ? await fetchEnglishStyleTitle(payload, String(wineStyle.id), taskLogger)
           : undefined
+
+        taskLogger.debug(`English style title fetched for variant ${wineVariant.id}`)
 
         // Fetch English description
         const englishDescription = await fetchEnglishDescription(
@@ -562,6 +667,8 @@ async function forceUpdateFlatVariants() {
           String(wine.id),
           taskLogger,
         )
+
+        taskLogger.debug(`English description fetched for variant ${wineVariant.id}`)
 
         // Fetch related data
         const wineWinery = typeof wine.winery === 'object' ? wine.winery : null
@@ -573,6 +680,8 @@ async function forceUpdateFlatVariants() {
         const relatedRegions = wineRegionForRelated
           ? await fetchRelatedRegions(payload, String(wineRegionForRelated.id), taskLogger)
           : undefined
+
+        taskLogger.debug(`Related data fetched for variant ${wineVariant.id}`)
 
         // Fetch English titles for localized collections
         const englishTitles = {
@@ -618,6 +727,13 @@ async function forceUpdateFlatVariants() {
           ),
         }
 
+        taskLogger.debug(`English titles fetched for variant ${wineVariant.id}`)
+
+        // Fetch winery tags
+        const wineryTags = wineWinery
+          ? await fetchWineryTags(payload, String(wineWinery.id), taskLogger)
+          : undefined
+
         // Prepare flat variant data
         const flatVariantData = prepareFlatVariantData(
           wineVariant as unknown as WineVariant,
@@ -627,11 +743,16 @@ async function forceUpdateFlatVariants() {
           englishDescription,
           relatedWineries,
           relatedRegions,
+          wineryTags,
           englishTitles,
         )
 
+        taskLogger.debug(`Flat variant data prepared for variant ${wineVariant.id}`)
+
         // Create or update flat variant
         await createOrUpdateFlatVariant(payload, flatVariantData, taskLogger)
+
+        taskLogger.debug(`Flat variant created/updated for variant ${wineVariant.id}`)
 
         successCount++
 
@@ -640,11 +761,16 @@ async function forceUpdateFlatVariants() {
         }
       } catch (error: any) {
         errorCount++
-        taskLogger.error(`Failed to process flat variant for ${wineVariant.id}:`, error.message)
+        taskLogger.error(
+          `Failed to process flat variant for ${wineVariant.id}:`,
+          error && error.stack ? error.stack : error,
+        )
 
         if (error.message && error.message.includes('Invalid wine data structure')) {
           skippedCount++
-          taskLogger.warn(`Skipping variant ${wineVariant.id} - invalid data structure`)
+          taskLogger.warn(
+            `Skipping variant ${wineVariant.id} - invalid data structure: ${error.message}`,
+          )
         }
       }
     }

@@ -361,6 +361,79 @@ async function fetchRelatedRegions(
   return undefined
 }
 
+// Fetch winery tags
+async function fetchWineryTags(
+  req: PayloadRequest,
+  wineryId: string,
+  logger: ReturnType<typeof createLogger>,
+): Promise<Array<{ id: string; title: string; titleEn?: string }> | undefined> {
+  try {
+    const winery = await req.payload.findByID({
+      collection: 'wineries',
+      id: wineryId,
+    })
+
+    if (winery && typeof winery === 'object' && 'tags' in winery && Array.isArray(winery.tags)) {
+      const tagPromises = winery.tags
+        .filter(
+          (tag: any) => tag && (typeof tag === 'string' || (typeof tag === 'object' && tag.id)),
+        )
+        .map(async (tag: any) => {
+          const tagId = typeof tag === 'string' ? tag : String(tag.id)
+
+          try {
+            // Fetch the full tag data
+            const fullTag = await req.payload.findByID({
+              collection: 'tags',
+              id: tagId,
+            })
+
+            if (fullTag && typeof fullTag === 'object' && 'title' in fullTag) {
+              // Fetch English title
+              let titleEn: string | undefined
+              try {
+                const englishTag = await req.payload.findByID({
+                  collection: 'tags',
+                  id: tagId,
+                  locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
+                })
+                if (englishTag && typeof englishTag === 'object' && 'title' in englishTag) {
+                  titleEn = englishTag.title
+                }
+              } catch (error) {
+                logger.warn('Could not fetch English tag title', { tagId, error: String(error) })
+              }
+
+              return {
+                id: tagId,
+                title: fullTag.title,
+                titleEn,
+              }
+            }
+          } catch (error) {
+            logger.warn('Could not fetch tag data', { tagId, error: String(error) })
+          }
+
+          return null
+        })
+
+      const tags = await Promise.all(tagPromises)
+      return tags.filter((tag) => tag !== null) as Array<{
+        id: string
+        title: string
+        titleEn?: string
+      }>
+    }
+  } catch (error) {
+    logger.warn('Could not fetch winery tags', {
+      wineryId,
+      error: String(error),
+    })
+  }
+
+  return undefined
+}
+
 // Helper function to recursively remove all id fields from objects
 function removeNestedIds(obj: any): any {
   if (Array.isArray(obj)) {
@@ -387,6 +460,7 @@ function prepareFlatVariantData(
   englishDescription: string | undefined,
   relatedWineries: Array<{ id: string }> | undefined,
   relatedRegions: Array<{ id: string }> | undefined,
+  wineryTags: Array<{ id: string; title: string; titleEn?: string }> | undefined,
   englishTitles: {
     englishAromaTitles: Record<string, string>
     englishTagTitles: Record<string, string>
@@ -417,6 +491,11 @@ function prepareFlatVariantData(
 
   return {
     originalVariant: wineVariant.id,
+    wineID: wine.id,
+    wineryID: winery?.id || null,
+    regionID: wineRegion?.id || null,
+    countryID: wineCountry?.id || null,
+    styleID: style?.id || null,
     wineTitle: wine.title,
     wineryTitle: winery?.title || '',
     wineryCode: winery?.wineryCode || '',
@@ -441,6 +520,11 @@ function prepareFlatVariantData(
     descriptionEn: englishDescription,
     relatedWineries: relatedWineries,
     relatedRegions: relatedRegions,
+    wineryTags: wineryTags?.map((tag) => ({
+      title: tag.title,
+      titleEn: tag.titleEn || null,
+      id: tag.id,
+    })),
     tastingNotes: (() => {
       const notes = wineVariant.tastingNotes
       if (!notes || typeof notes !== 'object') return undefined
@@ -606,6 +690,10 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       ? await fetchRelatedRegions(req, String(wineRegionForRelated.id), logger)
       : undefined
 
+    const wineryTags = wineWinery
+      ? await fetchWineryTags(req, String(wineWinery.id), logger)
+      : undefined
+
     const englishTitles = {
       englishAromaTitles: await fetchEnglishTitles(
         req,
@@ -657,6 +745,7 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       englishDescription,
       relatedWineries,
       relatedRegions,
+      wineryTags,
       englishTitles,
     )
 

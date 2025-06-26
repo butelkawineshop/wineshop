@@ -36,6 +36,51 @@ export const FlatWineVariants: CollectionConfig = {
       },
     },
     {
+      name: 'wineID',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Reference to the parent wine (for grouping variants)',
+      },
+    },
+    {
+      name: 'wineryID',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Reference to the winery (for related wines)',
+      },
+    },
+    {
+      name: 'regionID',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Reference to the region (for related wines)',
+      },
+    },
+    {
+      name: 'countryID',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Reference to the wine country (for related wines)',
+      },
+    },
+    {
+      name: 'styleID',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Reference to the wine style (for related wines)',
+      },
+    },
+    {
       name: 'sku',
       type: 'text',
       index: true,
@@ -233,6 +278,19 @@ export const FlatWineVariants: CollectionConfig = {
         description: 'Related regions for filtering',
       },
       fields: [{ name: 'id', type: 'text' }],
+    },
+    {
+      name: 'wineryTags',
+      type: 'array',
+      admin: {
+        readOnly: true,
+        description: 'Winery tags for filtering',
+      },
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
+        { name: 'id', type: 'text' },
+      ],
     },
     {
       name: 'tastingNotes',

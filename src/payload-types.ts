@@ -582,8 +582,8 @@ export interface Climate {
   climate?: ('desert' | 'maritime' | 'mediterranean' | 'continental' | 'alpine') | null
   climateTemperature?: ('cool' | 'moderate' | 'warm' | 'hot') | null
   climateConditions?: {
-    diurnalRange?: ('low' | 'medium' | 'high') | null
-    humidity?: ('dry' | 'moderate' | 'humid') | null
+    diurnalRange?: string | null
+    humidity?: string | null
   }
   bestRegions?: (number | Region)[] | null
   bestGrapes?: (number | GrapeVariety)[] | null
@@ -1051,6 +1051,26 @@ export interface FlatWineVariant {
    * Reference to the original wine variant
    */
   originalVariant: number | WineVariant
+  /**
+   * Reference to the parent wine (for grouping variants)
+   */
+  wineID?: number | null
+  /**
+   * Reference to the winery (for related wines)
+   */
+  wineryID?: number | null
+  /**
+   * Reference to the region (for related wines)
+   */
+  regionID?: number | null
+  /**
+   * Reference to the wine country (for related wines)
+   */
+  countryID?: number | null
+  /**
+   * Reference to the wine style (for related wines)
+   */
+  styleID?: number | null
   sku?: string | null
   wineTitle?: string | null
   wineryTitle?: string | null
@@ -1101,6 +1121,19 @@ export interface FlatWineVariant {
    */
   relatedRegions?:
     | {
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Winery tags for filtering
+   */
+  wineryTags?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
         id?: string | null
       }[]
     | null
@@ -2037,6 +2070,11 @@ export interface DishesSelect<T extends boolean = true> {
  */
 export interface FlatWineVariantsSelect<T extends boolean = true> {
   originalVariant?: T
+  wineID?: T
+  wineryID?: T
+  regionID?: T
+  countryID?: T
+  styleID?: T
   sku?: T
   wineTitle?: T
   wineryTitle?: T
@@ -2067,6 +2105,13 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   relatedRegions?:
     | T
     | {
+        id?: T
+      }
+  wineryTags?:
+    | T
+    | {
+        title?: T
+        titleEn?: T
         id?: T
       }
   tastingNotes?:

@@ -1,20 +1,31 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import { notFound } from 'next/navigation'
+import { getWineVariantData } from '@/lib/wineData'
+import { WineDetailServer } from '@/components/wine/WineDetailServer'
+import type { Locale } from '@/i18n/locales'
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string[] }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
+interface Props {
+  params: Promise<{
+    slug: string
+  }>
+}
+
+export default async function WineDetailPage({ params }: Props): Promise<React.JSX.Element> {
+  const { slug } = await params
+  const locale: Locale = 'sl' // Slovenian locale for this route
+
+  // Get all wine variant data server-side
+  const { variant, variants, relatedVariants, error } = await getWineVariantData(slug, locale)
+
+  if (error || !variant) {
+    return notFound()
+  }
+
   return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="sl"
-      baseSegment="vinoteka"
+    <WineDetailServer
+      variant={variant}
+      variants={variants}
+      relatedVariants={relatedVariants}
+      locale={locale}
     />
   )
 }
