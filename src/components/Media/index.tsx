@@ -25,8 +25,17 @@ const CLOUDFLARE_IMAGES_URL = process.env.NEXT_PUBLIC_CLOUDFLARE_IMAGES_URL
 const getImageUrl = (src: string | null | undefined, size?: string): string => {
   if (!src) return ''
 
-  // If the URL already ends with a known size, return as is
-  if (src.match(/\/(winecards|feature|hero|thumbnail)$/)) return src
+  // If the URL already ends with a known size, replace it with the new size
+  const sizeMatch = src.match(/\/(winecards|feature|hero|thumbnail)$/)
+  if (sizeMatch && size) {
+    // Replace the existing size with the new requested size
+    return src.replace(/\/(winecards|feature|hero|thumbnail)$/, `/${size}`)
+  }
+
+  // If the URL already ends with a known size but no new size requested, return as is
+  if (sizeMatch && !size) {
+    return src
+  }
 
   // If the URL is a full URL and a size is provided, append the size
   if (src.startsWith('http')) {

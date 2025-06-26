@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
-import { logger } from '../src/lib/logger'
-import payloadConfig from '../src/payload.config'
+import { logger } from '../../src/lib/logger'
+import payloadConfig from '../../src/payload.config'
 
 interface WineRegionData {
   title: string
@@ -491,6 +491,19 @@ const wineRegionsData: WineRegionData[] = [
       en: 'The Tokaji region in northeastern Hungary is known for its sweet wines.',
     },
     countrySlug: 'madzarska',
+  },
+  {
+    title: 'Santa Maria',
+    whyCool: {
+      sl: 'Santa Maria Valley je dom legendarnih modrih pinotov vin, enih najboljših na svetu.',
+      en: 'Santa Maria Valley is home to legendary pinot noirs, some of the finest in the world.',
+    },
+    priceRange: '40-50',
+    description: {
+      sl: 'Tokaji regija v severovzhodni Madžarski je znana po svojih sladkih vinih.',
+      en: 'The Tokaji region in northeastern Hungary is known for its sweet wines.',
+    },
+    countrySlug: 'zda',
   },
 ]
 

@@ -229,16 +229,90 @@ export class PayloadService {
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to create document in ${collection}: ${response.statusText}`)
+        // Try to get the actual error response
+        let errorDetails = ''
+        try {
+          const errorResponse = await response.json()
+          errorDetails = JSON.stringify(errorResponse, null, 2)
+        } catch {
+          errorDetails = await response.text()
+        }
+
+        const error = new Error(
+          `Failed to create ${collection}: ${response.statusText}\nResponse status: ${response.status}\nResponse data: ${errorDetails}`,
+        )
+        ;(error as any).status = response.status
+        ;(error as any).responseData = errorDetails
+        throw error
       }
 
-      const created = await response.json()
-      this.logger.info(`Successfully created document in ${collection}`)
-      return created as T
+      const result = await response.json()
+      this.logger.info(`Successfully created document in ${collection}`, {
+        collection,
+        id: result.doc?.id || result.id,
+      })
+
+      return result.doc || result
     } catch (error) {
       this.logger.error(`Failed to create document in ${collection}`, error as Error, {
         collection,
-        data: JSON.stringify(data),
+        data: JSON.parse(JSON.stringify(data)),
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Update an existing document in a collection
+   * @param collection - Collection name
+   * @param id - Document ID
+   * @param data - Document data to update
+   * @returns Updated document
+   */
+  async update<T = Record<string, unknown>>(
+    collection: string,
+    id: string,
+    data: Record<string, unknown>,
+  ): Promise<T> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/${collection}/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        // Try to get the actual error response
+        let errorDetails = ''
+        try {
+          const errorResponse = await response.json()
+          errorDetails = JSON.stringify(errorResponse, null, 2)
+        } catch {
+          errorDetails = await response.text()
+        }
+
+        const error = new Error(
+          `Failed to update ${collection}: ${response.statusText}\nResponse status: ${response.status}\nResponse data: ${errorDetails}`,
+        )
+        ;(error as any).status = response.status
+        ;(error as any).responseData = errorDetails
+        throw error
+      }
+
+      const result = await response.json()
+      this.logger.info(`Successfully updated document in ${collection}`, {
+        collection,
+        id: result.doc?.id || result.id,
+      })
+
+      return result.doc || result
+    } catch (error) {
+      this.logger.error(`Failed to update document in ${collection}`, error as Error, {
+        collection,
+        id,
+        data: JSON.parse(JSON.stringify(data)),
       })
       throw error
     }

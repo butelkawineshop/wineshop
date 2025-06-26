@@ -64,6 +64,8 @@
     "rowProgress": "{current} of {total}",
     "previousRow": "Previous row",
     "nextRow": "Next row",
+    "firstRow": "First row",
+    "lastRow": "Last row",
     "keyboardInstructions": "Use arrow keys to navigate between wine rows. Home and End keys to jump to first or last row. Page Up and Page Down to jump by 3 rows.",
     "wineGridLabel": "Wine grid with vertical row navigation",
     "sliderLabel": "Wine row carousel",

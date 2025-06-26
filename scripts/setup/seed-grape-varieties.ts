@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
-import { logger } from '../src/lib/logger'
-import payloadConfig from '../src/payload.config'
+import { logger } from '../../src/lib/logger'
+import payloadConfig from '../../src/payload.config'
 
 interface GrapeVarietyData {
   title: string
@@ -26,910 +26,1265 @@ interface GrapeVarietyData {
 }
 
 const grapeVarietiesData: GrapeVarietyData[] = [
-  // Red grape varieties
-  {
-    title: 'Cabernet Sauvignon',
-    description: {
-      sl: 'Cabernet Sauvignon je ena najbolj razširjenih rdečih sort grozdja na svetu.',
-      en: 'Cabernet Sauvignon is one of the most widely planted red grape varieties in the world.',
-    },
-    typicalStyle: {
-      sl: 'Močna, kompleksna vina z aromami črnega ribeza, višnje in cedrovine.',
-      en: 'Powerful, complex wines with aromas of blackcurrant, cherry, and cedar.',
-    },
-    whyCool: {
-      sl: 'Cabernet Sauvignon je osnova najboljših bordojskih vinov in kalifornijskih kultnih vinov.',
-      en: 'Cabernet Sauvignon is the foundation of the finest Bordeaux wines and California cult wines.',
-    },
-    character: {
-      sl: 'Polna, taninska vina z dolgoletnim potencialom za starjenje.',
-      en: 'Full-bodied, tannic wines with long-term aging potential.',
-    },
-    skin: 'red',
-    synonyms: ['Cabernet', 'CS'],
-  },
-  {
-    title: 'Merlot',
-    description: {
-      sl: 'Merlot je mehka in elegantna rdeča sorta grozdja.',
-      en: 'Merlot is a soft and elegant red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Mehka vina z aromami slive, črnega ribeza in čokolade.',
-      en: 'Soft wines with aromas of plum, blackcurrant, and chocolate.',
-    },
-    whyCool: {
-      sl: 'Merlot je znan po svoji dostopnosti in elegantnosti.',
-      en: 'Merlot is known for its approachability and elegance.',
-    },
-    character: {
-      sl: 'Srednje polna vina z mehkimi tanini in okusnim okusom.',
-      en: 'Medium-bodied wines with soft tannins and fruity taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Pinot Noir',
-    description: {
-      sl: 'Pinot Noir je elegantna in kompleksna rdeča sorta grozdja.',
-      en: 'Pinot Noir is an elegant and complex red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Elegantna vina z aromami jagod, malin in zemlje.',
-      en: 'Elegant wines with aromas of strawberries, raspberries, and earth.',
-    },
-    whyCool: {
-      sl: 'Pinot Noir je osnova najboljših burgundskih vinov.',
-      en: 'Pinot Noir is the foundation of the finest Burgundy wines.',
-    },
-    character: {
-      sl: 'Lahka do srednje polna vina z elegantnimi tanini.',
-      en: 'Light to medium-bodied wines with elegant tannins.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Syrah',
-    description: {
-      sl: 'Syrah je močna in aromatična rdeča sorta grozdja.',
-      en: 'Syrah is a powerful and aromatic red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Močna vina z aromami črnega sadeža, paprike in dima.',
-      en: 'Powerful wines with aromas of black fruit, pepper, and smoke.',
-    },
-    whyCool: {
-      sl: 'Syrah je osnova najboljših Rhône vinov in avstralskih Shiraz vinov.',
-      en: 'Syrah is the foundation of the finest Rhône wines and Australian Shiraz wines.',
-    },
-    character: {
-      sl: 'Polna vina z močnimi tanini in dolgotrajnim okusom.',
-      en: 'Full-bodied wines with strong tannins and long finish.',
-    },
-    skin: 'red',
-    synonyms: ['Shiraz'],
-  },
-  {
-    title: 'Grenache',
-    description: {
-      sl: 'Grenache je vročinska rdeča sorta grozdja.',
-      en: 'Grenache is a warm-climate red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami jagod, malin in začimb.',
-      en: 'Medium-bodied wines with aromas of strawberries, raspberries, and spices.',
-    },
-    whyCool: {
-      sl: 'Grenache je osnova Châteauneuf-du-Pape in številnih južnih vinov.',
-      en: 'Grenache is the foundation of Châteauneuf-du-Pape and many southern wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z mehkimi tanini in visoko alkoholno vsebnostjo.',
-      en: 'Medium-bodied wines with soft tannins and high alcohol content.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Tempranillo',
-    description: {
-      sl: 'Tempranillo je španska rdeča sorta grozdja.',
-      en: 'Tempranillo is a Spanish red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami črnega sadeža, vanilije in hrasta.',
-      en: 'Medium-bodied wines with aromas of black fruit, vanilla, and oak.',
-    },
-    whyCool: {
-      sl: 'Tempranillo je osnova najboljših španskih vinov iz Rioje in Ribera del Duero.',
-      en: 'Tempranillo is the foundation of the finest Spanish wines from Rioja and Ribera del Duero.',
-    },
-    character: {
-      sl: 'Srednje polna vina z uravnoteženimi tanini.',
-      en: 'Medium-bodied wines with balanced tannins.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Sangiovese',
-    description: {
-      sl: 'Sangiovese je italijanska rdeča sorta grozdja.',
-      en: 'Sangiovese is an Italian red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami češnje, slive in zemlje.',
-      en: 'Medium-bodied wines with aromas of cherry, plum, and earth.',
-    },
-    whyCool: {
-      sl: 'Sangiovese je osnova najboljših toskanskih vinov kot so Chianti in Brunello.',
-      en: 'Sangiovese is the foundation of the finest Tuscan wines like Chianti and Brunello.',
-    },
-    character: {
-      sl: 'Srednje polna vina z visoko kislino in tanini.',
-      en: 'Medium-bodied wines with high acidity and tannins.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Nebbiolo',
-    description: {
-      sl: 'Nebbiolo je piemontska rdeča sorta grozdja.',
-      en: 'Nebbiolo is a Piedmont red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Elegantna vina z aromami rož, višnje, zemlje in tartufov.',
-      en: 'Elegant wines with aromas of roses, cherry, earth, and truffles.',
-    },
-    whyCool: {
-      sl: 'Nebbiolo je osnova najboljših Barolo in Barbaresco vinov.',
-      en: 'Nebbiolo is the foundation of the finest Barolo and Barbaresco wines.',
-    },
-    character: {
-      sl: 'Elegantna vina z močnimi tanini in visoko kislino.',
-      en: 'Elegant wines with strong tannins and high acidity.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Malbec',
-    description: {
-      sl: 'Malbec je argentinska rdeča sorta grozdja.',
-      en: 'Malbec is an Argentine red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Polna vina z aromami črnega sadeža, čokolade in sladkega duhana.',
-      en: 'Full-bodied wines with aromas of black fruit, chocolate, and sweet tobacco.',
-    },
-    whyCool: {
-      sl: 'Malbec je osnova najboljših argentinskih vinov iz Mendoza.',
-      en: 'Malbec is the foundation of the finest Argentine wines from Mendoza.',
-    },
-    character: {
-      sl: 'Polna vina z mehkimi tanini in bogatim okusom.',
-      en: 'Full-bodied wines with soft tannins and rich taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Refošk',
-    description: {
-      sl: 'Refošk je slovenska rdeča sorta grozdja.',
-      en: 'Refošk is a Slovenian red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Močna vina z aromami črnega sadeža in začimb.',
-      en: 'Powerful wines with aromas of black fruit and spices.',
-    },
-    whyCool: {
-      sl: 'Refošk je osnova najboljših slovenskih vinov iz Primorske.',
-      en: 'Refošk is the foundation of the finest Slovenian wines from Primorska.',
-    },
-    character: {
-      sl: 'Polna vina z močnimi tanini in dolgotrajnim okusom.',
-      en: 'Full-bodied wines with strong tannins and long finish.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Teran',
-    description: {
-      sl: 'Teran je kraška rdeča sorta grozdja.',
-      en: 'Teran is a karst red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Močna vina z aromami črnega sadeža in mineralov.',
-      en: 'Powerful wines with aromas of black fruit and minerals.',
-    },
-    whyCool: {
-      sl: 'Teran je edinstvena kraška sorta z visoko vsebnostjo železa.',
-      en: 'Teran is a unique karst variety with high iron content.',
-    },
-    character: {
-      sl: 'Polna vina z močnimi tanini in mineralnim okusom.',
-      en: 'Full-bodied wines with strong tannins and mineral taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Modra Frankinja',
-    description: {
-      sl: 'Modra Frankinja je slovenska rdeča sorta grozdja.',
-      en: 'Modra Frankinja is a Slovenian red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Lahka vina z aromami črnega sadeža in začimb.',
-      en: 'Light wines with aromas of black fruit and spices.',
-    },
-    whyCool: {
-      sl: 'Modra Frankinja je osnova tradicionalnih slovenskih vinov.',
-      en: 'Modra Frankinja is the foundation of traditional Slovenian wines.',
-    },
-    character: {
-      sl: 'Lahka vina z mehkimi tanini in osvežilnim okusom.',
-      en: 'Light wines with soft tannins and refreshing taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Gamay',
-    description: {
-      sl: 'Gamay je francoska rdeča sorta grozdja.',
-      en: 'Gamay is a French red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Lahka vina z aromami jagod, malin in banan.',
-      en: 'Light wines with aromas of strawberries, raspberries, and bananas.',
-    },
-    whyCool: {
-      sl: 'Gamay je osnova Beaujolais vinov.',
-      en: 'Gamay is the foundation of Beaujolais wines.',
-    },
-    character: {
-      sl: 'Lahka vina z nizko kislino in mehkimi tanini.',
-      en: 'Light wines with low acidity and soft tannins.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Corvina',
-    description: {
-      sl: 'Corvina je italijanska rdeča sorta grozdja.',
-      en: 'Corvina is an Italian red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami češnje in začimb.',
-      en: 'Medium-bodied wines with aromas of cherry and spices.',
-    },
-    whyCool: {
-      sl: 'Corvina je osnova Amarone in Valpolicella vinov.',
-      en: 'Corvina is the foundation of Amarone and Valpolicella wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z uravnoteženimi tanini.',
-      en: 'Medium-bodied wines with balanced tannins.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Carignan',
-    description: {
-      sl: 'Carignan je južna rdeča sorta grozdja.',
-      en: 'Carignan is a southern red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Močna vina z aromami črnega sadeža in zemlje.',
-      en: 'Powerful wines with aromas of black fruit and earth.',
-    },
-    whyCool: {
-      sl: 'Carignan je osnova tradicionalnih južnih vinov.',
-      en: 'Carignan is the foundation of traditional southern wines.',
-    },
-    character: {
-      sl: 'Polna vina z močnimi tanini in visoko kislino.',
-      en: 'Full-bodied wines with strong tannins and high acidity.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Mourvedre',
-    description: {
-      sl: 'Mourvedre je južna rdeča sorta grozdja.',
-      en: 'Mourvedre is a southern red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Močna vina z aromami črnega sadeža, začimb in zemlje.',
-      en: 'Powerful wines with aromas of black fruit, spices, and earth.',
-    },
-    whyCool: {
-      sl: 'Mourvedre je pomembna sestavina južnih mešanic.',
-      en: 'Mourvedre is an important component of southern blends.',
-    },
-    character: {
-      sl: 'Polna vina z močnimi tanini in dolgotrajnim okusom.',
-      en: 'Full-bodied wines with strong tannins and long finish.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Cinsault',
-    description: {
-      sl: 'Cinsault je južna rdeča sorta grozdja.',
-      en: 'Cinsault is a southern red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Lahka vina z aromami jagod in rož.',
-      en: 'Light wines with aromas of strawberries and roses.',
-    },
-    whyCool: {
-      sl: 'Cinsault je pomembna sestavina rosé vinov.',
-      en: 'Cinsault is an important component of rosé wines.',
-    },
-    character: {
-      sl: 'Lahka vina z mehkimi tanini in osvežilnim okusom.',
-      en: 'Light wines with soft tannins and refreshing taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: "Nero d'Avola",
-    description: {
-      sl: "Nero d'Avola je sicilijanska rdeča sorta grozdja.",
-      en: "Nero d'Avola is a Sicilian red grape variety.",
-    },
-    typicalStyle: {
-      sl: 'Močna vina z aromami črnega sadeža in začimb.',
-      en: 'Powerful wines with aromas of black fruit and spices.',
-    },
-    whyCool: {
-      sl: "Nero d'Avola je osnova najboljših sicilijanskih vinov.",
-      en: "Nero d'Avola is the foundation of the finest Sicilian wines.",
-    },
-    character: {
-      sl: 'Polna vina z močnimi tanini in bogatim okusom.',
-      en: 'Full-bodied wines with strong tannins and rich taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Barbera',
-    description: {
-      sl: 'Barbera je piemontska rdeča sorta grozdja.',
-      en: 'Barbera is a Piedmont red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami črnega sadeža in visoko kislino.',
-      en: 'Medium-bodied wines with aromas of black fruit and high acidity.',
-    },
-    whyCool: {
-      sl: 'Barbera je najbolj razširjena sorta v Piemontu.',
-      en: 'Barbera is the most widely planted variety in Piedmont.',
-    },
-    character: {
-      sl: 'Srednje polna vina z visoko kislino in mehkimi tanini.',
-      en: 'Medium-bodied wines with high acidity and soft tannins.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Dolcetto',
-    description: {
-      sl: 'Dolcetto je piemontska rdeča sorta grozdja.',
-      en: 'Dolcetto is a Piedmont red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Lahka vina z aromami jagod in malin.',
-      en: 'Light wines with aromas of strawberries and raspberries.',
-    },
-    whyCool: {
-      sl: 'Dolcetto prideluje dostopna in okusna vina.',
-      en: 'Dolcetto produces approachable and fruity wines.',
-    },
-    character: {
-      sl: 'Lahka vina z mehkimi tanini in osvežilnim okusom.',
-      en: 'Light wines with soft tannins and refreshing taste.',
-    },
-    skin: 'red',
-  },
-  {
-    title: 'Bonarda',
-    description: {
-      sl: 'Bonarda je argentinska rdeča sorta grozdja.',
-      en: 'Bonarda is an Argentine red grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami črnega sadeža in začimb.',
-      en: 'Medium-bodied wines with aromas of black fruit and spices.',
-    },
-    whyCool: {
-      sl: 'Bonarda je druga najbolj razširjena sorta v Argentini.',
-      en: 'Bonarda is the second most widely planted variety in Argentina.',
-    },
-    character: {
-      sl: 'Srednje polna vina z uravnoteženimi tanini.',
-      en: 'Medium-bodied wines with balanced tannins.',
-    },
-    skin: 'red',
-  },
-
-  // White grape varieties
   {
     title: 'Chardonnay',
     description: {
-      sl: 'Chardonnay je ena najbolj razširjenih belih sort grozdja na svetu.',
-      en: 'Chardonnay is one of the most widely planted white grape varieties in the world.',
+      sl: 'Opis za Chardonnay (SL).',
+      en: 'Description for Chardonnay (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami jabolk, citrusov in vanilije.',
-      en: 'Elegant wines with aromas of apples, citrus, and vanilla.',
+      sl: 'Tipičen stil za Chardonnay (SL).',
+      en: 'Typical style for Chardonnay (EN).',
     },
     whyCool: {
-      sl: 'Chardonnay je osnova najboljših burgundskih in kalifornijskih vinov.',
-      en: 'Chardonnay is the foundation of the finest Burgundy and California wines.',
+      sl: 'Zakaj je Chardonnay kul (SL).',
+      en: 'Why Chardonnay is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
+      sl: 'Značilnosti Chardonnay (SL).',
+      en: 'Character of Chardonnay (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Riesling',
+    title: 'Secret Blend',
     description: {
-      sl: 'Riesling je elegantna bela sorta grozdja.',
-      en: 'Riesling is an elegant white grape variety.',
+      sl: 'Opis za Secret Blend (SL).',
+      en: 'Description for Secret Blend (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami citrusov, jabolk in mineralov.',
-      en: 'Elegant wines with aromas of citrus, apples, and minerals.',
+      sl: 'Tipičen stil za Secret Blend (SL).',
+      en: 'Typical style for Secret Blend (EN).',
     },
     whyCool: {
-      sl: 'Riesling je osnova najboljših nemških in avstrijskih vinov.',
-      en: 'Riesling is the foundation of the finest German and Austrian wines.',
+      sl: 'Zakaj je Secret Blend kul (SL).',
+      en: 'Why Secret Blend is cool (EN).',
     },
     character: {
-      sl: 'Lahka do srednje polna vina z visoko kislino.',
-      en: 'Light to medium-bodied wines with high acidity.',
+      sl: 'Značilnosti Secret Blend (SL).',
+      en: 'Character of Secret Blend (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Sauvignon Blanc',
+    title: 'Carricante',
     description: {
-      sl: 'Sauvignon Blanc je aromatična bela sorta grozdja.',
-      en: 'Sauvignon Blanc is an aromatic white grape variety.',
+      sl: 'Opis za Carricante (SL).',
+      en: 'Description for Carricante (EN).',
     },
     typicalStyle: {
-      sl: 'Aromatična vina z aromami citrusov, zelišč in zelenjave.',
-      en: 'Aromatic wines with aromas of citrus, herbs, and vegetables.',
+      sl: 'Tipičen stil za Carricante (SL).',
+      en: 'Typical style for Carricante (EN).',
     },
     whyCool: {
-      sl: 'Sauvignon Blanc je osnova najboljših loirskih in novozelandskih vinov.',
-      en: 'Sauvignon Blanc is the foundation of the finest Loire and New Zealand wines.',
+      sl: 'Zakaj je Carricante kul (SL).',
+      en: 'Why Carricante is cool (EN).',
     },
     character: {
-      sl: 'Lahka vina z visoko kislino in osvežilnim okusom.',
-      en: 'Light wines with high acidity and refreshing taste.',
+      sl: 'Značilnosti Carricante (SL).',
+      en: 'Character of Carricante (EN).',
     },
     skin: 'white',
-  },
-  {
-    title: 'Pinot Grigio',
-    description: {
-      sl: 'Pinot Grigio je italijanska bela sorta grozdja.',
-      en: 'Pinot Grigio is an Italian white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Lahka vina z aromami citrusov in zelenih jabolk.',
-      en: 'Light wines with aromas of citrus and green apples.',
-    },
-    whyCool: {
-      sl: 'Pinot Grigio je osnova najboljših severnoitalijanskih vinov.',
-      en: 'Pinot Grigio is the foundation of the finest northern Italian wines.',
-    },
-    character: {
-      sl: 'Lahka vina z nizko kislino in osvežilnim okusom.',
-      en: 'Light wines with low acidity and refreshing taste.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Gewürztraminer',
-    description: {
-      sl: 'Gewürztraminer je aromatična bela sorta grozdja.',
-      en: 'Gewürztraminer is an aromatic white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Aromatična vina z aromami rož, začimb in eksotičnega sadeža.',
-      en: 'Aromatic wines with aromas of roses, spices, and exotic fruit.',
-    },
-    whyCool: {
-      sl: 'Gewürztraminer je osnova najboljših alzaških vinov.',
-      en: 'Gewürztraminer is the foundation of the finest Alsace wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z nizko kislino in aromatičnim okusom.',
-      en: 'Medium-bodied wines with low acidity and aromatic taste.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Pinot Gris',
-    description: {
-      sl: 'Pinot Gris je francoska bela sorta grozdja.',
-      en: 'Pinot Gris is a French white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Srednje polna vina z aromami sadja in začimb.',
-      en: 'Medium-bodied wines with aromas of fruit and spices.',
-    },
-    whyCool: {
-      sl: 'Pinot Gris je osnova najboljših alzaških vinov.',
-      en: 'Pinot Gris is the foundation of the finest Alsace wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Glera',
-    description: {
-      sl: 'Glera je italijanska bela sorta grozdja za penine vina.',
-      en: 'Glera is an Italian white grape variety for sparkling wines.',
-    },
-    typicalStyle: {
-      sl: 'Osvežilna penina vina z aromami sadja in cvetov.',
-      en: 'Refreshing sparkling wines with aromas of fruit and flowers.',
-    },
-    whyCool: {
-      sl: 'Glera je osnova Prosecco vinov.',
-      en: 'Glera is the foundation of Prosecco wines.',
-    },
-    character: {
-      sl: 'Lahka penina vina z nizko kislino in osvežilnim okusom.',
-      en: 'Light sparkling wines with low acidity and refreshing taste.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Malvazija',
-    description: {
-      sl: 'Malvazija je slovenska bela sorta grozdja.',
-      en: 'Malvazija is a Slovenian white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Aromatična vina z aromami sadja in cvetov.',
-      en: 'Aromatic wines with aromas of fruit and flowers.',
-    },
-    whyCool: {
-      sl: 'Malvazija je osnova najboljših slovenskih belih vinov.',
-      en: 'Malvazija is the foundation of the finest Slovenian white wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z aromatičnim okusom.',
-      en: 'Medium-bodied wines with aromatic taste.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Laški Rizling',
-    description: {
-      sl: 'Laški Rizling je slovenska bela sorta grozdja.',
-      en: 'Laški Rizling is a Slovenian white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Elegantna vina z aromami citrusov in mineralov.',
-      en: 'Elegant wines with aromas of citrus and minerals.',
-    },
-    whyCool: {
-      sl: 'Laški Rizling je najbolj razširjena bela sorta v Sloveniji.',
-      en: 'Laški Rizling is the most widely planted white variety in Slovenia.',
-    },
-    character: {
-      sl: 'Srednje polna vina z visoko kislino in mineralnim okusom.',
-      en: 'Medium-bodied wines with high acidity and mineral taste.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Gruner Veltliner',
-    description: {
-      sl: 'Gruner Veltliner je avstrijska bela sorta grozdja.',
-      en: 'Gruner Veltliner is an Austrian white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Elegantna vina z aromami citrusov, zelišč in belega popra.',
-      en: 'Elegant wines with aromas of citrus, herbs, and white pepper.',
-    },
-    whyCool: {
-      sl: 'Gruner Veltliner je osnova najboljših avstrijskih vinov.',
-      en: 'Gruner Veltliner is the foundation of the finest Austrian wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z visoko kislino in mineralnim okusom.',
-      en: 'Medium-bodied wines with high acidity and mineral taste.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Weissburgunder',
-    description: {
-      sl: 'Weissburgunder je avstrijska bela sorta grozdja.',
-      en: 'Weissburgunder is an Austrian white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in mineralov.',
-      en: 'Elegant wines with aromas of fruit and minerals.',
-    },
-    whyCool: {
-      sl: 'Weissburgunder je pomembna bela sorta v Avstriji.',
-      en: 'Weissburgunder is an important white variety in Austria.',
-    },
-    character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
-    },
-    skin: 'white',
-  },
-  {
-    title: 'Friulano',
-    description: {
-      sl: 'Friulano je italijanska bela sorta grozdja.',
-      en: 'Friulano is an Italian white grape variety.',
-    },
-    typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in cvetov.',
-      en: 'Elegant wines with aromas of fruit and flowers.',
-    },
-    whyCool: {
-      sl: 'Friulano je osnova najboljših friulskih vinov.',
-      en: 'Friulano is the foundation of the finest Friuli wines.',
-    },
-    character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
-    },
-    skin: 'white',
+    synonyms: [],
   },
   {
     title: 'Ribolla Gialla',
     description: {
-      sl: 'Ribolla Gialla je italijanska bela sorta grozdja.',
-      en: 'Ribolla Gialla is an Italian white grape variety.',
+      sl: 'Opis za Ribolla Gialla (SL).',
+      en: 'Description for Ribolla Gialla (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in mineralov.',
-      en: 'Elegant wines with aromas of fruit and minerals.',
+      sl: 'Tipičen stil za Ribolla Gialla (SL).',
+      en: 'Typical style for Ribolla Gialla (EN).',
     },
     whyCool: {
-      sl: 'Ribolla Gialla je tradicionalna friulska sorta.',
-      en: 'Ribolla Gialla is a traditional Friuli variety.',
+      sl: 'Zakaj je Ribolla Gialla kul (SL).',
+      en: 'Why Ribolla Gialla is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z visoko kislino.',
-      en: 'Medium-bodied wines with high acidity.',
+      sl: 'Značilnosti Ribolla Gialla (SL).',
+      en: 'Character of Ribolla Gialla (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Catarratto',
+    title: 'Friulano',
     description: {
-      sl: 'Catarratto je sicilijanska bela sorta grozdja.',
-      en: 'Catarratto is a Sicilian white grape variety.',
+      sl: 'Opis za Friulano (SL).',
+      en: 'Description for Friulano (EN).',
     },
     typicalStyle: {
-      sl: 'Srednje polna vina z aromami sadja in cvetov.',
-      en: 'Medium-bodied wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Friulano (SL).',
+      en: 'Typical style for Friulano (EN).',
     },
     whyCool: {
-      sl: 'Catarratto je najbolj razširjena bela sorta na Siciliji.',
-      en: 'Catarratto is the most widely planted white variety in Sicily.',
+      sl: 'Zakaj je Friulano kul (SL).',
+      en: 'Why Friulano is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
+      sl: 'Značilnosti Friulano (SL).',
+      en: 'Character of Friulano (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Grillo',
+    title: 'Malvasia',
     description: {
-      sl: 'Grillo je sicilijanska bela sorta grozdja.',
-      en: 'Grillo is a Sicilian white grape variety.',
+      sl: 'Opis za Malvasia (SL).',
+      en: 'Description for Malvasia (EN).',
     },
     typicalStyle: {
-      sl: 'Srednje polna vina z aromami sadja in cvetov.',
-      en: 'Medium-bodied wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Malvasia (SL).',
+      en: 'Typical style for Malvasia (EN).',
     },
     whyCool: {
-      sl: 'Grillo je pomembna sestavina marsalskih vinov.',
-      en: 'Grillo is an important component of Marsala wines.',
+      sl: 'Zakaj je Malvasia kul (SL).',
+      en: 'Why Malvasia is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
+      sl: 'Značilnosti Malvasia (SL).',
+      en: 'Character of Malvasia (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Macabeo',
+    title: 'Welschriesling',
     description: {
-      sl: 'Macabeo je španska bela sorta grozdja.',
-      en: 'Macabeo is a Spanish white grape variety.',
+      sl: 'Opis za Welschriesling (SL).',
+      en: 'Description for Welschriesling (EN).',
     },
     typicalStyle: {
-      sl: 'Lahka vina z aromami sadja in cvetov.',
-      en: 'Light wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Welschriesling (SL).',
+      en: 'Typical style for Welschriesling (EN).',
     },
     whyCool: {
-      sl: 'Macabeo je osnova Cava peninih vinov.',
-      en: 'Macabeo is the foundation of Cava sparkling wines.',
+      sl: 'Zakaj je Welschriesling kul (SL).',
+      en: 'Why Welschriesling is cool (EN).',
     },
     character: {
-      sl: 'Lahka vina z nizko kislino in osvežilnim okusom.',
-      en: 'Light wines with low acidity and refreshing taste.',
+      sl: 'Značilnosti Welschriesling (SL).',
+      en: 'Character of Welschriesling (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Parellada',
+    title: 'Sauvignon Blanc',
     description: {
-      sl: 'Parellada je španska bela sorta grozdja.',
-      en: 'Parellada is a Spanish white grape variety.',
+      sl: 'Opis za Sauvignon Blanc (SL).',
+      en: 'Description for Sauvignon Blanc (EN).',
     },
     typicalStyle: {
-      sl: 'Lahka vina z aromami sadja in cvetov.',
-      en: 'Light wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Sauvignon Blanc (SL).',
+      en: 'Typical style for Sauvignon Blanc (EN).',
     },
     whyCool: {
-      sl: 'Parellada je pomembna sestavina Cava vinov.',
-      en: 'Parellada is an important component of Cava wines.',
+      sl: 'Zakaj je Sauvignon Blanc kul (SL).',
+      en: 'Why Sauvignon Blanc is cool (EN).',
     },
     character: {
-      sl: 'Lahka vina z nizko kislino in osvežilnim okusom.',
-      en: 'Light wines with low acidity and refreshing taste.',
+      sl: 'Značilnosti Sauvignon Blanc (SL).',
+      en: 'Character of Sauvignon Blanc (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Xarel-lo',
+    title: 'Riesling',
     description: {
-      sl: 'Xarel-lo je španska bela sorta grozdja.',
-      en: 'Xarel-lo is a Spanish white grape variety.',
+      sl: 'Opis za Riesling (SL).',
+      en: 'Description for Riesling (EN).',
     },
     typicalStyle: {
-      sl: 'Srednje polna vina z aromami sadja in cvetov.',
-      en: 'Medium-bodied wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Riesling (SL).',
+      en: 'Typical style for Riesling (EN).',
     },
     whyCool: {
-      sl: 'Xarel-lo je pomembna sestavina Cava vinov.',
-      en: 'Xarel-lo is an important component of Cava wines.',
+      sl: 'Zakaj je Riesling kul (SL).',
+      en: 'Why Riesling is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
+      sl: 'Značilnosti Riesling (SL).',
+      en: 'Character of Riesling (EN).',
     },
     skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Vitovska Grganja',
+    description: {
+      sl: 'Opis za Vitovska Grganja (SL).',
+      en: 'Description for Vitovska Grganja (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Vitovska Grganja (SL).',
+      en: 'Typical style for Vitovska Grganja (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Vitovska Grganja kul (SL).',
+      en: 'Why Vitovska Grganja is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Vitovska Grganja (SL).',
+      en: 'Character of Vitovska Grganja (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
   },
   {
     title: 'Furmint',
     description: {
-      sl: 'Furmint je madžarska bela sorta grozdja.',
-      en: 'Furmint is a Hungarian white grape variety.',
+      sl: 'Opis za Furmint (SL).',
+      en: 'Description for Furmint (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in mineralov.',
-      en: 'Elegant wines with aromas of fruit and minerals.',
+      sl: 'Tipičen stil za Furmint (SL).',
+      en: 'Typical style for Furmint (EN).',
     },
     whyCool: {
-      sl: 'Furmint je osnova Tokaji sladkih vinov.',
-      en: 'Furmint is the foundation of Tokaji sweet wines.',
+      sl: 'Zakaj je Furmint kul (SL).',
+      en: 'Why Furmint is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z visoko kislino.',
-      en: 'Medium-bodied wines with high acidity.',
+      sl: 'Značilnosti Furmint (SL).',
+      en: 'Character of Furmint (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Harslevelu',
+    title: 'Picolit',
     description: {
-      sl: 'Harslevelu je madžarska bela sorta grozdja.',
-      en: 'Harslevelu is a Hungarian white grape variety.',
+      sl: 'Opis za Picolit (SL).',
+      en: 'Description for Picolit (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in cvetov.',
-      en: 'Elegant wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Picolit (SL).',
+      en: 'Typical style for Picolit (EN).',
     },
     whyCool: {
-      sl: 'Harslevelu je pomembna sestavina Tokaji vinov.',
-      en: 'Harslevelu is an important component of Tokaji wines.',
+      sl: 'Zakaj je Picolit kul (SL).',
+      en: 'Why Picolit is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
+      sl: 'Značilnosti Picolit (SL).',
+      en: 'Character of Picolit (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Sarga Muskotaly',
+    title: 'Cortese',
     description: {
-      sl: 'Sarga Muskotaly je madžarska bela sorta grozdja.',
-      en: 'Sarga Muskotaly is a Hungarian white grape variety.',
+      sl: 'Opis za Cortese (SL).',
+      en: 'Description for Cortese (EN).',
     },
     typicalStyle: {
-      sl: 'Aromatična vina z aromami rož in sadja.',
-      en: 'Aromatic wines with aromas of roses and fruit.',
+      sl: 'Tipičen stil za Cortese (SL).',
+      en: 'Typical style for Cortese (EN).',
     },
     whyCool: {
-      sl: 'Sarga Muskotaly je pomembna sestavina Tokaji vinov.',
-      en: 'Sarga Muskotaly is an important component of Tokaji wines.',
+      sl: 'Zakaj je Cortese kul (SL).',
+      en: 'Why Cortese is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z aromatičnim okusom.',
-      en: 'Medium-bodied wines with aromatic taste.',
+      sl: 'Značilnosti Cortese (SL).',
+      en: 'Character of Cortese (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Pinela',
+    title: 'Arneis',
     description: {
-      sl: 'Pinela je slovenska bela sorta grozdja.',
-      en: 'Pinela is a Slovenian white grape variety.',
+      sl: 'Opis za Arneis (SL).',
+      en: 'Description for Arneis (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in cvetov.',
-      en: 'Elegant wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Arneis (SL).',
+      en: 'Typical style for Arneis (EN).',
     },
     whyCool: {
-      sl: 'Pinela je tradicionalna vipavska sorta.',
-      en: 'Pinela is a traditional Vipava variety.',
+      sl: 'Zakaj je Arneis kul (SL).',
+      en: 'Why Arneis is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z uravnoteženo kislino.',
-      en: 'Medium-bodied wines with balanced acidity.',
+      sl: 'Značilnosti Arneis (SL).',
+      en: 'Character of Arneis (EN).',
     },
     skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Pinot Blanc',
+    description: {
+      sl: 'Opis za Pinot Blanc (SL).',
+      en: 'Description for Pinot Blanc (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Pinot Blanc (SL).',
+      en: 'Typical style for Pinot Blanc (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Pinot Blanc kul (SL).',
+      en: 'Why Pinot Blanc is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Pinot Blanc (SL).',
+      en: 'Character of Pinot Blanc (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Garganega',
+    description: {
+      sl: 'Opis za Garganega (SL).',
+      en: 'Description for Garganega (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Garganega (SL).',
+      en: 'Typical style for Garganega (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Garganega kul (SL).',
+      en: 'Why Garganega is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Garganega (SL).',
+      en: 'Character of Garganega (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Vermentino',
+    description: {
+      sl: 'Opis za Vermentino (SL).',
+      en: 'Description for Vermentino (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Vermentino (SL).',
+      en: 'Typical style for Vermentino (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Vermentino kul (SL).',
+      en: 'Why Vermentino is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Vermentino (SL).',
+      en: 'Character of Vermentino (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Pinot Noir',
+    description: {
+      sl: 'Opis za Pinot Noir (SL).',
+      en: 'Description for Pinot Noir (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Pinot Noir (SL).',
+      en: 'Typical style for Pinot Noir (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Pinot Noir kul (SL).',
+      en: 'Why Pinot Noir is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Pinot Noir (SL).',
+      en: 'Character of Pinot Noir (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Pinot Meunier',
+    description: {
+      sl: 'Opis za Pinot Meunier (SL).',
+      en: 'Description for Pinot Meunier (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Pinot Meunier (SL).',
+      en: 'Typical style for Pinot Meunier (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Pinot Meunier kul (SL).',
+      en: 'Why Pinot Meunier is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Pinot Meunier (SL).',
+      en: 'Character of Pinot Meunier (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Glera',
+    description: {
+      sl: 'Opis za Glera (SL).',
+      en: 'Description for Glera (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Glera (SL).',
+      en: 'Typical style for Glera (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Glera kul (SL).',
+      en: 'Why Glera is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Glera (SL).',
+      en: 'Character of Glera (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Cabernet Sauvignon',
+    description: {
+      sl: 'Opis za Cabernet Sauvignon (SL).',
+      en: 'Description for Cabernet Sauvignon (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Cabernet Sauvignon (SL).',
+      en: 'Typical style for Cabernet Sauvignon (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Cabernet Sauvignon kul (SL).',
+      en: 'Why Cabernet Sauvignon is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Cabernet Sauvignon (SL).',
+      en: 'Character of Cabernet Sauvignon (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Cabernet Franc',
+    description: {
+      sl: 'Opis za Cabernet Franc (SL).',
+      en: 'Description for Cabernet Franc (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Cabernet Franc (SL).',
+      en: 'Typical style for Cabernet Franc (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Cabernet Franc kul (SL).',
+      en: 'Why Cabernet Franc is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Cabernet Franc (SL).',
+      en: 'Character of Cabernet Franc (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Merlot',
+    description: {
+      sl: 'Opis za Merlot (SL).',
+      en: 'Description for Merlot (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Merlot (SL).',
+      en: 'Typical style for Merlot (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Merlot kul (SL).',
+      en: 'Why Merlot is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Merlot (SL).',
+      en: 'Character of Merlot (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Petit Verdot',
+    description: {
+      sl: 'Opis za Petit Verdot (SL).',
+      en: 'Description for Petit Verdot (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Petit Verdot (SL).',
+      en: 'Typical style for Petit Verdot (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Petit Verdot kul (SL).',
+      en: 'Why Petit Verdot is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Petit Verdot (SL).',
+      en: 'Character of Petit Verdot (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Tempranillo',
+    description: {
+      sl: 'Opis za Tempranillo (SL).',
+      en: 'Description for Tempranillo (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Tempranillo (SL).',
+      en: 'Typical style for Tempranillo (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Tempranillo kul (SL).',
+      en: 'Why Tempranillo is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Tempranillo (SL).',
+      en: 'Character of Tempranillo (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Mourvedre',
+    description: {
+      sl: 'Opis za Mourvedre (SL).',
+      en: 'Description for Mourvedre (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Mourvedre (SL).',
+      en: 'Typical style for Mourvedre (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Mourvedre kul (SL).',
+      en: 'Why Mourvedre is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Mourvedre (SL).',
+      en: 'Character of Mourvedre (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Grenache',
+    description: {
+      sl: 'Opis za Grenache (SL).',
+      en: 'Description for Grenache (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Grenache (SL).',
+      en: 'Typical style for Grenache (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Grenache kul (SL).',
+      en: 'Why Grenache is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Grenache (SL).',
+      en: 'Character of Grenache (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Syrah',
+    description: {
+      sl: 'Opis za Syrah (SL).',
+      en: 'Description for Syrah (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Syrah (SL).',
+      en: 'Typical style for Syrah (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Syrah kul (SL).',
+      en: 'Why Syrah is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Syrah (SL).',
+      en: 'Character of Syrah (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Cinsault',
+    description: {
+      sl: 'Opis za Cinsault (SL).',
+      en: 'Description for Cinsault (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Cinsault (SL).',
+      en: 'Typical style for Cinsault (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Cinsault kul (SL).',
+      en: 'Why Cinsault is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Cinsault (SL).',
+      en: 'Character of Cinsault (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Sangiovese',
+    description: {
+      sl: 'Opis za Sangiovese (SL).',
+      en: 'Description for Sangiovese (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Sangiovese (SL).',
+      en: 'Typical style for Sangiovese (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Sangiovese kul (SL).',
+      en: 'Why Sangiovese is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Sangiovese (SL).',
+      en: 'Character of Sangiovese (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Nebbiolo',
+    description: {
+      sl: 'Opis za Nebbiolo (SL).',
+      en: 'Description for Nebbiolo (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Nebbiolo (SL).',
+      en: 'Typical style for Nebbiolo (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Nebbiolo kul (SL).',
+      en: 'Why Nebbiolo is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Nebbiolo (SL).',
+      en: 'Character of Nebbiolo (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Barbera',
+    description: {
+      sl: 'Opis za Barbera (SL).',
+      en: 'Description for Barbera (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Barbera (SL).',
+      en: 'Typical style for Barbera (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Barbera kul (SL).',
+      en: 'Why Barbera is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Barbera (SL).',
+      en: 'Character of Barbera (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Refosco',
+    description: {
+      sl: 'Opis za Refosco (SL).',
+      en: 'Description for Refosco (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Refosco (SL).',
+      en: 'Typical style for Refosco (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Refosco kul (SL).',
+      en: 'Why Refosco is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Refosco (SL).',
+      en: 'Character of Refosco (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Schioppettino',
+    description: {
+      sl: 'Opis za Schioppettino (SL).',
+      en: 'Description for Schioppettino (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Schioppettino (SL).',
+      en: 'Typical style for Schioppettino (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Schioppettino kul (SL).',
+      en: 'Why Schioppettino is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Schioppettino (SL).',
+      en: 'Character of Schioppettino (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Blaufrankisch',
+    description: {
+      sl: 'Opis za Blaufrankisch (SL).',
+      en: 'Description for Blaufrankisch (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Blaufrankisch (SL).',
+      en: 'Typical style for Blaufrankisch (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Blaufrankisch kul (SL).',
+      en: 'Why Blaufrankisch is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Blaufrankisch (SL).',
+      en: 'Character of Blaufrankisch (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Marsanne',
+    description: {
+      sl: 'Opis za Marsanne (SL).',
+      en: 'Description for Marsanne (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Marsanne (SL).',
+      en: 'Typical style for Marsanne (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Marsanne kul (SL).',
+      en: 'Why Marsanne is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Marsanne (SL).',
+      en: 'Character of Marsanne (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Rousanne',
+    description: {
+      sl: 'Opis za Rousanne (SL).',
+      en: 'Description for Rousanne (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Rousanne (SL).',
+      en: 'Typical style for Rousanne (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Rousanne kul (SL).',
+      en: 'Why Rousanne is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Rousanne (SL).',
+      en: 'Character of Rousanne (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Gewurztraminer',
+    description: {
+      sl: 'Opis za Gewurztraminer (SL).',
+      en: 'Description for Gewurztraminer (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Gewurztraminer (SL).',
+      en: 'Typical style for Gewurztraminer (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Gewurztraminer kul (SL).',
+      en: 'Why Gewurztraminer is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Gewurztraminer (SL).',
+      en: 'Character of Gewurztraminer (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Žametna Črnina',
+    description: {
+      sl: 'Opis za Žametna Črnina (SL).',
+      en: 'Description for Žametna Črnina (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Žametna Črnina (SL).',
+      en: 'Typical style for Žametna Črnina (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Žametna Črnina kul (SL).',
+      en: 'Why Žametna Črnina is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Žametna Črnina (SL).',
+      en: 'Character of Žametna Črnina (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Kraljevina',
+    description: {
+      sl: 'Opis za Kraljevina (SL).',
+      en: 'Description for Kraljevina (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Kraljevina (SL).',
+      en: 'Typical style for Kraljevina (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Kraljevina kul (SL).',
+      en: 'Why Kraljevina is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Kraljevina (SL).',
+      en: 'Character of Kraljevina (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Gruner Veltliner',
+    description: {
+      sl: 'Opis za Gruner Veltliner (SL).',
+      en: 'Description for Gruner Veltliner (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Gruner Veltliner (SL).',
+      en: 'Typical style for Gruner Veltliner (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Gruner Veltliner kul (SL).',
+      en: 'Why Gruner Veltliner is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Gruner Veltliner (SL).',
+      en: 'Character of Gruner Veltliner (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Pinot Gris',
+    description: {
+      sl: 'Opis za Pinot Gris (SL).',
+      en: 'Description for Pinot Gris (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Pinot Gris (SL).',
+      en: 'Typical style for Pinot Gris (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Pinot Gris kul (SL).',
+      en: 'Why Pinot Gris is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Pinot Gris (SL).',
+      en: 'Character of Pinot Gris (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Aligote',
+    description: {
+      sl: 'Opis za Aligote (SL).',
+      en: 'Description for Aligote (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Aligote (SL).',
+      en: 'Typical style for Aligote (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Aligote kul (SL).',
+      en: 'Why Aligote is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Aligote (SL).',
+      en: 'Character of Aligote (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
   },
   {
     title: 'Zelen',
     description: {
-      sl: 'Zelen je slovenska bela sorta grozdja.',
-      en: 'Zelen is a Slovenian white grape variety.',
+      sl: 'Opis za Zelen (SL).',
+      en: 'Description for Zelen (EN).',
     },
     typicalStyle: {
-      sl: 'Elegantna vina z aromami sadja in mineralov.',
-      en: 'Elegant wines with aromas of fruit and minerals.',
+      sl: 'Tipičen stil za Zelen (SL).',
+      en: 'Typical style for Zelen (EN).',
     },
     whyCool: {
-      sl: 'Zelen je tradicionalna vipavska sorta.',
-      en: 'Zelen is a traditional Vipava variety.',
+      sl: 'Zakaj je Zelen kul (SL).',
+      en: 'Why Zelen is cool (EN).',
     },
     character: {
-      sl: 'Srednje polna vina z visoko kislino.',
-      en: 'Medium-bodied wines with high acidity.',
+      sl: 'Značilnosti Zelen (SL).',
+      en: 'Character of Zelen (EN).',
     },
     skin: 'white',
+    synonyms: [],
   },
   {
-    title: 'Cviček',
+    title: 'Muscat of Alexandria',
     description: {
-      sl: 'Cviček je slovenska mešanica rdečih in belih sort.',
-      en: 'Cviček is a Slovenian blend of red and white varieties.',
+      sl: 'Opis za Muscat of Alexandria (SL).',
+      en: 'Description for Muscat of Alexandria (EN).',
     },
     typicalStyle: {
-      sl: 'Lahka vina z aromami sadja in cvetov.',
-      en: 'Light wines with aromas of fruit and flowers.',
+      sl: 'Tipičen stil za Muscat of Alexandria (SL).',
+      en: 'Typical style for Muscat of Alexandria (EN).',
     },
     whyCool: {
-      sl: 'Cviček je edinstvena slovenska mešanica.',
-      en: 'Cviček is a unique Slovenian blend.',
+      sl: 'Zakaj je Muscat of Alexandria kul (SL).',
+      en: 'Why Muscat of Alexandria is cool (EN).',
     },
     character: {
-      sl: 'Lahka vina z nizko kislino in osvežilnim okusom.',
-      en: 'Light wines with low acidity and refreshing taste.',
+      sl: 'Značilnosti Muscat of Alexandria (SL).',
+      en: 'Character of Muscat of Alexandria (EN).',
     },
     skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Cipro',
+    description: {
+      sl: 'Opis za Cipro (SL).',
+      en: 'Description for Cipro (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Cipro (SL).',
+      en: 'Typical style for Cipro (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Cipro kul (SL).',
+      en: 'Why Cipro is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Cipro (SL).',
+      en: 'Character of Cipro (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Corvina',
+    description: {
+      sl: 'Opis za Corvina (SL).',
+      en: 'Description for Corvina (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Corvina (SL).',
+      en: 'Typical style for Corvina (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Corvina kul (SL).',
+      en: 'Why Corvina is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Corvina (SL).',
+      en: 'Character of Corvina (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Croatina',
+    description: {
+      sl: 'Opis za Croatina (SL).',
+      en: 'Description for Croatina (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Croatina (SL).',
+      en: 'Typical style for Croatina (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Croatina kul (SL).',
+      en: 'Why Croatina is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Croatina (SL).',
+      en: 'Character of Croatina (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Gamay',
+    description: {
+      sl: 'Opis za Gamay (SL).',
+      en: 'Description for Gamay (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Gamay (SL).',
+      en: 'Typical style for Gamay (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Gamay kul (SL).',
+      en: 'Why Gamay is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Gamay (SL).',
+      en: 'Character of Gamay (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Klarnica',
+    description: {
+      sl: 'Opis za Klarnica (SL).',
+      en: 'Description for Klarnica (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Klarnica (SL).',
+      en: 'Typical style for Klarnica (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Klarnica kul (SL).',
+      en: 'Why Klarnica is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Klarnica (SL).',
+      en: 'Character of Klarnica (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Malbec',
+    description: {
+      sl: 'Opis za Malbec (SL).',
+      en: 'Description for Malbec (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Malbec (SL).',
+      en: 'Typical style for Malbec (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Malbec kul (SL).',
+      en: 'Why Malbec is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Malbec (SL).',
+      en: 'Character of Malbec (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Marselan',
+    description: {
+      sl: 'Opis za Marselan (SL).',
+      en: 'Description for Marselan (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Marselan (SL).',
+      en: 'Typical style for Marselan (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Marselan kul (SL).',
+      en: 'Why Marselan is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Marselan (SL).',
+      en: 'Character of Marselan (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Molinara',
+    description: {
+      sl: 'Opis za Molinara (SL).',
+      en: 'Description for Molinara (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Molinara (SL).',
+      en: 'Typical style for Molinara (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Molinara kul (SL).',
+      en: 'Why Molinara is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Molinara (SL).',
+      en: 'Character of Molinara (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Moscato Giallo',
+    description: {
+      sl: 'Opis za Moscato Giallo (SL).',
+      en: 'Description for Moscato Giallo (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Moscato Giallo (SL).',
+      en: 'Typical style for Moscato Giallo (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Moscato Giallo kul (SL).',
+      en: 'Why Moscato Giallo is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Moscato Giallo (SL).',
+      en: 'Character of Moscato Giallo (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Nerello Mascalese',
+    description: {
+      sl: 'Opis za Nerello Mascalese (SL).',
+      en: 'Description for Nerello Mascalese (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Nerello Mascalese (SL).',
+      en: 'Typical style for Nerello Mascalese (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Nerello Mascalese kul (SL).',
+      en: 'Why Nerello Mascalese is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Nerello Mascalese (SL).',
+      en: 'Character of Nerello Mascalese (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Parellada',
+    description: {
+      sl: 'Opis za Parellada (SL).',
+      en: 'Description for Parellada (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Parellada (SL).',
+      en: 'Typical style for Parellada (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Parellada kul (SL).',
+      en: 'Why Parellada is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Parellada (SL).',
+      en: 'Character of Parellada (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Pinela',
+    description: {
+      sl: 'Opis za Pinela (SL).',
+      en: 'Description for Pinela (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Pinela (SL).',
+      en: 'Typical style for Pinela (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Pinela kul (SL).',
+      en: 'Why Pinela is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Pinela (SL).',
+      en: 'Character of Pinela (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Rondinella',
+    description: {
+      sl: 'Opis za Rondinella (SL).',
+      en: 'Description for Rondinella (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Rondinella (SL).',
+      en: 'Typical style for Rondinella (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Rondinella kul (SL).',
+      en: 'Why Rondinella is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Rondinella (SL).',
+      en: 'Character of Rondinella (EN).',
+    },
+    skin: 'red',
+    synonyms: [],
+  },
+  {
+    title: 'Sumol',
+    description: {
+      sl: 'Opis za Sumol (SL).',
+      en: 'Description for Sumol (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Sumol (SL).',
+      en: 'Typical style for Sumol (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Sumol kul (SL).',
+      en: 'Why Sumol is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Sumol (SL).',
+      en: 'Character of Sumol (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
+  },
+  {
+    title: 'Xarel-lo',
+    description: {
+      sl: 'Opis za Xarel-lo (SL).',
+      en: 'Description for Xarel-lo (EN).',
+    },
+    typicalStyle: {
+      sl: 'Tipičen stil za Xarel-lo (SL).',
+      en: 'Typical style for Xarel-lo (EN).',
+    },
+    whyCool: {
+      sl: 'Zakaj je Xarel-lo kul (SL).',
+      en: 'Why Xarel-lo is cool (EN).',
+    },
+    character: {
+      sl: 'Značilnosti Xarel-lo (SL).',
+      en: 'Character of Xarel-lo (EN).',
+    },
+    skin: 'white',
+    synonyms: [],
   },
 ]
 

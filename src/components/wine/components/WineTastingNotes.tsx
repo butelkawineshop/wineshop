@@ -109,8 +109,8 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
   }
 
   return (
-    <div className="bg-background flex flex-col w-full h-full pb-2 pt-2 gap-2 px-2">
-      <div className="text-center px-4 text-xl font-accent font-bold">
+    <div className="bg-background flex flex-col w-full h-full px-2 aspect-square">
+      <div className="text-center px-4 font-accent font-bold">
         {page === 1 ? t('wine.tastingNotes.tasteProfile') : t('wine.tastingNotes.characterNotes')}
       </div>
 
@@ -158,17 +158,6 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
           )
         })}
       </div>
-
-      {/* Show aromas on second page */}
-      {page === 2 && variant.aromas && variant.aromas.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-1 text-xs text-foreground/60 px-4 mt-2">
-          {variant.aromas.map((aroma, index) => (
-            <span key={index} className="hashtag">
-              #{aroma.title}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

@@ -1,92 +1,127 @@
-import type { TaskHandler, PayloadRequest } from 'payload'
-import type { Aroma, Tag, Mood, GrapeVariety, WineVariant, Wine, Media } from '../payload-types'
-import { createLogger } from '../lib/logger'
-import { handleError, ValidationError } from '../lib/errors'
-import { generateWineVariantSlug } from '../utils/generateWineVariantSlug'
+import type { TaskHandler } from 'payload'
+import type { PayloadRequest } from 'payload'
+import type { WineVariant, Wine, FlatWineVariant } from '@/payload-types'
+import { createLogger } from '@/lib/logger'
+import { handleError } from '@/lib/errors'
+import { ValidationError } from '@/lib/errors'
+import { SYNC_CONSTANTS } from '@/constants/sync'
+import { generateWineVariantSlug } from '@/utils/generateWineVariantSlug'
 
-// Constants
-const SYNC_CONSTANTS = {
-  DEFAULT_LOCALE: 'sl',
-  ENGLISH_LOCALE: 'en',
-  PUBLISHED_STATUS: 'published',
-  MAX_DEPTH: 3,
-  BATCH_SIZE: 1000,
-} as const
-
-// Types
-interface GrapeVarietyItem {
-  variety?: number | GrapeVariety | null
-  percentage?: number | null
-  id?: string | null
-}
-
-interface MappedItem {
-  title: string | null
-}
-
-interface MappedItemWithEnglish extends MappedItem {
-  titleEn: string | null
-}
-
-interface FlatVariantData {
-  originalVariant: number
-  wineTitle: string
-  wineryTitle: string
-  wineryCode: string
-  regionTitle: string
-  countryTitle: string
-  countryTitleEn?: string
-  styleTitle?: string
-  styleTitleEn?: string
-  styleIconKey?: string
-  styleSlug?: string
-  vintage: string
-  size: string
-  sku: string
-  price: number
-  stockOnHand: number
-  canBackorder: boolean
-  maxBackorderQuantity: number
-  servingTemp: string
-  decanting: boolean
-  tastingProfile: string
-  // Individual tasting notes for filtering
-  tastingNotes?: {
-    dry?: number | null
-    ripe?: number | null
-    creamy?: number | null
-    oaky?: number | null
-    complex?: number | null
-    light?: number | null
-    smooth?: number | null
-    youthful?: number | null
-    energetic?: number | null
-    alcohol?: number | null
+// Helper function to extract primary image URL
+function extractPrimaryImageUrl(media: (number | any)[] | null | undefined): string | undefined {
+  if (Array.isArray(media) && media.length > 0) {
+    const media0 = media[0]
+    if (media0 && typeof media0 === 'object' && 'url' in media0 && typeof media0.url === 'string') {
+      return media0.url
+    }
   }
-  aromas?: MappedItemWithEnglish[]
-  tags?: MappedItemWithEnglish[]
-  moods?: MappedItemWithEnglish[]
-  grapeVarieties?: (MappedItemWithEnglish & { percentage?: number | null })[]
-  climates?: MappedItemWithEnglish[]
-  dishes?: MappedItemWithEnglish[]
-  primaryImageUrl?: string
-  slug: string
-  isPublished: boolean
-  syncedAt: string
+  return undefined
 }
 
-interface EnglishTitles {
-  englishAromaTitles: Record<string, string>
-  englishTagTitles: Record<string, string>
-  englishMoodTitles: Record<string, string>
-  englishGrapeVarietyTitles: Record<string, string>
+// Helper function to map items with English titles
+function mapItemsWithEnglish(
+  items: any[] | undefined,
+  englishTitles: Record<string, string>,
+): Array<{ title: string | null; titleEn: string | null; id: string | null }> {
+  if (!items || !Array.isArray(items)) return []
+
+  return items
+    .map((item) => {
+      let title: string | null = null
+      let titleEn: string | null = null
+      let id: string | null = null
+
+      if (typeof item === 'object' && item !== null) {
+        // Handle aromas specially - they need to resolve adjective and flavour
+        if ('adjective' in item && 'flavour' in item) {
+          if (item.title) {
+            title = item.title
+          } else if (
+            typeof item.adjective === 'object' &&
+            item.adjective &&
+            typeof item.flavour === 'object' &&
+            item.flavour
+          ) {
+            const adjectiveTitle =
+              typeof item.adjective.title === 'string' ? item.adjective.title : null
+            const flavourTitle = typeof item.flavour.title === 'string' ? item.flavour.title : null
+            if (adjectiveTitle && flavourTitle) {
+              title = `${adjectiveTitle} ${flavourTitle}`
+            }
+          }
+        } else {
+          title = typeof item.title === 'string' ? item.title : null
+        }
+
+        id = typeof item.id === 'string' ? item.id : String(item.id)
+      } else {
+        title = String(item)
+        id = String(item)
+      }
+
+      // Get English title if available
+      if (typeof item === 'object' && item !== null && item.id) {
+        const itemId = typeof item.id === 'string' ? item.id : String(item.id)
+        if (englishTitles[itemId]) {
+          titleEn = englishTitles[itemId]
+        }
+      }
+
+      return { title, titleEn, id }
+    })
+    .filter(Boolean)
 }
 
-// Helper functions
-async function getEnglishTitles(
+// Helper function to map grape varieties with percentage
+function mapGrapeVarietiesWithEnglish(
+  items: any[] | undefined,
+  englishTitles: Record<string, string>,
+): Array<{
+  title: string | null
+  titleEn: string | null
+  id: string | null
+  percentage?: number | null
+}> {
+  if (!items || !Array.isArray(items)) return []
+
+  return items
+    .map((item) => {
+      let title: string | null = null
+      let titleEn: string | null = null
+      let id: string | null = null
+      let percentage: number | null = null
+
+      if (item && typeof item === 'object') {
+        if (item.variety && typeof item.variety === 'object') {
+          title = typeof item.variety.title === 'string' ? item.variety.title : null
+          id = typeof item.variety.id === 'string' ? item.variety.id : String(item.variety.id)
+        } else if (typeof item.variety === 'string' || typeof item.variety === 'number') {
+          title = String(item.variety)
+          id = String(item.variety)
+        }
+
+        percentage = typeof item.percentage === 'number' ? item.percentage : null
+
+        // Get English title if available
+        if (item.variety && typeof item.variety === 'object' && item.variety.id) {
+          const varietyId =
+            typeof item.variety.id === 'string' ? item.variety.id : String(item.variety.id)
+          if (englishTitles[varietyId]) {
+            titleEn = englishTitles[varietyId]
+          }
+        }
+      }
+
+      return { title, titleEn, id, percentage }
+    })
+    .filter(Boolean)
+}
+
+// Fetch English titles for collections
+async function fetchEnglishTitles(
   req: PayloadRequest,
   items: Array<{ id: string }>,
-  collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties',
+  collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties' | 'climates',
   logger: ReturnType<typeof createLogger>,
 ): Promise<Record<string, string>> {
   const englishTitles: Record<string, string> = {}
@@ -118,113 +153,7 @@ async function getEnglishTitles(
   return englishTitles
 }
 
-function mapTitleOnlyWithEnglish(
-  arr: (Aroma | Tag | Mood | number)[] | undefined,
-  englishTitles: Record<string, string>,
-): MappedItemWithEnglish[] | undefined {
-  return arr?.map((item) => {
-    let title: string | null = null
-    let titleEn: string | null = null
-
-    if (typeof item === 'object' && item !== null) {
-      // Handle aromas specially - they need to resolve adjective and flavour
-      if ('adjective' in item && 'flavour' in item) {
-        // This is an aroma - try to get title from resolved relationships
-        if (item.title) {
-          title = item.title
-        } else if (
-          typeof item.adjective === 'object' &&
-          item.adjective &&
-          typeof item.flavour === 'object' &&
-          item.flavour
-        ) {
-          // Generate title from adjective and flavour
-          const adjectiveTitle =
-            typeof item.adjective.title === 'string' ? item.adjective.title : null
-          const flavourTitle = typeof item.flavour.title === 'string' ? item.flavour.title : null
-          if (adjectiveTitle && flavourTitle) {
-            title = `${adjectiveTitle} ${flavourTitle}`
-          }
-        }
-      } else {
-        // Handle regular items with title field
-        title = typeof item.title === 'string' ? item.title : null
-      }
-    } else {
-      title = String(item)
-    }
-
-    // Get English title if available (using the item's id if it's an object)
-    if (typeof item === 'object' && item !== null && item.id) {
-      const itemId = typeof item.id === 'string' ? item.id : String(item.id)
-      if (englishTitles[itemId]) {
-        titleEn = englishTitles[itemId]
-      }
-    }
-
-    return { title, titleEn }
-  })
-}
-
-function _mapGrapeVarietiesWithEnglish(
-  arr: GrapeVarietyItem[] | undefined,
-  englishTitles: Record<string, string>,
-): MappedItemWithEnglish[] | undefined {
-  return arr?.map((gv) => {
-    let title: string | null = null
-    let titleEn: string | null = null
-
-    if (gv && typeof gv === 'object') {
-      if (gv.variety && typeof gv.variety === 'object') {
-        title = typeof gv.variety.title === 'string' ? gv.variety.title : null
-      } else if (typeof gv.variety === 'string' || typeof gv.variety === 'number') {
-        title = String(gv.variety)
-      }
-    }
-
-    // Get English title if available
-    if (gv.variety && typeof gv.variety === 'object' && gv.variety.id) {
-      const varietyId = typeof gv.variety.id === 'string' ? gv.variety.id : String(gv.variety.id)
-      if (englishTitles[varietyId]) {
-        titleEn = englishTitles[varietyId]
-      }
-    }
-
-    return { title, titleEn }
-  })
-}
-
-function extractPrimaryImageUrl(media: (number | Media)[] | null | undefined): string | undefined {
-  if (Array.isArray(media) && media.length > 0) {
-    const media0 = media[0]
-    if (media0 && typeof media0 === 'object' && 'url' in media0 && typeof media0.url === 'string') {
-      return media0.url
-    }
-  }
-  return undefined
-}
-
-function validateWineData(wine: Wine): void {
-  if (
-    !wine ||
-    typeof wine !== 'object' ||
-    typeof wine.title !== 'string' ||
-    !wine.winery ||
-    typeof wine.winery !== 'object' ||
-    typeof wine.winery.title !== 'string' ||
-    !wine.region ||
-    typeof wine.region !== 'object' ||
-    typeof wine.region.title !== 'string' ||
-    !wine.region.country ||
-    typeof wine.region.country !== 'object' ||
-    typeof wine.region.country.title !== 'string'
-  ) {
-    throw new ValidationError('Invalid wine data structure', {
-      wineTitle: typeof wine === 'object' && 'title' in wine ? wine.title : null,
-    })
-  }
-}
-
+// Fetch wine variant with proper error handling
 async function fetchWineVariant(
   req: PayloadRequest,
   wineVariantId: string,
@@ -251,30 +180,33 @@ async function fetchWineVariant(
       logger.info('Wine variant not found, deleting flat variant if exists')
       return null
     }
-    // If it's not a NotFound error, re-throw it
     throw error
   }
 }
 
-async function deleteFlatVariantIfExists(
-  req: PayloadRequest,
-  wineVariantId: string,
-  logger: ReturnType<typeof createLogger>,
-): Promise<void> {
-  const deleteResult = await req.payload.delete({
-    collection: 'flat-wine-variants',
-    where: {
-      originalVariant: {
-        equals: Number(wineVariantId),
-      },
-    },
-  })
-
-  logger.debug('Delete result', {
-    deletedCount: deleteResult.docs?.length,
-  })
+// Validate wine data structure
+function validateWineData(wine: Wine): void {
+  if (
+    !wine ||
+    typeof wine !== 'object' ||
+    typeof wine.title !== 'string' ||
+    !wine.winery ||
+    typeof wine.winery !== 'object' ||
+    typeof wine.winery.title !== 'string' ||
+    !wine.region ||
+    typeof wine.region !== 'object' ||
+    typeof wine.region.title !== 'string' ||
+    !wine.region.country ||
+    typeof wine.region.country !== 'object' ||
+    typeof wine.region.country.title !== 'string'
+  ) {
+    throw new ValidationError('Invalid wine data structure', {
+      wineTitle: typeof wine === 'object' && 'title' in wine ? wine.title : null,
+    })
+  }
 }
 
+// Fetch English country title
 async function fetchEnglishCountryTitle(
   req: PayloadRequest,
   countryId: string,
@@ -305,6 +237,7 @@ async function fetchEnglishCountryTitle(
   return undefined
 }
 
+// Fetch English style title
 async function fetchEnglishStyleTitle(
   req: PayloadRequest,
   styleId: string,
@@ -335,122 +268,152 @@ async function fetchEnglishStyleTitle(
   return undefined
 }
 
-async function fetchEnglishTitlesForCollections(
+// Fetch English description
+async function fetchEnglishDescription(
   req: PayloadRequest,
-  wineVariant: WineVariant,
+  wineId: string,
   logger: ReturnType<typeof createLogger>,
-): Promise<EnglishTitles> {
-  const englishAromaTitles: Record<string, string> = {}
-  const englishTagTitles: Record<string, string> = {}
-  const englishMoodTitles: Record<string, string> = {}
-  const englishGrapeVarietyTitles: Record<string, string> = {}
+): Promise<string | undefined> {
+  try {
+    const englishWine = await req.payload.findByID({
+      collection: 'wines',
+      id: wineId,
+      locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
+    })
 
-  // Fetch English titles for aromas
-  if (wineVariant.aromas) {
-    const aromaIds = wineVariant.aromas
-      .map((item: Aroma | number) =>
-        typeof item === 'object' && item !== null ? String(item.id) : String(item),
-      )
-      .filter(Boolean)
-
-    Object.assign(
-      englishAromaTitles,
-      await getEnglishTitles(
-        req,
-        aromaIds.map((id: string) => ({ id })),
-        'aromas',
-        logger,
-      ),
-    )
+    if (
+      englishWine &&
+      typeof englishWine === 'object' &&
+      'description' in englishWine &&
+      typeof englishWine.description === 'string'
+    ) {
+      return englishWine.description
+    }
+  } catch (error) {
+    logger.warn('Could not fetch English wine description', {
+      wineId,
+      error: String(error),
+    })
   }
 
-  // Fetch English titles for tags
-  if (wineVariant.tags) {
-    const tagIds = wineVariant.tags
-      .map((item: Tag | number) =>
-        typeof item === 'object' && item !== null ? String(item.id) : String(item),
-      )
-      .filter(Boolean)
-
-    Object.assign(
-      englishTagTitles,
-      await getEnglishTitles(
-        req,
-        tagIds.map((id: string) => ({ id })),
-        'tags',
-        logger,
-      ),
-    )
-  }
-
-  // Fetch English titles for moods
-  if (wineVariant.moods) {
-    const moodIds = wineVariant.moods
-      .map((item: Mood | number) =>
-        typeof item === 'object' && item !== null ? String(item.id) : String(item),
-      )
-      .filter(Boolean)
-
-    Object.assign(
-      englishMoodTitles,
-      await getEnglishTitles(
-        req,
-        moodIds.map((id: string) => ({ id })),
-        'moods',
-        logger,
-      ),
-    )
-  }
-
-  // Fetch English titles for grape varieties
-  if (wineVariant.grapeVarieties) {
-    const grapeVarietyIds = wineVariant.grapeVarieties
-      .map((gv: GrapeVarietyItem) => {
-        if (gv && typeof gv === 'object' && gv.variety) {
-          return typeof gv.variety === 'object' ? String(gv.variety.id) : String(gv.variety)
-        }
-        return null
-      })
-      .filter((id: string | null): id is string => id !== null)
-
-    Object.assign(
-      englishGrapeVarietyTitles,
-      await getEnglishTitles(
-        req,
-        grapeVarietyIds.map((id: string) => ({ id })),
-        'grape-varieties',
-        logger,
-      ),
-    )
-  }
-
-  return {
-    englishAromaTitles,
-    englishTagTitles,
-    englishMoodTitles,
-    englishGrapeVarietyTitles,
-  }
+  return undefined
 }
 
+// Fetch related wineries
+async function fetchRelatedWineries(
+  req: PayloadRequest,
+  wineryId: string,
+  logger: ReturnType<typeof createLogger>,
+): Promise<Array<{ id: string }> | undefined> {
+  try {
+    const winery = await req.payload.findByID({
+      collection: 'wineries',
+      id: wineryId,
+    })
+
+    if (
+      winery &&
+      typeof winery === 'object' &&
+      'relatedWineries' in winery &&
+      Array.isArray(winery.relatedWineries)
+    ) {
+      return winery.relatedWineries
+        .filter((w: any) => w && (typeof w === 'string' || (typeof w === 'object' && w.id)))
+        .map((w: any) => ({ id: typeof w === 'string' ? w : String(w.id) }))
+    }
+  } catch (error) {
+    logger.warn('Could not fetch related wineries', {
+      wineryId,
+      error: String(error),
+    })
+  }
+
+  return undefined
+}
+
+// Fetch related regions
+async function fetchRelatedRegions(
+  req: PayloadRequest,
+  regionId: string,
+  logger: ReturnType<typeof createLogger>,
+): Promise<Array<{ id: string }> | undefined> {
+  try {
+    const region = await req.payload.findByID({
+      collection: 'regions',
+      id: regionId,
+    })
+
+    if (
+      region &&
+      typeof region === 'object' &&
+      'neighbours' in region &&
+      Array.isArray(region.neighbours)
+    ) {
+      return region.neighbours
+        .filter((r: any) => r && (typeof r === 'string' || (typeof r === 'object' && r.id)))
+        .map((r: any) => ({ id: typeof r === 'string' ? r : String(r.id) }))
+    }
+  } catch (error) {
+    logger.warn('Could not fetch related regions', {
+      regionId,
+      error: String(error),
+    })
+  }
+
+  return undefined
+}
+
+// Helper function to recursively remove all id fields from objects
+function removeNestedIds(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => removeNestedIds(item))
+  }
+  if (obj && typeof obj === 'object') {
+    const cleaned: any = {}
+    for (const [key, value] of Object.entries(obj)) {
+      if (key !== 'id') {
+        cleaned[key] = removeNestedIds(value)
+      }
+    }
+    return cleaned
+  }
+  return obj
+}
+
+// Prepare flat variant data
 function prepareFlatVariantData(
   wineVariant: WineVariant,
   wine: Wine,
   englishCountryTitle: string | undefined,
   englishStyleTitle: string | undefined,
-  englishTitles: EnglishTitles,
-): FlatVariantData {
+  englishDescription: string | undefined,
+  relatedWineries: Array<{ id: string }> | undefined,
+  relatedRegions: Array<{ id: string }> | undefined,
+  englishTitles: {
+    englishAromaTitles: Record<string, string>
+    englishTagTitles: Record<string, string>
+    englishMoodTitles: Record<string, string>
+    englishGrapeVarietyTitles: Record<string, string>
+    englishClimateTitles: Record<string, string>
+  },
+): Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'> {
   // Extract region and country info
-  const region = typeof wine.region === 'object' ? wine.region : null
-  const country = region && typeof region.country === 'object' ? region.country : null
+  const wineRegion = typeof wine.region === 'object' ? wine.region : null
+  const wineCountry =
+    wineRegion && typeof wineRegion.country === 'object' ? wineRegion.country : null
   const style = typeof wine.style === 'object' ? wine.style : null
   const winery = typeof wine.winery === 'object' ? wine.winery : null
+
+  // Extract climate from region
+  const regionClimate =
+    wineRegion && typeof wineRegion.climate === 'object' ? wineRegion.climate : null
 
   // Generate slug for the flat variant
   const slug = generateWineVariantSlug({
     wineryName: winery?.title || '',
     wineName: wine.title,
-    regionName: region?.title || '',
-    countryName: country?.title || '',
+    regionName: wineRegion?.title || '',
+    countryName: wineCountry?.title || '',
     vintage: wineVariant.vintage,
     size: wineVariant.size,
   })
@@ -463,20 +426,13 @@ function prepareFlatVariantData(
     wineTitle: wine.title,
     wineryTitle: winery?.title || '',
     wineryCode: winery?.wineryCode || '',
-    regionTitle: region?.title || '',
-    countryTitle: country?.title || '',
+    regionTitle: wineRegion?.title || '',
+    countryTitle: wineCountry?.title || '',
     countryTitleEn: englishCountryTitle,
     styleTitle: style?.title,
     styleTitleEn: englishStyleTitle,
     styleIconKey: style?.iconKey,
-    styleSlug:
-      style?.slug && typeof style.slug === 'object'
-        ? (style.slug as Record<string, string>)[SYNC_CONSTANTS.DEFAULT_LOCALE] ||
-          (style.slug as Record<string, string>).en ||
-          (style.slug as Record<string, string>).sl
-        : typeof style?.slug === 'string'
-          ? style.slug
-          : undefined,
+    styleSlug: style?.slug || '',
     vintage: wineVariant.vintage,
     size: wineVariant.size,
     sku: wineVariant.sku || '',
@@ -487,6 +443,10 @@ function prepareFlatVariantData(
     servingTemp: wineVariant.servingTemp || '',
     decanting: wineVariant.decanting || false,
     tastingProfile: wineVariant.tastingProfile || '',
+    description: wine.description || '',
+    descriptionEn: englishDescription,
+    relatedWineries: relatedWineries,
+    relatedRegions: relatedRegions,
     tastingNotes: (() => {
       const notes = wineVariant.tastingNotes
       if (!notes || typeof notes !== 'object') return undefined
@@ -497,28 +457,20 @@ function prepareFlatVariantData(
 
       return notes
     })(),
-    aromas:
-      wineVariant.aromas
-        ?.filter((aroma: any) => aroma && typeof aroma === 'object' && aroma.title)
-        ?.map((aroma: any) => ({
-          title: String(aroma.title || ''),
-          titleEn: String(aroma.titleEn || aroma.title || ''),
-        })) || [],
-    tags:
-      mapTitleOnlyWithEnglish(wineVariant.tags || undefined, englishTitles.englishTagTitles) || [],
-    moods:
-      mapTitleOnlyWithEnglish(wineVariant.moods || undefined, englishTitles.englishMoodTitles) ||
-      [],
-    grapeVarieties:
-      _mapGrapeVarietiesWithEnglish(
-        wineVariant.grapeVarieties || undefined,
-        englishTitles.englishGrapeVarietyTitles,
-      ) || [],
-    dishes:
-      mapTitleOnlyWithEnglish(
-        wineVariant.foodPairing || undefined,
-        englishTitles.englishTagTitles,
-      ) || [],
+    aromas: mapItemsWithEnglish(wineVariant.aromas || undefined, englishTitles.englishAromaTitles),
+    tags: mapItemsWithEnglish(wineVariant.tags || undefined, englishTitles.englishTagTitles),
+    moods: mapItemsWithEnglish(wineVariant.moods || undefined, englishTitles.englishMoodTitles),
+    grapeVarieties: mapGrapeVarietiesWithEnglish(
+      wineVariant.grapeVarieties || undefined,
+      englishTitles.englishGrapeVarietyTitles,
+    ),
+    climates: regionClimate
+      ? mapItemsWithEnglish([regionClimate], englishTitles.englishClimateTitles)
+      : undefined,
+    dishes: mapItemsWithEnglish(
+      wineVariant.foodPairing || undefined,
+      englishTitles.englishTagTitles,
+    ),
     primaryImageUrl,
     slug,
     isPublished: wineVariant._status === SYNC_CONSTANTS.PUBLISHED_STATUS,
@@ -526,56 +478,91 @@ function prepareFlatVariantData(
   }
 }
 
+// Create or update flat variant
 async function createOrUpdateFlatVariant(
   req: PayloadRequest,
-  wineVariantId: string,
-  flatVariantData: FlatVariantData,
+  flatVariantData: Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'>,
   logger: ReturnType<typeof createLogger>,
 ): Promise<void> {
-  const existingFlatVariants = await req.payload.find({
-    collection: 'flat-wine-variants',
-    where: {
-      originalVariant: {
-        equals: Number(wineVariantId),
-      },
-    },
-    limit: 1,
-  })
-
-  logger.debug('Found existing flat variants', { count: existingFlatVariants.docs.length })
-
-  if (existingFlatVariants.docs.length > 0) {
-    logger.info('Deleting existing flat variant to recreate with new structure', {
-      id: existingFlatVariants.docs[0].id,
-    })
-
-    await req.payload.delete({
-      collection: 'flat-wine-variants',
-      id: existingFlatVariants.docs[0].id,
-    })
-  }
-
-  logger.info('Creating new flat variant')
-  console.log('DEBUG FLAT VARIANT DATA:', JSON.stringify(flatVariantData, null, 2))
-  // Remove empty arrays from flatVariantData
-  Object.keys(flatVariantData).forEach((key) => {
-    const value = (flatVariantData as Record<string, any>)[key]
+  // Remove empty arrays and nested id fields from flatVariantData
+  const cleanedData = removeNestedIds(flatVariantData)
+  Object.keys(cleanedData).forEach((key) => {
+    const value = (cleanedData as Record<string, any>)[key]
     if (Array.isArray(value) && value.length === 0) {
-      delete (flatVariantData as Record<string, any>)[key]
+      delete (cleanedData as Record<string, any>)[key]
     }
   })
-  logger.debug('Flat variant data to be created', {
-    flatVariantData: JSON.stringify(flatVariantData, null, 2),
-  })
-  const createResult = await req.payload.create({
-    collection: 'flat-wine-variants',
-    data: flatVariantData,
+
+  logger.debug('Flat variant data to be upserted', {
+    originalVariant: String(cleanedData.originalVariant),
+    wineTitle: cleanedData.wineTitle,
+    vintage: cleanedData.vintage,
+    size: cleanedData.size,
   })
 
-  logger.debug('Create result', {
-    id: createResult.id,
-    success: true,
-  })
+  try {
+    // Try to update first (upsert behavior) - use originalVariant to find existing
+    const existingFlatVariants = await req.payload.find({
+      collection: 'flat-wine-variants',
+      where: {
+        originalVariant: {
+          equals: cleanedData.originalVariant,
+        },
+      },
+      limit: 1,
+    })
+
+    if (existingFlatVariants.docs.length > 0) {
+      // Update existing flat variant
+      const existingId = existingFlatVariants.docs[0].id
+      const updateResult = await req.payload.update({
+        collection: 'flat-wine-variants',
+        id: String(existingId),
+        data: cleanedData,
+      })
+
+      logger.debug('Update result', {
+        id: updateResult.id,
+        success: true,
+      })
+    } else {
+      // Create new flat variant
+      logger.info('Creating new flat variant')
+
+      const createResult = await req.payload.create({
+        collection: 'flat-wine-variants',
+        data: cleanedData,
+      })
+
+      logger.debug('Create result', {
+        id: createResult.id,
+        success: true,
+      })
+    }
+  } catch (error: any) {
+    throw error
+  }
+}
+
+// Delete flat variant if exists
+async function deleteFlatVariantIfExists(
+  req: PayloadRequest,
+  wineVariantId: string,
+  logger: ReturnType<typeof createLogger>,
+): Promise<void> {
+  try {
+    await req.payload.delete({
+      collection: 'flat-wine-variants',
+      id: wineVariantId,
+    })
+    logger.info('Deleted existing flat variant', { id: wineVariantId })
+  } catch (error: any) {
+    if (error && typeof error === 'object' && 'name' in error && error.name === 'NotFound') {
+      logger.info('Flat variant not found for deletion', { id: wineVariantId })
+    } else {
+      logger.warn('Error deleting flat variant', { id: wineVariantId, error: String(error) })
+    }
+  }
 }
 
 // Main task handler
@@ -622,8 +609,63 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       ? await fetchEnglishStyleTitle(req, String(wineStyle.id), logger)
       : undefined
 
+    // Fetch English description
+    const englishDescription = await fetchEnglishDescription(req, String(wine.id), logger)
+
+    // Fetch related data
+    const wineWinery = typeof wine.winery === 'object' ? wine.winery : null
+    const relatedWineries = wineWinery
+      ? await fetchRelatedWineries(req, String(wineWinery.id), logger)
+      : undefined
+
+    const wineRegionForRelated = typeof wine.region === 'object' ? wine.region : null
+    const relatedRegions = wineRegionForRelated
+      ? await fetchRelatedRegions(req, String(wineRegionForRelated.id), logger)
+      : undefined
+
     // Fetch English titles for localized collections
-    const englishTitles = await fetchEnglishTitlesForCollections(req, wineVariant, logger)
+    const englishTitles = {
+      englishAromaTitles: await fetchEnglishTitles(
+        req,
+        wineVariant.aromas?.map((a: any) => ({
+          id: typeof a === 'object' ? String(a.id) : String(a),
+        })) || [],
+        'aromas',
+        logger,
+      ),
+      englishTagTitles: await fetchEnglishTitles(
+        req,
+        wineVariant.tags?.map((t: any) => ({
+          id: typeof t === 'object' ? String(t.id) : String(t),
+        })) || [],
+        'tags',
+        logger,
+      ),
+      englishMoodTitles: await fetchEnglishTitles(
+        req,
+        wineVariant.moods?.map((m: any) => ({
+          id: typeof m === 'object' ? String(m.id) : String(m),
+        })) || [],
+        'moods',
+        logger,
+      ),
+      englishGrapeVarietyTitles: await fetchEnglishTitles(
+        req,
+        wineVariant.grapeVarieties?.map((gv: any) => ({
+          id: typeof gv.variety === 'object' ? String(gv.variety.id) : String(gv.variety),
+        })) || [],
+        'grape-varieties',
+        logger,
+      ),
+      englishClimateTitles: await fetchEnglishTitles(
+        req,
+        wineRegion && typeof wineRegion.climate === 'object' && wineRegion.climate
+          ? [{ id: String(wineRegion.climate.id) }]
+          : [],
+        'climates',
+        logger,
+      ),
+    }
 
     // Prepare flat variant data
     const flatVariantData = prepareFlatVariantData(
@@ -631,18 +673,20 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       wine,
       englishCountryTitle,
       englishStyleTitle,
+      englishDescription,
+      relatedWineries,
+      relatedRegions,
       englishTitles,
     )
 
     logger.debug('Prepared flat variant data', {
-      id: flatVariantData.originalVariant,
       wineTitle: flatVariantData.wineTitle,
       vintage: flatVariantData.vintage,
       size: flatVariantData.size,
     })
 
     // Create or update flat variant
-    await createOrUpdateFlatVariant(req, input.wineVariantId, flatVariantData, logger)
+    await createOrUpdateFlatVariant(req, flatVariantData, logger)
 
     logger.info('Successfully synced flat wine variant')
     return {

@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { getPayload } from 'payload'
 import { logger } from '../../src/lib/logger'
 import payloadConfig from '../../src/payload.config'
-import type { WineImageMapping } from '../../src/utilities/wineImageMapping'
+import type { WineImageMapping } from '../../src/utils/wineImageMapping'
 import { generateWineSlug } from '../../src/utils/generateWineSlug'
 import { readFile } from 'fs/promises'
 import path from 'path'
@@ -43,8 +43,8 @@ interface WineVariantData {
 
 function mapCategoryToStyle(category: string): string {
   const styleMap: { [key: string]: string } = {
-    Sladko: 'Cukri',
-    Cukri: 'Cukri',
+    Sladko: 'Cukrčki',
+    Cukri: 'Cukrčki',
     Rose: 'Roza',
     Roza: 'Roza',
     Rdeče: 'Rdeče',
@@ -115,7 +115,7 @@ function parseWineCSVRows(rows: CSVRow[]): WineData[] {
 }
 
 async function loadWinesFromCSV(): Promise<WineData[]> {
-  const csvPath = path.join(process.cwd(), 'scripts', 'Wines-All Wines.csv')
+  const csvPath = path.join(process.cwd(), 'scripts', 'setup/Wines-All Wines.csv')
   const csvContent = await readFile(csvPath, 'utf8')
   const parsed = Papa.parse(csvContent, { header: true, skipEmptyLines: true })
   return parseWineCSVRows(parsed.data as CSVRow[])
@@ -466,6 +466,8 @@ async function seedWines(): Promise<void> {
     logger.info('Wines and wine variants seeding completed successfully', { task: 'seed-wines' })
   } catch (error) {
     logger.error('Failed to seed wines and wine variants', error as Error, { task: 'seed-wines' })
+    console.error('Detailed error:', error)
+    console.error('Error stack:', (error as Error).stack)
     throw error
   }
 }

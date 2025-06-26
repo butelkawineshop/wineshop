@@ -2,7 +2,11 @@
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Virtual, Keyboard, A11y } from 'swiper/modules'
 import 'swiper/css'
+import 'swiper/css/virtual'
+import 'swiper/css/keyboard'
+import 'swiper/css/a11y'
 import { WineCard } from './WineCard'
 import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -10,6 +14,7 @@ import { WINE_CONSTANTS } from '@/constants/wine'
 import { logger } from '@/lib/logger'
 import type { Locale } from '@/i18n/locales'
 import type { Swiper as SwiperType } from 'swiper'
+import { fetchAllCollectionItems } from '@/lib/graphql'
 
 interface WineGridProps {
   variants: FlatWineVariant[]
@@ -25,18 +30,6 @@ const RESPONSIVE_CONFIG = {
   mobile: { cardsPerRow: 1 },
 } as const
 
-// Debounce utility
-const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  wait: number,
-): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), wait)
-  }
-}
-
 export function WineGrid({
   variants,
   locale,
@@ -45,24 +38,47 @@ export function WineGrid({
 }: WineGridProps): React.JSX.Element {
   const { t } = useTranslation()
   const swiperRef = useRef<SwiperType | null>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [swiperHeight, setSwiperHeight] = useState<number>(600)
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 1024,
   )
+  const [swiperHeight, setSwiperHeight] = useState<number>(600)
+  const [collectionItemsLoaded, setCollectionItemsLoaded] = useState(false)
 
-  // Reactive responsive config that updates with window size
-  const responsiveConfig = useMemo(() => {
-    if (windowWidth < 768) return RESPONSIVE_CONFIG.mobile
-    if (windowWidth < 1024) return RESPONSIVE_CONFIG.tablet
-    return RESPONSIVE_CONFIG.desktop
+  // Fetch all collection items once for all variants
+  useEffect(() => {
+    const loadCollectionItems = async () => {
+      try {
+        console.log('WineGrid: Starting to load collection items for', variants.length, 'variants')
+        const result = await fetchAllCollectionItems(variants, locale)
+        console.log('WineGrid: Collection items loaded successfully', {
+          aromas: result.aromas.length,
+          tags: result.tags.length,
+          moods: result.moods.length,
+          grapeVarieties: result.grapeVarieties.length,
+        })
+        setCollectionItemsLoaded(true)
+      } catch (error) {
+        console.error('WineGrid: Failed to load collection items', error)
+        logger.error('Failed to load collection items', { error })
+        // Still set as loaded to prevent infinite retries
+        setCollectionItemsLoaded(true)
+      }
+    }
+
+    if (variants.length > 0) {
+      loadCollectionItems()
+    }
+  }, [variants, locale])
+
+  // Responsive config
+  const cardsPerRow = useMemo(() => {
+    if (windowWidth < 768) return RESPONSIVE_CONFIG.mobile.cardsPerRow
+    if (windowWidth < 1024) return RESPONSIVE_CONFIG.tablet.cardsPerRow
+    return RESPONSIVE_CONFIG.desktop.cardsPerRow
   }, [windowWidth])
 
-  // Update cards per row when responsive config changes
-  const cardsPerRow = responsiveConfig.cardsPerRow
-
-  // Memoized wine rows creation - each row is one slide
+  // Create rows of wines
   const wineRows = useMemo(() => {
     const rows = []
     for (let i = 0; i < variants.length; i += cardsPerRow) {
@@ -71,124 +87,54 @@ export function WineGrid({
     return rows
   }, [variants, cardsPerRow])
 
-  // Memoized grid classes
+  // Grid classes
   const gridClasses = useMemo(() => {
     if (cardsPerRow === 1) return 'grid-cols-1'
     if (cardsPerRow === 2) return 'grid-cols-1 sm:grid-cols-2'
     return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
   }, [cardsPerRow])
 
-  // Optimized height calculation with debouncing
-  const calculateSwiperHeight = useCallback(
-    debounce(() => {
-      if (!containerRef.current) return
+  // Calculate height when content changes
+  const calculateHeight = useCallback(() => {
+    if (!swiperRef.current) return
 
-      // Use ResizeObserver for more efficient height detection
-      const container = containerRef.current
-      const gridElement = container.querySelector('.grid') as HTMLElement
+    // Get the active slide element
+    const activeSlide = swiperRef.current.slides[swiperRef.current.activeIndex]
+    if (activeSlide) {
+      // Get the actual content height including padding and margins
+      const contentHeight = activeSlide.scrollHeight
+      // Add some buffer to ensure nothing gets cut off, especially on mobile
+      const buffer = windowWidth < 768 ? 40 : 20
+      setSwiperHeight(contentHeight + buffer)
+    }
+  }, [windowWidth])
 
-      if (gridElement) {
-        const rowHeight = gridElement.offsetHeight
-        const slotIndicatorHeight = 30
-        const calculatedHeight = rowHeight + slotIndicatorHeight
-
-        // Only update if height changed significantly (prevents micro-adjustments)
-        setSwiperHeight((currentHeight) => {
-          const heightDiff = Math.abs(currentHeight - calculatedHeight)
-          return heightDiff > 5 ? calculatedHeight : currentHeight
-        })
-      }
-    }, 100), // Reduced from 200ms to 100ms
-    [],
-  )
-
-  // Window resize handler
+  // Handle window resize
   useEffect(() => {
-    const handleResize = debounce(() => {
+    const handleResize = () => {
       setWindowWidth(window.innerWidth)
-      calculateSwiperHeight()
-    }, 50) // Reduced from 150ms to 50ms for more responsive behavior
-
+      // Recalculate height after resize
+      setTimeout(calculateHeight, 100)
+    }
     window.addEventListener('resize', handleResize, { passive: true })
     return () => window.removeEventListener('resize', handleResize)
-  }, [calculateSwiperHeight])
+  }, [calculateHeight])
 
-  // Calculate height when variants change
-  useEffect(() => {
-    calculateSwiperHeight()
-  }, [variants, calculateSwiperHeight])
-
-  // Reset slide when variants change
+  // Reset when variants change
   useEffect(() => {
     if (swiperRef.current) {
       swiperRef.current.slideTo(0)
       setCurrentSlide(0)
+      // Recalculate height after slide change
+      setTimeout(calculateHeight, 100)
     }
-  }, [variants])
+  }, [variants, calculateHeight])
 
-  // Optimized keyboard navigation
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent): void => {
-      if (!swiperRef.current || wineRows.length === 0) return
-
-      const { key } = event
-      const currentIndex = currentSlide
-      const totalRows = wineRows.length
-
-      let newIndex = currentIndex
-
-      switch (key) {
-        case 'ArrowUp':
-          event.preventDefault()
-          newIndex = Math.max(0, currentIndex - 1)
-          break
-        case 'ArrowDown':
-          event.preventDefault()
-          newIndex = Math.min(totalRows - 1, currentIndex + 1)
-          break
-        case 'Home':
-          event.preventDefault()
-          newIndex = 0
-          break
-        case 'End':
-          event.preventDefault()
-          newIndex = totalRows - 1
-          break
-        case 'PageUp':
-          event.preventDefault()
-          newIndex = Math.max(0, currentIndex - 3)
-          break
-        case 'PageDown':
-          event.preventDefault()
-          newIndex = Math.min(totalRows - 1, currentIndex + 3)
-          break
-        default:
-          return
-      }
-
-      if (newIndex !== currentIndex) {
-        swiperRef.current.slideTo(newIndex)
-        setCurrentSlide(newIndex)
-      }
-    },
-    [currentSlide, wineRows.length],
-  )
-
-  // Single keyboard event listener
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    container.addEventListener('keydown', handleKeyDown)
-    return () => container.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
-
-  // Memoized event handlers
+  // Event handlers
   const handleShare = useCallback(
-    async (variant: FlatWineVariant): Promise<void> => {
+    async (variant: FlatWineVariant) => {
       try {
         const url = `${window.location.origin}/${locale}/wine/${variant.slug || variant.id}`
-
         if (navigator.clipboard && window.isSecureContext) {
           await navigator.clipboard.writeText(url)
         } else {
@@ -206,42 +152,38 @@ export function WineGrid({
     [locale],
   )
 
-  const handleLike = useCallback((): void => {
-    // TODO: BUTELKA-124 - Implement like functionality with backend integration
+  const handleLike = useCallback(() => {
+    // TODO: Implement like functionality
   }, [])
 
   // Memoized wine row renderer
   const renderWineRow = useCallback(
-    (wines: FlatWineVariant[], rowIndex: number): React.JSX.Element => (
+    (wines: FlatWineVariant[], rowIndex: number) => (
       <div
         className={`grid ${gridClasses} ${WINE_CONSTANTS.GRID_GAP} justify-center`}
         role="grid"
         aria-label={t('wine.rowGridLabel', { row: rowIndex + 1 })}
       >
         {wines.map((variant) => (
-          <div key={variant.id} className="w-full h-full" role="gridcell">
+          <div key={variant.id} className="w-full" role="gridcell">
             <WineCard
               variant={variant}
               locale={locale}
               onShare={handleShare}
               onLike={handleLike}
-              data-wine-card="true"
+              collectionItemsLoaded={collectionItemsLoaded}
             />
           </div>
         ))}
       </div>
     ),
-    [gridClasses, t, locale, handleShare, handleLike],
+    [gridClasses, t, locale, handleShare, handleLike, collectionItemsLoaded],
   )
 
   // Memoized row indicator
   const renderRowIndicator = useCallback(
-    (index: number, total: number, winesInRow: number): React.JSX.Element => (
-      <div
-        className="text-center mt-4 text-sm text-muted-foreground"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+    (index: number, total: number, winesInRow: number) => (
+      <div className="text-center mt-4 text-sm text-muted-foreground">
         {t('wine.rowIndicator', {
           current: index + 1,
           total,
@@ -264,47 +206,54 @@ export function WineGrid({
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={`w-full ${className}`}
-      role="region"
-      aria-label={t('wine.wineGridLabel')}
-      tabIndex={0}
-      aria-live="polite"
-      aria-atomic="false"
-    >
-      {/* Hidden content for height calculation - simplified */}
-      <div className="sr-only absolute top-0 left-0 w-full">
-        <div className="w-full">
-          {renderWineRow(variants.slice(0, cardsPerRow), 0)}
-          {renderRowIndicator(
-            0,
-            Math.ceil(variants.length / cardsPerRow),
-            Math.min(cardsPerRow, variants.length),
-          )}
-        </div>
-      </div>
-
+    <div className={`w-full ${className}`} role="region" aria-label={t('wine.wineGridLabel')}>
       <Swiper
         key={`wine-swiper-${cardsPerRow}`}
         direction="vertical"
+        modules={[Virtual, Keyboard, A11y]}
+        virtual={{
+          enabled: true,
+          addSlidesBefore: 1,
+          addSlidesAfter: 1,
+          cache: true,
+          slides: wineRows,
+        }}
+        keyboard={{
+          enabled: true,
+          onlyInViewport: true,
+        }}
+        a11y={{
+          enabled: true,
+          prevSlideMessage: t('wine.previousRow'),
+          nextSlideMessage: t('wine.nextRow'),
+          firstSlideMessage: t('wine.firstRow'),
+          lastSlideMessage: t('wine.lastRow'),
+        }}
         onSwiper={(swiper) => {
           swiperRef.current = swiper
+          // Calculate initial height
+          setTimeout(calculateHeight, 100)
         }}
         onSlideChange={(swiper) => {
           setCurrentSlide(swiper.activeIndex)
+          // Recalculate height after slide change
+          setTimeout(calculateHeight, 100)
         }}
-        className="wine-swiper focus-within:outline-2 focus-within:outline-primary focus-within:outline-offset-2"
-        style={{ '--wine-swiper-height': `${swiperHeight}px` } as React.CSSProperties}
+        className="wine-swiper"
         slidesPerView={1}
         speed={400}
-        allowTouchMove={true}
+        grabCursor={true}
+        watchSlidesProgress={false}
+        updateOnWindowResize={false}
+        observer={false}
+        observeParents={false}
+        style={{ height: `${swiperHeight}px` }}
         aria-label={t('wine.sliderLabel')}
       >
         {wineRows.map((row, index) => (
-          <SwiperSlide key={index}>
+          <SwiperSlide key={index} virtualIndex={index}>
             <div
-              className="w-full h-full flex flex-col"
+              className="w-full flex flex-col"
               role="group"
               aria-label={t('wine.rowLabel', {
                 current: index + 1,

@@ -106,7 +106,7 @@ body {
     @apply font-sans text-sm text-foreground/70;
   }
   .hashtag {
-    @apply font-sans text-sm text-foreground/70 hover:text-foreground transition-colors cursor-pointer;
+    @apply font-sans text-xs text-foreground/70 hover:text-foreground transition-colors cursor-pointer;
   }
 
   /* ===== LAYOUT UTILITIES ===== */

@@ -1,11 +1,13 @@
 import 'dotenv/config'
-import { logger } from '../src/lib/logger'
+import { logger } from '../../src/lib/logger'
 import { seedWineCountries } from './seed-wine-countries'
 import { seedTags } from './seed-tags'
 import { seedGrapeVarieties } from './seed-grape-varieties'
 import { seedWineRegions } from './seed-wine-regions'
 import { seedWineries } from './seed-wineries'
 import { seedMoods } from './seed-moods'
+import { seedClimates } from './seed-climates'
+import { seedStyles } from './seed-styles'
 import { seedWines } from './seed-wines'
 
 async function seedAll(): Promise<void> {
@@ -31,7 +33,13 @@ async function seedAll(): Promise<void> {
     logger.info('Step 6: Seeding moods...', { task: 'seed-all', step: 6 })
     await seedMoods()
 
-    logger.info('Step 7: Seeding wines and wine variants...', { task: 'seed-all', step: 7 })
+    logger.info('Step 7: Seeding climates...', { task: 'seed-all', step: 7 })
+    await seedClimates()
+
+    logger.info('Step 8: Seeding styles...', { task: 'seed-all', step: 8 })
+    await seedStyles()
+
+    logger.info('Step 9: Seeding wines and wine variants...', { task: 'seed-all', step: 9 })
     await seedWines()
 
     logger.info('Complete seeding process finished successfully!', { task: 'seed-all' })

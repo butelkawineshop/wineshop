@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
-import { logger } from '../src/lib/logger'
-import payloadConfig from '../src/payload.config'
+import { logger } from '../../src/lib/logger'
+import payloadConfig from '../../src/payload.config'
 
 interface WineCountryData {
   title: {
@@ -21,149 +21,158 @@ interface WineCountryData {
 }
 
 const wineCountriesData: WineCountryData[] = [
-  {
-    title: {
-      sl: 'Argentina',
-      en: 'Argentina',
-    },
-    description: {
-      sl: 'Argentina je največja vinogradniška država v Južni Ameriki z dolgoletno tradicijo vinarstva.',
-      en: 'Argentina is the largest wine-producing country in South America with a long winemaking tradition.',
-    },
-    whyCool: {
-      sl: 'Argentina je svetovno znana po svojih Malbec vinih iz Mendoza regije in visokogorskih vinogradih.',
-      en: 'Argentina is world-renowned for its Malbec wines from the Mendoza region and high-altitude vineyards.',
-    },
-    landArea: 2780400,
-    wineriesCount: 1200,
-  },
-  {
-    title: {
-      sl: 'Avstralija',
-      en: 'Australia',
-    },
-    description: {
-      sl: 'Avstralija je pomembna vinogradniška država z inovativnim pristopom k vinarstvu.',
-      en: 'Australia is an important wine-growing country with an innovative approach to winemaking.',
-    },
-    whyCool: {
-      sl: 'Avstralija je znana po svojih Shiraz vinih iz Barossa Valley in Chardonnay iz Margaret River.',
-      en: 'Australia is known for its Shiraz wines from Barossa Valley and Chardonnay from Margaret River.',
-    },
-    landArea: 7692024,
-    wineriesCount: 2400,
-  },
-  {
-    title: {
-      sl: 'Avstrija',
-      en: 'Austria',
-    },
-    description: {
-      sl: 'Avstrija je majhna, a pomembna vinogradniška država z visokokakovostnimi belimi vini.',
-      en: 'Austria is a small but important wine-growing country with high-quality white wines.',
-    },
-    whyCool: {
-      sl: 'Avstrija je znana po svojih Grüner Veltliner vinih in sladkih vinih iz Burgenlanda.',
-      en: 'Austria is known for its Grüner Veltliner wines and sweet wines from Burgenland.',
-    },
-    landArea: 83879,
-    wineriesCount: 23000,
-  },
-  {
-    title: {
-      sl: 'Francija',
-      en: 'France',
-    },
-    description: {
-      sl: 'Francija je svetovna prestolnica vinarstva z najbolj prestižnimi vinogradniškimi regijami.',
-      en: 'France is the world capital of winemaking with the most prestigious wine regions.',
-    },
-    whyCool: {
-      sl: 'Francija je dom najboljših vin na svetu iz regij kot so Bordeaux, Burgundy, Champagne in Rhône.',
-      en: "France is home to the world's finest wines from regions like Bordeaux, Burgundy, Champagne, and Rhône.",
-    },
-    landArea: 551695,
-    wineriesCount: 270000,
-  },
-  {
-    title: {
-      sl: 'Italija',
-      en: 'Italy',
-    },
-    description: {
-      sl: 'Italija je ena največjih vinogradniških držav na svetu z več kot 350 različnimi sortami grozdja.',
-      en: 'Italy is one of the largest wine-producing countries in the world with more than 350 different grape varieties.',
-    },
-    whyCool: {
-      sl: 'Italija je dom legendarnih vin kot so Barolo, Chianti, Brunello di Montalcino in Amarone.',
-      en: 'Italy is home to legendary wines like Barolo, Chianti, Brunello di Montalcino, and Amarone.',
-    },
-    landArea: 301340,
-    wineriesCount: 310000,
-  },
-  {
-    title: {
-      sl: 'Madžarska',
-      en: 'Hungary',
-    },
-    description: {
-      sl: 'Madžarska ima bogato vinogradniško tradicijo z edinstvenimi sladkimi vini.',
-      en: 'Hungary has a rich wine-growing tradition with unique sweet wines.',
-    },
-    whyCool: {
-      sl: 'Madžarska je dom legendarnih Tokaji vinov, enih najboljših sladkih vin na svetu.',
-      en: 'Hungary is home to legendary Tokaji wines, some of the finest sweet wines in the world.',
-    },
-    landArea: 93028,
-    wineriesCount: 22000,
-  },
+  // Slovenija / Slovenia
   {
     title: {
       sl: 'Slovenija',
       en: 'Slovenia',
     },
     description: {
-      sl: 'Slovenija je majhna, a ponosna vinogradniška država z bogasto zgodovino vinarstva, ki sega več kot 2000 let nazaj.',
-      en: 'Slovenia is a small but proud wine-growing country with a rich winemaking history dating back more than 2000 years.',
+      sl: 'Slovenija od kod lepote tvoje. Naša kokoška z izjemno pisanim okoljem, je dom skoraj 30.000 kletem in mnogo mnogo različnim stilom. Od lahkih, svežin vin, do kompleksnih barikiranih zadevc pa seveda naše maceracije, ki so mednarodno gledano naš paradni konj.',
+      en: 'Because this is our land, the land of champions haha. We love it for its variety of climates, environments and of course many many many different wine styles. Fresh whites, to oaked complexities, but it seems our main identity as far as the international market is concerned are our skin contact wines.',
     },
     whyCool: {
-      sl: 'Slovenija je dom edinstvenih vin, kot so Teran, Refošk in Modra Frankinja, ter prideluje vrhunske belo vino iz Rebule.',
-      en: 'Slovenia is home to unique wines like Teran, Refošk, and Modra Frankinja, and produces excellent white wine from Rebula.',
+      sl: 'Ker so Praslovani  tisočletja nazaj zbrali ravno naše področje za svoje prve kampe, ker je bil njihov cilj "se ustavit kjer rastejo trte".',
+      en: 'Because the ancient Slavic peoples decided this was the land to settle after following their credo of "we will settle where the vines will grow".',
     },
     landArea: 20273,
     wineriesCount: 28000,
   },
+  // Italija / Italy
   {
     title: {
-      sl: 'ZDA',
-      en: 'United States',
+      sl: 'Italija',
+      en: 'Italy',
     },
     description: {
-      sl: 'ZDA so ena največjih vinogradniških držav z različnimi klimatskimi območji.',
-      en: 'The United States is one of the largest wine-producing countries with diverse climate zones.',
+      sl: 'Naši zahodni sosedje, ki vino jemljejo tako resno, kot jemljejo njihovo hrano. No, skoraj. Njihova vina so romantična in glasna, a vendar imajo tisti neopisljiv eleganten občutek, ki ga znajo samo Italijani. Preko 700 sort raste po celi Italiji in seveda, da ne bi bilo preveč preprosto imajo zanje več kot 3000 imen. Da si ne bi slučajno kdo drznil razumet cele države.',
+      en: "Crazy Italians. They don't like things easy, do they? They have 700 different grape varieties with over 3000 names for them, just in case some smartass wanted to understand the country. Their wines are romantic and loud, but with the sofisticated Italian elegance, nobody else can quite mimic.",
     },
     whyCool: {
-      sl: 'Kalifornija je dom najboljših ameriških vinov, predvsem iz Napa Valley in Sonoma County.',
-      en: 'California is home to the finest American wines, especially from Napa Valley and Sonoma County.',
+      sl: 'Ker je vino za delit in ni je države, ki bi to bolj resno vzela kot Italijani. In ker je za njih vino hrana, nujen spremljeavelc vsakega obeda in ker so komplicirani.',
+      en: 'Because wine is made for sharing, and noone takes that more seriously than the Italians. Because wine is food to them and it belongs with every meal. How can you not love them!',
     },
-    landArea: 9833517,
-    wineriesCount: 11000,
+    landArea: 301340,
+    wineriesCount: 310000,
   },
+  // Francija / France
+  {
+    title: {
+      sl: 'Francija',
+      en: 'France',
+    },
+    description: {
+      sl: 'Absolutni kralji v vinskem svetu, a večini nam gre to kar malo v nos. Daleč od tega, da bi bili prvi, ki bi razumeli kako pomembno je lahko vino, a pismo, dolžni smo jim vsi. Menihi v srednjem veku so do potankosti preučili vinograde in tega znanja drugi pač nimamo. Jih pa zato vsi kopiramo! Kako ne bi? Vina z izjemno eleganco in prefinjenostjo, predvsem pa z izjemnim občutkom za "terroir" - krajem od koder vsaka butelka prihaja.',
+      en: 'Oh, our snobby little friends. We may dislike their attitudes, but we adore their wines. Crafted to absolute perfection, thanks to the Middle Ages and the monks in local monasteries carefully keeping records about each planted vineyard. Their understanding of terroir is second to none. No wonder, we all want to copy them.',
+    },
+    whyCool: {
+      sl: 'Ker so preprosto stoletja pred vsemi z razumevanjem njihove zemlje. A zavist nam ne bo pomagala, le trdno delo in skrbno varovanje zapiskov.',
+      en: 'Because they know what they are doing. They have managed to make the whole world look up to them, and their wines are the ONLY references we need when communicating about wine. How cool is that?!',
+    },
+    landArea: 551695,
+    wineriesCount: 270000,
+  },
+  // Madžarska / Hungary
+  {
+    title: {
+      sl: 'Madžarska',
+      en: 'Hungary',
+    },
+    description: {
+      sl: 'Madžari se nam mogoče ne zdijo, kot pomembna vinska regija, a potrebno si je zapomnit, da so izgubili cca 200 let z vpadom Turkov, ko so morali posekati svoje vinograde. Kljub temu, so bili eni prvih, ki so razumeli, da imajo posebno vino, saj je Tokaji kot območje z zaščitenim geografskim poreklom obstajalo že v prvi polovici 18.stoletja.',
+      en: 'Hungary is not the first place you think about when wine is the topic of discussion. But this could be very different had there not been for the Turkish invading Hungary, forcing them to chop down their vineyards. In spite of this 200 year setback, the Hungarians were still among the first countries to have a wine with a designated origin in Tokaji, as far back as 1737.',
+    },
+    whyCool: {
+      sl: 'Ker, če ne bi bilo turkov, si upamo trditi, da bi bila Madžarska to kar je danes Francija. Referenca svetonih vin!',
+      en: 'Because we firmly believe they would be a reference for world wine, if they were not slowed down in their prime. They would be what France is today!',
+    },
+    landArea: 93028,
+    wineriesCount: 22000,
+  },
+  // Argentina
+  {
+    title: {
+      sl: 'Argentina',
+      en: 'Argentina',
+    },
+    description: {
+      sl: 'Argentina je OGROMNA! In še bolj pomembno, razpotegnjena! Kar pomeni, da ima velik razpon vinskih regij, vse od severne Salte pa do južne Patagonije. Kljub temu, se bolj fokusirajo na mogočna, bogata vina, predvsem pa na vina, ki grejo fantastično z njihovim asadom (po domače žar).',
+      en: 'One of the longest countries in the world from North to South, meaning they have a variety of climates available to them. In spite of this, they focus on rich, bold wines, mainly to go with their beautiful asado!',
+    },
+    whyCool: {
+      sl: 'Ker se je njihov predsednik leta 1884 odločil, da oni bodo pa znani po Malbecu. Sicer so potrebovali 100 let, ampak evo jih tu!',
+      en: 'Because their president decided back in 1884 that they shall be famous for Malbec. And look at them now. Took them 100 years, but who cares!',
+    },
+    landArea: 2780400,
+    wineriesCount: 1200,
+  },
+  // Avstrija / Austria
+  {
+    title: {
+      sl: 'Avstrija',
+      en: 'Austria',
+    },
+    description: {
+      sl: 'Avstrijsi so si dovolil en ne tako majhen kiks v 80ih prejšnjega stoletja. Mogoče so malo po pomoti zastrupili nekaj ljudi. Upsi! Ampak, če kaj vemo o naših severnih sosedih, je to da se iz zgodovine marsikej naučijo (wink wink). Moderna vinska Avstrija postaja velesila! Z uspešnim vlaganjem in sistematičnim delom, postajajo konkurečni celo francozom. Njihova vina stremijo k svežini in preciznosti - kakopak.',
+      en: "Austria not to be confused with Australia my murican friends did a bit of a woopsie in the 1980s. They may have almost, kind of... poisoned some people. Woopsie! No biggie, if there is anything we know about Austrians, they learn from their past (wink wink). But let's let bygones be bygones. These days they are serious contenders in the wine business. Excellent funding and systematic approach has made them one of the most important wine regions in the world. Their wines are racy and often a bit spicy, but mainly just beautifully refreshing.",
+    },
+    whyCool: {
+      sl: 'Brez pogrevanja zgodovine, njihova vina so noro dobra. Slovijo po svežini in kdo si ne želi osvežitve ko pije vino??',
+      en: 'Because of their wines. I mean the freshness is something we crave for as wine people, and Austrians deliver it in heaps!',
+    },
+    landArea: 83879,
+    wineriesCount: 23000,
+  },
+  // Avstralija / Australia
+  {
+    title: {
+      sl: 'Avstralija',
+      en: 'Australia',
+    },
+    description: {
+      sl: 'Avstralija v Sloveniji ni ravno spoštovana kot vinska regija. Škoda! V bistvu se tam skrivajo fantasična vina, ki so zaenkrat še super cenovno ugodna. Ampak tudi to se spreminja. Kljub prepričanju, da je tam vse vroče, ne pozabimo kako blizu Antarktiki so, zato imajo precej tudi hladnega vpliva, ki je idealn za vina. Še vedno je vroče seveda, zato so vina takšna kot Avstralci. Glasna in aromatična!',
+      en: "Ozzies wines are just about as cool as they are. Loud, fun, easy to drink. People forgot that yes, it's hot. But Antarctica is close by, so there is some cool corridors perfect for making wines. Tasmania makes incredible bubbles, and Eden valley some seriously delicious cool-climate Rieslings. Give them a try, don't be shy.",
+    },
+    whyCool: {
+      sl: 'Ker so vina super preprosta za pit, niso zategnjena, prevsem pa so mehka. Aja pa, zato ker ko so dobri valovi, gredo raje surfat, kot pa v vinograd. Work-life balance? Check!',
+      en: 'Anyone that will drop everything and go surfing when the waves are up instead of working in the searing heat in the vineyards is our kind of person. Work-life balance? Check.',
+    },
+    landArea: 7692024,
+    wineriesCount: 2400,
+  },
+  // Španija / Spain
   {
     title: {
       sl: 'Španija',
       en: 'Spain',
     },
     description: {
-      sl: 'Španija ima največjo površino vinogradov na svetu in bogato tradicijo vinarstva.',
-      en: 'Spain has the largest vineyard area in the world and a rich winemaking tradition.',
+      sl: 'Španci so zanimiva nacija. Delajo vse od pljuske za v Sangrijo, pa super elegantnih prestižnih vin, ki stanejo tisoče evrov. Uživajo življenje in to se pozna na vinih. Imajo ogromno karakterja, kar je včasih tudi slabo, ampak vedno je dogodivščina! Več vin je bogatih kot svežih, a to ne pomeni, da jih ni. Sploh na zahodu delajo super lepa sveža vina.',
+      en: "Spain has the largest vineyard area in the world. It's absolutely massive. In spite of this, they have relatively few wineries - they are mostly huge though. Their wines match their character, they are bold, friendly, very smooth. The western part actually make some really nice fresh wines too. You got to, next to the Atlantic, right?",
     },
     whyCool: {
-      sl: 'Španija je znana po svojih Tempranillo vinih, Rioji, Prioratu in sherry vinih iz Andaluzije.',
-      en: 'Spain is known for its Tempranillo wines, Rioja, Priorat, and sherry wines from Andalusia.',
+      sl: 'Za razliko od Italijanov, so veliko bolj preprosti za razumet. To mislimo seveda v vinskem smislu (a ne?).',
+      en: 'Because they are huge, but much easier to learn and understand than Italians. Wines are made for Sangria and for thousands and thousands. The choice is yours!',
     },
     landArea: 505990,
     wineriesCount: 4000000,
+  },
+  // ZDA / USA
+  {
+    title: {
+      sl: 'ZDA',
+      en: 'USA',
+    },
+    description: {
+      sl: 'Američani proizvajajo vino v vseh svojih državah. Tudi Aljaski in na Havajih. Tega jim res ne bi bilo potrebno. Najboljše države so še vedno Kalifornija, Oregon, New York in Virginia. Vina so si izjemno različna v stilih, temu seveda botruje pisana kulturna dediščina in pa predvsem njihov kapitalistični pogled na ... vse! To ne pomeni, da vina niso fantastična. So pa verjetno na dnu, kar se tiče njihove vrednosti napram kvaliteti.',
+      en: "The americans produce wines in all of their states. Including Alaska and Hawaii. Well, maybe this wasn't necessary. The finest wine states are still California, Oregon, New York and Virginia. Their wines are as unique as their cultural heritage, but yes, there is some perceived sweetness to the wines too. Not necessarily a bad thing though!",
+    },
+    whyCool: {
+      sl: 'Ker niso tako tradicionalni, kot smo v Evropi. Riskirajo, eksperimentirajo in ustvarjajo super vina. Ok so malce na slajši strani, ampak to ni nujno slabo!',
+      en: "Because they are bold risk takers and are not afraid to experiment. Us Europeans are waaaay too traditional and we tend to fight over stupid little things. They don't care. And this makes the wines super fun!",
+    },
+    landArea: 9833517,
+    wineriesCount: 11000,
   },
 ]
 

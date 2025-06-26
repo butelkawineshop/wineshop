@@ -17,7 +17,7 @@ export const UI_CONSTANTS = {
   WINE_CARD_HEIGHT: 'h-64',
 
   // Image quality
-  DEFAULT_IMAGE_QUALITY: 75,
+  DEFAULT_IMAGE_QUALITY: 90,
 
   // Toast notifications
   TOAST: {

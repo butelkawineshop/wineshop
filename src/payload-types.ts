@@ -1043,6 +1043,9 @@ export interface Order {
  */
 export interface FlatWineVariant {
   id: number
+  /**
+   * Reference to the original wine variant
+   */
   originalVariant: number | WineVariant
   sku?: string | null
   wineTitle?: string | null
@@ -1073,6 +1076,30 @@ export interface FlatWineVariant {
   servingTemp?: string | null
   decanting?: boolean | null
   tastingProfile?: string | null
+  /**
+   * Wine description
+   */
+  description?: string | null
+  /**
+   * English wine description
+   */
+  descriptionEn?: string | null
+  /**
+   * Related wineries for filtering
+   */
+  relatedWineries?:
+    | {
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Related regions for filtering
+   */
+  relatedRegions?:
+    | {
+        id?: string | null
+      }[]
+    | null
   /**
    * Individual tasting note values for filtering
    */
@@ -2018,6 +2045,18 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   servingTemp?: T
   decanting?: T
   tastingProfile?: T
+  description?: T
+  descriptionEn?: T
+  relatedWineries?:
+    | T
+    | {
+        id?: T
+      }
+  relatedRegions?:
+    | T
+    | {
+        id?: T
+      }
   tastingNotes?:
     | T
     | {

@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
-import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 
 import { Icon } from '@/components/Icon'
+import { Media } from '@/components/Media'
 import { WineTitleBar } from './components/WineTitleBar'
 import { WineTastingNotes } from './components/WineTastingNotes'
 import { WineCartButton } from './components/WineCartButton'
@@ -24,6 +24,7 @@ interface WineCardProps {
   locale: Locale
   onShare?: (variant: FlatWineVariant) => void
   onLike?: (variant: FlatWineVariant) => void
+  collectionItemsLoaded?: boolean
 }
 
 export function WineCard({
@@ -32,11 +33,11 @@ export function WineCard({
   locale,
   onShare,
   onLike,
+  collectionItemsLoaded = false,
 }: WineCardProps): React.JSX.Element {
   const { t } = useTranslation()
   const swiperRef = useRef<{ swiper: SwiperType }>(null)
   const [activeIndex, setActiveIndex] = useState<number>(WINE_CONSTANTS.INITIAL_SLIDE_INDEX)
-  const [imageError, setImageError] = useState(false)
 
   const formattedPrice = formatPrice(variant.price)
   const formattedDiscountedPrice = formatPrice(discountedPrice)
@@ -65,10 +66,6 @@ export function WineCard({
     }
   }
 
-  const handleImageError = (): void => {
-    setImageError(true)
-  }
-
   return (
     <div className="flex flex-col w-full h-full">
       <WineTitleBar variant={variant} locale={locale} />
@@ -83,17 +80,16 @@ export function WineCard({
       >
         {/* Main wine image slide */}
         <SwiperSlide>
-          <div className="w-full flex items-start relative">
-            {variant.primaryImageUrl && !imageError && (
-              <div className="w-full overflow-hidden">
-                <Image
+          <div className="w-full flex items-start relative aspect-square">
+            {variant.primaryImageUrl && (
+              <div className="w-full overflow-hidden aspect-square">
+                <Media
                   src={variant.primaryImageUrl}
                   alt={variant.wineTitle || t('wine.fallbackAlt')}
-                  width={WINE_CONSTANTS.IMAGE_WIDTH}
-                  height={WINE_CONSTANTS.IMAGE_HEIGHT}
                   className="object-cover w-full h-full"
                   priority={false}
-                  onError={handleImageError}
+                  size="square"
+                  fill={true}
                 />
                 {/* Price overlay */}
                 {hasDiscount ? (
@@ -118,8 +114,8 @@ export function WineCard({
                 )}
               </div>
             )}
-            {/* Fallback for missing or failed images */}
-            {(!variant.primaryImageUrl || imageError) && (
+            {/* Fallback for missing images */}
+            {!variant.primaryImageUrl && (
               <div className="aspect-square w-full bg-foreground/10 flex items-center justify-center">
                 <span className="text-foreground/40">{t('wine.fallbackAlt')}</span>
               </div>
@@ -129,14 +125,14 @@ export function WineCard({
 
         {/* First tasting notes page */}
         <SwiperSlide>
-          <div className="w-full h-full flex">
+          <div className="w-full h-full flex aspect-square">
             <WineTastingNotes variant={variant} page={1} />
           </div>
         </SwiperSlide>
 
         {/* Second tasting notes page */}
         <SwiperSlide>
-          <div className="w-full h-full flex">
+          <div className="w-full h-full flex aspect-square">
             <WineTastingNotes variant={variant} page={2} />
           </div>
         </SwiperSlide>
@@ -197,7 +193,11 @@ export function WineCard({
         {/* Wine description and tags */}
         <div className="px-2 pb-2 w-full space-y-content">
           <WineDescription variant={variant} />
-          <WineCollectionTags variant={variant} locale={locale} />
+          <WineCollectionTags
+            variant={variant}
+            locale={locale}
+            collectionItemsLoaded={collectionItemsLoaded}
+          />
         </div>
       </div>
     </div>

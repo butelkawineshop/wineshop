@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
-import { logger } from '../src/lib/logger'
-import payloadConfig from '../src/payload.config'
+import { logger } from '../../src/lib/logger'
+import payloadConfig from '../../src/payload.config'
 
 interface MoodData {
   title: {
@@ -15,381 +15,202 @@ interface MoodData {
 }
 
 const moodsData: MoodData[] = [
-  // Social occasions
+  // Netflix & Chill / Neftlix & Chill
   {
     title: {
-      sl: 'Družinski obrok',
-      en: 'Family Dinner',
+      sl: 'Netflix & Chill',
+      en: 'Neftlix & Chill',
     },
     description: {
-      sl: 'Popolno vino za družinske obroke in praznične večerje z ljubljenimi.',
-      en: 'Perfect wine for family dinners and holiday meals with loved ones.',
+      sl: 'Ko rabiš butelko za boljšo atmosfero .. .pri gledanju filmov.',
+      en: 'When you need a bottle to set the mood for... movie watching.',
     },
   },
+  // Piknik / Picnic
   {
     title: {
-      sl: 'Romantična večerja',
-      en: 'Romantic Dinner',
+      sl: 'Piknik',
+      en: 'Picnic',
     },
     description: {
-      sl: 'Elegantno vino za romantične večerje in posebne trenutke z partnerjem.',
-      en: 'Elegant wine for romantic dinners and special moments with your partner.',
+      sl: 'Vina, ki prenesejo travne madeže, plastične kozarce in mlačen sir. Lahkotna, sveža in prijazna do odej.',
+      en: "Wines that don't mind grass stains, plastic cups, or warm cheese. Easy, breezy, and park-friendly.",
     },
   },
+  // Sam doma / Home alone
   {
     title: {
-      sl: 'Prijateljski sestanek',
-      en: 'Friends Gathering',
+      sl: 'Sam doma',
+      en: 'Home alone',
     },
     description: {
-      sl: 'Osvežilno vino za prijateljske sestanke in zabavne večere.',
-      en: 'Refreshing wine for friendly gatherings and fun evenings.',
+      sl: 'Ker ne piješ sam, ampak samo vnaprej tejstaš… za obiske, ki pridejo.... enkrat.',
+      en: "Because you're not drinking alone, you're just pre-tasting before guests arrive… at some point.",
     },
   },
+  // Tisti dnevi / Those days
   {
     title: {
-      sl: 'Poslovna večerja',
-      en: 'Business Dinner',
+      sl: 'Tisti dnevi',
+      en: 'Those days',
     },
     description: {
-      sl: 'Prestižno vino za poslovne večerje in pomembne sestanke.',
-      en: 'Prestigious wine for business dinners and important meetings.',
+      sl: 'Veš, kateri dnevi. Ne sprašuj – samo toči.',
+      en: "You know the ones. Don't ask, just pour.",
     },
   },
-
-  // Relaxation and comfort
+  // Zmenkarije / Date night
   {
     title: {
-      sl: 'Spočitek ob ognju',
-      en: 'Relaxing by the Fire',
+      sl: 'Zmenkarije',
+      en: 'Date night',
     },
     description: {
-      sl: 'Toplo in močno vino za večere ob ognju in sproščujoče trenutke.',
-      en: 'Warm and powerful wine for evenings by the fire and relaxing moments.',
+      sl: 'Vina, ki šepetajo sladke neumnosti… in potem mogoče še kaj več.',
+      en: 'Wines that whisper sweet nothings… and then maybe a little something more.',
     },
   },
+  // Neki novga / Something new
   {
     title: {
-      sl: 'Večerni spopad',
-      en: 'Evening Chill',
+      sl: 'Neki novga',
+      en: 'Something new',
     },
     description: {
-      sl: 'Lahko vino za sproščujoče večere in mirne trenutke.',
-      en: 'Light wine for relaxing evenings and quiet moments.',
+      sl: 'Dovolj malvazije in refoška? Dobrodošel v globokem koncu vinskega bazena.',
+      en: 'Tired of Pinot this and Chardonnay that? Welcome to the deep end of the wine pool.',
     },
   },
+  // Prepotentni kolegi? / Snobby friends?
   {
     title: {
-      sl: 'Vikend počitek',
-      en: 'Weekend Relaxation',
+      sl: 'Prepotentni kolegi?',
+      en: 'Snobby friends?',
     },
     description: {
-      sl: 'Osvežilno vino za vikend počitek in sproščujoče dni.',
-      en: 'Refreshing wine for weekend relaxation and relaxing days.',
+      sl: 'Ko rabiš vino, da naredi vtis namesto tebe.',
+      en: 'When you need a wine to impress instead of you.',
     },
   },
+  // Za tasta / Impress her dad
   {
     title: {
-      sl: 'Spa večer',
-      en: 'Spa Evening',
+      sl: 'Za tasta',
+      en: 'Impress her dad',
     },
     description: {
-      sl: 'Elegantno vino za spa večere in wellness trenutke.',
-      en: 'Elegant wine for spa evenings and wellness moments.',
+      sl: 'Ne zajebi situacije. Prinesi mu vino, ki bo njemu kul!',
+      en: "Don't mess this up. Bring a wine he thinks is amazing.",
     },
   },
-
-  // Celebration and special occasions
+  // Za taščo / For mother in law
   {
     title: {
-      sl: 'Rojstni dan',
-      en: 'Birthday',
+      sl: 'Za taščo',
+      en: 'For mother in law',
     },
     description: {
-      sl: 'Posebno vino za rojstnodnevne proslave in veselje.',
-      en: 'Special wine for birthday celebrations and joy.',
+      sl: 'Ko rabiš vino, da se neha vtikat v tvojga otroka.',
+      en: 'When you need a wine to keep her out of your parenting decisions.',
     },
   },
+  // Ikone & Legende / Icons & Legends
   {
     title: {
-      sl: 'Poroka',
-      en: 'Wedding',
+      sl: 'Ikone & Legende',
+      en: 'Icons & Legends',
     },
     description: {
-      sl: 'Elegantno vino za poročne proslave in najpomembnejše trenutke.',
-      en: 'Elegant wine for wedding celebrations and the most important moments.',
+      sl: 'Ta vina se niso prišla igrat. Prišla so pokazat, kdo je šefe!',
+      en: "These wines didn't come to play. They came to remind the rest who's boss.",
     },
   },
+  // Žurka / Parteeey
   {
     title: {
-      sl: 'Novo leto',
-      en: 'New Year',
+      sl: 'Žurka',
+      en: 'Parteeey',
     },
     description: {
-      sl: 'Penino vino za novoletne proslave in začetek novega leta.',
-      en: 'Sparkling wine for New Year celebrations and the start of a new year.',
+      sl: 'Vina, ki držijo tempo in glasnost. Bleščice niso obvezne, so pa zaželjene.',
+      en: 'Wines that keep the vibe up and the volume loud. Preferably with glitter.',
     },
   },
+  // Jadranje / Sailing
   {
     title: {
-      sl: 'Praznik',
-      en: 'Holiday',
+      sl: 'Jadranje',
+      en: 'Sailing',
     },
     description: {
-      sl: 'Posebno vino za praznične proslave in družinske sestanke.',
-      en: 'Special wine for holiday celebrations and family gatherings.',
+      sl: 'Za slan zrak, opečena ramena in vina, ki se dobro ujemajo z žulji od vrvi. Pa tudi z radensko če si skipper!',
+      en: "For salty air, sunburnt noses, and wines that pair well with rope burns. And bubbly water if you're the skipper!",
     },
   },
-
-  // Food pairing moods
+  // Vsakodnevci / Daily Boozers
   {
     title: {
-      sl: 'Morska hrana',
-      en: 'Seafood',
+      sl: 'Vsakodnevci',
+      en: 'Daily Boozers ',
     },
     description: {
-      sl: 'Osvežilno belo vino za morsko hrano in ribje jedi.',
-      en: 'Refreshing white wine for seafood and fish dishes.',
+      sl: 'Vina za med tednom, ki te ne obsojajo, tudi če pogledaš tri sezone v enem večeru.',
+      en: "Weekday wines that go down easy and don't judge your bingeing.",
     },
   },
+  // Wroooče! / Hot in herre
   {
     title: {
-      sl: 'Meso na žaru',
-      en: 'Grilled Meat',
+      sl: 'Wroooče!',
+      en: 'Hot in herre',
     },
     description: {
-      sl: 'Močno rdeče vino za meso na žaru in barbecue.',
-      en: 'Powerful red wine for grilled meat and barbecue.',
+      sl: 'Ko švicaš v kopalkah, rabiš vino v kterga lahko vržeš par kock ledu.',
+      en: 'Wines for your ice cubes when you are sweating in your bathing suit.',
     },
   },
+  // Lepe Butelke / Nice bottle
   {
     title: {
-      sl: 'Italijanska kuhinja',
-      en: 'Italian Cuisine',
+      sl: 'Lepe Butelke',
+      en: 'Nice bottle',
     },
     description: {
-      sl: 'Tradicionalno italijansko vino za pasta, pizza in mediteranske jedi.',
-      en: 'Traditional Italian wine for pasta, pizza, and Mediterranean dishes.',
+      sl: 'Lahko ga spiješ, ampak je ful lušna butelka - za darilo?',
+      en: "You could drink it, but this bottle sooo nice — it's perfect for gifting. ",
     },
   },
+  // Na vrhuncu / Peaking
   {
     title: {
-      sl: 'Sladice',
-      en: 'Desserts',
+      sl: 'Na vrhuncu',
+      en: 'Peaking',
     },
     description: {
-      sl: 'Sladko vino za sladice in sladke poslastice.',
-      en: 'Sweet wine for desserts and sweet treats.',
+      sl: 'Ta vina so na vrhuncu. Zorjena, pripravljena in z eno nogo že v legendi. Brez derez. Na kaj si pa ti pomislil?',
+      en: 'These wines are at their peak. Aged, poised, and ready to blow your mind. No climbing gear needed.',
     },
   },
-
-  // Seasonal moods
+  // Snob? / Snob much?
   {
     title: {
-      sl: 'Pomlad',
-      en: 'Spring',
+      sl: 'Snob?',
+      en: 'Snob much?',
     },
     description: {
-      sl: 'Sveže in osvežilno vino za pomladne dni in cvetoče narave.',
-      en: 'Fresh and refreshing wine for spring days and blooming nature.',
+      sl: 'Funky, divja in rahlo nerazumljena. Tako kot ti.',
+      en: 'Funky, wild, and slightly misunderstood. Just like you.',
     },
   },
+  // Someljejčki / Sommstuff
   {
     title: {
-      sl: 'Poletje',
-      en: 'Summer',
+      sl: 'Someljejčki',
+      en: 'Sommstuff',
     },
     description: {
-      sl: 'Lahko in osvežilno vino za poletne večere in terase.',
-      en: 'Light and refreshing wine for summer evenings and terraces.',
-    },
-  },
-  {
-    title: {
-      sl: 'Jesen',
-      en: 'Autumn',
-    },
-    description: {
-      sl: 'Toplo in kompleksno vino za jesenske večere in padajoče liste.',
-      en: 'Warm and complex wine for autumn evenings and falling leaves.',
-    },
-  },
-  {
-    title: {
-      sl: 'Zima',
-      en: 'Winter',
-    },
-    description: {
-      sl: 'Močno in toplo vino za zimske večere in snežne dni.',
-      en: 'Strong and warm wine for winter evenings and snowy days.',
-    },
-  },
-
-  // Activity-based moods
-  {
-    title: {
-      sl: 'Gledanje filma',
-      en: 'Movie Night',
-    },
-    description: {
-      sl: 'Udobno vino za gledanje filmov in večere pred televizorjem.',
-      en: 'Comfortable wine for watching movies and evenings in front of the TV.',
-    },
-  },
-  {
-    title: {
-      sl: 'Branje knjige',
-      en: 'Reading a Book',
-    },
-    description: {
-      sl: 'Mirno vino za branje knjig in introspektivne trenutke.',
-      en: 'Quiet wine for reading books and introspective moments.',
-    },
-  },
-  {
-    title: {
-      sl: 'Muzika',
-      en: 'Music',
-    },
-    description: {
-      sl: 'Vino za poslušanje glasbe in umetniške trenutke.',
-      en: 'Wine for listening to music and artistic moments.',
-    },
-  },
-  {
-    title: {
-      sl: 'Kuhanje',
-      en: 'Cooking',
-    },
-    description: {
-      sl: 'Vino za kuhanje in kulinarične eksperimente.',
-      en: 'Wine for cooking and culinary experiments.',
-    },
-  },
-
-  // Emotional moods
-  {
-    title: {
-      sl: 'Veselje',
-      en: 'Joy',
-    },
-    description: {
-      sl: 'Veselo vino za srečne trenutke in praznovanje.',
-      en: 'Joyful wine for happy moments and celebration.',
-    },
-  },
-  {
-    title: {
-      sl: 'Melanholija',
-      en: 'Melancholy',
-    },
-    description: {
-      sl: 'Kompleksno vino za melanholične trenutke in razmišljanja.',
-      en: 'Complex wine for melancholic moments and reflections.',
-    },
-  },
-  {
-    title: {
-      sl: 'Navdih',
-      en: 'Inspiration',
-    },
-    description: {
-      sl: 'Vino za navdih in kreativne trenutke.',
-      en: 'Wine for inspiration and creative moments.',
-    },
-  },
-  {
-    title: {
-      sl: 'Spoštovanje',
-      en: 'Appreciation',
-    },
-    description: {
-      sl: 'Prestižno vino za spoštovanje in posebne trenutke.',
-      en: 'Prestigious wine for appreciation and special moments.',
-    },
-  },
-
-  // Lifestyle moods
-  {
-    title: {
-      sl: 'Wellness',
-      en: 'Wellness',
-    },
-    description: {
-      sl: 'Zdravstveno vino za wellness trenutke in skrb za sebe.',
-      en: 'Healthy wine for wellness moments and self-care.',
-    },
-  },
-  {
-    title: {
-      sl: 'Luxury',
-      en: 'Luxury',
-    },
-    description: {
-      sl: 'Luksuzno vino za ekskluzivne trenutke in posebne priložnosti.',
-      en: 'Luxury wine for exclusive moments and special occasions.',
-    },
-  },
-  {
-    title: {
-      sl: 'Avantura',
-      en: 'Adventure',
-    },
-    description: {
-      sl: 'Eksperimentalno vino za nove izkušnje in avanture.',
-      en: 'Experimental wine for new experiences and adventures.',
-    },
-  },
-  {
-    title: {
-      sl: 'Tradicija',
-      en: 'Tradition',
-    },
-    description: {
-      sl: 'Tradicionalno vino za ohranjanje tradicij in zgodovine.',
-      en: 'Traditional wine for preserving traditions and history.',
-    },
-  },
-
-  // Time-based moods
-  {
-    title: {
-      sl: 'Zajtrk',
-      en: 'Breakfast',
-    },
-    description: {
-      sl: 'Lahko vino za zajtrk in začetek dneva.',
-      en: 'Light wine for breakfast and the start of the day.',
-    },
-  },
-  {
-    title: {
-      sl: 'Kosilo',
-      en: 'Lunch',
-    },
-    description: {
-      sl: 'Osvežilno vino za kosilo in sredino dneva.',
-      en: 'Refreshing wine for lunch and the middle of the day.',
-    },
-  },
-  {
-    title: {
-      sl: 'Večerja',
-      en: 'Dinner',
-    },
-    description: {
-      sl: 'Elegantno vino za večerjo in konec dneva.',
-      en: 'Elegant wine for dinner and the end of the day.',
-    },
-  },
-  {
-    title: {
-      sl: 'Pozna noč',
-      en: 'Late Night',
-    },
-    description: {
-      sl: 'Močno vino za pozne nočne ure in nočne sestanke.',
-      en: 'Strong wine for late night hours and night gatherings.',
+      sl: 'Ful lep PH! Kako dolgo na drožeh? In mikroklima? Če s tem ponavadi težiš vinarjem — si doma.',
+      en: "Niche, nerdy, and not for everyone. But if you're geeking out over lees contact — you're home.",
     },
   },
 ]

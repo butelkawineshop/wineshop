@@ -5,6 +5,7 @@ import {
 } from '@/components/CollectionPage/CollectionConfig'
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import type { Locale } from '@/utils/routeMappings'
+import { fetchAllCollectionItemsForFilters } from '@/lib/graphql'
 
 export interface CollectionItem {
   id: string
@@ -191,46 +192,93 @@ export class CollectionService {
   }
 
   /**
-   * Fetch collection items for filters
+   * Fetch collection items for filters using GraphQL
+   * Replaces 10 REST API calls with 1 efficient GraphQL query
    */
   async fetchCollectionItems(locale: Locale): Promise<Record<string, CollectionItem[]>> {
-    const collections = [
-      'aromas',
-      'climates',
-      'dishes',
-      'grape-varieties',
-      'moods',
-      'regions',
-      'styles',
-      'tags',
-      'wineCountries',
-      'wineries',
-    ]
+    try {
+      const result = await fetchAllCollectionItemsForFilters(locale)
 
-    // Use Promise.all for parallel requests instead of sequential
-    const collectionPromises = collections.map(async (collection) => {
-      try {
-        const response = await this.payload.find(collection, {
-          limit: 100,
-          depth: 0,
-          locale,
-          fields: ['id', 'title', 'slug'],
-          where: {
-            _status: {
-              equals: 'published',
-            },
-          },
-        })
-        return [collection, response.docs]
-      } catch (error) {
-        // Log error but don't break the entire page
-        console.warn(`Failed to fetch ${collection}:`, error)
-        return [collection, []]
+      // Helper function to extract slug string from localized slug object
+      const extractSlug = (slug: any): string => {
+        if (typeof slug === 'string') return slug
+        if (slug && typeof slug === 'object') {
+          return slug[locale] || slug.sl || slug.en || ''
+        }
+        return ''
       }
-    })
 
-    const results = await Promise.all(collectionPromises)
-    return Object.fromEntries(results)
+      // Transform the result to match the expected format
+      const transformed = {
+        aromas: result.aromas.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        climates: result.climates.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        dishes: result.dishes.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        'grape-varieties': result['grape-varieties'].map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        moods: result.moods.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        regions: result.regions.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        styles: result.styles.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        tags: result.tags.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        wineCountries: result.wineCountries.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+        wineries: result.wineries.map((item) => ({
+          id: item.id,
+          title: item.title || '',
+          slug: extractSlug(item.slug),
+        })),
+      }
+
+      return transformed
+    } catch (error) {
+      // Fallback to empty collections if GraphQL fails
+      console.warn('Failed to fetch collection items via GraphQL, using fallback:', error)
+      return {
+        aromas: [],
+        climates: [],
+        dishes: [],
+        'grape-varieties': [],
+        moods: [],
+        regions: [],
+        styles: [],
+        tags: [],
+        wineCountries: [],
+        wineries: [],
+      }
+    }
   }
 
   /**

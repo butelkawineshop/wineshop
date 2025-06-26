@@ -30,9 +30,9 @@ export const FlatWineVariants: CollectionConfig = {
       type: 'relationship',
       relationTo: 'wine-variants',
       required: true,
-      index: true,
       admin: {
-        position: 'sidebar',
+        readOnly: true,
+        description: 'Reference to the original wine variant',
       },
     },
     {
@@ -199,6 +199,42 @@ export const FlatWineVariants: CollectionConfig = {
       },
     },
     {
+      name: 'description',
+      type: 'textarea',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Wine description',
+      },
+    },
+    {
+      name: 'descriptionEn',
+      type: 'textarea',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'English wine description',
+      },
+    },
+    {
+      name: 'relatedWineries',
+      type: 'array',
+      admin: {
+        readOnly: true,
+        description: 'Related wineries for filtering',
+      },
+      fields: [{ name: 'id', type: 'text' }],
+    },
+    {
+      name: 'relatedRegions',
+      type: 'array',
+      admin: {
+        readOnly: true,
+        description: 'Related regions for filtering',
+      },
+      fields: [{ name: 'id', type: 'text' }],
+    },
+    {
       name: 'tastingNotes',
       type: 'group',
       admin: {
@@ -211,7 +247,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -221,7 +256,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -231,7 +265,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -241,7 +274,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -251,7 +283,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -261,7 +292,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -271,7 +301,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -281,7 +310,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -291,7 +319,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 10,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -301,7 +328,6 @@ export const FlatWineVariants: CollectionConfig = {
           type: 'number',
           min: 1,
           max: 20,
-          index: true,
           admin: {
             readOnly: true,
           },

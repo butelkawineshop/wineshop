@@ -64,6 +64,8 @@
     "rowProgress": "{current} od {total}",
     "previousRow": "Prejšnja vrstica",
     "nextRow": "Naslednja vrstica",
+    "firstRow": "Prva vrstica",
+    "lastRow": "Zadnja vrstica",
     "keyboardInstructions": "Uporabite puščice za navigacijo med vinskimi vrsticami. Tipki Home in End za skok na prvo ali zadnjo vrstico. Page Up in Page Down za skok za 3 vrstice.",
     "wineGridLabel": "Vinska mreža z vertikalno navigacijo vrstic",
     "sliderLabel": "Vinski koleselj vrstic",

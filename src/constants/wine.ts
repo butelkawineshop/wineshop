@@ -16,6 +16,7 @@ export const WINE_CONSTANTS = {
   MAX_GRAPE_VARIETIES: 2,
   MAX_TAGS: 2,
   MAX_MOODS: 1,
+  MAX_AROMAS: 2,
 
   // Icon sizes
   ICON_SIZE: 20,

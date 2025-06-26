@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
-import { logger } from '../src/lib/logger'
-import payloadConfig from '../src/payload.config'
+import { logger } from '../../src/lib/logger'
+import payloadConfig from '../../src/payload.config'
 
 interface WineryData {
   title: string
@@ -1216,10 +1216,26 @@ const wineriesData: WineryData[] = [
       website: 'https://www.gaja.com',
     },
   },
+  {
+    title: 'Vietti',
+    wineryCode: 'VIET',
+    description: {
+      sl: 'Vietti je ena najprestižnejših vinogradniških hiš v Piemontu, znana po svojih Barolo vinih.',
+      en: 'Vietti is one of the most prestigious wine houses in Piedmont, known for its Barolo wines.',
+    },
+    whyCool: {
+      sl: 'Vietti je revolucioniralo piemontsko vinarstvo z inovativnimi metodami in najvišjo kakovostjo.',
+      en: 'Viettie revolutionized Piedmont winemaking with innovative methods and the highest quality.',
+    },
+    social: {
+      instagram: '@viettiwines',
+      website: 'https://www.vietti.com',
+    },
+  },
 
   // Spain - Rioja
   {
-    title: 'Bodegas Vega Sicilia',
+    title: 'Vega Sicilia',
     wineryCode: 'VEGA',
     description: {
       sl: 'Vega Sicilia je najprestižnejša španska vinogradniška hiša, znana po svojih dolgoletnih vinih.',
