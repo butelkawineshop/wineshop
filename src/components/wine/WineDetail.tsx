@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import type { FlatWineVariant } from '@/payload-types'
-import { WineTitleBar } from './components/WineTitleBar'
 import { WineDescription } from './components/WineDescription'
 import { WineTastingNotes } from './components/WineTastingNotes'
 import { WineCollectionTags } from './components/WineCollectionTags'
@@ -13,11 +12,12 @@ import { Icon } from '@/components/Icon'
 import { Media } from '@/components/Media'
 import { RelatedWineVariants } from './components/RelatedWineVariants'
 import { WINE_CONSTANTS } from '@/constants/wine'
+import type { RelatedWineVariant } from '@/services/WineService'
 
 interface WineDetailProps {
   variant: FlatWineVariant
   variants: FlatWineVariant[]
-  allVariants?: FlatWineVariant[]
+  relatedVariants: RelatedWineVariant[]
   selectedVariant: FlatWineVariant | null
   onVariantSelect: (variant: FlatWineVariant) => void
   locale: 'sl' | 'en'
@@ -28,7 +28,7 @@ type AccordionSection = 'description' | 'tasting' | 'food' | null
 export function WineDetail({
   variant,
   variants,
-  allVariants = [],
+  relatedVariants,
   selectedVariant,
   onVariantSelect,
   locale,
@@ -38,6 +38,12 @@ export function WineDetail({
   const [openSection, setOpenSection] = useState<AccordionSection>('description')
   const [isEndOfContent, setIsEndOfContent] = useState(false)
   const endOfContentRef = useRef<HTMLDivElement>(null)
+
+  // Debug logging for relatedVariants
+  console.log('WineDetail: relatedVariants prop:', relatedVariants)
+  console.log('WineDetail: relatedVariants length:', relatedVariants?.length)
+  console.log('WineDetail: relatedVariants type:', typeof relatedVariants)
+  console.log('WineDetail: relatedVariants isArray:', Array.isArray(relatedVariants))
 
   // Intersection observer for end of content detection
   useEffect(() => {
@@ -308,12 +314,8 @@ export function WineDetail({
           </div>
 
           {/* Related Wines */}
-          {allVariants && allVariants.length > 0 && (
-            <RelatedWineVariants
-              currentVariant={currentVariant}
-              allVariants={allVariants}
-              locale={locale}
-            />
+          {relatedVariants && relatedVariants.length > 0 && (
+            <RelatedWineVariants relatedVariants={relatedVariants} locale={locale} />
           )}
         </div>
       </div>

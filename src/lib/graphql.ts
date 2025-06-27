@@ -721,3 +721,504 @@ export async function fetchCollectionItems(variant: FlatWineVariant): Promise<{
   const result = await fetchAllCollectionItems([variant])
   return result
 }
+
+/**
+ * GraphQL query for fetching wine variant data by slug
+ * Includes all necessary fields for wine detail display
+ */
+export const WINE_VARIANT_QUERY = `
+  query GetWineVariant($slug: String!, $locale: LocaleInputType!) {
+    FlatWineVariants(where: { slug: { equals: $slug }, isPublished: { equals: true } }, limit: 1, locale: $locale) {
+      docs {
+        id
+        slug
+        wineTitle
+        vintage
+        size
+        price
+        stockOnHand
+        description
+        tastingProfile
+        servingTemp
+        decanting
+        primaryImageUrl
+        originalVariant { id slug }
+        wineryTitle
+        regionTitle
+        countryTitle
+        styleTitle
+        dishes {
+          id
+          title
+          titleEn
+        }
+        tastingNotes {
+          dry
+          ripe
+          creamy
+          oaky
+          complex
+          light
+          smooth
+          youthful
+          energetic
+          alcohol
+        }
+      }
+    }
+  }
+`
+
+/**
+ * GraphQL query for fetching all variants of a wine by wine title
+ */
+export const WINE_VARIANTS_QUERY = `
+  query GetWineVariants($wineTitle: String!, $locale: LocaleInputType!) {
+    FlatWineVariants(
+      where: { 
+        AND: [
+          { wineTitle: { equals: $wineTitle } }, 
+          { isPublished: { equals: true } }
+        ] 
+      }, 
+      sort: "vintage", 
+      locale: $locale
+    ) {
+      docs {
+        id
+        slug
+        wineTitle
+        vintage
+        size
+        price
+        stockOnHand
+        originalVariant { id slug }
+        wineryTitle
+        regionTitle
+        countryTitle
+        styleTitle
+        primaryImageUrl
+      }
+    }
+  }
+`
+
+/**
+ * GraphQL query for fetching related wine variants
+ */
+export const RELATED_WINE_VARIANTS_QUERY = `
+  query GetRelatedWineVariants($variantId: Float!, $locale: LocaleInputType!) {
+    RelatedWineVariants(
+      where: { 
+        variantId: { equals: $variantId }
+      }, 
+      limit: 1, 
+      locale: $locale
+    ) {
+      docs {
+        id
+        variantId
+        relatedVariants {
+          type
+          relatedVariant {
+            ... on FlatWineVariant {
+              id
+              slug
+              wineTitle
+              vintage
+              size
+              price
+              stockOnHand
+              primaryImageUrl
+              wineryTitle
+              regionTitle
+              countryTitle
+              styleTitle
+              styleIconKey
+              styleSlug
+              originalVariant { id slug }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+/**
+ * GraphQL query for fetching related wine variants by IDs
+ */
+export const RELATED_VARIANTS_BY_IDS_QUERY = `
+  query GetRelatedVariantsByIds($locale: LocaleInputType!, $id0: Int, $id1: Int, $id2: Int, $id3: Int, $id4: Int, $id5: Int, $id6: Int, $id7: Int, $id8: Int, $id9: Int, $id10: Int, $id11: Int, $id12: Int, $id13: Int, $id14: Int, $id15: Int, $id16: Int, $id17: Int, $id18: Int, $id19: Int) {
+    FlatWineVariants(
+      where: { 
+        OR: [
+          { id: { equals: $id0 } },
+          { id: { equals: $id1 } },
+          { id: { equals: $id2 } },
+          { id: { equals: $id3 } },
+          { id: { equals: $id4 } },
+          { id: { equals: $id5 } },
+          { id: { equals: $id6 } },
+          { id: { equals: $id7 } },
+          { id: { equals: $id8 } },
+          { id: { equals: $id9 } },
+          { id: { equals: $id10 } },
+          { id: { equals: $id11 } },
+          { id: { equals: $id12 } },
+          { id: { equals: $id13 } },
+          { id: { equals: $id14 } },
+          { id: { equals: $id15 } },
+          { id: { equals: $id16 } },
+          { id: { equals: $id17 } },
+          { id: { equals: $id18 } },
+          { id: { equals: $id19 } }
+        ]
+      }, 
+      limit: 20, 
+      locale: $locale
+    ) {
+      docs {
+        id
+        slug
+        wineTitle
+        vintage
+        size
+        price
+        stockOnHand
+        primaryImageUrl
+        wineryTitle
+        regionTitle
+        countryTitle
+        styleTitle
+        styleIconKey
+        styleSlug
+        originalVariant { id slug }
+      }
+    }
+  }
+`
+
+/**
+ * GraphQL service functions for wine data
+ */
+
+interface WineVariantResponse {
+  FlatWineVariants: {
+    docs: FlatWineVariant[]
+  }
+}
+
+interface RelatedWineVariantsResponse {
+  RelatedWineVariants: {
+    docs: Array<{
+      id: string
+      variantId: number
+      relatedVariants: Array<{
+        type: string
+        relatedVariant: FlatWineVariant | number
+      }>
+    }>
+  }
+}
+
+// Import the RelatedWineVariant type from WineService
+export interface RelatedWineVariant {
+  type: 'winery' | 'relatedWinery' | 'region' | 'relatedRegion' | 'grapeVariety' | 'price'
+  title: string
+  variants: FlatWineVariant[]
+}
+
+/**
+ * Fetch wine variant by slug using GraphQL
+ */
+export async function fetchWineVariantBySlug(
+  slug: string,
+  locale: string,
+): Promise<{ data: FlatWineVariant | null; error: string | null }> {
+  const { data, error } = await graphqlRequest<WineVariantResponse>({
+    query: WINE_VARIANT_QUERY,
+    variables: { slug, locale },
+  })
+
+  if (error) {
+    logger.error('Failed to fetch wine variant by slug via GraphQL', { error, slug, locale })
+    return { data: null, error }
+  }
+
+  if (!data?.FlatWineVariants?.docs?.length) {
+    return { data: null, error: 'Variant not found' }
+  }
+
+  return { data: data.FlatWineVariants.docs[0], error: null }
+}
+
+/**
+ * Fetch all variants for a wine by wine title using GraphQL
+ */
+export async function fetchWineVariants(
+  wineTitle: string,
+  locale: string,
+): Promise<{ data: FlatWineVariant[]; error: string | null }> {
+  const { data, error } = await graphqlRequest<WineVariantResponse>({
+    query: WINE_VARIANTS_QUERY,
+    variables: { wineTitle, locale },
+  })
+
+  if (error) {
+    logger.error('Failed to fetch wine variants via GraphQL', { error, wineTitle, locale })
+    return { data: [], error }
+  }
+
+  return { data: data?.FlatWineVariants?.docs || [], error: null }
+}
+
+/**
+ * Fetch related wine variants using GraphQL
+ */
+export async function fetchRelatedWineVariants(
+  variantId: number,
+  locale: string,
+): Promise<{ data: RelatedWineVariant[]; error: string | null }> {
+  console.log('fetchRelatedWineVariants: Starting with variantId:', variantId, 'locale:', locale)
+
+  const { data: relatedData, error: relatedError } =
+    await graphqlRequest<RelatedWineVariantsResponse>({
+      query: RELATED_WINE_VARIANTS_QUERY,
+      variables: { variantId, locale },
+    })
+
+  console.log('fetchRelatedWineVariants: GraphQL response:', {
+    hasData: !!relatedData,
+    hasError: !!relatedError,
+    error: relatedError,
+    docsCount: relatedData?.RelatedWineVariants?.docs?.length || 0,
+    firstDoc: relatedData?.RelatedWineVariants?.docs?.[0],
+  })
+
+  if (relatedError) {
+    logger.error('Failed to fetch related wine variants document via GraphQL', {
+      error: relatedError,
+      variantId,
+      locale,
+    })
+    return { data: [], error: relatedError }
+  }
+
+  if (!relatedData?.RelatedWineVariants?.docs?.length) {
+    console.log('fetchRelatedWineVariants: No related documents found')
+    return { data: [], error: null }
+  }
+
+  const relatedDoc = relatedData.RelatedWineVariants.docs[0]
+  console.log('fetchRelatedWineVariants: Found related document:', {
+    id: relatedDoc.id,
+    variantId: relatedDoc.variantId,
+    expectedVariantId: variantId,
+    relatedVariantsCount: relatedDoc.relatedVariants?.length || 0,
+    relatedVariants: relatedDoc.relatedVariants,
+  })
+
+  if (relatedDoc.variantId !== variantId) {
+    logger.error('Data integrity issue: wrong variantId', {
+      searchedFor: variantId,
+      found: relatedDoc.variantId,
+      documentId: relatedDoc.id,
+    })
+    return { data: [], error: null }
+  }
+
+  if (!relatedDoc.relatedVariants || !Array.isArray(relatedDoc.relatedVariants)) {
+    console.log('fetchRelatedWineVariants: No relatedVariants array found')
+    return { data: [], error: null }
+  }
+
+  const variantIds = relatedDoc.relatedVariants
+    .map((rel) => {
+      if (typeof rel.relatedVariant === 'number') return rel.relatedVariant
+      if (
+        rel.relatedVariant &&
+        typeof rel.relatedVariant === 'object' &&
+        'id' in rel.relatedVariant
+      ) {
+        return rel.relatedVariant.id
+      }
+      return null
+    })
+    .filter((id): id is number => id !== null)
+
+  console.log('fetchRelatedWineVariants: Extracted variant IDs:', variantIds)
+
+  if (variantIds.length === 0) {
+    console.log('fetchRelatedWineVariants: No valid variant IDs found')
+    return { data: [], error: null }
+  }
+
+  // Limit to 20 IDs to match the query structure
+  const limitedVariantIds = variantIds.slice(0, 20)
+
+  // Create variables object with individual ID parameters
+  const variables: Record<string, unknown> = { locale }
+
+  // Set all 20 possible ID variables
+  for (let i = 0; i < 20; i++) {
+    variables[`id${i}`] = limitedVariantIds[i] || null
+  }
+
+  const { data: variantData, error: variantError } = await graphqlRequest<WineVariantResponse>({
+    query: RELATED_VARIANTS_BY_IDS_QUERY,
+    variables,
+  })
+
+  console.log('fetchRelatedWineVariants: Variants by IDs response:', {
+    hasData: !!variantData,
+    hasError: !!variantError,
+    error: variantError,
+    docsCount: variantData?.FlatWineVariants?.docs?.length || 0,
+    requestedIds: limitedVariantIds,
+  })
+
+  if (variantError) {
+    logger.error('Failed to fetch related variants by IDs via GraphQL', {
+      error: variantError,
+      variantIds: limitedVariantIds,
+      locale,
+    })
+    return { data: [], error: variantError }
+  }
+
+  const variantMap = new Map(
+    (variantData?.FlatWineVariants?.docs || []).map((doc) => [doc.id, doc]),
+  )
+
+  const groups: Record<string, RelatedWineVariant> = {}
+
+  for (const rel of relatedDoc.relatedVariants) {
+    const type = rel.type
+    if (!groups[type]) {
+      groups[type] = {
+        type: type as RelatedWineVariant['type'],
+        title: getTypeTitle(type),
+        variants: [],
+      }
+    }
+
+    const variantId =
+      typeof rel.relatedVariant === 'number' ? rel.relatedVariant : rel.relatedVariant?.id
+
+    if (variantId && variantMap.has(variantId)) {
+      groups[type].variants.push(variantMap.get(variantId)!)
+    }
+  }
+
+  const result = Object.values(groups)
+  console.log('fetchRelatedWineVariants: Final result:', {
+    groupsCount: result.length,
+    groups: result.map((g) => ({ type: g.type, title: g.title, variantsCount: g.variants.length })),
+  })
+
+  return { data: result, error: null }
+}
+
+/**
+ * Get type title for display
+ */
+function getTypeTitle(type: string): string {
+  const titles: Record<string, string> = {
+    winery: 'Related by Winery',
+    relatedWinery: 'Related Wineries',
+    region: 'Related by Region',
+    relatedRegion: 'Related Regions',
+    grapeVariety: 'Related by Grape Variety',
+    price: 'Similar Price Range',
+  }
+  return titles[type] || type
+}
+
+/**
+ * Fetch complete wine variant data (variant, variants, related variants) using GraphQL
+ */
+export async function fetchWineVariantData(
+  slug: string,
+  locale: string,
+): Promise<{
+  variant: FlatWineVariant | null
+  variants: FlatWineVariant[]
+  relatedVariants: RelatedWineVariant[]
+  error: string | null
+}> {
+  try {
+    console.log('fetchWineVariantData: Starting with slug:', slug, 'locale:', locale)
+
+    const { data: variant, error: variantError } = await fetchWineVariantBySlug(slug, locale)
+    console.log('fetchWineVariantData: Main variant result:', {
+      hasVariant: !!variant,
+      variantId: variant?.id,
+      wineTitle: variant?.wineTitle,
+      error: variantError,
+    })
+
+    if (variantError || !variant) {
+      return {
+        variant: null,
+        variants: [],
+        relatedVariants: [],
+        error: variantError || 'Variant not found',
+      }
+    }
+
+    const { data: variants, error: variantsError } = await fetchWineVariants(
+      variant.wineTitle!,
+      locale,
+    )
+    console.log('fetchWineVariantData: Variants result:', {
+      variantsCount: variants?.length || 0,
+      error: variantsError,
+    })
+
+    if (variantsError) {
+      logger.warn('Failed to fetch variants, continuing with main variant only', {
+        error: variantsError,
+      })
+    }
+
+    const { data: relatedVariants, error: relatedError } = await fetchRelatedWineVariants(
+      variant.id,
+      locale,
+    )
+    console.log('fetchWineVariantData: Related variants result:', {
+      relatedVariantsCount: relatedVariants?.length || 0,
+      error: relatedError,
+    })
+
+    if (relatedError) {
+      logger.warn('Failed to fetch related variants, continuing without them', {
+        error: relatedError,
+      })
+    }
+
+    const result = {
+      variant,
+      variants: variants || [],
+      relatedVariants: relatedVariants || [],
+      error: null,
+    }
+
+    console.log('fetchWineVariantData: Final result:', {
+      hasVariant: !!result.variant,
+      variantsCount: result.variants.length,
+      relatedVariantsCount: result.relatedVariants.length,
+      error: result.error,
+    })
+
+    return result
+  } catch (error) {
+    logger.error('Failed to fetch wine variant data via GraphQL', { error, slug, locale })
+    return {
+      variant: null,
+      variants: [],
+      relatedVariants: [],
+      error: 'Failed to load wine data',
+    }
+  }
+}

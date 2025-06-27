@@ -12,6 +12,7 @@ import { Flavours } from './Aromas/Flavours'
 import { Climates } from './Climates'
 import { Moods } from './Moods'
 import { Dishes } from './Dishes'
+import { RelatedWineVariants } from '../Related/RelatedWineVariants'
 
 export const WineCollections = [
   Wines,
@@ -28,4 +29,5 @@ export const WineCollections = [
   Climates,
   Moods,
   Dishes,
+  RelatedWineVariants,
 ]

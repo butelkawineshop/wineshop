@@ -91,6 +91,7 @@ export interface Config {
     climates: Climate
     moods: Mood
     dishes: Dish
+    'related-wine-variants': RelatedWineVariant
     'flat-wine-variants': FlatWineVariant
     'payload-jobs': PayloadJob
     'payload-locked-documents': PayloadLockedDocument
@@ -129,6 +130,7 @@ export interface Config {
     climates: ClimatesSelect<false> | ClimatesSelect<true>
     moods: MoodsSelect<false> | MoodsSelect<true>
     dishes: DishesSelect<false> | DishesSelect<true>
+    'related-wine-variants': RelatedWineVariantsSelect<false> | RelatedWineVariantsSelect<true>
     'flat-wine-variants': FlatWineVariantsSelect<false> | FlatWineVariantsSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-locked-documents':
@@ -1043,6 +1045,63 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "related-wine-variants".
+ */
+export interface RelatedWineVariant {
+  id: number
+  /**
+   * Reference to the flat wine variant
+   */
+  variantId: number
+  /**
+   * Pre-computed related wine variants with intelligent scoring
+   */
+  relatedVariants?:
+    | {
+        /**
+         * Type of relationship
+         */
+        type:
+          | 'winery'
+          | 'relatedWinery'
+          | 'region'
+          | 'relatedRegion'
+          | 'grapeVariety'
+          | 'price'
+          | 'style'
+        /**
+         * Relevance score (1-10)
+         */
+        score: number
+        /**
+         * Human-readable reason for the relationship
+         */
+        reason?: string | null
+        /**
+         * Complete related variant data for wine cards
+         */
+        relatedVariant: number | FlatWineVariant
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Total number of related variants
+   */
+  relatedCount?: number | null
+  /**
+   * When the related wines were last computed
+   */
+  lastComputed?: string | null
+  /**
+   * Version of the computation logic used
+   */
+  computationVersion?: string | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "flat-wine-variants".
  */
 export interface FlatWineVariant {
@@ -1421,6 +1480,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'dishes'
         value: number | Dish
+      } | null)
+    | ({
+        relationTo: 'related-wine-variants'
+        value: number | RelatedWineVariant
       } | null)
     | ({
         relationTo: 'flat-wine-variants'
@@ -2060,6 +2123,28 @@ export interface DishesSelect<T extends boolean = true> {
         image?: T
         structuredData?: T
       }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "related-wine-variants_select".
+ */
+export interface RelatedWineVariantsSelect<T extends boolean = true> {
+  variantId?: T
+  relatedVariants?:
+    | T
+    | {
+        type?: T
+        score?: T
+        reason?: T
+        relatedVariant?: T
+        id?: T
+      }
+  relatedCount?: T
+  lastComputed?: T
+  computationVersion?: T
   updatedAt?: T
   createdAt?: T
   _status?: T

@@ -123,6 +123,12 @@ type Query {
   docAccessDish(id: Int!): dishesDocAccess
   versionDish(id: Int, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): DishVersion
   versionsDishes(where: versionsDish_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): versionsDishes
+  RelatedWineVariant(id: Int!, draft: Boolean, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): RelatedWineVariant
+  RelatedWineVariants(draft: Boolean, where: RelatedWineVariant_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): RelatedWineVariants
+  countRelatedWineVariants(draft: Boolean, where: RelatedWineVariant_where, locale: LocaleInputType): countRelatedWineVariants
+  docAccessRelatedWineVariant(id: Int!): related_wine_variantsDocAccess
+  versionRelatedWineVariant(id: Int, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): RelatedWineVariantVersion
+  versionsRelatedWineVariants(where: versionsRelatedWineVariant_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): versionsRelatedWineVariants
   FlatWineVariant(id: Int!, draft: Boolean, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): FlatWineVariant
   FlatWineVariants(draft: Boolean, where: FlatWineVariant_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): FlatWineVariants
   countFlatWineVariants(draft: Boolean, where: FlatWineVariant_where, locale: LocaleInputType): countFlatWineVariants
@@ -21160,6 +21166,34 @@ input versionsDish_where_or {
   OR: [versionsDish_where_or]
 }
 
+type RelatedWineVariant {
+  id: Int!
+  variantId: Float!
+  relatedVariants: [RelatedWineVariant_RelatedVariants!]
+  relatedCount: Float
+  lastComputed: DateTime
+  computationVersion: String
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+type RelatedWineVariant_RelatedVariants {
+  relatedVariantId: Float
+  type: RelatedWineVariant_RelatedVariants_type
+  score: Float
+  reason: String
+  relatedVariant(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): FlatWineVariant
+  id: String
+}
+
+enum RelatedWineVariant_RelatedVariants_type {
+  winery
+  region
+  grapeVariety
+  price
+  style
+}
+
 type FlatWineVariant {
   id: Int!
   originalVariant(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): WineVariant
@@ -21276,6 +21310,848 @@ type FlatWineVariant_Dishes {
 enum FlatWineVariant__status {
   draft
   published
+}
+
+type RelatedWineVariants {
+  docs: [RelatedWineVariant!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input RelatedWineVariant_where {
+  variantId: RelatedWineVariant_variantId_operator
+  relatedVariants__relatedVariantId: RelatedWineVariant_relatedVariants__relatedVariantId_operator
+  relatedVariants__type: RelatedWineVariant_relatedVariants__type_operator
+  relatedVariants__score: RelatedWineVariant_relatedVariants__score_operator
+  relatedVariants__reason: RelatedWineVariant_relatedVariants__reason_operator
+  relatedVariants__relatedVariant: RelatedWineVariant_relatedVariants__relatedVariant_operator
+  relatedVariants__id: RelatedWineVariant_relatedVariants__id_operator
+  relatedCount: RelatedWineVariant_relatedCount_operator
+  lastComputed: RelatedWineVariant_lastComputed_operator
+  computationVersion: RelatedWineVariant_computationVersion_operator
+  updatedAt: RelatedWineVariant_updatedAt_operator
+  createdAt: RelatedWineVariant_createdAt_operator
+  id: RelatedWineVariant_id_operator
+  AND: [RelatedWineVariant_where_and]
+  OR: [RelatedWineVariant_where_or]
+}
+
+input RelatedWineVariant_variantId_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input RelatedWineVariant_relatedVariants__relatedVariantId_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input RelatedWineVariant_relatedVariants__type_operator {
+  equals: RelatedWineVariant_relatedVariants__type_Input
+  not_equals: RelatedWineVariant_relatedVariants__type_Input
+  in: [RelatedWineVariant_relatedVariants__type_Input]
+  not_in: [RelatedWineVariant_relatedVariants__type_Input]
+  all: [RelatedWineVariant_relatedVariants__type_Input]
+}
+
+enum RelatedWineVariant_relatedVariants__type_Input {
+  winery
+  region
+  grapeVariety
+  price
+  style
+}
+
+input RelatedWineVariant_relatedVariants__score_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input RelatedWineVariant_relatedVariants__reason_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input RelatedWineVariant_relatedVariants__relatedVariant_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input RelatedWineVariant_relatedVariants__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input RelatedWineVariant_relatedCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input RelatedWineVariant_lastComputed_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input RelatedWineVariant_computationVersion_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input RelatedWineVariant_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input RelatedWineVariant_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input RelatedWineVariant_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input RelatedWineVariant_where_and {
+  variantId: RelatedWineVariant_variantId_operator
+  relatedVariants__relatedVariantId: RelatedWineVariant_relatedVariants__relatedVariantId_operator
+  relatedVariants__type: RelatedWineVariant_relatedVariants__type_operator
+  relatedVariants__score: RelatedWineVariant_relatedVariants__score_operator
+  relatedVariants__reason: RelatedWineVariant_relatedVariants__reason_operator
+  relatedVariants__relatedVariant: RelatedWineVariant_relatedVariants__relatedVariant_operator
+  relatedVariants__id: RelatedWineVariant_relatedVariants__id_operator
+  relatedCount: RelatedWineVariant_relatedCount_operator
+  lastComputed: RelatedWineVariant_lastComputed_operator
+  computationVersion: RelatedWineVariant_computationVersion_operator
+  updatedAt: RelatedWineVariant_updatedAt_operator
+  createdAt: RelatedWineVariant_createdAt_operator
+  id: RelatedWineVariant_id_operator
+  AND: [RelatedWineVariant_where_and]
+  OR: [RelatedWineVariant_where_or]
+}
+
+input RelatedWineVariant_where_or {
+  variantId: RelatedWineVariant_variantId_operator
+  relatedVariants__relatedVariantId: RelatedWineVariant_relatedVariants__relatedVariantId_operator
+  relatedVariants__type: RelatedWineVariant_relatedVariants__type_operator
+  relatedVariants__score: RelatedWineVariant_relatedVariants__score_operator
+  relatedVariants__reason: RelatedWineVariant_relatedVariants__reason_operator
+  relatedVariants__relatedVariant: RelatedWineVariant_relatedVariants__relatedVariant_operator
+  relatedVariants__id: RelatedWineVariant_relatedVariants__id_operator
+  relatedCount: RelatedWineVariant_relatedCount_operator
+  lastComputed: RelatedWineVariant_lastComputed_operator
+  computationVersion: RelatedWineVariant_computationVersion_operator
+  updatedAt: RelatedWineVariant_updatedAt_operator
+  createdAt: RelatedWineVariant_createdAt_operator
+  id: RelatedWineVariant_id_operator
+  AND: [RelatedWineVariant_where_and]
+  OR: [RelatedWineVariant_where_or]
+}
+
+type countRelatedWineVariants {
+  totalDocs: Int
+}
+
+type related_wine_variantsDocAccess {
+  fields: RelatedWineVariantsDocAccessFields
+  create: RelatedWineVariantsCreateDocAccess
+  read: RelatedWineVariantsReadDocAccess
+  update: RelatedWineVariantsUpdateDocAccess
+  delete: RelatedWineVariantsDeleteDocAccess
+  readVersions: RelatedWineVariantsReadVersionsDocAccess
+}
+
+type RelatedWineVariantsDocAccessFields {
+  variantId: RelatedWineVariantsDocAccessFields_variantId
+  relatedVariants: RelatedWineVariantsDocAccessFields_relatedVariants
+  relatedCount: RelatedWineVariantsDocAccessFields_relatedCount
+  lastComputed: RelatedWineVariantsDocAccessFields_lastComputed
+  computationVersion: RelatedWineVariantsDocAccessFields_computationVersion
+  updatedAt: RelatedWineVariantsDocAccessFields_updatedAt
+  createdAt: RelatedWineVariantsDocAccessFields_createdAt
+}
+
+type RelatedWineVariantsDocAccessFields_variantId {
+  create: RelatedWineVariantsDocAccessFields_variantId_Create
+  read: RelatedWineVariantsDocAccessFields_variantId_Read
+  update: RelatedWineVariantsDocAccessFields_variantId_Update
+  delete: RelatedWineVariantsDocAccessFields_variantId_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_variantId_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_variantId_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_variantId_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_variantId_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_Delete
+  fields: RelatedWineVariantsDocAccessFields_relatedVariants_Fields
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_Fields {
+  relatedVariantId: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId
+  type: RelatedWineVariantsDocAccessFields_relatedVariants_type
+  score: RelatedWineVariantsDocAccessFields_relatedVariants_score
+  reason: RelatedWineVariantsDocAccessFields_relatedVariants_reason
+  relatedVariant: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant
+  id: RelatedWineVariantsDocAccessFields_relatedVariants_id
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_type {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_type_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_type_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_type_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_type_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_type_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_type_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_type_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_type_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_score {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_score_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_score_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_score_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_score_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_score_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_score_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_score_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_score_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_reason {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_reason_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_reason_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_reason_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_reason_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_reason_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_reason_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_reason_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_reason_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_id {
+  create: RelatedWineVariantsDocAccessFields_relatedVariants_id_Create
+  read: RelatedWineVariantsDocAccessFields_relatedVariants_id_Read
+  update: RelatedWineVariantsDocAccessFields_relatedVariants_id_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedVariants_id_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_id_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_id_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_id_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedVariants_id_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedCount {
+  create: RelatedWineVariantsDocAccessFields_relatedCount_Create
+  read: RelatedWineVariantsDocAccessFields_relatedCount_Read
+  update: RelatedWineVariantsDocAccessFields_relatedCount_Update
+  delete: RelatedWineVariantsDocAccessFields_relatedCount_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_relatedCount_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedCount_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedCount_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_relatedCount_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_lastComputed {
+  create: RelatedWineVariantsDocAccessFields_lastComputed_Create
+  read: RelatedWineVariantsDocAccessFields_lastComputed_Read
+  update: RelatedWineVariantsDocAccessFields_lastComputed_Update
+  delete: RelatedWineVariantsDocAccessFields_lastComputed_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_lastComputed_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_lastComputed_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_lastComputed_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_lastComputed_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_computationVersion {
+  create: RelatedWineVariantsDocAccessFields_computationVersion_Create
+  read: RelatedWineVariantsDocAccessFields_computationVersion_Read
+  update: RelatedWineVariantsDocAccessFields_computationVersion_Update
+  delete: RelatedWineVariantsDocAccessFields_computationVersion_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_computationVersion_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_computationVersion_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_computationVersion_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_computationVersion_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_updatedAt {
+  create: RelatedWineVariantsDocAccessFields_updatedAt_Create
+  read: RelatedWineVariantsDocAccessFields_updatedAt_Read
+  update: RelatedWineVariantsDocAccessFields_updatedAt_Update
+  delete: RelatedWineVariantsDocAccessFields_updatedAt_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_createdAt {
+  create: RelatedWineVariantsDocAccessFields_createdAt_Create
+  read: RelatedWineVariantsDocAccessFields_createdAt_Read
+  update: RelatedWineVariantsDocAccessFields_createdAt_Update
+  delete: RelatedWineVariantsDocAccessFields_createdAt_Delete
+}
+
+type RelatedWineVariantsDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsReadVersionsDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantVersion {
+  parent(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): RelatedWineVariant
+  version: RelatedWineVariantVersion_Version
+  createdAt: DateTime
+  updatedAt: DateTime
+  id: Int
+}
+
+type RelatedWineVariantVersion_Version {
+  variantId: Float
+  relatedVariants: [RelatedWineVariantVersion_Version_RelatedVariants!]
+  relatedCount: Float
+  lastComputed: DateTime
+  computationVersion: String
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+type RelatedWineVariantVersion_Version_RelatedVariants {
+  relatedVariantId: Float
+  type: RelatedWineVariantVersion_Version_RelatedVariants_type
+  score: Float
+  reason: String
+  relatedVariant(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): FlatWineVariant
+  id: String
+}
+
+enum RelatedWineVariantVersion_Version_RelatedVariants_type {
+  winery
+  region
+  grapeVariety
+  price
+  style
+}
+
+type versionsRelatedWineVariants {
+  docs: [RelatedWineVariantVersion!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input versionsRelatedWineVariant_where {
+  parent: versionsRelatedWineVariant_parent_operator
+  version__variantId: versionsRelatedWineVariant_version__variantId_operator
+  version__relatedVariants__relatedVariantId: versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator
+  version__relatedVariants__type: versionsRelatedWineVariant_version__relatedVariants__type_operator
+  version__relatedVariants__score: versionsRelatedWineVariant_version__relatedVariants__score_operator
+  version__relatedVariants__reason: versionsRelatedWineVariant_version__relatedVariants__reason_operator
+  version__relatedVariants__relatedVariant: versionsRelatedWineVariant_version__relatedVariants__relatedVariant_operator
+  version__relatedVariants__id: versionsRelatedWineVariant_version__relatedVariants__id_operator
+  version__relatedCount: versionsRelatedWineVariant_version__relatedCount_operator
+  version__lastComputed: versionsRelatedWineVariant_version__lastComputed_operator
+  version__computationVersion: versionsRelatedWineVariant_version__computationVersion_operator
+  version__updatedAt: versionsRelatedWineVariant_version__updatedAt_operator
+  version__createdAt: versionsRelatedWineVariant_version__createdAt_operator
+  createdAt: versionsRelatedWineVariant_createdAt_operator
+  updatedAt: versionsRelatedWineVariant_updatedAt_operator
+  id: versionsRelatedWineVariant_id_operator
+  AND: [versionsRelatedWineVariant_where_and]
+  OR: [versionsRelatedWineVariant_where_or]
+}
+
+input versionsRelatedWineVariant_parent_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__variantId_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsRelatedWineVariant_version__relatedVariants__type_operator {
+  equals: versionsRelatedWineVariant_version__relatedVariants__type_Input
+  not_equals: versionsRelatedWineVariant_version__relatedVariants__type_Input
+  in: [versionsRelatedWineVariant_version__relatedVariants__type_Input]
+  not_in: [versionsRelatedWineVariant_version__relatedVariants__type_Input]
+  all: [versionsRelatedWineVariant_version__relatedVariants__type_Input]
+}
+
+enum versionsRelatedWineVariant_version__relatedVariants__type_Input {
+  winery
+  region
+  grapeVariety
+  price
+  style
+}
+
+input versionsRelatedWineVariant_version__relatedVariants__score_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsRelatedWineVariant_version__relatedVariants__reason_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__relatedVariants__relatedVariant_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input versionsRelatedWineVariant_version__relatedVariants__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__relatedCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__lastComputed_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__computationVersion_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_version__createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_where_and {
+  parent: versionsRelatedWineVariant_parent_operator
+  version__variantId: versionsRelatedWineVariant_version__variantId_operator
+  version__relatedVariants__relatedVariantId: versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator
+  version__relatedVariants__type: versionsRelatedWineVariant_version__relatedVariants__type_operator
+  version__relatedVariants__score: versionsRelatedWineVariant_version__relatedVariants__score_operator
+  version__relatedVariants__reason: versionsRelatedWineVariant_version__relatedVariants__reason_operator
+  version__relatedVariants__relatedVariant: versionsRelatedWineVariant_version__relatedVariants__relatedVariant_operator
+  version__relatedVariants__id: versionsRelatedWineVariant_version__relatedVariants__id_operator
+  version__relatedCount: versionsRelatedWineVariant_version__relatedCount_operator
+  version__lastComputed: versionsRelatedWineVariant_version__lastComputed_operator
+  version__computationVersion: versionsRelatedWineVariant_version__computationVersion_operator
+  version__updatedAt: versionsRelatedWineVariant_version__updatedAt_operator
+  version__createdAt: versionsRelatedWineVariant_version__createdAt_operator
+  createdAt: versionsRelatedWineVariant_createdAt_operator
+  updatedAt: versionsRelatedWineVariant_updatedAt_operator
+  id: versionsRelatedWineVariant_id_operator
+  AND: [versionsRelatedWineVariant_where_and]
+  OR: [versionsRelatedWineVariant_where_or]
+}
+
+input versionsRelatedWineVariant_where_or {
+  parent: versionsRelatedWineVariant_parent_operator
+  version__variantId: versionsRelatedWineVariant_version__variantId_operator
+  version__relatedVariants__relatedVariantId: versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator
+  version__relatedVariants__type: versionsRelatedWineVariant_version__relatedVariants__type_operator
+  version__relatedVariants__score: versionsRelatedWineVariant_version__relatedVariants__score_operator
+  version__relatedVariants__reason: versionsRelatedWineVariant_version__relatedVariants__reason_operator
+  version__relatedVariants__relatedVariant: versionsRelatedWineVariant_version__relatedVariants__relatedVariant_operator
+  version__relatedVariants__id: versionsRelatedWineVariant_version__relatedVariants__id_operator
+  version__relatedCount: versionsRelatedWineVariant_version__relatedCount_operator
+  version__lastComputed: versionsRelatedWineVariant_version__lastComputed_operator
+  version__computationVersion: versionsRelatedWineVariant_version__computationVersion_operator
+  version__updatedAt: versionsRelatedWineVariant_version__updatedAt_operator
+  version__createdAt: versionsRelatedWineVariant_version__createdAt_operator
+  createdAt: versionsRelatedWineVariant_createdAt_operator
+  updatedAt: versionsRelatedWineVariant_updatedAt_operator
+  id: versionsRelatedWineVariant_id_operator
+  AND: [versionsRelatedWineVariant_where_and]
+  OR: [versionsRelatedWineVariant_where_or]
 }
 
 type FlatWineVariants {
@@ -26418,11 +27294,12 @@ enum PayloadLockedDocument_Document_RelationTo {
   climates
   moods
   dishes
+  related_wine_variants
   flat_wine_variants
   payload_jobs
 }
 
-union PayloadLockedDocument_Document = User | Customer | Media | Invoice | ActiveCart | SavedCart | SharedCart | StockReservation | Order | Wine | WineVariant | Winery | Region | WineCountry | GrapeVariety | Tag | Aroma | Adjective | Flavour | Style | Climate | Mood | Dish | FlatWineVariant | PayloadJob
+union PayloadLockedDocument_Document = User | Customer | Media | Invoice | ActiveCart | SavedCart | SharedCart | StockReservation | Order | Wine | WineVariant | Winery | Region | WineCountry | GrapeVariety | Tag | Aroma | Adjective | Flavour | Style | Climate | Mood | Dish | RelatedWineVariant | FlatWineVariant | PayloadJob
 
 type PayloadLockedDocument_User_Relationship {
   relationTo: PayloadLockedDocument_User_RelationTo
@@ -26490,6 +27367,7 @@ enum PayloadLockedDocument_document_Relation_RelationTo {
   climates
   moods
   dishes
+  related_wine_variants
   flat_wine_variants
   payload_jobs
 }
@@ -27035,6 +27913,7 @@ type Access {
   climates: climatesAccess
   moods: moodsAccess
   dishes: dishesAccess
+  related_wine_variants: related_wine_variantsAccess
   flat_wine_variants: flat_wine_variantsAccess
   payload_jobs: payload_jobsAccess
   payload_locked_documents: payload_locked_documentsAccess
@@ -36538,6 +37417,359 @@ type DishesReadVersionsAccess {
   where: JSONObject
 }
 
+type related_wine_variantsAccess {
+  fields: RelatedWineVariantsFields
+  create: RelatedWineVariantsCreateAccess
+  read: RelatedWineVariantsReadAccess
+  update: RelatedWineVariantsUpdateAccess
+  delete: RelatedWineVariantsDeleteAccess
+  readVersions: RelatedWineVariantsReadVersionsAccess
+}
+
+type RelatedWineVariantsFields {
+  variantId: RelatedWineVariantsFields_variantId
+  relatedVariants: RelatedWineVariantsFields_relatedVariants
+  relatedCount: RelatedWineVariantsFields_relatedCount
+  lastComputed: RelatedWineVariantsFields_lastComputed
+  computationVersion: RelatedWineVariantsFields_computationVersion
+  updatedAt: RelatedWineVariantsFields_updatedAt
+  createdAt: RelatedWineVariantsFields_createdAt
+}
+
+type RelatedWineVariantsFields_variantId {
+  create: RelatedWineVariantsFields_variantId_Create
+  read: RelatedWineVariantsFields_variantId_Read
+  update: RelatedWineVariantsFields_variantId_Update
+  delete: RelatedWineVariantsFields_variantId_Delete
+}
+
+type RelatedWineVariantsFields_variantId_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_variantId_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_variantId_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_variantId_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants {
+  create: RelatedWineVariantsFields_relatedVariants_Create
+  read: RelatedWineVariantsFields_relatedVariants_Read
+  update: RelatedWineVariantsFields_relatedVariants_Update
+  delete: RelatedWineVariantsFields_relatedVariants_Delete
+  fields: RelatedWineVariantsFields_relatedVariants_Fields
+}
+
+type RelatedWineVariantsFields_relatedVariants_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_Fields {
+  relatedVariantId: RelatedWineVariantsFields_relatedVariants_relatedVariantId
+  type: RelatedWineVariantsFields_relatedVariants_type
+  score: RelatedWineVariantsFields_relatedVariants_score
+  reason: RelatedWineVariantsFields_relatedVariants_reason
+  relatedVariant: RelatedWineVariantsFields_relatedVariants_relatedVariant
+  id: RelatedWineVariantsFields_relatedVariants_id
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariantId {
+  create: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Create
+  read: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Read
+  update: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Update
+  delete: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Delete
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_type {
+  create: RelatedWineVariantsFields_relatedVariants_type_Create
+  read: RelatedWineVariantsFields_relatedVariants_type_Read
+  update: RelatedWineVariantsFields_relatedVariants_type_Update
+  delete: RelatedWineVariantsFields_relatedVariants_type_Delete
+}
+
+type RelatedWineVariantsFields_relatedVariants_type_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_type_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_type_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_type_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_score {
+  create: RelatedWineVariantsFields_relatedVariants_score_Create
+  read: RelatedWineVariantsFields_relatedVariants_score_Read
+  update: RelatedWineVariantsFields_relatedVariants_score_Update
+  delete: RelatedWineVariantsFields_relatedVariants_score_Delete
+}
+
+type RelatedWineVariantsFields_relatedVariants_score_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_score_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_score_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_score_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_reason {
+  create: RelatedWineVariantsFields_relatedVariants_reason_Create
+  read: RelatedWineVariantsFields_relatedVariants_reason_Read
+  update: RelatedWineVariantsFields_relatedVariants_reason_Update
+  delete: RelatedWineVariantsFields_relatedVariants_reason_Delete
+}
+
+type RelatedWineVariantsFields_relatedVariants_reason_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_reason_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_reason_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_reason_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariant {
+  create: RelatedWineVariantsFields_relatedVariants_relatedVariant_Create
+  read: RelatedWineVariantsFields_relatedVariants_relatedVariant_Read
+  update: RelatedWineVariantsFields_relatedVariants_relatedVariant_Update
+  delete: RelatedWineVariantsFields_relatedVariants_relatedVariant_Delete
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariant_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariant_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariant_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_relatedVariant_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_id {
+  create: RelatedWineVariantsFields_relatedVariants_id_Create
+  read: RelatedWineVariantsFields_relatedVariants_id_Read
+  update: RelatedWineVariantsFields_relatedVariants_id_Update
+  delete: RelatedWineVariantsFields_relatedVariants_id_Delete
+}
+
+type RelatedWineVariantsFields_relatedVariants_id_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_id_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_id_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedVariants_id_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedCount {
+  create: RelatedWineVariantsFields_relatedCount_Create
+  read: RelatedWineVariantsFields_relatedCount_Read
+  update: RelatedWineVariantsFields_relatedCount_Update
+  delete: RelatedWineVariantsFields_relatedCount_Delete
+}
+
+type RelatedWineVariantsFields_relatedCount_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedCount_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedCount_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_relatedCount_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_lastComputed {
+  create: RelatedWineVariantsFields_lastComputed_Create
+  read: RelatedWineVariantsFields_lastComputed_Read
+  update: RelatedWineVariantsFields_lastComputed_Update
+  delete: RelatedWineVariantsFields_lastComputed_Delete
+}
+
+type RelatedWineVariantsFields_lastComputed_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_lastComputed_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_lastComputed_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_lastComputed_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_computationVersion {
+  create: RelatedWineVariantsFields_computationVersion_Create
+  read: RelatedWineVariantsFields_computationVersion_Read
+  update: RelatedWineVariantsFields_computationVersion_Update
+  delete: RelatedWineVariantsFields_computationVersion_Delete
+}
+
+type RelatedWineVariantsFields_computationVersion_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_computationVersion_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_computationVersion_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_computationVersion_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_updatedAt {
+  create: RelatedWineVariantsFields_updatedAt_Create
+  read: RelatedWineVariantsFields_updatedAt_Read
+  update: RelatedWineVariantsFields_updatedAt_Update
+  delete: RelatedWineVariantsFields_updatedAt_Delete
+}
+
+type RelatedWineVariantsFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_createdAt {
+  create: RelatedWineVariantsFields_createdAt_Create
+  read: RelatedWineVariantsFields_createdAt_Read
+  update: RelatedWineVariantsFields_createdAt_Update
+  delete: RelatedWineVariantsFields_createdAt_Delete
+}
+
+type RelatedWineVariantsFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type RelatedWineVariantsReadVersionsAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type flat_wine_variantsAccess {
   fields: FlatWineVariantsFields
   create: FlatWineVariantsCreateAccess
@@ -39519,6 +40751,11 @@ type Mutation {
   deleteDish(id: Int!): Dish
   duplicateDish(id: Int!, data: mutationDishInput!): Dish
   restoreVersionDish(id: Int, draft: Boolean): Dish
+  createRelatedWineVariant(data: mutationRelatedWineVariantInput!, draft: Boolean, locale: LocaleInputType): RelatedWineVariant
+  updateRelatedWineVariant(id: Int!, autosave: Boolean, data: mutationRelatedWineVariantUpdateInput!, draft: Boolean, locale: LocaleInputType): RelatedWineVariant
+  deleteRelatedWineVariant(id: Int!): RelatedWineVariant
+  duplicateRelatedWineVariant(id: Int!, data: mutationRelatedWineVariantInput!): RelatedWineVariant
+  restoreVersionRelatedWineVariant(id: Int, draft: Boolean): RelatedWineVariant
   createFlatWineVariant(data: mutationFlatWineVariantInput!, draft: Boolean, locale: LocaleInputType): FlatWineVariant
   updateFlatWineVariant(id: Int!, autosave: Boolean, data: mutationFlatWineVariantUpdateInput!, draft: Boolean, locale: LocaleInputType): FlatWineVariant
   deleteFlatWineVariant(id: Int!): FlatWineVariant
@@ -40946,6 +42183,60 @@ enum DishUpdate__status_MutationInput {
   published
 }
 
+input mutationRelatedWineVariantInput {
+  variantId: Float!
+  relatedVariants: [mutationRelatedWineVariant_RelatedVariantsInput]
+  relatedCount: Float
+  lastComputed: String
+  computationVersion: String
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationRelatedWineVariant_RelatedVariantsInput {
+  relatedVariantId: Float!
+  type: RelatedWineVariant_RelatedVariants_type_MutationInput!
+  score: Float!
+  reason: String
+  relatedVariant: Int
+  id: String
+}
+
+enum RelatedWineVariant_RelatedVariants_type_MutationInput {
+  winery
+  region
+  grapeVariety
+  price
+  style
+}
+
+input mutationRelatedWineVariantUpdateInput {
+  variantId: Float
+  relatedVariants: [mutationRelatedWineVariantUpdate_RelatedVariantsInput]
+  relatedCount: Float
+  lastComputed: String
+  computationVersion: String
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationRelatedWineVariantUpdate_RelatedVariantsInput {
+  relatedVariantId: Float!
+  type: RelatedWineVariantUpdate_RelatedVariants_type_MutationInput!
+  score: Float!
+  reason: String
+  relatedVariant: Int
+  id: String
+}
+
+enum RelatedWineVariantUpdate_RelatedVariants_type_MutationInput {
+  winery
+  region
+  grapeVariety
+  price
+  style
+}
+
 input mutationFlatWineVariantInput {
   originalVariant: Int
   wineID: Float
@@ -41307,6 +42598,7 @@ enum PayloadLockedDocument_DocumentRelationshipInputRelationTo {
   climates
   moods
   dishes
+  related_wine_variants
   flat_wine_variants
   payload_jobs
 }
@@ -41358,6 +42650,7 @@ enum PayloadLockedDocumentUpdate_DocumentRelationshipInputRelationTo {
   climates
   moods
   dishes
+  related_wine_variants
   flat_wine_variants
   payload_jobs
 }

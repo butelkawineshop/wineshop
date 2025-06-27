@@ -264,6 +264,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'relatedWineries',
       type: 'array',
+      index: true,
       admin: {
         readOnly: true,
         description: 'Related wineries for filtering',
@@ -273,6 +274,7 @@ export const FlatWineVariants: CollectionConfig = {
     {
       name: 'relatedRegions',
       type: 'array',
+      index: true,
       admin: {
         readOnly: true,
         description: 'Related regions for filtering',

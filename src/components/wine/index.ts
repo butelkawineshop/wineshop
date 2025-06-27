@@ -2,8 +2,6 @@ export { WineCard } from './WineCard'
 export { WineGrid } from './WineGrid'
 export { WineDetail } from './WineDetail'
 export { WineDetailWrapper } from './WineDetailWrapper'
-export { WineDetailServer } from './WineDetailServer'
-export { WineDetailClient } from './WineDetailClient'
 
 // Sub-components
 export { WineTitleBar } from './components/WineTitleBar'

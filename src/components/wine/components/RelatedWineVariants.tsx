@@ -9,8 +9,11 @@ import 'swiper/css'
 import 'swiper/css/effect-cards'
 
 interface RelatedWineVariantsProps {
-  currentVariant: FlatWineVariant
-  allVariants: FlatWineVariant[]
+  relatedVariants: Array<{
+    type: string
+    title: string
+    variants: FlatWineVariant[]
+  }>
   locale: 'sl' | 'en'
 }
 
@@ -21,303 +24,86 @@ interface RelatedGroup {
 }
 
 export function RelatedWineVariants({
-  currentVariant,
-  allVariants,
+  relatedVariants,
   locale,
 }: RelatedWineVariantsProps): React.JSX.Element {
   const t = useTranslations('wine.detail')
 
-  // Helper function to get grape variety titles (not IDs)
-  const getGrapeVarietyTitles = (variant: FlatWineVariant): string[] => {
-    return variant.grapeVarieties?.map((gv) => gv.title || '').filter(Boolean) || []
-  }
-
-  // Helper function to get related winery IDs
-  const getRelatedWineryIds = (variant: FlatWineVariant): string[] => {
-    const relatedIds: string[] = []
-    if (variant.relatedWineries) {
-      variant.relatedWineries.forEach((rw) => {
-        if (rw.id) relatedIds.push(rw.id)
-      })
-    }
-    return relatedIds
-  }
-
-  // Helper function to get related region IDs
-  const getRelatedRegionIds = (variant: FlatWineVariant): string[] => {
-    const relatedIds: string[] = []
-    if (variant.relatedRegions) {
-      variant.relatedRegions.forEach((rr) => {
-        if (rr.id) relatedIds.push(rr.id)
-      })
-    }
-    return relatedIds
-  }
-
-  // Helper function to calculate price range percentage
-  const getPriceRange = (price: number): { min: number; max: number } => {
-    if (price <= 15) {
-      return { min: price * 0.7, max: price * 1.3 } // 30% range
-    } else if (price <= 30) {
-      return { min: price * 0.75, max: price * 1.25 } // 25% range
-    } else {
-      return { min: price * 0.8, max: price * 1.2 } // 20% range
-    }
-  }
-
-  // Helper function to calculate grape variety similarity score
-  const calculateGrapeSimilarity = (currentGrapes: string[], variantGrapes: string[]): number => {
-    if (currentGrapes.length === 0 || variantGrapes.length === 0) return 0
-
-    // Exact matches get highest score (10 points each)
-    const exactMatches = currentGrapes.filter((g) => variantGrapes.includes(g)).length
-    if (exactMatches > 0) return exactMatches * 10
-
-    // Check for partial matches (same grape variety family)
-    // This is a simplified approach - in a real implementation, you'd have a grape variety taxonomy
-    const currentGrapeNames = currentGrapes.map((g) => g.toLowerCase())
-    const variantGrapeNames = variantGrapes.map((g) => g.toLowerCase())
-
-    // Check for common grape families (simplified)
-    const grapeFamilies = {
-      pinot: ['pinot noir', 'pinot gris', 'pinot blanc', 'pinot meunier'],
-      cabernet: ['cabernet sauvignon', 'cabernet franc'],
-      merlot: ['merlot'],
-      syrah: ['syrah', 'shiraz'],
-      chardonnay: ['chardonnay'],
-      sauvignon: ['sauvignon blanc'],
-      riesling: ['riesling'],
-      nebbiolo: ['nebbiolo'],
-      sangiovese: ['sangiovese'],
-      tempranillo: ['tempranillo'],
-      grenache: ['grenache', 'garnacha'],
-      mourvedre: ['mourvedre', 'monastrell'],
-      malbec: ['malbec'],
-      barbera: ['barbera'],
-      dolcetto: ['dolcetto'],
-      refosco: ['refosco'],
-      schioppettino: ['schioppettino'],
-      blaufrankisch: ['blaufrankisch'],
-      marsanne: ['marsanne'],
-      roussanne: ['roussanne'],
-      carricante: ['carricante'],
-      vitovska: ['vitovska grganja'],
-      furmint: ['furmint'],
-      picolit: ['picolit'],
-      glera: ['glera'],
-      parellada: ['parellada'],
-      nerello: ['nerello mascalese'],
-      moscato: ['moscato giallo'],
-      molinara: ['molinara'],
-      marselan: ['marselan'],
-    }
-
-    let familyMatches = 0
-    for (const [family, varieties] of Object.entries(grapeFamilies)) {
-      const currentInFamily = currentGrapeNames.some((g) =>
-        varieties.some((v) => g.includes(v) || v.includes(g)),
-      )
-      const variantInFamily = variantGrapeNames.some((g) =>
-        varieties.some((v) => g.includes(v) || v.includes(g)),
-      )
-
-      if (currentInFamily && variantInFamily) {
-        familyMatches++
-      }
-    }
-
-    // Family matches get 5 points each
-    if (familyMatches > 0) return familyMatches * 5
-
-    // Check for blending partners (simplified common combinations)
-    const commonBlends = [
-      ['cabernet sauvignon', 'merlot'],
-      ['cabernet sauvignon', 'cabernet franc'],
-      ['syrah', 'grenache'],
-      ['syrah', 'mourvedre'],
-      ['grenache', 'mourvedre'],
-      ['marsanne', 'roussanne'],
-      ['pinot noir', 'pinot meunier'],
-      ['sangiovese', 'cabernet sauvignon'],
-      ['tempranillo', 'grenache'],
-      ['barbera', 'nebbiolo'],
-      ['refosco', 'schioppettino'],
-    ]
-
-    for (const blend of commonBlends) {
-      const currentHasBlend = blend.some((g) =>
-        currentGrapeNames.some((cg) => cg.includes(g) || g.includes(cg)),
-      )
-      const variantHasBlend = blend.some((g) =>
-        variantGrapeNames.some((vg) => vg.includes(g) || g.includes(vg)),
-      )
-
-      if (currentHasBlend && variantHasBlend) {
-        return 3 // Blending partner match
-      }
-    }
-
-    return 0
-  }
-
-  // 1. Brothers and Sisters - same winery and/or related wineries
-  const getBrothersAndSisters = (): FlatWineVariant[] => {
-    const currentWineryId = currentVariant.wineryID
-    const relatedWineryIds = getRelatedWineryIds(currentVariant)
-
-    const candidates = allVariants.filter(
-      (variant) =>
-        variant.id !== currentVariant.id &&
-        variant.isPublished &&
-        (variant.stockOnHand || 0) > 0 &&
-        (variant.wineryID === currentWineryId ||
-          (variant.wineryID && relatedWineryIds.includes(variant.wineryID.toString()))),
-    )
-
-    // Sort by same winery first, then by creation date
-    return candidates
-      .sort((a, b) => {
-        const aSameWinery = a.wineryID === currentWineryId ? 1 : 0
-        const bSameWinery = b.wineryID === currentWineryId ? 1 : 0
-        if (aSameWinery !== bSameWinery) return bSameWinery - aSameWinery
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      })
-      .slice(0, 5)
-  }
-
-  // 2. Neighbours - same region and/or neighbouring regions
-  const getNeighbours = (excludedIds: Set<number>): FlatWineVariant[] => {
-    const currentRegionId = currentVariant.regionID
-    const relatedRegionIds = getRelatedRegionIds(currentVariant)
-
-    const candidates = allVariants.filter(
-      (variant) =>
-        variant.id !== currentVariant.id &&
-        !excludedIds.has(variant.id) &&
-        variant.isPublished &&
-        (variant.stockOnHand || 0) > 0 &&
-        (variant.regionID === currentRegionId ||
-          (variant.regionID && relatedRegionIds.includes(variant.regionID.toString()))),
-    )
-
-    // Sort by same region first, then by creation date
-    return candidates
-      .sort((a, b) => {
-        const aSameRegion = a.regionID === currentRegionId ? 1 : 0
-        const bSameRegion = b.regionID === currentRegionId ? 1 : 0
-        if (aSameRegion !== bSameRegion) return bSameRegion - aSameRegion
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      })
-      .slice(0, 5)
-  }
-
-  // 3. Cousins - same grape variety and/or related grape varieties
-  const getCousins = (excludedIds: Set<number>): FlatWineVariant[] => {
-    const currentGrapeTitles = getGrapeVarietyTitles(currentVariant)
-
-    const candidates = allVariants.filter(
-      (variant) =>
-        variant.id !== currentVariant.id &&
-        !excludedIds.has(variant.id) &&
-        variant.isPublished &&
-        (variant.stockOnHand || 0) > 0 &&
-        variant.grapeVarieties &&
-        variant.grapeVarieties.length > 0,
-    )
-
-    // Calculate similarity scores and sort
-    const scoredCandidates = candidates.map((variant) => {
-      const variantGrapeTitles = getGrapeVarietyTitles(variant)
-      const similarity = calculateGrapeSimilarity(currentGrapeTitles, variantGrapeTitles)
-      return { variant, similarity }
-    })
-
-    return scoredCandidates
-      .filter((c) => c.similarity > 0)
-      .sort((a, b) => b.similarity - a.similarity)
-      .map((c) => c.variant)
-      .slice(0, 5)
-  }
-
-  // 4. Budget Buds - wines in the same price range
-  const getBudgetBuds = (excludedIds: Set<number>): FlatWineVariant[] => {
-    if (!currentVariant.price) return []
-
-    const { min, max } = getPriceRange(currentVariant.price)
-
-    const candidates = allVariants.filter(
-      (variant) =>
-        variant.id !== currentVariant.id &&
-        !excludedIds.has(variant.id) &&
-        variant.isPublished &&
-        (variant.stockOnHand || 0) > 0 &&
-        variant.price &&
-        variant.price >= min &&
-        variant.price <= max,
-    )
-
-    // Sort by price proximity to current wine
-    return candidates
-      .sort((a, b) => {
-        const aDiff = Math.abs((a.price || 0) - currentVariant.price!)
-        const bDiff = Math.abs((b.price || 0) - currentVariant.price!)
-        return aDiff - bDiff
-      })
-      .slice(0, 5)
-  }
-
-  // Build the related groups
-  const buildRelatedGroups = (): RelatedGroup[] => {
+  // Transform the relatedVariants data into the expected format
+  const transformRelatedVariants = (): RelatedGroup[] => {
     const groups: RelatedGroup[] = []
     const seenIds = new Set<number>()
 
-    // 1. Brothers and Sisters
-    const brothers = getBrothersAndSisters()
-    if (brothers.length > 0) {
-      groups.push({
-        type: 'brothers',
-        title: t('brothersAndSisters'),
-        variants: brothers,
-      })
-      brothers.forEach((v) => seenIds.add(v.id))
+    // Define the priority order for sorting
+    const priorityOrder = ['brothers', 'neighbours', 'cousins', 'budget']
+    const typePriority = new Map(priorityOrder.map((type, index) => [type, index]))
+
+    // Map the relatedVariants to our expected format
+    for (const group of relatedVariants) {
+      if (group.variants.length === 0) continue
+
+      // Filter out already seen variants
+      const uniqueVariants = group.variants.filter((v) => !seenIds.has(v.id))
+      if (uniqueVariants.length === 0) continue
+
+      // Map the type to our expected types
+      let mappedType: RelatedGroup['type']
+      let mappedTitle: string
+
+      switch (group.type) {
+        case 'winery':
+        case 'relatedWinery':
+          mappedType = 'brothers'
+          mappedTitle = t('brothersAndSisters')
+          break
+        case 'region':
+        case 'relatedRegion':
+          mappedType = 'neighbours'
+          mappedTitle = t('neighbours')
+          break
+        case 'grapeVariety':
+          mappedType = 'cousins'
+          mappedTitle = t('cousins')
+          break
+        case 'price':
+          mappedType = 'budget'
+          mappedTitle = t('budgetBuds')
+          break
+        default:
+          continue // Skip unknown types
+      }
+
+      // Check if we already have this type
+      const existingGroup = groups.find((g) => g.type === mappedType)
+      if (existingGroup) {
+        // Add unique variants to existing group
+        uniqueVariants.forEach((v) => {
+          if (!existingGroup.variants.some((existing) => existing.id === v.id)) {
+            existingGroup.variants.push(v)
+          }
+        })
+      } else {
+        // Create new group
+        groups.push({
+          type: mappedType,
+          title: mappedTitle,
+          variants: uniqueVariants.slice(0, 5), // Limit to 5 per group
+        })
+      }
+
+      // Mark variants as seen
+      uniqueVariants.forEach((v) => seenIds.add(v.id))
     }
 
-    // 2. Neighbours
-    const neighbours = getNeighbours(seenIds)
-    if (neighbours.length > 0) {
-      groups.push({
-        type: 'neighbours',
-        title: t('neighbours'),
-        variants: neighbours,
-      })
-      neighbours.forEach((v) => seenIds.add(v.id))
-    }
-
-    // 3. Cousins
-    const cousins = getCousins(seenIds)
-    if (cousins.length > 0) {
-      groups.push({
-        type: 'cousins',
-        title: t('cousins'),
-        variants: cousins,
-      })
-      cousins.forEach((v) => seenIds.add(v.id))
-    }
-
-    // 4. Budget Buds
-    const budgetBuds = getBudgetBuds(seenIds)
-    if (budgetBuds.length > 0) {
-      groups.push({
-        type: 'budget',
-        title: t('budgetBuds'),
-        variants: budgetBuds,
-      })
-    }
-
-    return groups
+    // Sort groups by priority order
+    return groups.sort((a, b) => {
+      const aPriority = typePriority.get(a.type) ?? 999
+      const bPriority = typePriority.get(b.type) ?? 999
+      return aPriority - bPriority
+    })
   }
 
-  const relatedGroups = buildRelatedGroups()
+  const relatedGroups = transformRelatedVariants()
 
   if (relatedGroups.length === 0) {
     return (

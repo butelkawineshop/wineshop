@@ -1,6 +1,4 @@
-import { notFound } from 'next/navigation'
-import { getWineVariantData } from '@/lib/wineData'
-import { WineDetailServer } from '@/components/wine/WineDetailServer'
+import { WineDetailWrapper } from '@/components/wine/WineDetailWrapper'
 import type { Locale } from '@/i18n/locales'
 
 interface Props {
@@ -13,19 +11,5 @@ export default async function WineDetailPage({ params }: Props): Promise<React.J
   const { slug } = await params
   const locale: Locale = 'en' // English locale for this route
 
-  // Get all wine variant data server-side
-  const { variant, variants, allVariants, error } = await getWineVariantData(slug, locale)
-
-  if (error || !variant) {
-    return notFound()
-  }
-
-  return (
-    <WineDetailServer
-      variant={variant}
-      variants={variants}
-      allVariants={allVariants}
-      locale={locale}
-    />
-  )
+  return <WineDetailWrapper slug={slug} locale={locale} />
 }
