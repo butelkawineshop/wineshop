@@ -400,7 +400,7 @@ async function seedWines(): Promise<void> {
                 })
                 if (grapeVariety.docs[0]) {
                   grapeVarietyIds.push({
-                    variety: grapeVariety.docs[0].id as string,
+                    variety: grapeVariety.docs[0].id as unknown as string,
                     percentage: grapeData.percentage,
                   })
                 }
@@ -412,7 +412,7 @@ async function seedWines(): Promise<void> {
 
             const createdVariant = await payload.create({
               collection: 'wine-variants',
-              data: variantPayloadData,
+              data: variantPayloadData as any,
               locale: 'sl',
             })
 

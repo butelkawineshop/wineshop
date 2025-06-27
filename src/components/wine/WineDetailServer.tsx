@@ -2,19 +2,18 @@ import { WineDetailClient } from './WineDetailClient'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
-import type { RelatedWineVariant } from '@/lib/wineData'
 
 interface WineDetailServerProps {
   variant: FlatWineVariant
   variants: FlatWineVariant[]
-  relatedVariants: RelatedWineVariant[]
+  allVariants?: FlatWineVariant[]
   locale: Locale
 }
 
 export function WineDetailServer({
   variant,
   variants,
-  relatedVariants,
+  allVariants = [],
   locale,
 }: WineDetailServerProps): React.JSX.Element {
   return (
@@ -22,7 +21,7 @@ export function WineDetailServer({
       <WineDetailClient
         variant={variant}
         variants={variants}
-        relatedVariants={relatedVariants}
+        allVariants={allVariants}
         locale={locale}
       />
     </ErrorBoundary>

@@ -20,8 +20,8 @@ export const WINE_CONSTANTS = {
   MAX_AROMAS: 2,
 
   // Icon sizes
-  ICON_SIZE: 20,
-  TITLE_ICON_SIZE: 40,
+  ICON_SIZE: 25,
+  TITLE_ICON_SIZE: 25,
 
   // Wine card
   INITIAL_SLIDE_INDEX: 0,

@@ -17,11 +17,7 @@ import { WINE_CONSTANTS } from '@/constants/wine'
 interface WineDetailProps {
   variant: FlatWineVariant
   variants: FlatWineVariant[]
-  relatedVariants: Array<{
-    type: 'winery' | 'region' | 'grapeVariety' | 'price'
-    title: string
-    variants: FlatWineVariant[]
-  }>
+  allVariants?: FlatWineVariant[]
   selectedVariant: FlatWineVariant | null
   onVariantSelect: (variant: FlatWineVariant) => void
   locale: 'sl' | 'en'
@@ -32,7 +28,7 @@ type AccordionSection = 'description' | 'tasting' | 'food' | null
 export function WineDetail({
   variant,
   variants,
-  relatedVariants,
+  allVariants = [],
   selectedVariant,
   onVariantSelect,
   locale,
@@ -312,10 +308,10 @@ export function WineDetail({
           </div>
 
           {/* Related Wines */}
-          {relatedVariants.length > 0 && (
+          {allVariants && allVariants.length > 0 && (
             <RelatedWineVariants
               currentVariant={currentVariant}
-              relatedVariants={relatedVariants}
+              allVariants={allVariants}
               locale={locale}
             />
           )}

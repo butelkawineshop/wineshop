@@ -119,7 +119,7 @@ function mapGrapeVarietiesWithEnglish(
 async function fetchEnglishTitles(
   req: PayloadRequest,
   items: Array<{ id: string }>,
-  collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties' | 'climates',
+  collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties' | 'climates' | 'dishes',
   logger: ReturnType<typeof createLogger>,
 ): Promise<Record<string, string>> {
   const englishTitles: Record<string, string> = {}
@@ -467,6 +467,7 @@ function prepareFlatVariantData(
     englishMoodTitles: Record<string, string>
     englishGrapeVarietyTitles: Record<string, string>
     englishClimateTitles: Record<string, string>
+    englishDishTitles: Record<string, string>
   },
 ): Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'> {
   const wineRegion = typeof wine.region === 'object' ? wine.region : null
@@ -546,7 +547,7 @@ function prepareFlatVariantData(
       : undefined,
     dishes: mapItemsWithEnglish(
       wineVariant.foodPairing || undefined,
-      englishTitles.englishTagTitles,
+      englishTitles.englishDishTitles,
     ),
     primaryImageUrl,
     slug,
@@ -733,6 +734,14 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
           ? [{ id: String(wineRegion.climate.id) }]
           : [],
         'climates',
+        logger,
+      ),
+      englishDishTitles: await fetchEnglishTitles(
+        req,
+        wineVariant.foodPairing?.map((f: any) => ({
+          id: typeof f === 'object' ? String(f.id) : String(f),
+        })) || [],
+        'dishes',
         logger,
       ),
     }

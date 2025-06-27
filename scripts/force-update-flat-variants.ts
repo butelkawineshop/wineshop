@@ -120,36 +120,37 @@ function mapGrapeVarietiesWithEnglish(
 async function fetchEnglishTitles(
   payload: any,
   items: Array<{ id: string }>,
-  collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties' | 'climates',
+  collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties' | 'climates' | 'dishes',
   logger: any,
 ): Promise<Record<string, string>> {
-  const englishTitles: Record<string, string> = {}
-
-  for (const item of items) {
-    try {
-      const englishItem = await payload.findByID({
-        collection,
-        id: item.id,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishItem &&
-        typeof englishItem === 'object' &&
-        'title' in englishItem &&
-        typeof englishItem.title === 'string'
-      ) {
-        englishTitles[item.id] = englishItem.title
-      }
-    } catch (error) {
-      logger.warn(`Could not fetch English title for ${collection}`, {
-        id: item.id,
-        error: String(error),
-      })
-    }
+  if (!items || items.length === 0) {
+    return {}
   }
 
-  return englishTitles
+  try {
+    const englishTitles: Record<string, string> = {}
+
+    for (const item of items) {
+      try {
+        const doc = await payload.findByID({
+          collection,
+          id: item.id,
+          locale: 'en',
+        })
+
+        if (doc && doc.title) {
+          englishTitles[item.id] = doc.title
+        }
+      } catch (error) {
+        logger.warn(`Failed to fetch English title for ${collection} ${item.id}:`, error)
+      }
+    }
+
+    return englishTitles
+  } catch (error) {
+    logger.error(`Failed to fetch English titles for ${collection}:`, error)
+    return {}
+  }
 }
 
 // Validate wine data structure
@@ -448,6 +449,7 @@ function prepareFlatVariantData(
     englishMoodTitles: Record<string, string>
     englishGrapeVarietyTitles: Record<string, string>
     englishClimateTitles: Record<string, string>
+    englishDishTitles: Record<string, string>
   },
 ): Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'> {
   // Extract region and country info
@@ -534,7 +536,7 @@ function prepareFlatVariantData(
       : undefined,
     dishes: mapItemsWithEnglish(
       wineVariant.foodPairing || undefined,
-      englishTitles.englishTagTitles,
+      englishTitles.englishDishTitles,
     ),
     primaryImageUrl,
     slug,
@@ -723,6 +725,14 @@ async function forceUpdateFlatVariants() {
               ? [{ id: String(wineRegion.climate.id) }]
               : [],
             'climates',
+            taskLogger,
+          ),
+          englishDishTitles: await fetchEnglishTitles(
+            payload,
+            (wineVariant.foodPairing as any[])?.map((d: any) => ({
+              id: typeof d === 'object' ? String(d.id) : String(d),
+            })) || [],
+            'dishes',
             taskLogger,
           ),
         }

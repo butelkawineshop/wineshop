@@ -148,7 +148,12 @@ export function WineCard({
                 className="interactive rounded-full p-1 focus-ring"
                 aria-label={t('wine.actions.like')}
               >
-                <Icon name="like" variant="active" />
+                <Icon
+                  name="like"
+                  variant="active"
+                  width={WINE_CONSTANTS.ICON_SIZE}
+                  height={WINE_CONSTANTS.ICON_SIZE}
+                />
               </button>
               <button
                 onClick={handleShareWine}

@@ -15,6 +15,7 @@ interface UseWineVariantDataReturn {
   // Data
   variant: FlatWineVariant | null
   variants: FlatWineVariant[]
+  allVariants: FlatWineVariant[]
   relatedVariants: RelatedWineVariant[]
   selectedVariant: FlatWineVariant | null
 
@@ -39,6 +40,7 @@ export function useWineVariantData({
 }: UseWineVariantDataOptions): UseWineVariantDataReturn {
   const [variant, setVariant] = useState<FlatWineVariant | null>(initialData || null)
   const [variants, setVariants] = useState<FlatWineVariant[]>([])
+  const [allVariants, setAllVariants] = useState<FlatWineVariant[]>([])
   const [relatedVariants, setRelatedVariants] = useState<RelatedWineVariant[]>([])
   const [selectedVariant, setSelectedVariant] = useState<FlatWineVariant | null>(
     initialData || null,
@@ -71,9 +73,13 @@ export function useWineVariantData({
 
         // Fetch all variants for this wine
         if (variantData.wineTitle) {
-          const allVariants = await service.getVariantsForWine(variantData.wineTitle, locale)
-          setVariants(allVariants)
+          const wineVariants = await service.getVariantsForWine(variantData.wineTitle, locale)
+          setVariants(wineVariants)
         }
+
+        // Fetch all variants for related wines functionality
+        const allVariantsData = await service.getAllVariants(locale)
+        setAllVariants(allVariantsData)
 
         // Fetch related variants
         const related = await service.getRelatedWineVariants(variantData, locale)
@@ -104,12 +110,16 @@ export function useWineVariantData({
       setError(null)
 
       try {
-        const allVariants = await service.getVariantsForWine(title, locale)
-        setVariants(allVariants)
+        const wineVariants = await service.getVariantsForWine(title, locale)
+        setVariants(wineVariants)
 
-        if (allVariants.length > 0 && !selectedVariant) {
-          setSelectedVariant(allVariants[0])
+        if (wineVariants.length > 0 && !selectedVariant) {
+          setSelectedVariant(wineVariants[0])
         }
+
+        // Fetch all variants for related wines functionality
+        const allVariantsData = await service.getAllVariants(locale)
+        setAllVariants(allVariantsData)
       } catch (err) {
         const errorMessage = 'Failed to load wine variants'
         setError(errorMessage)
@@ -156,6 +166,7 @@ export function useWineVariantData({
     // Data
     variant,
     variants,
+    allVariants,
     relatedVariants,
     selectedVariant,
 

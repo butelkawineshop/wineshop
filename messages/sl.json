@@ -125,7 +125,11 @@
       "noRelatedByWinery": "Ni podobnih vin iz te kleti",
       "noRelatedByRegion": "Ni podobnih vin iz te regije",
       "noRelatedByGrapeVariety": "Ni podobnih vin s to sorto grozdja",
-      "noRelatedByPrice": "Ni vin v podobnem cenovnem razponu"
+      "noRelatedByPrice": "Ni vin v podobnem cenovnem razponu",
+      "brothersAndSisters": "Bratje in sestre",
+      "neighbours": "Sosedi",
+      "cousins": "Sestrični",
+      "budgetBuds": "Cenovni prijatelji"
     }
   },
   "winery": {

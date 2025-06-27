@@ -16,7 +16,7 @@ export function WineDetailWrapper({
   locale,
   initialData,
 }: WineDetailWrapperProps): React.JSX.Element {
-  const { variant, variants, relatedVariants, selectedVariant, isLoading, error, selectVariant } =
+  const { variant, variants, allVariants, selectedVariant, isLoading, error, selectVariant } =
     useWineVariantData({
       slug,
       locale,
@@ -47,7 +47,7 @@ export function WineDetailWrapper({
       <WineDetail
         variant={variant}
         variants={variants}
-        relatedVariants={relatedVariants}
+        allVariants={allVariants}
         selectedVariant={selectedVariant}
         onVariantSelect={selectVariant}
         locale={locale}

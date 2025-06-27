@@ -116,6 +116,33 @@ export class FlatWineVariantService {
   }
 
   /**
+   * Fetch all published wine variants for related wines functionality
+   */
+  async getAllVariants(locale: Locale): Promise<FlatWineVariant[]> {
+    try {
+      const result = await this.payload.find('flat-wine-variants', {
+        depth: 1,
+        locale,
+        limit: 1000, // Higher limit for related wines functionality
+        where: {
+          isPublished: {
+            equals: true,
+          },
+        },
+        sort: '-createdAt',
+      })
+
+      return result.docs as unknown as FlatWineVariant[]
+    } catch (error) {
+      logger.error('Failed to fetch all wine variants', {
+        error,
+        locale,
+      })
+      return []
+    }
+  }
+
+  /**
    * Fetch related wine variants based on various criteria
    */
   async getRelatedWineVariants(

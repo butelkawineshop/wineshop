@@ -125,7 +125,11 @@
       "noRelatedByWinery": "No related wines from this winery",
       "noRelatedByRegion": "No related wines from this region",
       "noRelatedByGrapeVariety": "No related wines with this grape variety",
-      "noRelatedByPrice": "No wines in similar price range"
+      "noRelatedByPrice": "No wines in similar price range",
+      "brothersAndSisters": "Brothers & Sisters",
+      "neighbours": "Neighbours",
+      "cousins": "Cousins",
+      "budgetBuds": "Budget Buds"
     }
   },
   "winery": {

@@ -49,48 +49,73 @@ export async function getWineVariantData(
 ): Promise<{
   variant: FlatWineVariant | null
   variants: FlatWineVariant[]
-  relatedVariants: RelatedWineVariant[]
+  allVariants: FlatWineVariant[]
   error: string | null
 }> {
   const payload = createPayloadService()
 
   try {
-    // Get the main variant
+    // Now try the specific query
     const { docs: variants } = await payload.find('flat-wine-variants', {
       depth: 1,
       locale,
-      limit: 1,
+      limit: 1000,
       where: {
-        and: [
-          {
-            slug: {
-              equals: slug,
-            },
-          },
-          {
-            isPublished: {
-              equals: true,
-            },
-          },
-        ],
+        slug: {
+          equals: slug,
+        },
       },
     })
 
-    if (!variants.length) {
+    // Check if any of the returned variants actually match our slug
+    const matchingVariants = variants.filter((v) => v.slug === slug)
+
+    if (matchingVariants.length === 0) {
       return {
         variant: null,
         variants: [],
-        relatedVariants: [],
+        allVariants: [],
         error: 'Variant not found',
       }
     }
 
-    const variant = variants[0] as unknown as FlatWineVariant
+    // Filter for published variants
+    const publishedVariants = matchingVariants.filter((v) => v.isPublished === true)
+
+    console.log('🔍 After published filter:', {
+      publishedCount: publishedVariants.length,
+      publishedVariants: publishedVariants.map((v) => ({
+        id: v.id,
+        wineTitle: v.wineTitle,
+        wineryTitle: v.wineryTitle,
+        slug: v.slug,
+        isPublished: v.isPublished,
+      })),
+    })
+
+    if (!publishedVariants.length) {
+      console.log('❌ No published variants found for slug:', slug)
+      return {
+        variant: null,
+        variants: [],
+        allVariants: [],
+        error: 'Variant not found',
+      }
+    }
+
+    const variant = publishedVariants[0] as unknown as FlatWineVariant
+
+    console.log('✅ Found variant:', {
+      id: variant.id,
+      wineTitle: variant.wineTitle,
+      wineryTitle: variant.wineryTitle,
+      slug: variant.slug,
+    })
 
     // Get all variants for this wine
-    let allVariants: FlatWineVariant[] = []
+    let wineVariants: FlatWineVariant[] = []
     if (variant.wineTitle) {
-      const { docs: wineVariants } = await payload.find('flat-wine-variants', {
+      const { docs: variantsForWine } = await payload.find('flat-wine-variants', {
         depth: 1,
         locale,
         limit: 100,
@@ -110,16 +135,26 @@ export async function getWineVariantData(
         },
         sort: 'vintage',
       })
-      allVariants = wineVariants as unknown as FlatWineVariant[]
+      wineVariants = variantsForWine as unknown as FlatWineVariant[]
     }
 
-    // Get related variants
-    const relatedVariants = await getRelatedWineVariants(variant, locale, payload)
+    // Get all variants for related wines functionality
+    const { docs: allVariantsData } = await payload.find('flat-wine-variants', {
+      depth: 1,
+      locale,
+      limit: 1000,
+      where: {
+        isPublished: {
+          equals: true,
+        },
+      },
+      sort: '-createdAt',
+    })
 
     return {
       variant,
-      variants: allVariants,
-      relatedVariants,
+      variants: wineVariants,
+      allVariants: allVariantsData as unknown as FlatWineVariant[],
       error: null,
     }
   } catch (error) {
@@ -131,7 +166,7 @@ export async function getWineVariantData(
     return {
       variant: null,
       variants: [],
-      relatedVariants: [],
+      allVariants: [],
       error: 'Failed to load wine data',
     }
   }

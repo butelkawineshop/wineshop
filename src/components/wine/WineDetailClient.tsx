@@ -10,14 +10,14 @@ import type { RelatedWineVariant } from '@/lib/wineData'
 interface WineDetailClientProps {
   variant: FlatWineVariant
   variants: FlatWineVariant[]
-  relatedVariants: RelatedWineVariant[]
+  allVariants?: FlatWineVariant[]
   locale: Locale
 }
 
 export function WineDetailClient({
   variant,
   variants,
-  relatedVariants,
+  allVariants = [],
   locale,
 }: WineDetailClientProps): React.JSX.Element {
   const router = useRouter()
@@ -43,7 +43,7 @@ export function WineDetailClient({
     <WineDetail
       variant={variant}
       variants={variants}
-      relatedVariants={relatedVariants}
+      allVariants={allVariants}
       selectedVariant={selectedVariant}
       onVariantSelect={handleVariantSelect}
       locale={locale}

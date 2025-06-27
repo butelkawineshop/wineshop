@@ -14,7 +14,7 @@ export default async function WineDetailPage({ params }: Props): Promise<React.J
   const locale: Locale = 'sl' // Slovenian locale for this route
 
   // Get all wine variant data server-side
-  const { variant, variants, relatedVariants, error } = await getWineVariantData(slug, locale)
+  const { variant, variants, allVariants, error } = await getWineVariantData(slug, locale)
 
   if (error || !variant) {
     return notFound()
@@ -24,7 +24,7 @@ export default async function WineDetailPage({ params }: Props): Promise<React.J
     <WineDetailServer
       variant={variant}
       variants={variants}
-      relatedVariants={relatedVariants}
+      allVariants={allVariants}
       locale={locale}
     />
   )
