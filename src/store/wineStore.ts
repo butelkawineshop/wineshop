@@ -31,6 +31,11 @@ interface WineFilters {
   }
 }
 
+interface SortState {
+  field: 'createdAt' | 'price' | 'name'
+  direction: 'asc' | 'desc'
+}
+
 interface WineState {
   // Data
   wineVariants: FlatWineVariant[]
@@ -40,6 +45,8 @@ interface WineState {
   hasFetched: boolean
   // Filters
   filters: WineFilters
+  // Sorting
+  sort: SortState
 }
 
 interface WineActions {
@@ -54,6 +61,10 @@ interface WineActions {
   clearFilter: (key: keyof WineFilters) => void
   clearAllFilters: () => void
 
+  // Sort actions
+  setSort: (field: SortState['field'], direction?: SortState['direction']) => void
+  toggleSortDirection: () => void
+
   // Migration function
   _migrateFilters: () => void
 }
@@ -65,6 +76,7 @@ interface WineSelectors {
   isPriceFilterActive: () => boolean
   isTastingNotesFilterActive: () => boolean
   hasActiveFilters: () => boolean
+  getCurrentSort: () => SortState
 }
 
 type WineStore = WineState & WineActions & WineSelectors
@@ -101,6 +113,45 @@ const initialState: WineState = {
       alcohol: [0, 20],
     },
   },
+  sort: {
+    field: 'createdAt',
+    direction: 'desc',
+  },
+}
+
+// Sort logic
+const applySort = (variants: FlatWineVariant[], sort: SortState): FlatWineVariant[] => {
+  const sortedVariants = [...variants]
+
+  sortedVariants.sort((a, b) => {
+    let aValue: string | number | Date
+    let bValue: string | number | Date
+
+    switch (sort.field) {
+      case 'createdAt':
+        aValue = new Date(a.createdAt || 0)
+        bValue = new Date(b.createdAt || 0)
+        break
+      case 'price':
+        aValue = a.price || 0
+        bValue = b.price || 0
+        break
+      case 'name':
+        aValue = a.slug || ''
+        bValue = b.slug || ''
+        break
+      default:
+        return 0
+    }
+
+    if (sort.direction === 'asc') {
+      return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
+    } else {
+      return aValue < bValue ? 1 : aValue > bValue ? -1 : 0
+    }
+  })
+
+  return sortedVariants
 }
 
 // Filter logic
@@ -270,23 +321,27 @@ export const useWineStore = create<WineStore>()(
 
         // Data actions
         setWineVariants: (variants) => {
-          const { filters } = get()
+          const { filters, sort } = get()
           const filteredVariants = applyFilters(variants, filters)
+          const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           // Debug logging
           console.log('🔍 WineStore: Setting wine variants', {
             totalVariants: variants.length,
             filteredVariants: filteredVariants.length,
+            sortedVariants: sortedAndFilteredVariants.length,
             filters: Object.keys(filters).filter((key) => {
               const value = filters[key as keyof WineFilters]
               if (Array.isArray(value)) return value.length > 0
               return false
             }),
+            sort: { field: sort.field, direction: sort.direction },
           })
 
           // More explicit logging
           console.log(`🍷 Total wines loaded: ${variants.length}`)
           console.log(`🍷 Filtered wines: ${filteredVariants.length}`)
+          console.log(`🍷 Sorted wines: ${sortedAndFilteredVariants.length}`)
           console.log(
             `🍷 Active filters: ${
               Object.keys(filters).filter((key) => {
@@ -368,7 +423,7 @@ export const useWineStore = create<WineStore>()(
 
           set({
             wineVariants: variants,
-            filteredVariants,
+            filteredVariants: sortedAndFilteredVariants,
             hasFetched: true,
           })
         },
@@ -381,34 +436,73 @@ export const useWineStore = create<WineStore>()(
 
         // Filter actions
         setFilter: (key, values) => {
-          const { wineVariants, filters } = get()
+          const { wineVariants, filters, sort } = get()
           const newFilters = { ...filters, [key]: values }
           const filteredVariants = applyFilters(wineVariants, newFilters)
+          const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
             filters: newFilters,
-            filteredVariants,
+            filteredVariants: sortedAndFilteredVariants,
           })
         },
 
         clearFilter: (key) => {
-          const { wineVariants, filters } = get()
+          const { wineVariants, filters, sort } = get()
           const newFilters = { ...filters, [key]: [] }
           const filteredVariants = applyFilters(wineVariants, newFilters)
+          const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
             filters: newFilters,
-            filteredVariants,
+            filteredVariants: sortedAndFilteredVariants,
           })
         },
 
         clearAllFilters: () => {
-          const { wineVariants } = get()
+          const { wineVariants, sort } = get()
           const filteredVariants = applyFilters(wineVariants, initialState.filters)
+          const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
             filters: initialState.filters,
-            filteredVariants,
+            filteredVariants: sortedAndFilteredVariants,
+          })
+        },
+
+        // Sort actions
+        setSort: (field, direction) => {
+          const { wineVariants, filters, sort } = get()
+          const newSort: SortState = {
+            field,
+            direction:
+              direction || (sort.field === field && sort.direction === 'asc' ? 'desc' : 'asc'),
+          }
+          const filteredVariants = applyFilters(wineVariants, filters)
+          const sortedAndFilteredVariants = applySort(filteredVariants, newSort)
+
+          console.log('🍷 Setting sort:', { field, direction: newSort.direction })
+
+          set({
+            sort: newSort,
+            filteredVariants: sortedAndFilteredVariants,
+          })
+        },
+
+        toggleSortDirection: () => {
+          const { wineVariants, filters, sort } = get()
+          const newSort: SortState = {
+            ...sort,
+            direction: sort.direction === 'asc' ? 'desc' : 'asc',
+          }
+          const filteredVariants = applyFilters(wineVariants, filters)
+          const sortedAndFilteredVariants = applySort(filteredVariants, newSort)
+
+          console.log('🍷 Toggling sort direction:', newSort.direction)
+
+          set({
+            sort: newSort,
+            filteredVariants: sortedAndFilteredVariants,
           })
         },
 
@@ -416,6 +510,8 @@ export const useWineStore = create<WineStore>()(
         getFilteredCount: () => get().filteredVariants.length,
 
         getTotalCount: () => get().wineVariants.length,
+
+        getCurrentSort: () => get().sort,
 
         isFilterActive: (key) => {
           const { filters } = get()
@@ -513,6 +609,7 @@ export const useWineStore = create<WineStore>()(
         name: 'wine-store',
         partialize: (state) => ({
           filters: state.filters,
+          sort: state.sort,
         }),
       },
     ),

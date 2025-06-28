@@ -9,7 +9,7 @@ export const SORT_OPTIONS = [
   {
     value: 'createdAt',
     icon: 'date',
-    tooltipKey: 'sorting.newest',
+    tooltipKey: 'sorting.createdAt',
   },
   {
     value: 'price',
