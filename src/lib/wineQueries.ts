@@ -331,17 +331,3 @@ export function mapRelatedWineVariantRow(row: RelatedWineVariantRow): RelatedWin
     updatedAt: new Date().toISOString(),
   }
 }
-
-/**
- * Get human-readable title for related wine type
- */
-function getRelatedTypeTitle(type: string): string {
-  const titles: Record<string, string> = {
-    winery: 'Brothers',
-    region: 'Neighbors',
-    grapeVariety: 'Cousins',
-    price: 'Similar Price Range',
-  }
-
-  return titles[type] || type
-}

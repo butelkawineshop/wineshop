@@ -5,7 +5,6 @@ import type { FieldConfig } from '../CollectionPage/CollectionConfig'
 import { Media } from '../Media'
 import type { Locale } from '@/utils/routeMappings'
 import { CollectionLink } from '@/components/ui/CollectionLink'
-import { getLocalizedRouteSegment } from '@/utils/routeMappings'
 
 interface InfoCarouselProps {
   item: Record<string, unknown>
@@ -24,35 +23,12 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string | un
   }, obj) as string | undefined
 }
 
-function getNestedValueAsObject(
-  obj: Record<string, unknown>,
-  path: string,
-): Record<string, unknown> | null {
-  return path.split('.').reduce((current: unknown, key: string) => {
-    if (current && typeof current === 'object' && key in current) {
-      return (current as Record<string, unknown>)[key] as Record<string, unknown>
-    }
-    return null
-  }, obj) as Record<string, unknown> | null
-}
-
-function getNestedValueAsArray(obj: Record<string, unknown>, path: string): unknown[] | null {
-  const value = path.split('.').reduce((current: unknown, key: string) => {
-    if (current && typeof current === 'object' && key in current) {
-      return (current as Record<string, unknown>)[key]
-    }
-    return null
-  }, obj)
-
-  return Array.isArray(value) ? value : null
-}
-
 function renderFieldValue(
   field: FieldConfig,
   value: unknown,
   locale: Locale,
   t: (key: string) => string,
-  item?: Record<string, unknown>,
+  _item?: Record<string, unknown>,
 ) {
   if (!value) return null
 
@@ -74,8 +50,8 @@ function renderFieldValue(
         items = value
       } else if (value && typeof value === 'object') {
         // Check if it's a Payload relationship object with docs
-        if ('docs' in value && Array.isArray((value as any).docs)) {
-          items = (value as any).docs
+        if ('docs' in value && Array.isArray((value as Record<string, unknown>).docs)) {
+          items = (value as Record<string, unknown>).docs as unknown[]
         } else {
           // Single relationship object
           items = [value]
@@ -97,8 +73,6 @@ function renderFieldValue(
             const slug = itemObj.slug as string
 
             if (linkTo && slug) {
-              const localizedSegment = getLocalizedRouteSegment(linkTo, locale)
-              const localePrefix = locale === 'en' ? '/en' : ''
               return (
                 <CollectionLink
                   key={String(itemObj.id || index)}
@@ -246,8 +220,8 @@ export function InfoCarousel({ item, fields, mediaField, locale, messages }: Inf
         items = value
       } else if (value && typeof value === 'object') {
         // Check if it's a Payload relationship object with docs
-        if ('docs' in value && Array.isArray((value as any).docs)) {
-          items = (value as any).docs
+        if ('docs' in value && Array.isArray((value as Record<string, unknown>).docs)) {
+          items = (value as Record<string, unknown>).docs as unknown[]
         } else {
           // Single relationship object
           items = [value]

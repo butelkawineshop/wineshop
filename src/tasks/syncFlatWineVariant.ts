@@ -852,14 +852,6 @@ async function findRelatedWinesIntelligently(
 ): Promise<any[]> {
   const relatedVariants: any[] = []
   const seenVariantIds = new Set<number>() // Global set to prevent duplicates across groups
-  const categoryLimits = {
-    wineryRelated: 5, // Combined: same winery + related wineries
-    regionRelated: 5, // Combined: same region + related regions
-    grapeVariety: 5,
-    price: 5,
-  }
-  const wineryCount = 0
-  const regionCount = 0
 
   try {
     // 1. Winery-related wines (score 10) - Brothers

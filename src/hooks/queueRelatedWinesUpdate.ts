@@ -5,7 +5,7 @@ export const queueRelatedWinesUpdate: CollectionAfterChangeHook = async ({
   doc,
   req,
   operation,
-  previousDoc,
+  previousDoc: _previousDoc,
 }) => {
   const logger = createLogger(req, {
     task: 'queueRelatedWinesUpdate',

@@ -1,14 +1,6 @@
-import {
-  GraphQLString,
-  GraphQLObjectType,
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLInt,
-  GraphQLFloat,
-} from 'graphql'
+import { GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql'
 import { WineService } from '../../services/WineService'
 import { db } from '../../lib/db'
-import type { Locale } from '../../i18n/locales'
 
 /**
  * Custom GraphQL resolver for wineDetail query
@@ -16,9 +8,16 @@ import type { Locale } from '../../i18n/locales'
  * Follows project conventions for type safety and error handling
  */
 export function createWineDetailResolver() {
-  return (graphQL: any, context: any) => {
+  return (graphQL: unknown, context: Record<string, unknown>) => {
     // Get existing types from collections
-    const FlatWineVariantType = context.collections['flat-wine-variants']?.graphQL?.type
+    const { collections } = context as {
+      collections: Record<string, { graphQL?: { type: unknown } }>
+    }
+    const FlatWineVariantType = collections['flat-wine-variants']?.graphQL?.type
+
+    // FlatWineVariantType is dynamically provided by Payload, so we must cast to 'any' for GraphQL types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const FlatWineVariantTypeAny = FlatWineVariantType as any
 
     // Create custom RelatedWineVariant type for the response
     const CustomRelatedWineVariantType = new GraphQLObjectType({
@@ -26,15 +25,15 @@ export function createWineDetailResolver() {
       fields: {
         type: { type: GraphQLString },
         title: { type: GraphQLString },
-        variants: { type: new GraphQLList(FlatWineVariantType) },
+        variants: { type: new GraphQLList(FlatWineVariantTypeAny) },
       },
     })
 
     const WineDetailResultType = new GraphQLObjectType({
       name: 'WineDetailResult',
       fields: {
-        variant: { type: FlatWineVariantType },
-        variants: { type: new GraphQLList(FlatWineVariantType) },
+        variant: { type: FlatWineVariantTypeAny },
+        variants: { type: new GraphQLList(FlatWineVariantTypeAny) },
         relatedVariants: { type: new GraphQLList(CustomRelatedWineVariantType) },
         error: { type: GraphQLString },
       },
@@ -47,7 +46,11 @@ export function createWineDetailResolver() {
           slug: { type: new GraphQLNonNull(GraphQLString) },
           locale: { type: new GraphQLNonNull(GraphQLString) },
         },
-        resolve: async (parent: unknown, args: { slug: string; locale: string }, _context: any) => {
+        resolve: async (
+          parent: unknown,
+          args: { slug: string; locale: string },
+          _context: unknown,
+        ) => {
           try {
             // 1. Find the wineId from the slug
             const slugQuery = `SELECT wine_i_d FROM flat_wine_variants WHERE slug = $1 LIMIT 1`

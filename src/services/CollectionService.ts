@@ -103,7 +103,7 @@ export class CollectionService {
       // Log relationship fields specifically
       config.fields.forEach((field) => {
         if (field.type === 'relationship') {
-          const value = foundItem[field.name]
+          const _value = foundItem[field.name]
         }
       })
     }

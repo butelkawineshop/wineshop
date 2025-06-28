@@ -32,9 +32,9 @@ class DatabaseService {
   /**
    * Execute a query with proper error handling and logging
    */
-  async query<T extends QueryResultRow = any>(
+  async query<T extends QueryResultRow = QueryResultRow>(
     text: string,
-    params?: any[],
+    params?: unknown[],
     context?: string,
   ): Promise<QueryResult<T>> {
     const pool = this.initializePool()

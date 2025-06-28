@@ -59,8 +59,8 @@ export class WineService {
   /**
    * Convert snake_case database fields to camelCase
    */
-  private static mapSnakeToCamel(obj: any): any {
-    const mapped: any = {}
+  private static mapSnakeToCamel(obj: Record<string, unknown>): Record<string, unknown> {
+    const mapped: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(obj)) {
       const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
       mapped[camelKey] = value
@@ -87,7 +87,7 @@ export class WineService {
     `
 
     const result = await db.query(query, [wineId])
-    return result.rows.map((row) => this.mapSnakeToCamel(row))
+    return result.rows.map((row) => this.mapSnakeToCamel(row) as unknown as FlatWineVariant)
   }
 
   /**
@@ -123,7 +123,7 @@ export class WineService {
 
     result.rows.forEach((row) => {
       const type = row.type || 'related'
-      const mappedVariant = this.mapSnakeToCamel(row)
+      const mappedVariant = this.mapSnakeToCamel(row) as unknown as FlatWineVariant
 
       if (!groupedByType.has(type)) {
         groupedByType.set(type, [])
