@@ -11,16 +11,17 @@ import { routeMappings, Locale } from '@/utils/routeMappings'
 
 // Canonical list of wine navigation collections and their i18n keys
 const WINE_NAV_CONFIG = [
+  { collection: 'wines', i18n: 'wine.list.title' },
+  { collection: 'styles', i18n: 'style.list.title' },
   { collection: 'wineCountries', i18n: 'wineCountry.list.title' },
   { collection: 'regions', i18n: 'region.list.title' },
-  { collection: 'grape-varieties', i18n: 'grapeVariety.list.title' },
   { collection: 'wineries', i18n: 'winery.list.title' },
-  { collection: 'styles', i18n: 'style.list.title' },
-  { collection: 'aromas', i18n: 'aroma.list.title' },
-  { collection: 'climates', i18n: 'climate.list.title' },
+  { collection: 'grape-varieties', i18n: 'grapeVariety.list.title' },
   { collection: 'moods', i18n: 'mood.list.title' },
-  { collection: 'dishes', i18n: 'dish.list.title' },
   { collection: 'tags', i18n: 'tag.list.title' },
+  { collection: 'dishes', i18n: 'dish.list.title' },
+  { collection: 'climates', i18n: 'climate.list.title' },
+  { collection: 'aromas', i18n: 'aroma.list.title' },
 ]
 
 function getSegmentForCollection(collection: string, locale: Locale): string | null {
@@ -56,7 +57,7 @@ export const WineNavBar: React.FC<WineNavBarProps> = ({ locale }) => {
       {/* Swiper nav */}
       <Swiper
         spaceBetween={8}
-        slidesPerView={3}
+        slidesPerView={5}
         slideToClickedSlide={true}
         centeredSlides
         initialSlide={activeIndex > -1 ? activeIndex : 0}

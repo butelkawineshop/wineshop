@@ -1,4 +1,50 @@
 {
+  "see-less": "Show less",
+  "tasting": {
+    "notes": {
+      "titlePage1": "Feel",
+      "titlePage2": "Character",
+      "dry": "Dry",
+      "sweet": "Sweet",
+      "freshFruit": "Fresh fruit",
+      "ripeFruit": "Ripe fruit",
+      "crisp": "Light",
+      "creamy": "Creamy",
+      "noOak": "No oak",
+      "oaky": "Barrique",
+      "simple": "Light",
+      "complex": "Complex",
+      "light": "Delicate",
+      "rich": "Rich",
+      "austere": "Sharp",
+      "smooth": "Smooth",
+      "mature": "Mature",
+      "youthful": "Youthful",
+      "restrained": "Restrained",
+      "energetic": "Energetic",
+      "noAlcohol": "No alcohol",
+      "highAlcohol": "High alcohol"
+    },
+    "descriptions": {
+      "dry": "From bone dry to seductively sweet",
+      "ripe": "From fresh to ripe fruit",
+      "creamy": "From light to creamy texture",
+      "oaky": "From inox to pronounced barrique",
+      "complex": "From light to complex character",
+      "light": "From light to rich body",
+      "smooth": "From smooth to sharp mouthfeel",
+      "youthful": "From youthful to mature character",
+      "energetic": "From restrained to energetic style",
+      "alcohol": "From no alcohol to high alcohol"
+    }
+  },
+  "see-more": "Show more",
+  "dark": "Turn off lights",
+  "light": "Turn on lights",
+  "system": "System theme",
+  "theme": "Theme",
+  "language": "Language",
+  "settings": "Settings",
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
@@ -16,7 +62,7 @@
     "noResults": "No results found",
     "page": "Page",
     "logo": "Butelka logo",
-    "reset": "Reset"
+    "reset": "Clear"
   },
   "auth": {
     "login": "Login",
@@ -24,49 +70,67 @@
     "logout": "Logout",
     "email": "Email",
     "password": "Password",
-    "forgotPassword": "Forgot Password?",
-    "resetPassword": "Reset Password",
-    "verifyEmail": "Verify Email",
-    "magicLink": "Send Magic Link",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "verifyEmail": "Verify email",
+    "magicLink": "Send magic link",
     "continueWithGoogle": "Continue with Google",
     "emailVerification": {
       "title": "Verify your email address",
       "description": "Please click the button below to verify your email address:",
-      "button": "Verify Email",
+      "button": "Verify email",
       "buttonAria": "Verify email address",
       "ignoreMessage": "If you didn't request this email, you can safely ignore it.",
       "preview": "Verify your email address"
     }
   },
+  "login": {
+    "title": "Sign in to your account",
+    "magicLink": "Sign in with Magic Link",
+    "or": "Sign in or",
+    "emailPlaceholder": "Enter your email.",
+    "facebook": "Sign in with your Facebook account.",
+    "google": "Sign in with your Google account."
+  },
+  "close": "Close",
+  "menu": "Menu",
+  "toTop": "To top",
+  "search": {
+    "placeholder": "Write and search!",
+    "button": "Search",
+    "search": "Search",
+    "noResults": "No results found",
+    "loading": "Searching fox...."
+  },
   "wine": {
-    "title": "Wines",
-    "details": "Wine Details",
+    "title": "Wine",
+    "details": "Wine details",
     "region": "Region",
-    "variety": "Grape Variety",
+    "variety": "Grape variety",
     "year": "Vintage",
     "price": "Price",
-    "addToCart": "Add to Cart",
-    "inStock": "In Stock",
-    "outOfStock": "Out of Stock",
+    "addToCart": "Add to cart",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
     "noWinesFound": "No wines found",
-    "relatedWines": "Related Wines",
+    "relatedWines": "Related wines",
     "discoverWines": "Discover wines from {location}",
     "showingWines": "Showing {showing} of {total} wines",
-    "unknownWine": "Unknown Wine",
-    "unknownWinery": "Unknown Winery",
+    "unknownWine": "Unknown wine",
+    "unknownWinery": "Unknown winery",
     "fallbackAlt": "Wine",
     "loadingWines": "Loading wines...",
-    "unableToLoadWines": "Unable to load wines at the moment.",
-    "clearAllFilters": "Clear All Filters",
+    "unableToLoadWines": "Wines cannot be loaded at the moment.",
+    "clearAllFilters": "Clear all filters",
     "showingWinesCount": "Showing {count} wines",
-    "fetchError": "Failed to fetch wine variants",
+    "fetchError": "Error loading wines",
     "rowIndicator": "Row {current} of {total}",
     "rowProgress": "{current} of {total}",
     "previousRow": "Previous row",
     "nextRow": "Next row",
     "firstRow": "First row",
     "lastRow": "Last row",
-    "keyboardInstructions": "Use arrow keys to navigate between wine rows. Home and End keys to jump to first or last row. Page Up and Page Down to jump by 3 rows.",
+    "keyboardInstructions": "Use arrow keys to navigate between wine rows. Home and End keys to jump to first or last row. Page Up and Page Down to jump 3 rows.",
     "wineGridLabel": "Wine grid with vertical row navigation",
     "sliderLabel": "Wine row carousel",
     "rowLabel": "Wine row {current} of {total}",
@@ -80,7 +144,7 @@
     "cart": {
       "loading": "...",
       "success": "✓",
-      "outOfStock": "Out of Stock",
+      "outOfStock": "Out of stock",
       "addButton": "+",
       "outOfStockAria": "Out of stock",
       "addToCartAria": "Add {wineTitle} to cart"
@@ -90,19 +154,19 @@
       "showLess": "Show less"
     },
     "tastingNotes": {
-      "tasteProfile": "Taste Profile",
-      "characterNotes": "Character Notes"
+      "tasteProfile": "Taste profile",
+      "characterNotes": "Character notes"
     },
     "list": {
       "title": "Wines",
-      "description": "Discover our curated selection of wines"
+      "description": "Discover our carefully curated collection of wines"
     },
     "filters": {
       "title": "Filters",
-      "price": "Price Range",
+      "price": "Price range",
       "region": "Region",
-      "variety": "Grape Variety",
-      "year": "Vintage Year"
+      "variety": "Grape variety",
+      "year": "Vintage"
     },
     "fields": {
       "description": "Description",
@@ -115,67 +179,229 @@
       "recommended": "Recommended",
       "notRecommended": "Not recommended",
       "description": "Description",
-      "tastingProfile": "Tasting Profile",
-      "tastingNotes": "Tasting Notes",
-      "foodPairing": "Food Pairing",
+      "tastingProfile": "Tasting profile",
+      "tastingNotes": "Tasting notes",
+      "foodPairing": "Food pairing",
       "save": "Save",
       "share": "Share",
-      "inStock": "In Stock",
+      "inStock": "In stock",
       "priceWithVAT": "Price with VAT",
-      "relatedWines": "Related Wines",
-      "noRelatedByWinery": "No related wines from this winery",
-      "noRelatedByRegion": "No related wines from this region",
-      "noRelatedByGrapeVariety": "No related wines with this grape variety",
+      "relatedWines": "Related wines",
+      "noRelatedByWinery": "No similar wines from this winery",
+      "noRelatedByRegion": "No similar wines from this region",
+      "noRelatedByGrapeVariety": "No similar wines with this grape variety",
       "noRelatedByPrice": "No wines in similar price range",
-      "brothersAndSisters": "Brothers & Sisters",
+      "brothersAndSisters": "Brothers and sisters",
       "neighbours": "Neighbours",
       "cousins": "Cousins",
-      "budgetBuds": "Budget Buds"
+      "budgetBuds": "Budget buds"
+    },
+    "shop": {
+      "title": "Wine Shop",
+      "description": "Discover our carefully curated collection of wines from around the world.",
+      "tips": {
+        "title": "Wine buying tips",
+        "quality": "Each wine is carefully selected for its exceptional quality and unique character.",
+        "selection": "Our collection ranges from classic regions to emerging wine regions.",
+        "experience": "Each bottle tells a story - explore our diverse range of styles and flavours."
+      },
+      "showcase": {
+        "title": "Uncork your mind",
+        "tagline": "Let these carefully selected wines inspire your next discovery"
+      }
     }
   },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty :(",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "tax": "22% VAT",
+    "success": "Woohoo!",
+    "save": {
+      "button": "Save cart",
+      "loading": "Saving..."
+    },
+    "share": {
+      "button": "Share cart",
+      "loading": "Sharing...",
+      "success": "There you go!",
+      "modalTitle": "Share cart",
+      "nothingToCopy": "Can't copy!",
+      "shareLinkMissing": "Share link not available.",
+      "copyButton": "Copy link",
+      "cartShared": "Link copied to clipboard. Hope you get permission! ;) ",
+      "error": {
+        "noCart": "You don't have a cart to share yet",
+        "failed": "Sharing cart failed. Please try again."
+      }
+    },
+    "checkout": "Shall we pack?",
+    "add": {
+      "success": "Added!",
+      "itemAdded": "One step closer!",
+      "button": "Add to cart",
+      "error": "Error adding product to cart",
+      "allToCart": "Add all to cart"
+    },
+    "clear": {
+      "button": "Clear cart",
+      "cartCleared": "Cart cleared",
+      "confirm": {
+        "title": "Clear cart",
+        "description": "Are you sure you want to clear your cart? The thirst will remain...",
+        "cancel": "Cancel",
+        "confirm": "Clear cart"
+      },
+      "success": "Cart cleared",
+      "error": "Oops! I couldn't clear the cart."
+    },
+    "addShared": {
+      "button": "Add to cart",
+      "description": "Choose how you want to add these products to your cart",
+      "addToCurrent": "Add to current cart",
+      "replaceCurrent": "Replace current cart",
+      "cancel": "Cancel",
+      "loading": "Adding...",
+      "success": {
+        "added": "Products added to cart",
+        "replaced": "Products from shared cart replaced current cart"
+      },
+      "error": "Oops! Adding products to cart failed"
+    },
+    "common": {
+      "error": "Error"
+    }
+  },
+  "account": "Account",
+  "posts": {
+    "title": "Posts"
+  },
+  "butelka": {
+    "title": "Butelka"
+  },
+  "kgb": {
+    "title": "KGB"
+  },
+  "blog": {
+    "title": "Blog"
+  },
+  "tastings": {
+    "title": "Tastings"
+  },
+  "footer": {
+    "contact": "Contact",
+    "about": "About",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "copyright": "Copyright",
+    "allRightsReserved": "All rights reserved",
+    "openingHours": "Opening hours",
+    "search": "Search",
+    "menu": "Menu",
+    "cart": {
+      "title": "Cart"
+    },
+    "winery": {
+      "title": "Winery"
+    },
+    "wine": {
+      "title": "Wine"
+    },
+    "toTop": "To top"
+  },
+  "navigation": {
+    "moods": "By mood",
+    "dishes": "We're hungry",
+    "styles": "Styles",
+    "regions": "By regions",
+    "countries": "By countries",
+    "wineries": "Our wineries",
+    "grapeVarieties": "All varieties",
+    "collections": "Collections",
+    "aromas": "Smells like",
+    "wineshop": "Wine shop",
+    "climates": "Climates",
+    "description": "Description",
+    "skinColor": "Skin color",
+    "synonyms": "Synonyms",
+    "tastingProfile": "Aromatics",
+    "distinctiveAromas": "Distinctive aromas",
+    "bestRegions": "Best regions",
+    "relatedVarieties": "Related varieties",
+    "styleCompatibleVarieties": "Similar varieties",
+    "availableVariants": "Available variants",
+    "adjective": "Adjective",
+    "flavour": "Flavour",
+    "instagram": "Instagram",
+    "website": "Website"
+  },
+  "region": {
+    "whyCool": "Why is it cool for us?",
+    "climate": "Climates",
+    "priceRange": "Best price range",
+    "neighboringRegions": "Neighbours",
+    "bestGrapes": "Distinctive grapes",
+    "legendaryWineries": "Iconic wineries",
+    "winesFrom": "Wines from region"
+  },
+  "noMoreWines": "No more wines to show",
+  "noWinesFound": "Woopsie! No wines here...",
   "winery": {
+    "winesFrom": "Wines from winery",
+    "social": "Contact",
+    "website": "Website",
+    "instagram": "Instagram",
+    "description": "Winery story",
+    "whyCool": "Why is it cool for us?",
+    "tags": "Collections",
+    "relatedWineries": "Sister wineries",
+    "relatedWines": "Can I tease you a bit?",
+    "noRelatedByWinery": "Looks like I'm an only child.",
+    "noRelatedByRegion": "I live somewhere alone it seems.",
     "list": {
       "title": "Wineries",
       "description": "Explore the wineries behind our wines"
     },
     "fields": {
       "description": "Description",
-      "whyCool": "Why it's cool",
+      "whyCool": "Why is it cool",
       "tags": "Tags",
-      "social": "Social",
-      "relatedWineries": "Related Wineries"
-    }
-  },
-  "region": {
-    "list": {
-      "title": "Wine Regions",
-      "description": "Explore wine regions and their characteristics"
-    },
-    "fields": {
-      "whyCool": "Why Cool",
-      "priceRange": "Price Range",
-      "climate": "Climate",
-      "description": "Description",
-      "country": "Country",
-      "neighbours": "Neighbouring Regions",
-      "bestGrapes": "Best Grapes",
-      "legends": "Legends"
+      "social": "Social media",
+      "relatedWineries": "Related wineries"
     }
   },
   "wineCountry": {
+    "winesFrom": "Wines from country",
+    "bestRegions": "Distinctive regions",
+    "bestGrapes": "Distinctive grapes",
+    "legends": "Iconic wineries",
+    "description": "Story",
+    "whyCool": "Why is it cool for us?",
+    "tags": "Collections",
+    "relatedWineries": "Sister wineries",
+    "relatedWines": "Can I tease you a bit?",
+    "noRelatedByWinery": "Looks like I'm an only child.",
+    "noRelatedByRegion": "I live somewhere alone it seems.",
+    "wineriesCount": "All wineries",
+    "landArea": "Total vineyard area",
+    "stats": "Statistics",
     "list": {
       "title": "Wine Countries",
       "description": "Explore wine countries and their traditions"
     },
     "fields": {
       "description": "Description",
-      "whyCool": "Why Cool",
+      "whyCool": "Why is it cool",
       "statistics": "Statistics",
-      "landArea": "Land Area",
-      "wineriesCount": "Wineries Count",
+      "landArea": "Area",
+      "wineriesCount": "Number of wineries",
       "regions": "Regions",
-      "bestRegions": "Best Regions",
-      "bestGrapes": "Best Grapes",
+      "bestRegions": "Best regions",
+      "bestGrapes": "Best grapes",
       "legends": "Legends"
     },
     "units": {
@@ -184,24 +410,37 @@
     }
   },
   "grapeVariety": {
+    "whyCool": "Why is it cool for us?",
+    "description": "Story",
+    "style": "Typical style",
+    "skin": "Skin color",
+    "distinctiveAromas": "Distinctive aromas",
+    "bestRegions": "Interesting regions",
+    "blendingPartners": "Partners in cuvées",
+    "similarVarieties": "Varieties of similar style",
+    "winesFrom": "Wines from variety",
+    "redGrape": "Red",
+    "whiteGrape": "White",
+    "synonyms": "Synonyms",
     "list": {
       "title": "Grape Varieties",
-      "description": "Learn about different grape varieties"
+      "description": "Discover different grape varieties"
     },
     "fields": {
       "description": "Description",
-      "typicalStyle": "Typical Style",
-      "whyCool": "Why it's cool",
+      "typicalStyle": "Typical style",
+      "whyCool": "Why is it cool",
       "character": "Character",
       "skin": "Skin",
       "synonyms": "Synonyms",
-      "distinctiveAromas": "Distinctive Aromas",
-      "bestRegions": "Best Regions",
-      "blendingPartners": "Blending Partners",
-      "similarVarieties": "Similar Varieties"
+      "distinctiveAromas": "Characteristic aromas",
+      "bestRegions": "Best regions",
+      "blendingPartners": "Blending partners",
+      "similarVarieties": "Similar varieties"
     }
   },
   "style": {
+    "winesFrom": "Wines with this style",
     "list": {
       "title": "Wine Styles",
       "description": "Explore different wine styles"
@@ -212,9 +451,10 @@
     }
   },
   "aroma": {
+    "winesFrom": "Wines with this aroma",
     "list": {
       "title": "Aromas",
-      "description": "Discover wine aromas and flavors"
+      "description": "Discover wine aromas and flavours"
     },
     "fields": {
       "description": "Description",
@@ -222,16 +462,47 @@
     }
   },
   "climate": {
+    "type": {
+      "desert": "Desert",
+      "maritime": "Maritime",
+      "mediterranean": "Mediterranean",
+      "continental": "Continental",
+      "alpine": "Alpine"
+    },
+    "temperature": {
+      "cool": "Cool",
+      "moderate": "Moderate",
+      "warm": "Warm",
+      "hot": "Hot"
+    },
+    "diurnalRange": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "humidity": {
+      "dry": "Dry",
+      "moderate": "Moderate",
+      "humid": "Humid"
+    },
+    "details": "Details",
+    "bestRegions": "Distinctive regions",
+    "bestGrapes": "Distinctive grapes",
+    "winesFrom": "Wines of this climate",
+    "typeLabel": "Climate type",
+    "temperatureLabel": "Temperature range",
+    "diurnalRangeLabel": "Daily temperature variation",
+    "humidityLabel": "Humidity",
     "list": {
       "title": "Climates",
-      "description": "Learn about wine climates"
+      "description": "Discover wine climates"
     },
     "fields": {
       "description": "Description",
       "climate": "Climate Type",
       "climateTemperature": "Temperature",
       "climateConditions": "Climate Conditions",
-      "diurnalRange": "Diurnal Temperature Range",
+      "diurnalRange": "Daily Temperature Range",
       "humidity": "Humidity",
       "bestRegions": "Best Regions",
       "bestGrapes": "Best Grapes",
@@ -264,6 +535,8 @@
     }
   },
   "mood": {
+    "winesFrom": "Wines for this mood",
+    "description": "Description",
     "list": {
       "title": "Moods",
       "description": "Find wines for every mood"
@@ -273,10 +546,14 @@
       "wines": "Wines"
     }
   },
+  "food": {
+    "winesFrom": "Wines for this food"
+  },
   "dish": {
+    "winesFrom": "Wines for this dish",
     "list": {
-      "title": "Dish Pairings",
-      "description": "Discover perfect food and wine pairings"
+      "title": "Dishes",
+      "description": "Discover perfect food and wine combinations"
     },
     "fields": {
       "description": "Description",
@@ -284,46 +561,14 @@
     }
   },
   "tag": {
+    "winesFrom": "Wines for this collection",
     "list": {
       "title": "Collections",
-      "description": "Browse our curated collections"
+      "description": "Explore our carefully curated collections"
     },
     "fields": {
       "description": "Description",
       "wines": "Wines"
-    }
-  },
-  "tasting": {
-    "list": {
-      "title": "Tastings",
-      "description": "Join our wine tasting events"
-    },
-    "fields": {
-      "description": "Description",
-      "date": "Date",
-      "location": "Location"
-    },
-    "notes": {
-      "dry": "Dry",
-      "sweet": "Sweet",
-      "light": "Light",
-      "rich": "Rich",
-      "smooth": "Smooth",
-      "austere": "Austere",
-      "crisp": "Crisp",
-      "creamy": "Creamy",
-      "noAlcohol": "No Alcohol",
-      "highAlcohol": "High Alcohol",
-      "freshFruit": "Fresh Fruit",
-      "ripeFruit": "Ripe Fruit",
-      "noOak": "No Oak",
-      "oaky": "Oaky",
-      "simple": "Simple",
-      "complex": "Complex",
-      "youthful": "Youthful",
-      "mature": "Mature",
-      "restrained": "Restrained",
-      "energetic": "Energetic"
     }
   },
   "giftCard": {
@@ -339,7 +584,7 @@
   "merch": {
     "list": {
       "title": "Merchandise",
-      "description": "Wine-themed merchandise and accessories"
+      "description": "Wine merchandise and accessories"
     },
     "fields": {
       "description": "Description",
@@ -349,7 +594,7 @@
   "post": {
     "list": {
       "title": "Encyclopedia",
-      "description": "Learn about wine, regions, and more"
+      "description": "Learn about wines, regions and more"
     },
     "fields": {
       "excerpt": "Excerpt",
@@ -373,37 +618,126 @@
       "title": "Collection"
     }
   },
-  "cart": {
-    "title": "Shopping Cart",
-    "empty": "Your cart is empty",
-    "subtotal": "Subtotal",
-    "total": "Total",
-    "checkout": "Proceed to Checkout",
-    "continueShopping": "Continue Shopping",
-    "remove": "Remove Item"
-  },
   "checkout": {
     "title": "Checkout",
-    "shipping": "Shipping Information",
-    "orderSummary": "Order Summary",
-    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "continueToPayment": "Continue to payment",
     "address": {
-      "street": "Street Address",
-      "city": "City",
-      "postalCode": "Postal Code",
-      "country": "Country"
+      "isBusiness": "Is business",
+      "businessName": "Business",
+      "vatNumber": "VAT number",
+      "searchPlaceholder": "Enter address..."
     },
-    "payment": {
-      "title": "Payment Information",
-      "cardNumber": "Card Number",
-      "expiry": "Expiry Date",
-      "cvv": "CVV"
+    "paymentMethod": {
+      "title": "Payment method",
+      "creditCard": "Credit card",
+      "bankTransfer": "Bank transfer",
+      "payInStore": "Pay in store",
+      "paymentDetails": "Payment details",
+      "payNow": "Pay now"
+    },
+    "auth": {
+      "login": "Sign in",
+      "noAccount": "Don't have an account?",
+      "sendMagicLink": "Send magic link",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email.",
+      "legalConfirmation": "I agree to the terms and conditions, privacy policy, cookies and confirm that I am over 18 years old.",
+      "createAccount": "Create account",
+      "saveAddress": "Save address"
+    },
+    "shippingAddress": {
+      "title": "Shipping address",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "address1": "Address",
+      "address2": "Apartment, floor, etc.",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "phone": "Phone"
+    },
+    "billingAddress": {
+      "title": "Billing address",
+      "sameAsShipping": "Billing address is the same as shipping address",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "address1": "Address",
+      "address2": "Additional address (optional)",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "phone": "Phone"
+    },
+    "error": {
+      "emptyCart": "Your cart is empty",
+      "redirectingToHome": "Redirecting to home page...",
+      "failedToLoadCart": "Error loading cart",
+      "paymentSystemNotConfigured": "Payment system is not properly configured. Please contact support.",
+      "failedToCreateOrder": "Error creating order",
+      "checkoutFailed": "Checkout failed",
+      "unknownError": "An unknown error occurred",
+      "validationFailed": "Check your data",
+      "pleaseCheckFields": "Some required fields are missing or invalid",
+      "stockUnavailable": "Stock unavailable",
+      "orderNotFound": "Order not found",
+      "cartNotFound": "Cart not found",
+      "cartCleared": "Cart successfully cleared",
+      "cartNotCleared": "Cart not cleared",
+      "paymentFailed": "Payment failed",
+      "paymentSuccessful": "Payment successful"
+    },
+    "success": {
+      "orderCreated": "Order successfully created",
+      "redirectingToConfirmation": "Redirecting to order confirmation...",
+      "paymentFailed": "Payment failed",
+      "paymentSuccessful": "Payment successful"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Enter a valid email address",
+      "invalidPhone": "Enter a valid phone number",
+      "invalidPostalCode": "Enter a valid postal code"
+    },
+    "summary": {
+      "title": "Order summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "VAT",
+      "total": "Total",
+      "free": "Free shipping"
+    }
+  },
+  "orderConfirmation": {
+    "title": "Order confirmation",
+    "description": "Your order has been confirmed",
+    "orderConfirmed": "Order confirmed!",
+    "thankYou": "Thank you for your order. We will send you a confirmation email soon.",
+    "orderNumber": "Order number",
+    "orderDate": "Order date",
+    "paymentStatus": "Payment status",
+    "orderStatus": "Order status",
+    "shippingAddress": "Shipping address",
+    "orderSummary": "Order summary",
+    "continueShopping": "Continue shopping",
+    "refreshStatus": "Refresh status",
+    "paymentProcessing": "Payment processing",
+    "checkingStatus": "Checking status...",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "paid": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded"
     }
   },
   "errors": {
     "required": "This field is required",
     "invalidEmail": "Invalid email address",
-    "invalidPassword": "Password must be at least 8 characters",
+    "invalidPassword": "Password must contain at least 8 characters",
     "passwordsDoNotMatch": "Passwords do not match",
     "invalidCard": "Invalid card number",
     "invalidExpiry": "Invalid expiry date",
@@ -412,8 +746,8 @@
   "home": {
     "hero": {
       "title": "Butelka",
-      "subtitle": "Discover the finest Slovenian wines",
-      "alt": "A beautiful glass of wine with a vineyard in the background",
+      "subtitle": "Discover the best Slovenian wines",
+      "alt": "Wine glass with vineyard in background",
       "cta": "Explore Wines"
     },
     "featured": {
@@ -422,75 +756,91 @@
         "rebula": {
           "name": "Rebula",
           "region": "Goriška Brda",
-          "alt": "A bottle of Rebula wine"
+          "alt": "Bottle of Rebula wine"
         },
         "teran": {
           "name": "Teran",
           "region": "Kras",
-          "alt": "A bottle of Teran wine"
+          "alt": "Bottle of Teran wine"
         },
         "malvazija": {
           "name": "Malvazija",
           "region": "Primorska",
-          "alt": "A bottle of Malvazija wine"
+          "alt": "Bottle of Malvazija wine"
         },
-        "learnMore": "Learn More"
+        "learnMore": "Learn More About Wine"
       }
     },
     "about": {
       "title": "About Butelka",
-      "description": "We are passionate about bringing you the finest selection of Slovenian wines, carefully curated from the best vineyards across our beautiful country.",
+      "description": "We passionately bring you the best selection of Slovenian wines, carefully chosen from the finest vineyards of our beautiful country.",
       "cta": "Our Story"
     }
   },
   "header": {
     "language": {
-      "switch": "Slovenščina"
+      "switch": "English"
     },
     "theme": {
-      "light": "Turn on the lights",
-      "dark": "Turn off the lights"
-    }
+      "light": "Turn on lights",
+      "dark": "Turn off lights"
+    },
+    "search": {
+      "placeholder": "What are you looking for?",
+      "button": "Search",
+      "loading": "Searching...",
+      "noResults": "Huh, we don't have that...",
+      "viewAllResults": "Actually, I have more ideas here",
+      "similarWineries": "similar wineries",
+      "regions": "neighboring regions",
+      "neighboringRegions": "neighboring regions",
+      "similarVarieties": "similar varieties",
+      "search": "Search",
+      "question": "What interests you?",
+      "didYouMean": "Did you mean",
+      "orThis": "Or this",
+      "also": "You also have"
+    },
+    "wine": {
+      "button": "Wine"
+    },
+    "cart": "Cart",
+    "account": "Account"
   },
   "filters": {
     "aromas": "Aromas",
     "climates": "Climates",
     "foods": "Foods",
-    "grapeVarieties": "Grape Varieties",
+    "grapeVarieties": "Varieties",
     "moods": "Moods",
     "regions": "Regions",
     "styles": "Styles",
-    "tags": "Tags",
+    "tags": "Collections",
     "countries": "Countries",
     "wineries": "Wineries",
-    "price": "Price Range",
-    "tastingNotes": "Tasting Notes",
-    "apply": "Apply Filters",
-    "showMore": "Show More",
-    "showLess": "Show Less",
+    "price": "How much did you pay?!",
+    "tastingNotes": "Tune the taste buds",
+    "apply": "Apply filters",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "search": "Search...",
-    "collections": "Filters"
+    "collections": "Too much choice?"
   },
   "sorting": {
-    "newest": {
-      "label": "Newest",
-      "asc": "Newest (ascending)",
-      "desc": "Newest (descending)"
+    "createdAt": {
+      "label": "By freshness",
+      "asc": "Fresh",
+      "desc": "Not so fresh"
     },
     "price": {
-      "label": "Price",
-      "asc": "Price (ascending)",
-      "desc": "Price (descending)"
+      "label": "By price",
+      "asc": "Cheap to expensive",
+      "desc": "Expensive to cheap"
     },
     "name": {
-      "label": "Name",
-      "asc": "Name (ascending)",
-      "desc": "Name (descending)"
-    },
-    "createdAt": {
-      "label": "Created At",
-      "asc": "Created At (ascending)",
-      "desc": "Created At (descending)"
+      "label": "By name",
+      "asc": "A to Z",
+      "desc": "Z to A"
     }
   }
 }

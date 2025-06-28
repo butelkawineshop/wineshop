@@ -34,7 +34,7 @@ export default function Sorting(): React.JSX.Element {
           onClick={() => handleSort(option.value)}
           onKeyDown={(e) => handleKeyDown(e, option.value)}
           className={cn(
-            `flex flex-col items-center ${SORT_CONSTANTS.ICON_GAP} p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`,
+            `grid items-center justify-items-center p-2 w-24 h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`,
             sort.field === option.value && 'text-foreground',
           )}
           title={t(`sorting.${option.value}.label`)}
@@ -43,7 +43,7 @@ export default function Sorting(): React.JSX.Element {
           tabIndex={0}
         >
           <Icon name={option.icon} className={SORT_CONSTANTS.ICON_SIZE} variant="color" />
-          <span className="text-xs">
+          <span className="text-xs text-center leading-tight max-w-full truncate">
             {sort.field === option.value
               ? t(`sorting.${option.value}.${sort.direction}`)
               : t(`sorting.${option.value}.label`)}

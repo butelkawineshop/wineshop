@@ -1,19 +1,19 @@
 {
   "common": {
     "loading": "Nalaganje...",
-    "error": "Prišlo je do napake",
-    "success": "Uspeh",
+    "error": "Upsi, neki ga sraćkamo...",
+    "success": "Woohoo!!",
     "save": "Shrani",
     "cancel": "Prekliči",
     "delete": "Izbriši",
     "edit": "Uredi",
     "search": "Išči",
-    "previous": "Prejšnja",
-    "next": "Naslednja",
+    "previous": "Nazaj",
+    "next": "Naprej",
     "showing": "Prikazano",
     "of": "od",
     "results": "rezultatov",
-    "noResults": "Ni najdenih rezultatov",
+    "noResults": "Sori, nič nismo našli",
     "page": "Stran",
     "logo": "Butelka logo",
     "reset": "Počisti"
@@ -40,18 +40,18 @@
   },
   "wine": {
     "title": "Vina",
-    "details": "Podrobnosti vina",
+    "details": "Podrobnosti",
     "region": "Regija",
     "variety": "Sorta grozdja",
     "year": "Letnik",
     "price": "Cena",
-    "addToCart": "Dodaj v košarico",
+    "addToCart": "Dodaj v cekarček",
     "inStock": "Na voljo",
     "outOfStock": "Ni na voljo",
-    "noWinesFound": "Ni najdenih vin",
-    "relatedWines": "Podobna vina",
-    "discoverWines": "Odkrijte vina iz {location}",
-    "showingWines": "Prikazano {showing} od {total} vin",
+    "noWinesFound": "Sori, nič nismo našli",
+    "relatedWines": "Malo extra inspiracije...",
+    "discoverWines": "Odkrij vina iz {location}",
+    "showingWines": "Prikazano {showing} od {total}",
     "unknownWine": "Neznano vino",
     "unknownWinery": "Neznana vinska klet",
     "fallbackAlt": "Vino",
@@ -75,7 +75,7 @@
     "actions": {
       "like": "Všeč mi je vino",
       "share": "Deli vino",
-      "goToSlide": "Pojdi na diapozitiv {slideNumber}"
+      "goToSlide": "Pojdi na slajd {slideNumber}"
     },
     "cart": {
       "loading": "...",
@@ -109,46 +109,60 @@
       "winery": "Klet",
       "region": "Regija",
       "style": "Stil",
-      "variants": "Različice"
+      "variants": "Etikete"
     },
     "detail": {
-      "recommended": "Priporočeno",
-      "notRecommended": "Ni priporočeno",
-      "description": "Opis",
-      "tastingProfile": "Okusni profil",
-      "tastingNotes": "Ocene okusov",
-      "foodPairing": "Spojitev s hrano",
+      "recommended": "Absolutno",
+      "notRecommended": "Ni potrebe",
+      "description": "Zgodba vina",
+      "tastingProfile": "Profil okusa",
+      "tastingNotes": "Stil vina",
+      "foodPairing": "Ful paše z",
       "save": "Shrani",
       "share": "Deli",
       "inStock": "Na voljo",
       "priceWithVAT": "Cena z DDV",
-      "relatedWines": "Podobna vina",
-      "noRelatedByWinery": "Ni podobnih vin iz te kleti",
-      "noRelatedByRegion": "Ni podobnih vin iz te regije",
-      "noRelatedByGrapeVariety": "Ni podobnih vin s to sorto grozdja",
+      "relatedWines": "Malo extra inspiracije...",
+      "noRelatedByWinery": "Nimam bratov ali sester :(",
+      "noRelatedByRegion": "Ni ni sosedov...",
+      "noRelatedByGrapeVariety": "Ni nobenih vinčkov z iste sorte",
       "noRelatedByPrice": "Ni vin v podobnem cenovnem razponu",
-      "brothersAndSisters": "Bratje in sestre",
-      "neighbours": "Sosedi",
-      "cousins": "Sestrični",
-      "budgetBuds": "Cenovni prijatelji"
+      "brothersAndSisters": "Bratje & sestre",
+      "neighbours": "Sosedje",
+      "cousins": "Bratranci & Sestrične",
+      "budgetBuds": "Za isti keš"
+    },
+    "shop": {
+      "title": "Trgovina z vinom",
+      "description": "Odkrijte našo skrbno izbrano zbirko vin iz vsega sveta.",
+      "tips": {
+        "title": "Nasveti za nakup vina",
+        "quality": "Vsako vino skrbno izberemo zaradi njegove izjemne kakovosti in edinstvenega značaja.",
+        "selection": "Naša zbirka sega od klasičnih regij do novih vinorodnih območij.",
+        "experience": "Vsaka steklenica pripoveduje zgodbo - raziskujte našo raznoliko paleto stilov in okusov."
+      },
+      "showcase": {
+        "title": "Uncork your mind",
+        "tagline": "Naj te ta skrbno izbrana vina navdihnejo za naslednje odkritje"
+      }
     }
   },
   "winery": {
     "list": {
       "title": "Kleti",
-      "description": "Raziskujte kleti za našimi vini"
+      "description": "Raziskujte kleti z našimi vini"
     },
     "fields": {
       "description": "Opis",
       "whyCool": "Zakaj je kul",
-      "tags": "Oznake",
+      "tags": "Zbirke",
       "social": "Družbena omrežja",
       "relatedWineries": "Sorodne kleti"
     }
   },
   "region": {
     "list": {
-      "title": "Vinske Regije",
+      "title": "Regije",
       "description": "Raziskujte vinske regije in njihove značilnosti"
     },
     "fields": {
@@ -164,14 +178,14 @@
   },
   "wineCountry": {
     "list": {
-      "title": "Vinske Države",
-      "description": "Raziskujte vinske države in njihove tradicije"
+      "title": "Države",
+      "description": "Raziskujte države in njihove tradicije"
     },
     "fields": {
       "description": "Opis",
       "whyCool": "Zakaj je kul",
-      "statistics": "Statistike",
-      "landArea": "Površina",
+      "statistics": "Statistika",
+      "landArea": "Površina pod trtami",
       "wineriesCount": "Število kleti",
       "regions": "Regije",
       "bestRegions": "Najboljše regije",
@@ -185,7 +199,7 @@
   },
   "grapeVariety": {
     "list": {
-      "title": "Sorte Grozdja",
+      "title": "Sorte",
       "description": "Spoznajte različne sorte grozdja"
     },
     "fields": {
@@ -197,13 +211,13 @@
       "synonyms": "Sinonimi",
       "distinctiveAromas": "Značilne arome",
       "bestRegions": "Najboljše regije",
-      "blendingPartners": "Partnerji za zmešavo",
+      "blendingPartners": "Cuvée kolegi",
       "similarVarieties": "Podobne sorte"
     }
   },
   "style": {
     "list": {
-      "title": "Vinski Stili",
+      "title": "Stili",
       "description": "Raziskujte različne vinske stile"
     },
     "fields": {
@@ -214,7 +228,7 @@
   "aroma": {
     "list": {
       "title": "Arome",
-      "description": "Odkrijte vinske arome in okuse"
+      "description": "Raziskujte vina po armoah."
     },
     "fields": {
       "description": "Opis",
@@ -224,7 +238,7 @@
   "climate": {
     "list": {
       "title": "Podnebja",
-      "description": "Spoznajte vinska podnebja"
+      "description": "Raziskujte vina po podnebjih in njihovih značilnostih"
     },
     "fields": {
       "description": "Opis",
@@ -234,14 +248,14 @@
       "diurnalRange": "Dnevni Temperaturni Razpon",
       "humidity": "Vlažnost",
       "bestRegions": "Najboljše Regije",
-      "bestGrapes": "Najboljše Grozdje",
+      "bestGrapes": "Najboljše sorte",
       "regions": "Regije"
     },
     "values": {
       "diurnalRange": {
-        "low": "Nizka",
-        "moderate": "Zmerna",
-        "high": "Visoka"
+        "low": "Nizek",
+        "moderate": "Zmeren",
+        "high": "Visok"
       },
       "humidity": {
         "dry": "Suha",
@@ -250,7 +264,7 @@
       },
       "climate": {
         "desert": "Puščavsko",
-        "maritime": "Morsko",
+        "maritime": "Oceansko",
         "mediterranean": "Sredozemsko",
         "continental": "Kontinentalno",
         "alpine": "Alpsko"
@@ -266,7 +280,7 @@
   "mood": {
     "list": {
       "title": "Filing",
-      "description": "Poiščite vina za vsak razpoloženje"
+      "description": "Poiščite vina za vsako razpoloženje"
     },
     "fields": {
       "description": "Opis",
@@ -304,26 +318,40 @@
       "location": "Lokacija"
     },
     "notes": {
+      "titlePage1": "Občutek",
+      "titlePage2": "Značaj",
       "dry": "Suho",
       "sweet": "Sladko",
-      "light": "Lahko",
-      "rich": "Bogato",
-      "smooth": "Gladko",
-      "austere": "Strogo",
-      "crisp": "Sveže",
-      "creamy": "Kremasto",
-      "noAlcohol": "Brez Alkohola",
-      "highAlcohol": "Visok Alkohol",
-      "freshFruit": "Sveže Sadje",
-      "ripeFruit": "Zrelo Sadje",
-      "noOak": "Brez Hrasta",
-      "oaky": "Hrastovo",
-      "simple": "Preprosto",
+      "freshFruit": "Sveže sadje",
+      "ripeFruit": "Zrelo sadje",
+      "crisp": "Lahkotno",
+      "creamy": "Kremno",
+      "noOak": "Brez lesa",
+      "oaky": "Barrique",
+      "simple": "Lahkotno",
       "complex": "Kompleksno",
-      "youthful": "Mlado",
+      "light": "Nežno",
+      "rich": "Bogato",
+      "austere": "Ostro",
+      "smooth": "Nežno",
       "mature": "Zrelo",
+      "youthful": "Mladostno",
       "restrained": "Zadržano",
-      "energetic": "Energetično"
+      "energetic": "Energično",
+      "noAlcohol": "Brez alkohola",
+      "highAlcohol": "Veliko alkohola"
+    },
+    "descriptions": {
+      "dry": "Od popolnoma suhega do zapeljivo sladkega",
+      "ripe": "Od svežega do zrelega sadja",
+      "creamy": "Od lahkotne do kremne teksture",
+      "oaky": "Od inoxa do izrazite barikiranosti",
+      "complex": "Od lahkotnega do kompleksnega značaja",
+      "light": "Od lahkotnega do bogatega telesa",
+      "smooth": "Od nežnega do ostrega občutka v ustih",
+      "youthful": "Od mladostnega do zrelega značaja",
+      "energetic": "Od zadržanega do energičnega stila",
+      "alcohol": "Od brez alkohola do visokega alkohola"
     }
   },
   "giftCard": {
@@ -374,11 +402,11 @@
     }
   },
   "cart": {
-    "title": "Nakupna košarica",
-    "empty": "Vaša košarica je prazna",
+    "title": "Cekarček",
+    "empty": "Tvoj cekarček je prazen",
     "subtotal": "Vmesni znesek",
     "total": "Skupaj",
-    "checkout": "Na blagajno",
+    "checkout": "Na kasu",
     "continueShopping": "Nadaljuj z nakupom",
     "remove": "Odstrani izdelek"
   },
@@ -472,25 +500,20 @@
     "collections": "Filtri"
   },
   "sorting": {
-    "newest": {
-      "label": "Najnovejše",
-      "asc": "Najnovejše (naraščajoče)",
-      "desc": "Najnovejše (padajoče)"
+    "createdAt": {
+      "label": "Po friškosti",
+      "asc": "Frišno",
+      "desc": "Ne tak frišno"
     },
     "price": {
-      "label": "Cena",
-      "asc": "Cena (naraščajoče)",
-      "desc": "Cena (padajoče)"
+      "label": "Po ceni",
+      "asc": "Ful do djabe",
+      "desc": "Djabe do ful"
     },
     "name": {
-      "label": "Ime",
-      "asc": "Ime (naraščajoče)",
-      "desc": "Ime (padajoče)"
-    },
-    "createdAt": {
-      "label": "Datum",
-      "asc": "Datum (naraščajoče)",
-      "desc": "Datum (padajoče)"
+      "label": "Po kleti",
+      "asc": "Od A do Ž",
+      "desc": "Od Ž do A"
     }
   }
 }

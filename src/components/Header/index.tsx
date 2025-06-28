@@ -44,44 +44,65 @@ export const Header = () => {
   // Navigation items (replace t('...') with strings or your translation function)
   const navItems: NavItem[] = [
     {
+      id: 'search',
+      title: 'Search',
+      icon: 'search',
+      url: '/search',
+      order: 0,
+    },
+    {
       id: 'wineshop',
       title: 'Wineshop',
       icon: 'wine',
       url: '/wineshop',
-      order: 0,
+      order: 1,
     },
     {
       id: 'tastings',
       title: 'Tastings',
       icon: 'tastings',
       url: '/tastings',
-      order: 1,
+      order: 2,
     },
     {
       id: 'kgb',
       title: 'KGB',
       icon: 'kgb',
       url: '/kgb',
-      order: 2,
+      order: 3,
     },
     {
       id: 'butelka',
       title: 'Butelka',
       icon: 'butelka',
       url: '/butelka',
-      order: 3,
+      order: 4,
     },
     {
       id: 'blog',
       title: 'Blog',
       icon: 'blog',
       url: '/encyclopedia',
-      order: 4,
+      order: 5,
+    },
+    {
+      id: 'account',
+      title: 'Account',
+      icon: 'account',
+      url: '/account',
+      order: 6,
+    },
+    {
+      id: 'cart',
+      title: 'Cart',
+      icon: 'cart',
+      url: '/cart',
+      order: 7,
     },
   ]
 
-  const leftMenuItems = navItems.filter((item) => item.order < 3)
-  const rightMenuItems = navItems.filter((item) => item.order >= 3)
+  const leftMenuItems = navItems.filter((item) => item.order < 4)
+  const rightMenuItems = navItems.filter((item) => item.order >= 4)
 
   return (
     <>
@@ -134,7 +155,7 @@ export const Header = () => {
                   className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
                 >
                   <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
-                    <Icon name={item.icon} width={32} height={32} />
+                    <Icon name={item.icon} width={32} height={32} variant="switch" />
                   </div>
                   {showLogo && (
                     <span className="text-[10px] text-foreground/60 subtitle">{item.title}</span>
