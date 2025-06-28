@@ -220,6 +220,7 @@ async function findGrapeVarietyMatches(
   seenVariantIds: Set<number>,
 ): Promise<Array<{ relatedVariant: FlatWineVariant; score: number; reason: string }>> {
   const matches: Array<{ relatedVariant: FlatWineVariant; score: number; reason: string }> = []
+  const styleID = variant.styleID ?? null
 
   // Sort grape varieties by percentage (highest first)
   const sortedGrapeVarieties = [...(variant.grapeVarieties || [])]
@@ -244,19 +245,18 @@ async function findGrapeVarietyMatches(
       logger,
     )
 
-    for (const match of singleGrapeMatches) {
+    // Prioritize same-style matches first
+    const sameStyle = singleGrapeMatches.filter((m) => m.relatedVariant.styleID === styleID)
+    const otherStyle = singleGrapeMatches.filter((m) => m.relatedVariant.styleID !== styleID)
+    for (const match of [...sameStyle, ...otherStyle]) {
       if (!seenVariantIds.has(match.relatedVariant.id)) {
         matches.push({
           relatedVariant: match.relatedVariant,
           score: 10,
-          reason: `Single grape variety: ${singleGrapeTitle}`,
+          reason: `Single grape variety: ${singleGrapeTitle}${match.relatedVariant.styleID === styleID ? ' (same style)' : ''}`,
         })
         seenVariantIds.add(match.relatedVariant.id)
-
-        if (matches.length >= 5) {
-          console.log(`🔍 [findGrapeVarietyMatches] Reached 5 matches with single-variety wines`)
-          return matches
-        }
+        if (matches.length >= 5) return matches
       }
     }
 
@@ -294,7 +294,10 @@ async function findGrapeVarietyMatches(
         })
         .sort((a, b) => b.targetPercentage - a.targetPercentage)
 
-      for (const match of blendMatches) {
+      // Prioritize same-style blends first
+      const sameStyleBlends = blendMatches.filter((m) => m.relatedVariant.styleID === styleID)
+      const otherStyleBlends = blendMatches.filter((m) => m.relatedVariant.styleID !== styleID)
+      for (const match of [...sameStyleBlends, ...otherStyleBlends]) {
         if (!seenVariantIds.has(match.relatedVariant.id) && matches.length < 5) {
           console.log(
             `🔍 [findGrapeVarietyMatches] Adding blend: ${match.relatedVariant.wineTitle} (${match.targetPercentage}% ${singleGrapeTitle})`,
@@ -303,7 +306,7 @@ async function findGrapeVarietyMatches(
           matches.push({
             relatedVariant: match.relatedVariant,
             score: 8,
-            reason: `Contains grape variety: ${singleGrapeTitle} (${match.targetPercentage}%)`,
+            reason: `Contains grape variety: ${singleGrapeTitle} (${match.targetPercentage}%)${match.relatedVariant.styleID === styleID ? ' (same style)' : ''}`,
           })
           seenVariantIds.add(match.relatedVariant.id)
         }
@@ -325,19 +328,22 @@ async function findGrapeVarietyMatches(
       logger,
     )
 
-    for (const match of exactCompositionMatches) {
+    // Prioritize same-style matches first
+    const sameStyleExact = exactCompositionMatches.filter(
+      (m) => m.relatedVariant.styleID === styleID,
+    )
+    const otherStyleExact = exactCompositionMatches.filter(
+      (m) => m.relatedVariant.styleID !== styleID,
+    )
+    for (const match of [...sameStyleExact, ...otherStyleExact]) {
       if (!seenVariantIds.has(match.relatedVariant.id)) {
         matches.push({
           relatedVariant: match.relatedVariant,
           score: 10,
-          reason: `Exact composition match`,
+          reason: `Exact composition match${match.relatedVariant.styleID === styleID ? ' (same style)' : ''}`,
         })
         seenVariantIds.add(match.relatedVariant.id)
-
-        if (matches.length >= 5) {
-          console.log(`🔍 [findGrapeVarietyMatches] Reached 5 matches with exact composition`)
-          return matches
-        }
+        if (matches.length >= 5) return matches
       }
     }
 
@@ -356,12 +362,15 @@ async function findGrapeVarietyMatches(
         logger,
       )
 
-      for (const match of dominantMatches) {
+      // Prioritize same-style matches first
+      const sameStyleDominant = dominantMatches.filter((m) => m.relatedVariant.styleID === styleID)
+      const otherStyleDominant = dominantMatches.filter((m) => m.relatedVariant.styleID !== styleID)
+      for (const match of [...sameStyleDominant, ...otherStyleDominant]) {
         if (!seenVariantIds.has(match.relatedVariant.id) && matches.length < 5) {
           matches.push({
             relatedVariant: match.relatedVariant,
             score: 9 - i, // Higher score for more dominant grapes
-            reason: `Dominant grape: ${grape.title} (${grape.percentage}%)`,
+            reason: `Dominant grape: ${grape.title} (${grape.percentage}%)${match.relatedVariant.styleID === styleID ? ' (same style)' : ''}`,
           })
           seenVariantIds.add(match.relatedVariant.id)
         }
@@ -382,12 +391,17 @@ async function findGrapeVarietyMatches(
         logger,
       )
 
-      for (const match of singleGrapeMatches) {
+      // Prioritize same-style matches first
+      const sameStyleSingle = singleGrapeMatches.filter((m) => m.relatedVariant.styleID === styleID)
+      const otherStyleSingle = singleGrapeMatches.filter(
+        (m) => m.relatedVariant.styleID !== styleID,
+      )
+      for (const match of [...sameStyleSingle, ...otherStyleSingle]) {
         if (!seenVariantIds.has(match.relatedVariant.id) && matches.length < 5) {
           matches.push({
             relatedVariant: match.relatedVariant,
             score: 7 - i, // Higher score for more dominant grapes
-            reason: `Single grape variety: ${grape.title}`,
+            reason: `Single grape variety: ${grape.title}${match.relatedVariant.styleID === styleID ? ' (same style)' : ''}`,
           })
           seenVariantIds.add(match.relatedVariant.id)
         }
@@ -843,6 +857,126 @@ async function findPriceMatches(
     logger.error('Error finding price matches', error as Error)
     return []
   }
+}
+
+// Helper function to map items with English titles and slugs
+function mapItemsWithEnglish(
+  items: any[] | undefined,
+  englishTitles: Record<string, string>,
+  englishSlugs: Record<string, string>,
+): Array<{
+  title: string | null
+  titleEn: string | null
+  id: string | null
+  slug: string | null
+  slugEn: string | null
+}> {
+  if (!items || !Array.isArray(items)) return []
+
+  return items
+    .map((item) => {
+      let title: string | null = null
+      let titleEn: string | null = null
+      let id: string | null = null
+      let slug: string | null = null
+      let slugEn: string | null = null
+
+      if (typeof item === 'object' && item !== null) {
+        if ('adjective' in item && 'flavour' in item) {
+          if (item.title) {
+            title = item.title
+          } else if (
+            typeof item.adjective === 'object' &&
+            item.adjective &&
+            typeof item.flavour === 'object' &&
+            item.flavour
+          ) {
+            const adjectiveTitle =
+              typeof item.adjective.title === 'string' ? item.adjective.title : null
+            const flavourTitle = typeof item.flavour.title === 'string' ? item.flavour.title : null
+            if (adjectiveTitle && flavourTitle) {
+              title = `${adjectiveTitle} ${flavourTitle}`
+            }
+          }
+          // Extract slug from aroma object
+          slug = typeof item.slug === 'string' ? item.slug : null
+        } else {
+          title = typeof item.title === 'string' ? item.title : null
+          slug = typeof item.slug === 'string' ? item.slug : null
+        }
+
+        id = typeof item.id === 'string' ? item.id : String(item.id)
+      } else {
+        title = String(item)
+        id = String(item)
+      }
+
+      if (typeof item === 'object' && item !== null && item.id) {
+        const itemId = typeof item.id === 'string' ? item.id : String(item.id)
+        if (englishTitles[itemId]) {
+          titleEn = englishTitles[itemId]
+        }
+        if (englishSlugs[itemId]) {
+          slugEn = englishSlugs[itemId]
+        }
+      }
+
+      return { title, titleEn, id, slug, slugEn }
+    })
+    .filter(Boolean)
+}
+
+// Helper function to map grape varieties with percentage and slugs
+function mapGrapeVarietiesWithEnglish(
+  items: any[] | undefined,
+  englishTitles: Record<string, string>,
+  englishSlugs: Record<string, string>,
+): Array<{
+  title: string | null
+  titleEn: string | null
+  id: string | null
+  percentage?: number | null
+  slug: string | null
+  slugEn: string | null
+}> {
+  if (!items || !Array.isArray(items)) return []
+
+  return items
+    .map((item) => {
+      let title: string | null = null
+      let titleEn: string | null = null
+      let id: string | null = null
+      let percentage: number | null = null
+      let slug: string | null = null
+      let slugEn: string | null = null
+
+      if (item && typeof item === 'object') {
+        if (item.variety && typeof item.variety === 'object') {
+          title = typeof item.variety.title === 'string' ? item.variety.title : null
+          id = typeof item.variety.id === 'string' ? item.variety.id : String(item.variety.id)
+          slug = typeof item.variety.slug === 'string' ? item.variety.slug : null
+        } else if (typeof item.variety === 'string' || typeof item.variety === 'number') {
+          title = String(item.variety)
+          id = String(item.variety)
+        }
+
+        percentage = typeof item.percentage === 'number' ? item.percentage : null
+
+        if (item.variety && typeof item.variety === 'object' && item.variety.id) {
+          const varietyId =
+            typeof item.variety.id === 'string' ? item.variety.id : String(item.variety.id)
+          if (englishTitles[varietyId]) {
+            titleEn = englishTitles[varietyId]
+          }
+          if (englishSlugs[varietyId]) {
+            slugEn = englishSlugs[varietyId]
+          }
+        }
+      }
+
+      return { title, titleEn, id, percentage, slug, slugEn }
+    })
+    .filter(Boolean)
 }
 
 async function populateRelatedWines(): Promise<void> {

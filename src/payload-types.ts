@@ -1150,6 +1150,34 @@ export interface FlatWineVariant {
    * Style slug for URL generation
    */
   styleSlug?: string | null
+  /**
+   * English style slug for URL generation
+   */
+  styleSlugEn?: string | null
+  /**
+   * Winery slug for URL generation
+   */
+  winerySlug?: string | null
+  /**
+   * English winery slug for URL generation
+   */
+  winerySlugEn?: string | null
+  /**
+   * Region slug for URL generation
+   */
+  regionSlug?: string | null
+  /**
+   * English region slug for URL generation
+   */
+  regionSlugEn?: string | null
+  /**
+   * Country slug for URL generation
+   */
+  countrySlug?: string | null
+  /**
+   * English country slug for URL generation
+   */
+  countrySlugEn?: string | null
   size?: string | null
   vintage?: string | null
   price?: number | null
@@ -1194,6 +1222,14 @@ export interface FlatWineVariant {
          */
         titleEn?: string | null
         id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   /**
@@ -1219,6 +1255,14 @@ export interface FlatWineVariant {
          */
         titleEn?: string | null
         id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   tags?:
@@ -1229,6 +1273,14 @@ export interface FlatWineVariant {
          */
         titleEn?: string | null
         id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   moods?:
@@ -1239,6 +1291,14 @@ export interface FlatWineVariant {
          */
         titleEn?: string | null
         id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   grapeVarieties?:
@@ -1253,6 +1313,14 @@ export interface FlatWineVariant {
          * Grape variety percentage
          */
         percentage?: number | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   /**
@@ -1266,6 +1334,14 @@ export interface FlatWineVariant {
          */
         titleEn?: string | null
         id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   /**
@@ -1279,6 +1355,14 @@ export interface FlatWineVariant {
          */
         titleEn?: string | null
         id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
       }[]
     | null
   primaryImageUrl?: string | null
@@ -2171,6 +2255,13 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   styleTitleEn?: T
   styleIconKey?: T
   styleSlug?: T
+  styleSlugEn?: T
+  winerySlug?: T
+  winerySlugEn?: T
+  regionSlug?: T
+  regionSlugEn?: T
+  countrySlug?: T
+  countrySlugEn?: T
   size?: T
   vintage?: T
   price?: T
@@ -2198,6 +2289,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         title?: T
         titleEn?: T
         id?: T
+        slug?: T
+        slugEn?: T
       }
   tastingNotes?:
     | T
@@ -2219,6 +2312,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         title?: T
         titleEn?: T
         id?: T
+        slug?: T
+        slugEn?: T
       }
   tags?:
     | T
@@ -2226,6 +2321,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         title?: T
         titleEn?: T
         id?: T
+        slug?: T
+        slugEn?: T
       }
   moods?:
     | T
@@ -2233,6 +2330,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         title?: T
         titleEn?: T
         id?: T
+        slug?: T
+        slugEn?: T
       }
   grapeVarieties?:
     | T
@@ -2241,6 +2340,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         titleEn?: T
         id?: T
         percentage?: T
+        slug?: T
+        slugEn?: T
       }
   climates?:
     | T
@@ -2248,6 +2349,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         title?: T
         titleEn?: T
         id?: T
+        slug?: T
+        slugEn?: T
       }
   dishes?:
     | T
@@ -2255,6 +2358,8 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
         title?: T
         titleEn?: T
         id?: T
+        slug?: T
+        slugEn?: T
       }
   primaryImageUrl?: T
   slug?: T

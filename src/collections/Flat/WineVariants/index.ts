@@ -172,6 +172,69 @@ export const FlatWineVariants: CollectionConfig = {
       },
     },
     {
+      name: 'styleSlugEn',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'English style slug for URL generation',
+      },
+    },
+    {
+      name: 'winerySlug',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Winery slug for URL generation',
+      },
+    },
+    {
+      name: 'winerySlugEn',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'English winery slug for URL generation',
+      },
+    },
+    {
+      name: 'regionSlug',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Region slug for URL generation',
+      },
+    },
+    {
+      name: 'regionSlugEn',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'English region slug for URL generation',
+      },
+    },
+    {
+      name: 'countrySlug',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Country slug for URL generation',
+      },
+    },
+    {
+      name: 'countrySlugEn',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'English country slug for URL generation',
+      },
+    },
+    {
       name: 'size',
       type: 'text',
       index: true,
@@ -292,6 +355,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'title', type: 'text' },
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {
@@ -404,6 +469,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'title', type: 'text' },
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {
@@ -416,6 +483,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'title', type: 'text' },
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {
@@ -428,6 +497,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'title', type: 'text' },
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {
@@ -441,6 +512,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
         { name: 'percentage', type: 'number', admin: { description: 'Grape variety percentage' } },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {
@@ -454,6 +527,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'title', type: 'text' },
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {
@@ -467,6 +542,8 @@ export const FlatWineVariants: CollectionConfig = {
         { name: 'title', type: 'text' },
         { name: 'titleEn', type: 'text', admin: { description: 'English title' } },
         { name: 'id', type: 'text' },
+        { name: 'slug', type: 'text', admin: { description: 'Slovenian slug' } },
+        { name: 'slugEn', type: 'text', admin: { description: 'English slug' } },
       ],
     },
     {

@@ -17,6 +17,7 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "sync:flat-wine": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/force-update-flat-variants.ts",
+    "populate:related-wines": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/populate-related-wines.ts",
     "sync:cloud-images": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/sync-cloud-images.ts",
     "sync:wine-images": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/sync-existing-wine-images.ts",
     "seed:countries": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/setup/seed-wine-countries.ts",

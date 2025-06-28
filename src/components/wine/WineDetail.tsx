@@ -13,6 +13,7 @@ import { Media } from '@/components/Media'
 import { RelatedWineVariants } from './components/RelatedWineVariants'
 import { WINE_CONSTANTS } from '@/constants/wine'
 import type { RelatedWineVariant } from '@/lib/graphql'
+import { CollectionLink } from '@/components/ui/CollectionLink'
 
 interface WineDetailProps {
   variant: FlatWineVariant
@@ -98,9 +99,18 @@ export function WineDetail({
                   {/* Winery Title */}
                   {currentVariant.wineryTitle && (
                     <div className="flex items-center justify-center mb-2">
-                      <span className="text-sm text-foreground/60 font-medium">
+                      <CollectionLink
+                        collection="wineries"
+                        slug={
+                          locale === 'en'
+                            ? currentVariant.winerySlugEn || currentVariant.winerySlug || ''
+                            : currentVariant.winerySlug || ''
+                        }
+                        locale={locale}
+                        className="text-sm text-foreground/60 font-medium interactive-text"
+                      >
                         {currentVariant.wineryTitle}
-                      </span>
+                      </CollectionLink>
                     </div>
                   )}
 
@@ -168,19 +178,60 @@ export function WineDetail({
                     {currentVariant.regionTitle && (
                       <div className="flex items-center gap-2">
                         <Icon name="region" className="w-4 h-4" variant="color" />
-                        <span>{currentVariant.regionTitle}</span>
+                        <CollectionLink
+                          collection="regions"
+                          slug={
+                            locale === 'en'
+                              ? currentVariant.regionSlugEn || currentVariant.regionSlug || ''
+                              : currentVariant.regionSlug || ''
+                          }
+                          locale={locale}
+                          className="interactive-text"
+                        >
+                          <span>{currentVariant.regionTitle}</span>
+                        </CollectionLink>
                       </div>
                     )}
                     {currentVariant.countryTitle && (
                       <div className="flex items-center gap-2">
                         <Icon name="country" className="w-4 h-4" variant="color" />
-                        <span>{currentVariant.countryTitle}</span>
+                        <CollectionLink
+                          collection="wineCountries"
+                          slug={
+                            locale === 'en'
+                              ? currentVariant.countrySlugEn || currentVariant.countrySlug || ''
+                              : currentVariant.countrySlug || ''
+                          }
+                          locale={locale}
+                          className="interactive-text"
+                        >
+                          <span>
+                            {locale === 'en'
+                              ? currentVariant.countryTitleEn || currentVariant.countryTitle
+                              : currentVariant.countryTitle}
+                          </span>
+                        </CollectionLink>
                       </div>
                     )}
                     {currentVariant.styleTitle && (
                       <div className="flex items-center gap-2">
                         <Icon name="style" className="w-4 h-4" variant="color" />
-                        <span>{currentVariant.styleTitle}</span>
+                        <CollectionLink
+                          collection="styles"
+                          slug={
+                            locale === 'en'
+                              ? currentVariant.styleSlugEn || currentVariant.styleSlug || ''
+                              : currentVariant.styleSlug || ''
+                          }
+                          locale={locale}
+                          className="interactive-text"
+                        >
+                          <span>
+                            {locale === 'en'
+                              ? currentVariant.styleTitleEn || currentVariant.styleTitle
+                              : currentVariant.styleTitle}
+                          </span>
+                        </CollectionLink>
                       </div>
                     )}
                   </div>
@@ -218,20 +269,6 @@ export function WineDetail({
                     </Accordion>
                   )}
 
-                  {/* Tasting Profile */}
-                  {currentVariant.tastingProfile && (
-                    <Accordion
-                      title={t('tastingProfile')}
-                      isOpen={openSection === 'tasting'}
-                      onToggle={() => setOpenSection(openSection === 'tasting' ? null : 'tasting')}
-                      icon="tasting-profile"
-                    >
-                      <div className="prose prose-lg max-w-none text-sm">
-                        <p>{currentVariant.tastingProfile}</p>
-                      </div>
-                    </Accordion>
-                  )}
-
                   {/* Food Pairing */}
                   {currentVariant.dishes && currentVariant.dishes.length > 0 && (
                     <Accordion
@@ -252,16 +289,35 @@ export function WineDetail({
                       </div>
                     </Accordion>
                   )}
+                  {/* Tasting Profile */}
+                  {currentVariant.tastingProfile && (
+                    <Accordion
+                      title={t('tastingProfile')}
+                      isOpen={openSection === 'tasting'}
+                      onToggle={() => setOpenSection(openSection === 'tasting' ? null : 'tasting')}
+                      icon="tasting-profile"
+                    >
+                      <div className="prose prose-lg max-w-none text-sm">
+                        <p>{currentVariant.tastingProfile}</p>
+                      </div>
+                    </Accordion>
+                  )}
+                  {/* Tasting Notes */}
+                  {currentVariant.tastingNotes && (
+                    <Accordion
+                      title={t('tastingNotes')}
+                      isOpen={openSection === 'tasting'}
+                      onToggle={() => setOpenSection(openSection === 'tasting' ? null : 'tasting')}
+                      icon="tasting-profile"
+                    >
+                      <div className="prose prose-lg max-w-none text-sm">
+                        <div className="flex flex-col gap-2 text-sm">
+                          <WineTastingNotes variant={currentVariant} />
+                        </div>
+                      </div>
+                    </Accordion>
+                  )}
                 </div>
-
-                {/* Tasting Notes */}
-                {currentVariant.tastingNotes && (
-                  <div>
-                    <div className="flex flex-col gap-2 text-sm">
-                      <WineTastingNotes variant={currentVariant} />
-                    </div>
-                  </div>
-                )}
 
                 {/* Sticky Action Bar */}
                 <div className="sticky bottom-0 left-0 right-0 bg-background z-20 border-t border-other-bg/20 lg:group-[.end-of-content]:w-screen lg:group-[.end-of-content]:-mx-4">

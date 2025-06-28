@@ -24,7 +24,6 @@ interface WineCardProps {
   locale: Locale
   onShare?: (variant: FlatWineVariant) => void
   onLike?: (variant: FlatWineVariant) => void
-  collectionItemsLoaded?: boolean
 }
 
 export function WineCard({
@@ -33,7 +32,6 @@ export function WineCard({
   locale,
   onShare,
   onLike,
-  collectionItemsLoaded = false,
 }: WineCardProps): React.JSX.Element {
   const { t } = useTranslation()
   const swiperRef = useRef<{ swiper: SwiperType }>(null)
@@ -125,14 +123,20 @@ export function WineCard({
 
         {/* First tasting notes page */}
         <SwiperSlide>
-          <div className="w-full h-full flex aspect-square">
+          <div className="w-full h-full flex aspect-square flex-col">
+            <div className="text-center px-4 font-accent text-sm">
+              {t('wine.tastingNotes.tasteProfile')}
+            </div>
             <WineTastingNotes variant={variant} page={1} />
           </div>
         </SwiperSlide>
 
         {/* Second tasting notes page */}
         <SwiperSlide>
-          <div className="w-full h-full flex aspect-square">
+          <div className="w-full h-full flex aspect-square flex-col">
+            <div className="text-center px-4 font-accent text-sm">
+              {t('wine.tastingNotes.characterNotes')}
+            </div>
             <WineTastingNotes variant={variant} page={2} />
           </div>
         </SwiperSlide>
@@ -140,7 +144,7 @@ export function WineCard({
 
       <div className="bg-background flex flex-col w-full">
         {/* Action buttons */}
-        <div className="grid grid-cols-3 w-full py-2 px-1">
+        <div className="grid grid-cols-3 w-full py-2 px-2">
           <div className="flex items-center">
             <div className="flex gap-2">
               <button
@@ -162,7 +166,7 @@ export function WineCard({
               >
                 <Icon
                   name="share"
-                  variant="white"
+                  variant="color"
                   width={WINE_CONSTANTS.ICON_SIZE}
                   height={WINE_CONSTANTS.ICON_SIZE}
                 />
@@ -198,11 +202,7 @@ export function WineCard({
         {/* Wine description and tags */}
         <div className="px-2 pb-2 w-full space-y-content">
           <WineDescription variant={variant} />
-          <WineCollectionTags
-            variant={variant}
-            locale={locale}
-            collectionItemsLoaded={collectionItemsLoaded}
-          />
+          <WineCollectionTags variant={variant} locale={locale} />
         </div>
       </div>
     </div>

@@ -148,6 +148,11 @@ type Query {
   countPayloadPreferences(draft: Boolean, where: PayloadPreference_where, locale: LocaleInputType): countPayloadPreferences
   docAccessPayloadPreference(id: Int!): payload_preferencesDocAccess
   Access: Access
+
+  """
+  Fetches a wine variant, all its variants, and related variants in a single call.
+  """
+  wineDetail(slug: String!, locale: String!): WineDetailResult
 }
 
 type User {
@@ -21168,17 +21173,17 @@ input versionsDish_where_or {
 
 type RelatedWineVariant {
   id: Int!
-  variantId: Float!
+  variantId: Float
   relatedVariants: [RelatedWineVariant_RelatedVariants!]
   relatedCount: Float
   lastComputed: DateTime
   computationVersion: String
   updatedAt: DateTime
   createdAt: DateTime
+  _status: RelatedWineVariant__status
 }
 
 type RelatedWineVariant_RelatedVariants {
-  relatedVariantId: Float
   type: RelatedWineVariant_RelatedVariants_type
   score: Float
   reason: String
@@ -21188,7 +21193,9 @@ type RelatedWineVariant_RelatedVariants {
 
 enum RelatedWineVariant_RelatedVariants_type {
   winery
+  relatedWinery
   region
+  relatedRegion
   grapeVariety
   price
   style
@@ -21213,6 +21220,13 @@ type FlatWineVariant {
   styleTitleEn: String
   styleIconKey: String
   styleSlug: String
+  styleSlugEn: String
+  winerySlug: String
+  winerySlugEn: String
+  regionSlug: String
+  regionSlugEn: String
+  countrySlug: String
+  countrySlugEn: String
   size: String
   vintage: String
   price: Float
@@ -21255,6 +21269,8 @@ type FlatWineVariant_WineryTags {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariant_TastingNotes {
@@ -21274,18 +21290,24 @@ type FlatWineVariant_Aromas {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariant_Tags {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariant_Moods {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariant_GrapeVarieties {
@@ -21293,21 +21315,32 @@ type FlatWineVariant_GrapeVarieties {
   titleEn: String
   id: String
   percentage: Float
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariant_Climates {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariant_Dishes {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 enum FlatWineVariant__status {
+  draft
+  published
+}
+
+enum RelatedWineVariant__status {
   draft
   published
 }
@@ -21328,7 +21361,6 @@ type RelatedWineVariants {
 
 input RelatedWineVariant_where {
   variantId: RelatedWineVariant_variantId_operator
-  relatedVariants__relatedVariantId: RelatedWineVariant_relatedVariants__relatedVariantId_operator
   relatedVariants__type: RelatedWineVariant_relatedVariants__type_operator
   relatedVariants__score: RelatedWineVariant_relatedVariants__score_operator
   relatedVariants__reason: RelatedWineVariant_relatedVariants__reason_operator
@@ -21339,21 +21371,13 @@ input RelatedWineVariant_where {
   computationVersion: RelatedWineVariant_computationVersion_operator
   updatedAt: RelatedWineVariant_updatedAt_operator
   createdAt: RelatedWineVariant_createdAt_operator
+  _status: RelatedWineVariant__status_operator
   id: RelatedWineVariant_id_operator
   AND: [RelatedWineVariant_where_and]
   OR: [RelatedWineVariant_where_or]
 }
 
 input RelatedWineVariant_variantId_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-}
-
-input RelatedWineVariant_relatedVariants__relatedVariantId_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -21372,7 +21396,9 @@ input RelatedWineVariant_relatedVariants__type_operator {
 
 enum RelatedWineVariant_relatedVariants__type_Input {
   winery
+  relatedWinery
   region
+  relatedRegion
   grapeVariety
   price
   style
@@ -21471,6 +21497,20 @@ input RelatedWineVariant_createdAt_operator {
   exists: Boolean
 }
 
+input RelatedWineVariant__status_operator {
+  equals: RelatedWineVariant__status_Input
+  not_equals: RelatedWineVariant__status_Input
+  in: [RelatedWineVariant__status_Input]
+  not_in: [RelatedWineVariant__status_Input]
+  all: [RelatedWineVariant__status_Input]
+  exists: Boolean
+}
+
+enum RelatedWineVariant__status_Input {
+  draft
+  published
+}
+
 input RelatedWineVariant_id_operator {
   equals: Int
   not_equals: Int
@@ -21483,7 +21523,6 @@ input RelatedWineVariant_id_operator {
 
 input RelatedWineVariant_where_and {
   variantId: RelatedWineVariant_variantId_operator
-  relatedVariants__relatedVariantId: RelatedWineVariant_relatedVariants__relatedVariantId_operator
   relatedVariants__type: RelatedWineVariant_relatedVariants__type_operator
   relatedVariants__score: RelatedWineVariant_relatedVariants__score_operator
   relatedVariants__reason: RelatedWineVariant_relatedVariants__reason_operator
@@ -21494,6 +21533,7 @@ input RelatedWineVariant_where_and {
   computationVersion: RelatedWineVariant_computationVersion_operator
   updatedAt: RelatedWineVariant_updatedAt_operator
   createdAt: RelatedWineVariant_createdAt_operator
+  _status: RelatedWineVariant__status_operator
   id: RelatedWineVariant_id_operator
   AND: [RelatedWineVariant_where_and]
   OR: [RelatedWineVariant_where_or]
@@ -21501,7 +21541,6 @@ input RelatedWineVariant_where_and {
 
 input RelatedWineVariant_where_or {
   variantId: RelatedWineVariant_variantId_operator
-  relatedVariants__relatedVariantId: RelatedWineVariant_relatedVariants__relatedVariantId_operator
   relatedVariants__type: RelatedWineVariant_relatedVariants__type_operator
   relatedVariants__score: RelatedWineVariant_relatedVariants__score_operator
   relatedVariants__reason: RelatedWineVariant_relatedVariants__reason_operator
@@ -21512,6 +21551,7 @@ input RelatedWineVariant_where_or {
   computationVersion: RelatedWineVariant_computationVersion_operator
   updatedAt: RelatedWineVariant_updatedAt_operator
   createdAt: RelatedWineVariant_createdAt_operator
+  _status: RelatedWineVariant__status_operator
   id: RelatedWineVariant_id_operator
   AND: [RelatedWineVariant_where_and]
   OR: [RelatedWineVariant_where_or]
@@ -21538,6 +21578,7 @@ type RelatedWineVariantsDocAccessFields {
   computationVersion: RelatedWineVariantsDocAccessFields_computationVersion
   updatedAt: RelatedWineVariantsDocAccessFields_updatedAt
   createdAt: RelatedWineVariantsDocAccessFields_createdAt
+  _status: RelatedWineVariantsDocAccessFields__status
 }
 
 type RelatedWineVariantsDocAccessFields_variantId {
@@ -21588,35 +21629,11 @@ type RelatedWineVariantsDocAccessFields_relatedVariants_Delete {
 }
 
 type RelatedWineVariantsDocAccessFields_relatedVariants_Fields {
-  relatedVariantId: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId
   type: RelatedWineVariantsDocAccessFields_relatedVariants_type
   score: RelatedWineVariantsDocAccessFields_relatedVariants_score
   reason: RelatedWineVariantsDocAccessFields_relatedVariants_reason
   relatedVariant: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariant
   id: RelatedWineVariantsDocAccessFields_relatedVariants_id
-}
-
-type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId {
-  create: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Create
-  read: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Read
-  update: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Update
-  delete: RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Delete
-}
-
-type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Create {
-  permission: Boolean!
-}
-
-type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Read {
-  permission: Boolean!
-}
-
-type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Update {
-  permission: Boolean!
-}
-
-type RelatedWineVariantsDocAccessFields_relatedVariants_relatedVariantId_Delete {
-  permission: Boolean!
 }
 
 type RelatedWineVariantsDocAccessFields_relatedVariants_type {
@@ -21849,6 +21866,29 @@ type RelatedWineVariantsDocAccessFields_createdAt_Delete {
   permission: Boolean!
 }
 
+type RelatedWineVariantsDocAccessFields__status {
+  create: RelatedWineVariantsDocAccessFields__status_Create
+  read: RelatedWineVariantsDocAccessFields__status_Read
+  update: RelatedWineVariantsDocAccessFields__status_Update
+  delete: RelatedWineVariantsDocAccessFields__status_Delete
+}
+
+type RelatedWineVariantsDocAccessFields__status_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields__status_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields__status_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsDocAccessFields__status_Delete {
+  permission: Boolean!
+}
+
 type RelatedWineVariantsCreateDocAccess {
   permission: Boolean!
   where: JSONObject
@@ -21875,10 +21915,13 @@ type RelatedWineVariantsReadVersionsDocAccess {
 }
 
 type RelatedWineVariantVersion {
-  parent(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): RelatedWineVariant
+  parent(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): RelatedWineVariant
   version: RelatedWineVariantVersion_Version
   createdAt: DateTime
   updatedAt: DateTime
+  snapshot: Boolean
+  publishedLocale: RelatedWineVariantVersion_publishedLocale
+  latest: Boolean
   id: Int
 }
 
@@ -21890,10 +21933,10 @@ type RelatedWineVariantVersion_Version {
   computationVersion: String
   updatedAt: DateTime
   createdAt: DateTime
+  _status: RelatedWineVariantVersion_Version__status
 }
 
 type RelatedWineVariantVersion_Version_RelatedVariants {
-  relatedVariantId: Float
   type: RelatedWineVariantVersion_Version_RelatedVariants_type
   score: Float
   reason: String
@@ -21903,10 +21946,22 @@ type RelatedWineVariantVersion_Version_RelatedVariants {
 
 enum RelatedWineVariantVersion_Version_RelatedVariants_type {
   winery
+  relatedWinery
   region
+  relatedRegion
   grapeVariety
   price
   style
+}
+
+enum RelatedWineVariantVersion_Version__status {
+  draft
+  published
+}
+
+enum RelatedWineVariantVersion_publishedLocale {
+  sl
+  en
 }
 
 type versionsRelatedWineVariants {
@@ -21926,7 +21981,6 @@ type versionsRelatedWineVariants {
 input versionsRelatedWineVariant_where {
   parent: versionsRelatedWineVariant_parent_operator
   version__variantId: versionsRelatedWineVariant_version__variantId_operator
-  version__relatedVariants__relatedVariantId: versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator
   version__relatedVariants__type: versionsRelatedWineVariant_version__relatedVariants__type_operator
   version__relatedVariants__score: versionsRelatedWineVariant_version__relatedVariants__score_operator
   version__relatedVariants__reason: versionsRelatedWineVariant_version__relatedVariants__reason_operator
@@ -21937,8 +21991,12 @@ input versionsRelatedWineVariant_where {
   version__computationVersion: versionsRelatedWineVariant_version__computationVersion_operator
   version__updatedAt: versionsRelatedWineVariant_version__updatedAt_operator
   version__createdAt: versionsRelatedWineVariant_version__createdAt_operator
+  version___status: versionsRelatedWineVariant_version___status_operator
   createdAt: versionsRelatedWineVariant_createdAt_operator
   updatedAt: versionsRelatedWineVariant_updatedAt_operator
+  snapshot: versionsRelatedWineVariant_snapshot_operator
+  publishedLocale: versionsRelatedWineVariant_publishedLocale_operator
+  latest: versionsRelatedWineVariant_latest_operator
   id: versionsRelatedWineVariant_id_operator
   AND: [versionsRelatedWineVariant_where_and]
   OR: [versionsRelatedWineVariant_where_or]
@@ -21962,15 +22020,6 @@ input versionsRelatedWineVariant_version__variantId_operator {
   less_than: Float
 }
 
-input versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-}
-
 input versionsRelatedWineVariant_version__relatedVariants__type_operator {
   equals: versionsRelatedWineVariant_version__relatedVariants__type_Input
   not_equals: versionsRelatedWineVariant_version__relatedVariants__type_Input
@@ -21981,7 +22030,9 @@ input versionsRelatedWineVariant_version__relatedVariants__type_operator {
 
 enum versionsRelatedWineVariant_version__relatedVariants__type_Input {
   winery
+  relatedWinery
   region
+  relatedRegion
   grapeVariety
   price
   style
@@ -22080,6 +22131,20 @@ input versionsRelatedWineVariant_version__createdAt_operator {
   exists: Boolean
 }
 
+input versionsRelatedWineVariant_version___status_operator {
+  equals: versionsRelatedWineVariant_version___status_Input
+  not_equals: versionsRelatedWineVariant_version___status_Input
+  in: [versionsRelatedWineVariant_version___status_Input]
+  not_in: [versionsRelatedWineVariant_version___status_Input]
+  all: [versionsRelatedWineVariant_version___status_Input]
+  exists: Boolean
+}
+
+enum versionsRelatedWineVariant_version___status_Input {
+  draft
+  published
+}
+
 input versionsRelatedWineVariant_createdAt_operator {
   equals: DateTime
   not_equals: DateTime
@@ -22102,6 +22167,32 @@ input versionsRelatedWineVariant_updatedAt_operator {
   exists: Boolean
 }
 
+input versionsRelatedWineVariant_snapshot_operator {
+  equals: Boolean
+  not_equals: Boolean
+  exists: Boolean
+}
+
+input versionsRelatedWineVariant_publishedLocale_operator {
+  equals: versionsRelatedWineVariant_publishedLocale_Input
+  not_equals: versionsRelatedWineVariant_publishedLocale_Input
+  in: [versionsRelatedWineVariant_publishedLocale_Input]
+  not_in: [versionsRelatedWineVariant_publishedLocale_Input]
+  all: [versionsRelatedWineVariant_publishedLocale_Input]
+  exists: Boolean
+}
+
+enum versionsRelatedWineVariant_publishedLocale_Input {
+  sl
+  en
+}
+
+input versionsRelatedWineVariant_latest_operator {
+  equals: Boolean
+  not_equals: Boolean
+  exists: Boolean
+}
+
 input versionsRelatedWineVariant_id_operator {
   equals: Int
   not_equals: Int
@@ -22115,7 +22206,6 @@ input versionsRelatedWineVariant_id_operator {
 input versionsRelatedWineVariant_where_and {
   parent: versionsRelatedWineVariant_parent_operator
   version__variantId: versionsRelatedWineVariant_version__variantId_operator
-  version__relatedVariants__relatedVariantId: versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator
   version__relatedVariants__type: versionsRelatedWineVariant_version__relatedVariants__type_operator
   version__relatedVariants__score: versionsRelatedWineVariant_version__relatedVariants__score_operator
   version__relatedVariants__reason: versionsRelatedWineVariant_version__relatedVariants__reason_operator
@@ -22126,8 +22216,12 @@ input versionsRelatedWineVariant_where_and {
   version__computationVersion: versionsRelatedWineVariant_version__computationVersion_operator
   version__updatedAt: versionsRelatedWineVariant_version__updatedAt_operator
   version__createdAt: versionsRelatedWineVariant_version__createdAt_operator
+  version___status: versionsRelatedWineVariant_version___status_operator
   createdAt: versionsRelatedWineVariant_createdAt_operator
   updatedAt: versionsRelatedWineVariant_updatedAt_operator
+  snapshot: versionsRelatedWineVariant_snapshot_operator
+  publishedLocale: versionsRelatedWineVariant_publishedLocale_operator
+  latest: versionsRelatedWineVariant_latest_operator
   id: versionsRelatedWineVariant_id_operator
   AND: [versionsRelatedWineVariant_where_and]
   OR: [versionsRelatedWineVariant_where_or]
@@ -22136,7 +22230,6 @@ input versionsRelatedWineVariant_where_and {
 input versionsRelatedWineVariant_where_or {
   parent: versionsRelatedWineVariant_parent_operator
   version__variantId: versionsRelatedWineVariant_version__variantId_operator
-  version__relatedVariants__relatedVariantId: versionsRelatedWineVariant_version__relatedVariants__relatedVariantId_operator
   version__relatedVariants__type: versionsRelatedWineVariant_version__relatedVariants__type_operator
   version__relatedVariants__score: versionsRelatedWineVariant_version__relatedVariants__score_operator
   version__relatedVariants__reason: versionsRelatedWineVariant_version__relatedVariants__reason_operator
@@ -22147,8 +22240,12 @@ input versionsRelatedWineVariant_where_or {
   version__computationVersion: versionsRelatedWineVariant_version__computationVersion_operator
   version__updatedAt: versionsRelatedWineVariant_version__updatedAt_operator
   version__createdAt: versionsRelatedWineVariant_version__createdAt_operator
+  version___status: versionsRelatedWineVariant_version___status_operator
   createdAt: versionsRelatedWineVariant_createdAt_operator
   updatedAt: versionsRelatedWineVariant_updatedAt_operator
+  snapshot: versionsRelatedWineVariant_snapshot_operator
+  publishedLocale: versionsRelatedWineVariant_publishedLocale_operator
+  latest: versionsRelatedWineVariant_latest_operator
   id: versionsRelatedWineVariant_id_operator
   AND: [versionsRelatedWineVariant_where_and]
   OR: [versionsRelatedWineVariant_where_or]
@@ -22186,6 +22283,13 @@ input FlatWineVariant_where {
   styleTitleEn: FlatWineVariant_styleTitleEn_operator
   styleIconKey: FlatWineVariant_styleIconKey_operator
   styleSlug: FlatWineVariant_styleSlug_operator
+  styleSlugEn: FlatWineVariant_styleSlugEn_operator
+  winerySlug: FlatWineVariant_winerySlug_operator
+  winerySlugEn: FlatWineVariant_winerySlugEn_operator
+  regionSlug: FlatWineVariant_regionSlug_operator
+  regionSlugEn: FlatWineVariant_regionSlugEn_operator
+  countrySlug: FlatWineVariant_countrySlug_operator
+  countrySlugEn: FlatWineVariant_countrySlugEn_operator
   size: FlatWineVariant_size_operator
   vintage: FlatWineVariant_vintage_operator
   price: FlatWineVariant_price_operator
@@ -22202,6 +22306,8 @@ input FlatWineVariant_where {
   wineryTags__title: FlatWineVariant_wineryTags__title_operator
   wineryTags__titleEn: FlatWineVariant_wineryTags__titleEn_operator
   wineryTags__id: FlatWineVariant_wineryTags__id_operator
+  wineryTags__slug: FlatWineVariant_wineryTags__slug_operator
+  wineryTags__slugEn: FlatWineVariant_wineryTags__slugEn_operator
   tastingNotes__dry: FlatWineVariant_tastingNotes__dry_operator
   tastingNotes__ripe: FlatWineVariant_tastingNotes__ripe_operator
   tastingNotes__creamy: FlatWineVariant_tastingNotes__creamy_operator
@@ -22215,22 +22321,34 @@ input FlatWineVariant_where {
   aromas__title: FlatWineVariant_aromas__title_operator
   aromas__titleEn: FlatWineVariant_aromas__titleEn_operator
   aromas__id: FlatWineVariant_aromas__id_operator
+  aromas__slug: FlatWineVariant_aromas__slug_operator
+  aromas__slugEn: FlatWineVariant_aromas__slugEn_operator
   tags__title: FlatWineVariant_tags__title_operator
   tags__titleEn: FlatWineVariant_tags__titleEn_operator
   tags__id: FlatWineVariant_tags__id_operator
+  tags__slug: FlatWineVariant_tags__slug_operator
+  tags__slugEn: FlatWineVariant_tags__slugEn_operator
   moods__title: FlatWineVariant_moods__title_operator
   moods__titleEn: FlatWineVariant_moods__titleEn_operator
   moods__id: FlatWineVariant_moods__id_operator
+  moods__slug: FlatWineVariant_moods__slug_operator
+  moods__slugEn: FlatWineVariant_moods__slugEn_operator
   grapeVarieties__title: FlatWineVariant_grapeVarieties__title_operator
   grapeVarieties__titleEn: FlatWineVariant_grapeVarieties__titleEn_operator
   grapeVarieties__id: FlatWineVariant_grapeVarieties__id_operator
   grapeVarieties__percentage: FlatWineVariant_grapeVarieties__percentage_operator
+  grapeVarieties__slug: FlatWineVariant_grapeVarieties__slug_operator
+  grapeVarieties__slugEn: FlatWineVariant_grapeVarieties__slugEn_operator
   climates__title: FlatWineVariant_climates__title_operator
   climates__titleEn: FlatWineVariant_climates__titleEn_operator
   climates__id: FlatWineVariant_climates__id_operator
+  climates__slug: FlatWineVariant_climates__slug_operator
+  climates__slugEn: FlatWineVariant_climates__slugEn_operator
   dishes__title: FlatWineVariant_dishes__title_operator
   dishes__titleEn: FlatWineVariant_dishes__titleEn_operator
   dishes__id: FlatWineVariant_dishes__id_operator
+  dishes__slug: FlatWineVariant_dishes__slug_operator
+  dishes__slugEn: FlatWineVariant_dishes__slugEn_operator
   primaryImageUrl: FlatWineVariant_primaryImageUrl_operator
   slug: FlatWineVariant_slug_operator
   syncedAt: FlatWineVariant_syncedAt_operator
@@ -22422,6 +22540,83 @@ input FlatWineVariant_styleSlug_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_styleSlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_winerySlug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_winerySlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_regionSlug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_regionSlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_countrySlug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_countrySlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input FlatWineVariant_size_operator {
   equals: String
   not_equals: String
@@ -22579,6 +22774,28 @@ input FlatWineVariant_wineryTags__id_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_wineryTags__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_wineryTags__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input FlatWineVariant_tastingNotes__dry_operator {
   equals: Float
   not_equals: Float
@@ -22712,6 +22929,28 @@ input FlatWineVariant_aromas__id_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_aromas__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_aromas__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input FlatWineVariant_tags__title_operator {
   equals: String
   not_equals: String
@@ -22745,6 +22984,28 @@ input FlatWineVariant_tags__id_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_tags__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_tags__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input FlatWineVariant_moods__title_operator {
   equals: String
   not_equals: String
@@ -22768,6 +23029,28 @@ input FlatWineVariant_moods__titleEn_operator {
 }
 
 input FlatWineVariant_moods__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_moods__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_moods__slugEn_operator {
   equals: String
   not_equals: String
   like: String
@@ -22821,6 +23104,28 @@ input FlatWineVariant_grapeVarieties__percentage_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_grapeVarieties__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_grapeVarieties__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input FlatWineVariant_climates__title_operator {
   equals: String
   not_equals: String
@@ -22854,6 +23159,28 @@ input FlatWineVariant_climates__id_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_climates__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_climates__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input FlatWineVariant_dishes__title_operator {
   equals: String
   not_equals: String
@@ -22877,6 +23204,28 @@ input FlatWineVariant_dishes__titleEn_operator {
 }
 
 input FlatWineVariant_dishes__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_dishes__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FlatWineVariant_dishes__slugEn_operator {
   equals: String
   not_equals: String
   like: String
@@ -22990,6 +23339,13 @@ input FlatWineVariant_where_and {
   styleTitleEn: FlatWineVariant_styleTitleEn_operator
   styleIconKey: FlatWineVariant_styleIconKey_operator
   styleSlug: FlatWineVariant_styleSlug_operator
+  styleSlugEn: FlatWineVariant_styleSlugEn_operator
+  winerySlug: FlatWineVariant_winerySlug_operator
+  winerySlugEn: FlatWineVariant_winerySlugEn_operator
+  regionSlug: FlatWineVariant_regionSlug_operator
+  regionSlugEn: FlatWineVariant_regionSlugEn_operator
+  countrySlug: FlatWineVariant_countrySlug_operator
+  countrySlugEn: FlatWineVariant_countrySlugEn_operator
   size: FlatWineVariant_size_operator
   vintage: FlatWineVariant_vintage_operator
   price: FlatWineVariant_price_operator
@@ -23006,6 +23362,8 @@ input FlatWineVariant_where_and {
   wineryTags__title: FlatWineVariant_wineryTags__title_operator
   wineryTags__titleEn: FlatWineVariant_wineryTags__titleEn_operator
   wineryTags__id: FlatWineVariant_wineryTags__id_operator
+  wineryTags__slug: FlatWineVariant_wineryTags__slug_operator
+  wineryTags__slugEn: FlatWineVariant_wineryTags__slugEn_operator
   tastingNotes__dry: FlatWineVariant_tastingNotes__dry_operator
   tastingNotes__ripe: FlatWineVariant_tastingNotes__ripe_operator
   tastingNotes__creamy: FlatWineVariant_tastingNotes__creamy_operator
@@ -23019,22 +23377,34 @@ input FlatWineVariant_where_and {
   aromas__title: FlatWineVariant_aromas__title_operator
   aromas__titleEn: FlatWineVariant_aromas__titleEn_operator
   aromas__id: FlatWineVariant_aromas__id_operator
+  aromas__slug: FlatWineVariant_aromas__slug_operator
+  aromas__slugEn: FlatWineVariant_aromas__slugEn_operator
   tags__title: FlatWineVariant_tags__title_operator
   tags__titleEn: FlatWineVariant_tags__titleEn_operator
   tags__id: FlatWineVariant_tags__id_operator
+  tags__slug: FlatWineVariant_tags__slug_operator
+  tags__slugEn: FlatWineVariant_tags__slugEn_operator
   moods__title: FlatWineVariant_moods__title_operator
   moods__titleEn: FlatWineVariant_moods__titleEn_operator
   moods__id: FlatWineVariant_moods__id_operator
+  moods__slug: FlatWineVariant_moods__slug_operator
+  moods__slugEn: FlatWineVariant_moods__slugEn_operator
   grapeVarieties__title: FlatWineVariant_grapeVarieties__title_operator
   grapeVarieties__titleEn: FlatWineVariant_grapeVarieties__titleEn_operator
   grapeVarieties__id: FlatWineVariant_grapeVarieties__id_operator
   grapeVarieties__percentage: FlatWineVariant_grapeVarieties__percentage_operator
+  grapeVarieties__slug: FlatWineVariant_grapeVarieties__slug_operator
+  grapeVarieties__slugEn: FlatWineVariant_grapeVarieties__slugEn_operator
   climates__title: FlatWineVariant_climates__title_operator
   climates__titleEn: FlatWineVariant_climates__titleEn_operator
   climates__id: FlatWineVariant_climates__id_operator
+  climates__slug: FlatWineVariant_climates__slug_operator
+  climates__slugEn: FlatWineVariant_climates__slugEn_operator
   dishes__title: FlatWineVariant_dishes__title_operator
   dishes__titleEn: FlatWineVariant_dishes__titleEn_operator
   dishes__id: FlatWineVariant_dishes__id_operator
+  dishes__slug: FlatWineVariant_dishes__slug_operator
+  dishes__slugEn: FlatWineVariant_dishes__slugEn_operator
   primaryImageUrl: FlatWineVariant_primaryImageUrl_operator
   slug: FlatWineVariant_slug_operator
   syncedAt: FlatWineVariant_syncedAt_operator
@@ -23065,6 +23435,13 @@ input FlatWineVariant_where_or {
   styleTitleEn: FlatWineVariant_styleTitleEn_operator
   styleIconKey: FlatWineVariant_styleIconKey_operator
   styleSlug: FlatWineVariant_styleSlug_operator
+  styleSlugEn: FlatWineVariant_styleSlugEn_operator
+  winerySlug: FlatWineVariant_winerySlug_operator
+  winerySlugEn: FlatWineVariant_winerySlugEn_operator
+  regionSlug: FlatWineVariant_regionSlug_operator
+  regionSlugEn: FlatWineVariant_regionSlugEn_operator
+  countrySlug: FlatWineVariant_countrySlug_operator
+  countrySlugEn: FlatWineVariant_countrySlugEn_operator
   size: FlatWineVariant_size_operator
   vintage: FlatWineVariant_vintage_operator
   price: FlatWineVariant_price_operator
@@ -23081,6 +23458,8 @@ input FlatWineVariant_where_or {
   wineryTags__title: FlatWineVariant_wineryTags__title_operator
   wineryTags__titleEn: FlatWineVariant_wineryTags__titleEn_operator
   wineryTags__id: FlatWineVariant_wineryTags__id_operator
+  wineryTags__slug: FlatWineVariant_wineryTags__slug_operator
+  wineryTags__slugEn: FlatWineVariant_wineryTags__slugEn_operator
   tastingNotes__dry: FlatWineVariant_tastingNotes__dry_operator
   tastingNotes__ripe: FlatWineVariant_tastingNotes__ripe_operator
   tastingNotes__creamy: FlatWineVariant_tastingNotes__creamy_operator
@@ -23094,22 +23473,34 @@ input FlatWineVariant_where_or {
   aromas__title: FlatWineVariant_aromas__title_operator
   aromas__titleEn: FlatWineVariant_aromas__titleEn_operator
   aromas__id: FlatWineVariant_aromas__id_operator
+  aromas__slug: FlatWineVariant_aromas__slug_operator
+  aromas__slugEn: FlatWineVariant_aromas__slugEn_operator
   tags__title: FlatWineVariant_tags__title_operator
   tags__titleEn: FlatWineVariant_tags__titleEn_operator
   tags__id: FlatWineVariant_tags__id_operator
+  tags__slug: FlatWineVariant_tags__slug_operator
+  tags__slugEn: FlatWineVariant_tags__slugEn_operator
   moods__title: FlatWineVariant_moods__title_operator
   moods__titleEn: FlatWineVariant_moods__titleEn_operator
   moods__id: FlatWineVariant_moods__id_operator
+  moods__slug: FlatWineVariant_moods__slug_operator
+  moods__slugEn: FlatWineVariant_moods__slugEn_operator
   grapeVarieties__title: FlatWineVariant_grapeVarieties__title_operator
   grapeVarieties__titleEn: FlatWineVariant_grapeVarieties__titleEn_operator
   grapeVarieties__id: FlatWineVariant_grapeVarieties__id_operator
   grapeVarieties__percentage: FlatWineVariant_grapeVarieties__percentage_operator
+  grapeVarieties__slug: FlatWineVariant_grapeVarieties__slug_operator
+  grapeVarieties__slugEn: FlatWineVariant_grapeVarieties__slugEn_operator
   climates__title: FlatWineVariant_climates__title_operator
   climates__titleEn: FlatWineVariant_climates__titleEn_operator
   climates__id: FlatWineVariant_climates__id_operator
+  climates__slug: FlatWineVariant_climates__slug_operator
+  climates__slugEn: FlatWineVariant_climates__slugEn_operator
   dishes__title: FlatWineVariant_dishes__title_operator
   dishes__titleEn: FlatWineVariant_dishes__titleEn_operator
   dishes__id: FlatWineVariant_dishes__id_operator
+  dishes__slug: FlatWineVariant_dishes__slug_operator
+  dishes__slugEn: FlatWineVariant_dishes__slugEn_operator
   primaryImageUrl: FlatWineVariant_primaryImageUrl_operator
   slug: FlatWineVariant_slug_operator
   syncedAt: FlatWineVariant_syncedAt_operator
@@ -23153,6 +23544,13 @@ type FlatWineVariantsDocAccessFields {
   styleTitleEn: FlatWineVariantsDocAccessFields_styleTitleEn
   styleIconKey: FlatWineVariantsDocAccessFields_styleIconKey
   styleSlug: FlatWineVariantsDocAccessFields_styleSlug
+  styleSlugEn: FlatWineVariantsDocAccessFields_styleSlugEn
+  winerySlug: FlatWineVariantsDocAccessFields_winerySlug
+  winerySlugEn: FlatWineVariantsDocAccessFields_winerySlugEn
+  regionSlug: FlatWineVariantsDocAccessFields_regionSlug
+  regionSlugEn: FlatWineVariantsDocAccessFields_regionSlugEn
+  countrySlug: FlatWineVariantsDocAccessFields_countrySlug
+  countrySlugEn: FlatWineVariantsDocAccessFields_countrySlugEn
   size: FlatWineVariantsDocAccessFields_size
   vintage: FlatWineVariantsDocAccessFields_vintage
   price: FlatWineVariantsDocAccessFields_price
@@ -23574,6 +23972,167 @@ type FlatWineVariantsDocAccessFields_styleSlug_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_styleSlugEn {
+  create: FlatWineVariantsDocAccessFields_styleSlugEn_Create
+  read: FlatWineVariantsDocAccessFields_styleSlugEn_Read
+  update: FlatWineVariantsDocAccessFields_styleSlugEn_Update
+  delete: FlatWineVariantsDocAccessFields_styleSlugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_styleSlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_styleSlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_styleSlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_styleSlugEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlug {
+  create: FlatWineVariantsDocAccessFields_winerySlug_Create
+  read: FlatWineVariantsDocAccessFields_winerySlug_Read
+  update: FlatWineVariantsDocAccessFields_winerySlug_Update
+  delete: FlatWineVariantsDocAccessFields_winerySlug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_winerySlug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlugEn {
+  create: FlatWineVariantsDocAccessFields_winerySlugEn_Create
+  read: FlatWineVariantsDocAccessFields_winerySlugEn_Read
+  update: FlatWineVariantsDocAccessFields_winerySlugEn_Update
+  delete: FlatWineVariantsDocAccessFields_winerySlugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_winerySlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_winerySlugEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlug {
+  create: FlatWineVariantsDocAccessFields_regionSlug_Create
+  read: FlatWineVariantsDocAccessFields_regionSlug_Read
+  update: FlatWineVariantsDocAccessFields_regionSlug_Update
+  delete: FlatWineVariantsDocAccessFields_regionSlug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_regionSlug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlugEn {
+  create: FlatWineVariantsDocAccessFields_regionSlugEn_Create
+  read: FlatWineVariantsDocAccessFields_regionSlugEn_Read
+  update: FlatWineVariantsDocAccessFields_regionSlugEn_Update
+  delete: FlatWineVariantsDocAccessFields_regionSlugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_regionSlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_regionSlugEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlug {
+  create: FlatWineVariantsDocAccessFields_countrySlug_Create
+  read: FlatWineVariantsDocAccessFields_countrySlug_Read
+  update: FlatWineVariantsDocAccessFields_countrySlug_Update
+  delete: FlatWineVariantsDocAccessFields_countrySlug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_countrySlug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlugEn {
+  create: FlatWineVariantsDocAccessFields_countrySlugEn_Create
+  read: FlatWineVariantsDocAccessFields_countrySlugEn_Read
+  update: FlatWineVariantsDocAccessFields_countrySlugEn_Update
+  delete: FlatWineVariantsDocAccessFields_countrySlugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_countrySlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_countrySlugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_size {
   create: FlatWineVariantsDocAccessFields_size_Create
   read: FlatWineVariantsDocAccessFields_size_Read
@@ -23957,6 +24516,8 @@ type FlatWineVariantsDocAccessFields_wineryTags_Fields {
   title: FlatWineVariantsDocAccessFields_wineryTags_title
   titleEn: FlatWineVariantsDocAccessFields_wineryTags_titleEn
   id: FlatWineVariantsDocAccessFields_wineryTags_id
+  slug: FlatWineVariantsDocAccessFields_wineryTags_slug
+  slugEn: FlatWineVariantsDocAccessFields_wineryTags_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_wineryTags_title {
@@ -24025,6 +24586,52 @@ type FlatWineVariantsDocAccessFields_wineryTags_id_Update {
 }
 
 type FlatWineVariantsDocAccessFields_wineryTags_id_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slug {
+  create: FlatWineVariantsDocAccessFields_wineryTags_slug_Create
+  read: FlatWineVariantsDocAccessFields_wineryTags_slug_Read
+  update: FlatWineVariantsDocAccessFields_wineryTags_slug_Update
+  delete: FlatWineVariantsDocAccessFields_wineryTags_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slugEn {
+  create: FlatWineVariantsDocAccessFields_wineryTags_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_wineryTags_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_wineryTags_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_wineryTags_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_wineryTags_slugEn_Delete {
   permission: Boolean!
 }
 
@@ -24323,6 +24930,8 @@ type FlatWineVariantsDocAccessFields_aromas_Fields {
   title: FlatWineVariantsDocAccessFields_aromas_title
   titleEn: FlatWineVariantsDocAccessFields_aromas_titleEn
   id: FlatWineVariantsDocAccessFields_aromas_id
+  slug: FlatWineVariantsDocAccessFields_aromas_slug
+  slugEn: FlatWineVariantsDocAccessFields_aromas_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_aromas_title {
@@ -24394,6 +25003,52 @@ type FlatWineVariantsDocAccessFields_aromas_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_aromas_slug {
+  create: FlatWineVariantsDocAccessFields_aromas_slug_Create
+  read: FlatWineVariantsDocAccessFields_aromas_slug_Read
+  update: FlatWineVariantsDocAccessFields_aromas_slug_Update
+  delete: FlatWineVariantsDocAccessFields_aromas_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slugEn {
+  create: FlatWineVariantsDocAccessFields_aromas_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_aromas_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_aromas_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_aromas_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_aromas_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_tags {
   create: FlatWineVariantsDocAccessFields_tags_Create
   read: FlatWineVariantsDocAccessFields_tags_Read
@@ -24422,6 +25077,8 @@ type FlatWineVariantsDocAccessFields_tags_Fields {
   title: FlatWineVariantsDocAccessFields_tags_title
   titleEn: FlatWineVariantsDocAccessFields_tags_titleEn
   id: FlatWineVariantsDocAccessFields_tags_id
+  slug: FlatWineVariantsDocAccessFields_tags_slug
+  slugEn: FlatWineVariantsDocAccessFields_tags_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_tags_title {
@@ -24493,6 +25150,52 @@ type FlatWineVariantsDocAccessFields_tags_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_tags_slug {
+  create: FlatWineVariantsDocAccessFields_tags_slug_Create
+  read: FlatWineVariantsDocAccessFields_tags_slug_Read
+  update: FlatWineVariantsDocAccessFields_tags_slug_Update
+  delete: FlatWineVariantsDocAccessFields_tags_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_tags_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slugEn {
+  create: FlatWineVariantsDocAccessFields_tags_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_tags_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_tags_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_tags_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_tags_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_tags_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_moods {
   create: FlatWineVariantsDocAccessFields_moods_Create
   read: FlatWineVariantsDocAccessFields_moods_Read
@@ -24521,6 +25224,8 @@ type FlatWineVariantsDocAccessFields_moods_Fields {
   title: FlatWineVariantsDocAccessFields_moods_title
   titleEn: FlatWineVariantsDocAccessFields_moods_titleEn
   id: FlatWineVariantsDocAccessFields_moods_id
+  slug: FlatWineVariantsDocAccessFields_moods_slug
+  slugEn: FlatWineVariantsDocAccessFields_moods_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_moods_title {
@@ -24592,6 +25297,52 @@ type FlatWineVariantsDocAccessFields_moods_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_moods_slug {
+  create: FlatWineVariantsDocAccessFields_moods_slug_Create
+  read: FlatWineVariantsDocAccessFields_moods_slug_Read
+  update: FlatWineVariantsDocAccessFields_moods_slug_Update
+  delete: FlatWineVariantsDocAccessFields_moods_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_moods_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slugEn {
+  create: FlatWineVariantsDocAccessFields_moods_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_moods_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_moods_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_moods_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_moods_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_moods_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_grapeVarieties {
   create: FlatWineVariantsDocAccessFields_grapeVarieties_Create
   read: FlatWineVariantsDocAccessFields_grapeVarieties_Read
@@ -24621,6 +25372,8 @@ type FlatWineVariantsDocAccessFields_grapeVarieties_Fields {
   titleEn: FlatWineVariantsDocAccessFields_grapeVarieties_titleEn
   id: FlatWineVariantsDocAccessFields_grapeVarieties_id
   percentage: FlatWineVariantsDocAccessFields_grapeVarieties_percentage
+  slug: FlatWineVariantsDocAccessFields_grapeVarieties_slug
+  slugEn: FlatWineVariantsDocAccessFields_grapeVarieties_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_grapeVarieties_title {
@@ -24715,6 +25468,52 @@ type FlatWineVariantsDocAccessFields_grapeVarieties_percentage_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_grapeVarieties_slug {
+  create: FlatWineVariantsDocAccessFields_grapeVarieties_slug_Create
+  read: FlatWineVariantsDocAccessFields_grapeVarieties_slug_Read
+  update: FlatWineVariantsDocAccessFields_grapeVarieties_slug_Update
+  delete: FlatWineVariantsDocAccessFields_grapeVarieties_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slugEn {
+  create: FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_grapeVarieties_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_climates {
   create: FlatWineVariantsDocAccessFields_climates_Create
   read: FlatWineVariantsDocAccessFields_climates_Read
@@ -24743,6 +25542,8 @@ type FlatWineVariantsDocAccessFields_climates_Fields {
   title: FlatWineVariantsDocAccessFields_climates_title
   titleEn: FlatWineVariantsDocAccessFields_climates_titleEn
   id: FlatWineVariantsDocAccessFields_climates_id
+  slug: FlatWineVariantsDocAccessFields_climates_slug
+  slugEn: FlatWineVariantsDocAccessFields_climates_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_climates_title {
@@ -24814,6 +25615,52 @@ type FlatWineVariantsDocAccessFields_climates_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_climates_slug {
+  create: FlatWineVariantsDocAccessFields_climates_slug_Create
+  read: FlatWineVariantsDocAccessFields_climates_slug_Read
+  update: FlatWineVariantsDocAccessFields_climates_slug_Update
+  delete: FlatWineVariantsDocAccessFields_climates_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_climates_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slugEn {
+  create: FlatWineVariantsDocAccessFields_climates_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_climates_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_climates_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_climates_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_climates_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_climates_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_dishes {
   create: FlatWineVariantsDocAccessFields_dishes_Create
   read: FlatWineVariantsDocAccessFields_dishes_Read
@@ -24842,6 +25689,8 @@ type FlatWineVariantsDocAccessFields_dishes_Fields {
   title: FlatWineVariantsDocAccessFields_dishes_title
   titleEn: FlatWineVariantsDocAccessFields_dishes_titleEn
   id: FlatWineVariantsDocAccessFields_dishes_id
+  slug: FlatWineVariantsDocAccessFields_dishes_slug
+  slugEn: FlatWineVariantsDocAccessFields_dishes_slugEn
 }
 
 type FlatWineVariantsDocAccessFields_dishes_title {
@@ -24910,6 +25759,52 @@ type FlatWineVariantsDocAccessFields_dishes_id_Update {
 }
 
 type FlatWineVariantsDocAccessFields_dishes_id_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slug {
+  create: FlatWineVariantsDocAccessFields_dishes_slug_Create
+  read: FlatWineVariantsDocAccessFields_dishes_slug_Read
+  update: FlatWineVariantsDocAccessFields_dishes_slug_Update
+  delete: FlatWineVariantsDocAccessFields_dishes_slug_Delete
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slugEn {
+  create: FlatWineVariantsDocAccessFields_dishes_slugEn_Create
+  read: FlatWineVariantsDocAccessFields_dishes_slugEn_Read
+  update: FlatWineVariantsDocAccessFields_dishes_slugEn_Update
+  delete: FlatWineVariantsDocAccessFields_dishes_slugEn_Delete
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dishes_slugEn_Delete {
   permission: Boolean!
 }
 
@@ -25128,6 +26023,13 @@ type FlatWineVariantVersion_Version {
   styleTitleEn: String
   styleIconKey: String
   styleSlug: String
+  styleSlugEn: String
+  winerySlug: String
+  winerySlugEn: String
+  regionSlug: String
+  regionSlugEn: String
+  countrySlug: String
+  countrySlugEn: String
   size: String
   vintage: String
   price: Float
@@ -25170,6 +26072,8 @@ type FlatWineVariantVersion_Version_WineryTags {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariantVersion_Version_TastingNotes {
@@ -25189,18 +26093,24 @@ type FlatWineVariantVersion_Version_Aromas {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariantVersion_Version_Tags {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariantVersion_Version_Moods {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariantVersion_Version_GrapeVarieties {
@@ -25208,18 +26118,24 @@ type FlatWineVariantVersion_Version_GrapeVarieties {
   titleEn: String
   id: String
   percentage: Float
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariantVersion_Version_Climates {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 type FlatWineVariantVersion_Version_Dishes {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 enum FlatWineVariantVersion_Version__status {
@@ -25265,6 +26181,13 @@ input versionsFlatWineVariant_where {
   version__styleTitleEn: versionsFlatWineVariant_version__styleTitleEn_operator
   version__styleIconKey: versionsFlatWineVariant_version__styleIconKey_operator
   version__styleSlug: versionsFlatWineVariant_version__styleSlug_operator
+  version__styleSlugEn: versionsFlatWineVariant_version__styleSlugEn_operator
+  version__winerySlug: versionsFlatWineVariant_version__winerySlug_operator
+  version__winerySlugEn: versionsFlatWineVariant_version__winerySlugEn_operator
+  version__regionSlug: versionsFlatWineVariant_version__regionSlug_operator
+  version__regionSlugEn: versionsFlatWineVariant_version__regionSlugEn_operator
+  version__countrySlug: versionsFlatWineVariant_version__countrySlug_operator
+  version__countrySlugEn: versionsFlatWineVariant_version__countrySlugEn_operator
   version__size: versionsFlatWineVariant_version__size_operator
   version__vintage: versionsFlatWineVariant_version__vintage_operator
   version__price: versionsFlatWineVariant_version__price_operator
@@ -25281,6 +26204,8 @@ input versionsFlatWineVariant_where {
   version__wineryTags__title: versionsFlatWineVariant_version__wineryTags__title_operator
   version__wineryTags__titleEn: versionsFlatWineVariant_version__wineryTags__titleEn_operator
   version__wineryTags__id: versionsFlatWineVariant_version__wineryTags__id_operator
+  version__wineryTags__slug: versionsFlatWineVariant_version__wineryTags__slug_operator
+  version__wineryTags__slugEn: versionsFlatWineVariant_version__wineryTags__slugEn_operator
   version__tastingNotes__dry: versionsFlatWineVariant_version__tastingNotes__dry_operator
   version__tastingNotes__ripe: versionsFlatWineVariant_version__tastingNotes__ripe_operator
   version__tastingNotes__creamy: versionsFlatWineVariant_version__tastingNotes__creamy_operator
@@ -25294,22 +26219,34 @@ input versionsFlatWineVariant_where {
   version__aromas__title: versionsFlatWineVariant_version__aromas__title_operator
   version__aromas__titleEn: versionsFlatWineVariant_version__aromas__titleEn_operator
   version__aromas__id: versionsFlatWineVariant_version__aromas__id_operator
+  version__aromas__slug: versionsFlatWineVariant_version__aromas__slug_operator
+  version__aromas__slugEn: versionsFlatWineVariant_version__aromas__slugEn_operator
   version__tags__title: versionsFlatWineVariant_version__tags__title_operator
   version__tags__titleEn: versionsFlatWineVariant_version__tags__titleEn_operator
   version__tags__id: versionsFlatWineVariant_version__tags__id_operator
+  version__tags__slug: versionsFlatWineVariant_version__tags__slug_operator
+  version__tags__slugEn: versionsFlatWineVariant_version__tags__slugEn_operator
   version__moods__title: versionsFlatWineVariant_version__moods__title_operator
   version__moods__titleEn: versionsFlatWineVariant_version__moods__titleEn_operator
   version__moods__id: versionsFlatWineVariant_version__moods__id_operator
+  version__moods__slug: versionsFlatWineVariant_version__moods__slug_operator
+  version__moods__slugEn: versionsFlatWineVariant_version__moods__slugEn_operator
   version__grapeVarieties__title: versionsFlatWineVariant_version__grapeVarieties__title_operator
   version__grapeVarieties__titleEn: versionsFlatWineVariant_version__grapeVarieties__titleEn_operator
   version__grapeVarieties__id: versionsFlatWineVariant_version__grapeVarieties__id_operator
   version__grapeVarieties__percentage: versionsFlatWineVariant_version__grapeVarieties__percentage_operator
+  version__grapeVarieties__slug: versionsFlatWineVariant_version__grapeVarieties__slug_operator
+  version__grapeVarieties__slugEn: versionsFlatWineVariant_version__grapeVarieties__slugEn_operator
   version__climates__title: versionsFlatWineVariant_version__climates__title_operator
   version__climates__titleEn: versionsFlatWineVariant_version__climates__titleEn_operator
   version__climates__id: versionsFlatWineVariant_version__climates__id_operator
+  version__climates__slug: versionsFlatWineVariant_version__climates__slug_operator
+  version__climates__slugEn: versionsFlatWineVariant_version__climates__slugEn_operator
   version__dishes__title: versionsFlatWineVariant_version__dishes__title_operator
   version__dishes__titleEn: versionsFlatWineVariant_version__dishes__titleEn_operator
   version__dishes__id: versionsFlatWineVariant_version__dishes__id_operator
+  version__dishes__slug: versionsFlatWineVariant_version__dishes__slug_operator
+  version__dishes__slugEn: versionsFlatWineVariant_version__dishes__slugEn_operator
   version__primaryImageUrl: versionsFlatWineVariant_version__primaryImageUrl_operator
   version__slug: versionsFlatWineVariant_version__slug_operator
   version__syncedAt: versionsFlatWineVariant_version__syncedAt_operator
@@ -25515,6 +26452,83 @@ input versionsFlatWineVariant_version__styleSlug_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__styleSlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__winerySlug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__winerySlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__regionSlug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__regionSlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__countrySlug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__countrySlugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input versionsFlatWineVariant_version__size_operator {
   equals: String
   not_equals: String
@@ -25672,6 +26686,28 @@ input versionsFlatWineVariant_version__wineryTags__id_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__wineryTags__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__wineryTags__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input versionsFlatWineVariant_version__tastingNotes__dry_operator {
   equals: Float
   not_equals: Float
@@ -25805,6 +26841,28 @@ input versionsFlatWineVariant_version__aromas__id_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__aromas__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__aromas__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input versionsFlatWineVariant_version__tags__title_operator {
   equals: String
   not_equals: String
@@ -25838,6 +26896,28 @@ input versionsFlatWineVariant_version__tags__id_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__tags__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__tags__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input versionsFlatWineVariant_version__moods__title_operator {
   equals: String
   not_equals: String
@@ -25861,6 +26941,28 @@ input versionsFlatWineVariant_version__moods__titleEn_operator {
 }
 
 input versionsFlatWineVariant_version__moods__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__moods__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__moods__slugEn_operator {
   equals: String
   not_equals: String
   like: String
@@ -25914,6 +27016,28 @@ input versionsFlatWineVariant_version__grapeVarieties__percentage_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__grapeVarieties__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__grapeVarieties__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input versionsFlatWineVariant_version__climates__title_operator {
   equals: String
   not_equals: String
@@ -25947,6 +27071,28 @@ input versionsFlatWineVariant_version__climates__id_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__climates__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__climates__slugEn_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input versionsFlatWineVariant_version__dishes__title_operator {
   equals: String
   not_equals: String
@@ -25970,6 +27116,28 @@ input versionsFlatWineVariant_version__dishes__titleEn_operator {
 }
 
 input versionsFlatWineVariant_version__dishes__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__dishes__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsFlatWineVariant_version__dishes__slugEn_operator {
   equals: String
   not_equals: String
   like: String
@@ -26132,6 +27300,13 @@ input versionsFlatWineVariant_where_and {
   version__styleTitleEn: versionsFlatWineVariant_version__styleTitleEn_operator
   version__styleIconKey: versionsFlatWineVariant_version__styleIconKey_operator
   version__styleSlug: versionsFlatWineVariant_version__styleSlug_operator
+  version__styleSlugEn: versionsFlatWineVariant_version__styleSlugEn_operator
+  version__winerySlug: versionsFlatWineVariant_version__winerySlug_operator
+  version__winerySlugEn: versionsFlatWineVariant_version__winerySlugEn_operator
+  version__regionSlug: versionsFlatWineVariant_version__regionSlug_operator
+  version__regionSlugEn: versionsFlatWineVariant_version__regionSlugEn_operator
+  version__countrySlug: versionsFlatWineVariant_version__countrySlug_operator
+  version__countrySlugEn: versionsFlatWineVariant_version__countrySlugEn_operator
   version__size: versionsFlatWineVariant_version__size_operator
   version__vintage: versionsFlatWineVariant_version__vintage_operator
   version__price: versionsFlatWineVariant_version__price_operator
@@ -26148,6 +27323,8 @@ input versionsFlatWineVariant_where_and {
   version__wineryTags__title: versionsFlatWineVariant_version__wineryTags__title_operator
   version__wineryTags__titleEn: versionsFlatWineVariant_version__wineryTags__titleEn_operator
   version__wineryTags__id: versionsFlatWineVariant_version__wineryTags__id_operator
+  version__wineryTags__slug: versionsFlatWineVariant_version__wineryTags__slug_operator
+  version__wineryTags__slugEn: versionsFlatWineVariant_version__wineryTags__slugEn_operator
   version__tastingNotes__dry: versionsFlatWineVariant_version__tastingNotes__dry_operator
   version__tastingNotes__ripe: versionsFlatWineVariant_version__tastingNotes__ripe_operator
   version__tastingNotes__creamy: versionsFlatWineVariant_version__tastingNotes__creamy_operator
@@ -26161,22 +27338,34 @@ input versionsFlatWineVariant_where_and {
   version__aromas__title: versionsFlatWineVariant_version__aromas__title_operator
   version__aromas__titleEn: versionsFlatWineVariant_version__aromas__titleEn_operator
   version__aromas__id: versionsFlatWineVariant_version__aromas__id_operator
+  version__aromas__slug: versionsFlatWineVariant_version__aromas__slug_operator
+  version__aromas__slugEn: versionsFlatWineVariant_version__aromas__slugEn_operator
   version__tags__title: versionsFlatWineVariant_version__tags__title_operator
   version__tags__titleEn: versionsFlatWineVariant_version__tags__titleEn_operator
   version__tags__id: versionsFlatWineVariant_version__tags__id_operator
+  version__tags__slug: versionsFlatWineVariant_version__tags__slug_operator
+  version__tags__slugEn: versionsFlatWineVariant_version__tags__slugEn_operator
   version__moods__title: versionsFlatWineVariant_version__moods__title_operator
   version__moods__titleEn: versionsFlatWineVariant_version__moods__titleEn_operator
   version__moods__id: versionsFlatWineVariant_version__moods__id_operator
+  version__moods__slug: versionsFlatWineVariant_version__moods__slug_operator
+  version__moods__slugEn: versionsFlatWineVariant_version__moods__slugEn_operator
   version__grapeVarieties__title: versionsFlatWineVariant_version__grapeVarieties__title_operator
   version__grapeVarieties__titleEn: versionsFlatWineVariant_version__grapeVarieties__titleEn_operator
   version__grapeVarieties__id: versionsFlatWineVariant_version__grapeVarieties__id_operator
   version__grapeVarieties__percentage: versionsFlatWineVariant_version__grapeVarieties__percentage_operator
+  version__grapeVarieties__slug: versionsFlatWineVariant_version__grapeVarieties__slug_operator
+  version__grapeVarieties__slugEn: versionsFlatWineVariant_version__grapeVarieties__slugEn_operator
   version__climates__title: versionsFlatWineVariant_version__climates__title_operator
   version__climates__titleEn: versionsFlatWineVariant_version__climates__titleEn_operator
   version__climates__id: versionsFlatWineVariant_version__climates__id_operator
+  version__climates__slug: versionsFlatWineVariant_version__climates__slug_operator
+  version__climates__slugEn: versionsFlatWineVariant_version__climates__slugEn_operator
   version__dishes__title: versionsFlatWineVariant_version__dishes__title_operator
   version__dishes__titleEn: versionsFlatWineVariant_version__dishes__titleEn_operator
   version__dishes__id: versionsFlatWineVariant_version__dishes__id_operator
+  version__dishes__slug: versionsFlatWineVariant_version__dishes__slug_operator
+  version__dishes__slugEn: versionsFlatWineVariant_version__dishes__slugEn_operator
   version__primaryImageUrl: versionsFlatWineVariant_version__primaryImageUrl_operator
   version__slug: versionsFlatWineVariant_version__slug_operator
   version__syncedAt: versionsFlatWineVariant_version__syncedAt_operator
@@ -26213,6 +27402,13 @@ input versionsFlatWineVariant_where_or {
   version__styleTitleEn: versionsFlatWineVariant_version__styleTitleEn_operator
   version__styleIconKey: versionsFlatWineVariant_version__styleIconKey_operator
   version__styleSlug: versionsFlatWineVariant_version__styleSlug_operator
+  version__styleSlugEn: versionsFlatWineVariant_version__styleSlugEn_operator
+  version__winerySlug: versionsFlatWineVariant_version__winerySlug_operator
+  version__winerySlugEn: versionsFlatWineVariant_version__winerySlugEn_operator
+  version__regionSlug: versionsFlatWineVariant_version__regionSlug_operator
+  version__regionSlugEn: versionsFlatWineVariant_version__regionSlugEn_operator
+  version__countrySlug: versionsFlatWineVariant_version__countrySlug_operator
+  version__countrySlugEn: versionsFlatWineVariant_version__countrySlugEn_operator
   version__size: versionsFlatWineVariant_version__size_operator
   version__vintage: versionsFlatWineVariant_version__vintage_operator
   version__price: versionsFlatWineVariant_version__price_operator
@@ -26229,6 +27425,8 @@ input versionsFlatWineVariant_where_or {
   version__wineryTags__title: versionsFlatWineVariant_version__wineryTags__title_operator
   version__wineryTags__titleEn: versionsFlatWineVariant_version__wineryTags__titleEn_operator
   version__wineryTags__id: versionsFlatWineVariant_version__wineryTags__id_operator
+  version__wineryTags__slug: versionsFlatWineVariant_version__wineryTags__slug_operator
+  version__wineryTags__slugEn: versionsFlatWineVariant_version__wineryTags__slugEn_operator
   version__tastingNotes__dry: versionsFlatWineVariant_version__tastingNotes__dry_operator
   version__tastingNotes__ripe: versionsFlatWineVariant_version__tastingNotes__ripe_operator
   version__tastingNotes__creamy: versionsFlatWineVariant_version__tastingNotes__creamy_operator
@@ -26242,22 +27440,34 @@ input versionsFlatWineVariant_where_or {
   version__aromas__title: versionsFlatWineVariant_version__aromas__title_operator
   version__aromas__titleEn: versionsFlatWineVariant_version__aromas__titleEn_operator
   version__aromas__id: versionsFlatWineVariant_version__aromas__id_operator
+  version__aromas__slug: versionsFlatWineVariant_version__aromas__slug_operator
+  version__aromas__slugEn: versionsFlatWineVariant_version__aromas__slugEn_operator
   version__tags__title: versionsFlatWineVariant_version__tags__title_operator
   version__tags__titleEn: versionsFlatWineVariant_version__tags__titleEn_operator
   version__tags__id: versionsFlatWineVariant_version__tags__id_operator
+  version__tags__slug: versionsFlatWineVariant_version__tags__slug_operator
+  version__tags__slugEn: versionsFlatWineVariant_version__tags__slugEn_operator
   version__moods__title: versionsFlatWineVariant_version__moods__title_operator
   version__moods__titleEn: versionsFlatWineVariant_version__moods__titleEn_operator
   version__moods__id: versionsFlatWineVariant_version__moods__id_operator
+  version__moods__slug: versionsFlatWineVariant_version__moods__slug_operator
+  version__moods__slugEn: versionsFlatWineVariant_version__moods__slugEn_operator
   version__grapeVarieties__title: versionsFlatWineVariant_version__grapeVarieties__title_operator
   version__grapeVarieties__titleEn: versionsFlatWineVariant_version__grapeVarieties__titleEn_operator
   version__grapeVarieties__id: versionsFlatWineVariant_version__grapeVarieties__id_operator
   version__grapeVarieties__percentage: versionsFlatWineVariant_version__grapeVarieties__percentage_operator
+  version__grapeVarieties__slug: versionsFlatWineVariant_version__grapeVarieties__slug_operator
+  version__grapeVarieties__slugEn: versionsFlatWineVariant_version__grapeVarieties__slugEn_operator
   version__climates__title: versionsFlatWineVariant_version__climates__title_operator
   version__climates__titleEn: versionsFlatWineVariant_version__climates__titleEn_operator
   version__climates__id: versionsFlatWineVariant_version__climates__id_operator
+  version__climates__slug: versionsFlatWineVariant_version__climates__slug_operator
+  version__climates__slugEn: versionsFlatWineVariant_version__climates__slugEn_operator
   version__dishes__title: versionsFlatWineVariant_version__dishes__title_operator
   version__dishes__titleEn: versionsFlatWineVariant_version__dishes__titleEn_operator
   version__dishes__id: versionsFlatWineVariant_version__dishes__id_operator
+  version__dishes__slug: versionsFlatWineVariant_version__dishes__slug_operator
+  version__dishes__slugEn: versionsFlatWineVariant_version__dishes__slugEn_operator
   version__primaryImageUrl: versionsFlatWineVariant_version__primaryImageUrl_operator
   version__slug: versionsFlatWineVariant_version__slug_operator
   version__syncedAt: versionsFlatWineVariant_version__syncedAt_operator
@@ -37434,6 +38644,7 @@ type RelatedWineVariantsFields {
   computationVersion: RelatedWineVariantsFields_computationVersion
   updatedAt: RelatedWineVariantsFields_updatedAt
   createdAt: RelatedWineVariantsFields_createdAt
+  _status: RelatedWineVariantsFields__status
 }
 
 type RelatedWineVariantsFields_variantId {
@@ -37484,35 +38695,11 @@ type RelatedWineVariantsFields_relatedVariants_Delete {
 }
 
 type RelatedWineVariantsFields_relatedVariants_Fields {
-  relatedVariantId: RelatedWineVariantsFields_relatedVariants_relatedVariantId
   type: RelatedWineVariantsFields_relatedVariants_type
   score: RelatedWineVariantsFields_relatedVariants_score
   reason: RelatedWineVariantsFields_relatedVariants_reason
   relatedVariant: RelatedWineVariantsFields_relatedVariants_relatedVariant
   id: RelatedWineVariantsFields_relatedVariants_id
-}
-
-type RelatedWineVariantsFields_relatedVariants_relatedVariantId {
-  create: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Create
-  read: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Read
-  update: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Update
-  delete: RelatedWineVariantsFields_relatedVariants_relatedVariantId_Delete
-}
-
-type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Create {
-  permission: Boolean!
-}
-
-type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Read {
-  permission: Boolean!
-}
-
-type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Update {
-  permission: Boolean!
-}
-
-type RelatedWineVariantsFields_relatedVariants_relatedVariantId_Delete {
-  permission: Boolean!
 }
 
 type RelatedWineVariantsFields_relatedVariants_type {
@@ -37745,6 +38932,29 @@ type RelatedWineVariantsFields_createdAt_Delete {
   permission: Boolean!
 }
 
+type RelatedWineVariantsFields__status {
+  create: RelatedWineVariantsFields__status_Create
+  read: RelatedWineVariantsFields__status_Read
+  update: RelatedWineVariantsFields__status_Update
+  delete: RelatedWineVariantsFields__status_Delete
+}
+
+type RelatedWineVariantsFields__status_Create {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields__status_Read {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields__status_Update {
+  permission: Boolean!
+}
+
+type RelatedWineVariantsFields__status_Delete {
+  permission: Boolean!
+}
+
 type RelatedWineVariantsCreateAccess {
   permission: Boolean!
   where: JSONObject
@@ -37797,6 +39007,13 @@ type FlatWineVariantsFields {
   styleTitleEn: FlatWineVariantsFields_styleTitleEn
   styleIconKey: FlatWineVariantsFields_styleIconKey
   styleSlug: FlatWineVariantsFields_styleSlug
+  styleSlugEn: FlatWineVariantsFields_styleSlugEn
+  winerySlug: FlatWineVariantsFields_winerySlug
+  winerySlugEn: FlatWineVariantsFields_winerySlugEn
+  regionSlug: FlatWineVariantsFields_regionSlug
+  regionSlugEn: FlatWineVariantsFields_regionSlugEn
+  countrySlug: FlatWineVariantsFields_countrySlug
+  countrySlugEn: FlatWineVariantsFields_countrySlugEn
   size: FlatWineVariantsFields_size
   vintage: FlatWineVariantsFields_vintage
   price: FlatWineVariantsFields_price
@@ -38218,6 +39435,167 @@ type FlatWineVariantsFields_styleSlug_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsFields_styleSlugEn {
+  create: FlatWineVariantsFields_styleSlugEn_Create
+  read: FlatWineVariantsFields_styleSlugEn_Read
+  update: FlatWineVariantsFields_styleSlugEn_Update
+  delete: FlatWineVariantsFields_styleSlugEn_Delete
+}
+
+type FlatWineVariantsFields_styleSlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_styleSlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_styleSlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_styleSlugEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlug {
+  create: FlatWineVariantsFields_winerySlug_Create
+  read: FlatWineVariantsFields_winerySlug_Read
+  update: FlatWineVariantsFields_winerySlug_Update
+  delete: FlatWineVariantsFields_winerySlug_Delete
+}
+
+type FlatWineVariantsFields_winerySlug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlugEn {
+  create: FlatWineVariantsFields_winerySlugEn_Create
+  read: FlatWineVariantsFields_winerySlugEn_Read
+  update: FlatWineVariantsFields_winerySlugEn_Update
+  delete: FlatWineVariantsFields_winerySlugEn_Delete
+}
+
+type FlatWineVariantsFields_winerySlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_winerySlugEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlug {
+  create: FlatWineVariantsFields_regionSlug_Create
+  read: FlatWineVariantsFields_regionSlug_Read
+  update: FlatWineVariantsFields_regionSlug_Update
+  delete: FlatWineVariantsFields_regionSlug_Delete
+}
+
+type FlatWineVariantsFields_regionSlug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlugEn {
+  create: FlatWineVariantsFields_regionSlugEn_Create
+  read: FlatWineVariantsFields_regionSlugEn_Read
+  update: FlatWineVariantsFields_regionSlugEn_Update
+  delete: FlatWineVariantsFields_regionSlugEn_Delete
+}
+
+type FlatWineVariantsFields_regionSlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_regionSlugEn_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlug {
+  create: FlatWineVariantsFields_countrySlug_Create
+  read: FlatWineVariantsFields_countrySlug_Read
+  update: FlatWineVariantsFields_countrySlug_Update
+  delete: FlatWineVariantsFields_countrySlug_Delete
+}
+
+type FlatWineVariantsFields_countrySlug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlugEn {
+  create: FlatWineVariantsFields_countrySlugEn_Create
+  read: FlatWineVariantsFields_countrySlugEn_Read
+  update: FlatWineVariantsFields_countrySlugEn_Update
+  delete: FlatWineVariantsFields_countrySlugEn_Delete
+}
+
+type FlatWineVariantsFields_countrySlugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_countrySlugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsFields_size {
   create: FlatWineVariantsFields_size_Create
   read: FlatWineVariantsFields_size_Read
@@ -38601,6 +39979,8 @@ type FlatWineVariantsFields_wineryTags_Fields {
   title: FlatWineVariantsFields_wineryTags_title
   titleEn: FlatWineVariantsFields_wineryTags_titleEn
   id: FlatWineVariantsFields_wineryTags_id
+  slug: FlatWineVariantsFields_wineryTags_slug
+  slugEn: FlatWineVariantsFields_wineryTags_slugEn
 }
 
 type FlatWineVariantsFields_wineryTags_title {
@@ -38669,6 +40049,52 @@ type FlatWineVariantsFields_wineryTags_id_Update {
 }
 
 type FlatWineVariantsFields_wineryTags_id_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slug {
+  create: FlatWineVariantsFields_wineryTags_slug_Create
+  read: FlatWineVariantsFields_wineryTags_slug_Read
+  update: FlatWineVariantsFields_wineryTags_slug_Update
+  delete: FlatWineVariantsFields_wineryTags_slug_Delete
+}
+
+type FlatWineVariantsFields_wineryTags_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slugEn {
+  create: FlatWineVariantsFields_wineryTags_slugEn_Create
+  read: FlatWineVariantsFields_wineryTags_slugEn_Read
+  update: FlatWineVariantsFields_wineryTags_slugEn_Update
+  delete: FlatWineVariantsFields_wineryTags_slugEn_Delete
+}
+
+type FlatWineVariantsFields_wineryTags_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_wineryTags_slugEn_Delete {
   permission: Boolean!
 }
 
@@ -38967,6 +40393,8 @@ type FlatWineVariantsFields_aromas_Fields {
   title: FlatWineVariantsFields_aromas_title
   titleEn: FlatWineVariantsFields_aromas_titleEn
   id: FlatWineVariantsFields_aromas_id
+  slug: FlatWineVariantsFields_aromas_slug
+  slugEn: FlatWineVariantsFields_aromas_slugEn
 }
 
 type FlatWineVariantsFields_aromas_title {
@@ -39038,6 +40466,52 @@ type FlatWineVariantsFields_aromas_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsFields_aromas_slug {
+  create: FlatWineVariantsFields_aromas_slug_Create
+  read: FlatWineVariantsFields_aromas_slug_Read
+  update: FlatWineVariantsFields_aromas_slug_Update
+  delete: FlatWineVariantsFields_aromas_slug_Delete
+}
+
+type FlatWineVariantsFields_aromas_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slugEn {
+  create: FlatWineVariantsFields_aromas_slugEn_Create
+  read: FlatWineVariantsFields_aromas_slugEn_Read
+  update: FlatWineVariantsFields_aromas_slugEn_Update
+  delete: FlatWineVariantsFields_aromas_slugEn_Delete
+}
+
+type FlatWineVariantsFields_aromas_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_aromas_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsFields_tags {
   create: FlatWineVariantsFields_tags_Create
   read: FlatWineVariantsFields_tags_Read
@@ -39066,6 +40540,8 @@ type FlatWineVariantsFields_tags_Fields {
   title: FlatWineVariantsFields_tags_title
   titleEn: FlatWineVariantsFields_tags_titleEn
   id: FlatWineVariantsFields_tags_id
+  slug: FlatWineVariantsFields_tags_slug
+  slugEn: FlatWineVariantsFields_tags_slugEn
 }
 
 type FlatWineVariantsFields_tags_title {
@@ -39137,6 +40613,52 @@ type FlatWineVariantsFields_tags_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsFields_tags_slug {
+  create: FlatWineVariantsFields_tags_slug_Create
+  read: FlatWineVariantsFields_tags_slug_Read
+  update: FlatWineVariantsFields_tags_slug_Update
+  delete: FlatWineVariantsFields_tags_slug_Delete
+}
+
+type FlatWineVariantsFields_tags_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slugEn {
+  create: FlatWineVariantsFields_tags_slugEn_Create
+  read: FlatWineVariantsFields_tags_slugEn_Read
+  update: FlatWineVariantsFields_tags_slugEn_Update
+  delete: FlatWineVariantsFields_tags_slugEn_Delete
+}
+
+type FlatWineVariantsFields_tags_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_tags_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsFields_moods {
   create: FlatWineVariantsFields_moods_Create
   read: FlatWineVariantsFields_moods_Read
@@ -39165,6 +40687,8 @@ type FlatWineVariantsFields_moods_Fields {
   title: FlatWineVariantsFields_moods_title
   titleEn: FlatWineVariantsFields_moods_titleEn
   id: FlatWineVariantsFields_moods_id
+  slug: FlatWineVariantsFields_moods_slug
+  slugEn: FlatWineVariantsFields_moods_slugEn
 }
 
 type FlatWineVariantsFields_moods_title {
@@ -39236,6 +40760,52 @@ type FlatWineVariantsFields_moods_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsFields_moods_slug {
+  create: FlatWineVariantsFields_moods_slug_Create
+  read: FlatWineVariantsFields_moods_slug_Read
+  update: FlatWineVariantsFields_moods_slug_Update
+  delete: FlatWineVariantsFields_moods_slug_Delete
+}
+
+type FlatWineVariantsFields_moods_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slugEn {
+  create: FlatWineVariantsFields_moods_slugEn_Create
+  read: FlatWineVariantsFields_moods_slugEn_Read
+  update: FlatWineVariantsFields_moods_slugEn_Update
+  delete: FlatWineVariantsFields_moods_slugEn_Delete
+}
+
+type FlatWineVariantsFields_moods_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_moods_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsFields_grapeVarieties {
   create: FlatWineVariantsFields_grapeVarieties_Create
   read: FlatWineVariantsFields_grapeVarieties_Read
@@ -39265,6 +40835,8 @@ type FlatWineVariantsFields_grapeVarieties_Fields {
   titleEn: FlatWineVariantsFields_grapeVarieties_titleEn
   id: FlatWineVariantsFields_grapeVarieties_id
   percentage: FlatWineVariantsFields_grapeVarieties_percentage
+  slug: FlatWineVariantsFields_grapeVarieties_slug
+  slugEn: FlatWineVariantsFields_grapeVarieties_slugEn
 }
 
 type FlatWineVariantsFields_grapeVarieties_title {
@@ -39359,6 +40931,52 @@ type FlatWineVariantsFields_grapeVarieties_percentage_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsFields_grapeVarieties_slug {
+  create: FlatWineVariantsFields_grapeVarieties_slug_Create
+  read: FlatWineVariantsFields_grapeVarieties_slug_Read
+  update: FlatWineVariantsFields_grapeVarieties_slug_Update
+  delete: FlatWineVariantsFields_grapeVarieties_slug_Delete
+}
+
+type FlatWineVariantsFields_grapeVarieties_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slugEn {
+  create: FlatWineVariantsFields_grapeVarieties_slugEn_Create
+  read: FlatWineVariantsFields_grapeVarieties_slugEn_Read
+  update: FlatWineVariantsFields_grapeVarieties_slugEn_Update
+  delete: FlatWineVariantsFields_grapeVarieties_slugEn_Delete
+}
+
+type FlatWineVariantsFields_grapeVarieties_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_grapeVarieties_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsFields_climates {
   create: FlatWineVariantsFields_climates_Create
   read: FlatWineVariantsFields_climates_Read
@@ -39387,6 +41005,8 @@ type FlatWineVariantsFields_climates_Fields {
   title: FlatWineVariantsFields_climates_title
   titleEn: FlatWineVariantsFields_climates_titleEn
   id: FlatWineVariantsFields_climates_id
+  slug: FlatWineVariantsFields_climates_slug
+  slugEn: FlatWineVariantsFields_climates_slugEn
 }
 
 type FlatWineVariantsFields_climates_title {
@@ -39458,6 +41078,52 @@ type FlatWineVariantsFields_climates_id_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsFields_climates_slug {
+  create: FlatWineVariantsFields_climates_slug_Create
+  read: FlatWineVariantsFields_climates_slug_Read
+  update: FlatWineVariantsFields_climates_slug_Update
+  delete: FlatWineVariantsFields_climates_slug_Delete
+}
+
+type FlatWineVariantsFields_climates_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slugEn {
+  create: FlatWineVariantsFields_climates_slugEn_Create
+  read: FlatWineVariantsFields_climates_slugEn_Read
+  update: FlatWineVariantsFields_climates_slugEn_Update
+  delete: FlatWineVariantsFields_climates_slugEn_Delete
+}
+
+type FlatWineVariantsFields_climates_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_climates_slugEn_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsFields_dishes {
   create: FlatWineVariantsFields_dishes_Create
   read: FlatWineVariantsFields_dishes_Read
@@ -39486,6 +41152,8 @@ type FlatWineVariantsFields_dishes_Fields {
   title: FlatWineVariantsFields_dishes_title
   titleEn: FlatWineVariantsFields_dishes_titleEn
   id: FlatWineVariantsFields_dishes_id
+  slug: FlatWineVariantsFields_dishes_slug
+  slugEn: FlatWineVariantsFields_dishes_slugEn
 }
 
 type FlatWineVariantsFields_dishes_title {
@@ -39554,6 +41222,52 @@ type FlatWineVariantsFields_dishes_id_Update {
 }
 
 type FlatWineVariantsFields_dishes_id_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slug {
+  create: FlatWineVariantsFields_dishes_slug_Create
+  read: FlatWineVariantsFields_dishes_slug_Read
+  update: FlatWineVariantsFields_dishes_slug_Update
+  delete: FlatWineVariantsFields_dishes_slug_Delete
+}
+
+type FlatWineVariantsFields_dishes_slug_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slug_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slug_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slug_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slugEn {
+  create: FlatWineVariantsFields_dishes_slugEn_Create
+  read: FlatWineVariantsFields_dishes_slugEn_Read
+  update: FlatWineVariantsFields_dishes_slugEn_Update
+  delete: FlatWineVariantsFields_dishes_slugEn_Delete
+}
+
+type FlatWineVariantsFields_dishes_slugEn_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slugEn_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slugEn_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dishes_slugEn_Delete {
   permission: Boolean!
 }
 
@@ -40630,6 +42344,19 @@ type PayloadPreferencesUpdateAccess {
 type PayloadPreferencesDeleteAccess {
   permission: Boolean!
   where: JSONObject
+}
+
+type WineDetailResult {
+  variant: FlatWineVariant
+  variants: [FlatWineVariant]
+  relatedVariants: [CustomRelatedWineVariant]
+  error: String
+}
+
+type CustomRelatedWineVariant {
+  type: String
+  title: String
+  variants: [FlatWineVariant]
 }
 
 type Mutation {
@@ -42191,10 +43918,10 @@ input mutationRelatedWineVariantInput {
   computationVersion: String
   updatedAt: String
   createdAt: String
+  _status: RelatedWineVariant__status_MutationInput
 }
 
 input mutationRelatedWineVariant_RelatedVariantsInput {
-  relatedVariantId: Float!
   type: RelatedWineVariant_RelatedVariants_type_MutationInput!
   score: Float!
   reason: String
@@ -42204,10 +43931,17 @@ input mutationRelatedWineVariant_RelatedVariantsInput {
 
 enum RelatedWineVariant_RelatedVariants_type_MutationInput {
   winery
+  relatedWinery
   region
+  relatedRegion
   grapeVariety
   price
   style
+}
+
+enum RelatedWineVariant__status_MutationInput {
+  draft
+  published
 }
 
 input mutationRelatedWineVariantUpdateInput {
@@ -42218,10 +43952,10 @@ input mutationRelatedWineVariantUpdateInput {
   computationVersion: String
   updatedAt: String
   createdAt: String
+  _status: RelatedWineVariantUpdate__status_MutationInput
 }
 
 input mutationRelatedWineVariantUpdate_RelatedVariantsInput {
-  relatedVariantId: Float!
   type: RelatedWineVariantUpdate_RelatedVariants_type_MutationInput!
   score: Float!
   reason: String
@@ -42231,10 +43965,17 @@ input mutationRelatedWineVariantUpdate_RelatedVariantsInput {
 
 enum RelatedWineVariantUpdate_RelatedVariants_type_MutationInput {
   winery
+  relatedWinery
   region
+  relatedRegion
   grapeVariety
   price
   style
+}
+
+enum RelatedWineVariantUpdate__status_MutationInput {
+  draft
+  published
 }
 
 input mutationFlatWineVariantInput {
@@ -42255,6 +43996,13 @@ input mutationFlatWineVariantInput {
   styleTitleEn: String
   styleIconKey: String
   styleSlug: String
+  styleSlugEn: String
+  winerySlug: String
+  winerySlugEn: String
+  regionSlug: String
+  regionSlugEn: String
+  countrySlug: String
+  countrySlugEn: String
   size: String
   vintage: String
   price: Float
@@ -42297,6 +44045,8 @@ input mutationFlatWineVariant_WineryTagsInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariant_TastingNotesInput {
@@ -42316,18 +44066,24 @@ input mutationFlatWineVariant_AromasInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariant_TagsInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariant_MoodsInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariant_GrapeVarietiesInput {
@@ -42335,18 +44091,24 @@ input mutationFlatWineVariant_GrapeVarietiesInput {
   titleEn: String
   id: String
   percentage: Float
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariant_ClimatesInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariant_DishesInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 enum FlatWineVariant__status_MutationInput {
@@ -42372,6 +44134,13 @@ input mutationFlatWineVariantUpdateInput {
   styleTitleEn: String
   styleIconKey: String
   styleSlug: String
+  styleSlugEn: String
+  winerySlug: String
+  winerySlugEn: String
+  regionSlug: String
+  regionSlugEn: String
+  countrySlug: String
+  countrySlugEn: String
   size: String
   vintage: String
   price: Float
@@ -42414,6 +44183,8 @@ input mutationFlatWineVariantUpdate_WineryTagsInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariantUpdate_TastingNotesInput {
@@ -42433,18 +44204,24 @@ input mutationFlatWineVariantUpdate_AromasInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariantUpdate_TagsInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariantUpdate_MoodsInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariantUpdate_GrapeVarietiesInput {
@@ -42452,18 +44229,24 @@ input mutationFlatWineVariantUpdate_GrapeVarietiesInput {
   titleEn: String
   id: String
   percentage: Float
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariantUpdate_ClimatesInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 input mutationFlatWineVariantUpdate_DishesInput {
   title: String
   titleEn: String
   id: String
+  slug: String
+  slugEn: String
 }
 
 enum FlatWineVariantUpdate__status_MutationInput {

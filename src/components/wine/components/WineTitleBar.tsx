@@ -43,9 +43,18 @@ export function WineTitleBar({ variant, locale }: WineTitleBarProps): React.JSX.
         </CollectionLink>
 
         <div className="flex flex-row gap-1 justify-between w-full text-base md:text-xs text-foreground/90">
-          <p className="interactive-text transition-colors">
-            {variant.wineryTitle || t('wine.unknownWinery')}
-          </p>
+          <CollectionLink
+            collection="wineries"
+            slug={
+              locale === 'en'
+                ? variant.winerySlugEn || variant.winerySlug || ''
+                : variant.winerySlug || ''
+            }
+            locale={locale}
+            className="interactive-text transition-colors"
+          >
+            <p>{variant.wineryTitle || t('wine.unknownWinery')}</p>
+          </CollectionLink>
           <p>
             {variant.size}ml - {variant.vintage}
           </p>

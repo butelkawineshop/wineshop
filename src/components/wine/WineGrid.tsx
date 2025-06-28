@@ -151,14 +151,13 @@ export function WineGrid({ variants, locale, className = '' }: WineGridProps): R
                 locale={locale}
                 onShare={handleShare}
                 onLike={handleLike}
-                collectionItemsLoaded={collectionItemsLoaded}
               />
             </div>
           ))}
         </div>
       </div>
     ),
-    [gridClasses, t, locale, handleShare, handleLike, collectionItemsLoaded],
+    [gridClasses, t, locale, handleShare, handleLike],
   )
 
   // Empty state

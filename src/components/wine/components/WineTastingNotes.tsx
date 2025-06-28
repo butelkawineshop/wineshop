@@ -109,11 +109,7 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
   }
 
   return (
-    <div className="bg-background flex flex-col w-full h-full px-2 aspect-square">
-      <div className="text-center px-4 font-accent font-bold">
-        {page === 1 ? t('wine.tastingNotes.tasteProfile') : t('wine.tastingNotes.characterNotes')}
-      </div>
-
+    <div className="bg-background flex flex-col w-full h-full px-2">
       <div className="grid grid-cols-1 gap-4 px-2 sm:px-0">
         {currentPagePairs.map(({ key, left, right }) => {
           const value = getTastingValue(key)
@@ -124,8 +120,8 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
           const percentage = (value / maxValue) * 100
 
           return (
-            <div key={key} className="flex flex-col gap-2">
-              <div className="flex items-center justify-between text-xs text-foreground/60">
+            <div key={key} className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-xs text-foreground/70">
                 <div className="flex items-center gap-2">
                   <Icon
                     name={left.icon}
