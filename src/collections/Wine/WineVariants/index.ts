@@ -2,6 +2,7 @@ import type { CollectionConfig, CollectionSlug } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
 import { generateWineVariantSlug } from '@/utils/generateWineVariantSlug'
+import { generateWineVariantSku } from '@/utils/generateWineVariantSku'
 import { queueFlatWineVariantSync } from '@/hooks/queueFlatWineVariantSync'
 
 interface WineData {
@@ -101,6 +102,7 @@ export const WineVariants: CollectionConfig = {
           name: 'sku',
           type: 'text',
           index: true,
+          unique: true,
           admin: { readOnly: true, width: '50%' },
         },
       ],
@@ -386,11 +388,11 @@ export const WineVariants: CollectionConfig = {
             })
 
             if (isWineData(wine)) {
-              const wineryCode = wine.winery.wineryCode
-              const wineNumber = data.wine.toString().padStart(4, '0')
-              const sizeCode = data.size.toString().padStart(4, '0')
-              const vintageCode = data.vintage === 'NV' ? '0000' : data.vintage.padStart(4, '0')
-              data.sku = `${wineryCode}${wineNumber}${sizeCode}${vintageCode}`
+              data.sku = generateWineVariantSku({
+                wine,
+                size: data.size,
+                vintage: data.vintage,
+              })
             }
           } catch (error) {
             console.error('Error generating SKU:', error)

@@ -154,7 +154,9 @@ export function WineDetail({
                                 }}
                                 className="w-full px-4 py-2 text-left hover:bg-other-bg/10 transition-colors first:rounded-t-lg last:rounded-b-lg"
                               >
-                                {variant.wineTitle}, {variant.vintage}, {variant.size}ml
+                                {variant.wineryTitle}, {variant.wineTitle}, {variant.regionTitle},{' '}
+                                {variant.countryTitle}, {variant.styleTitle} {variant.vintage},{' '}
+                                {variant.size}ml
                               </button>
                             ))}
                         </div>
