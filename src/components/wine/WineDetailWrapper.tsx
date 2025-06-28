@@ -41,8 +41,6 @@ export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapp
 
   // Handle errors
   if (error) {
-    console.error('WineDetailWrapper: Error loading wine data', { error, slug, locale })
-
     // If it's a "not found" error, trigger Next.js 404
     if (error === 'Variant not found' || error === 'Failed to load wine data') {
       notFound()
@@ -60,7 +58,6 @@ export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapp
 
   // Handle missing data
   if (!data) {
-    console.error('WineDetailWrapper: No data available', { slug, locale })
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -72,7 +69,6 @@ export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapp
 
   // Ensure we have a variant
   if (!data.variant) {
-    console.error('WineDetailWrapper: No variant in data', { data, slug, locale })
     notFound()
   }
 

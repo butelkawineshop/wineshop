@@ -1,279 +1,187 @@
-import { createPayloadService } from '@/lib/payload'
-import { logger } from '@/lib/logger'
-import type { FlatWineVariant } from '@/payload-types'
-import type { Locale } from '@/i18n/locales'
+import { db } from '../lib/db'
 
-export interface RelatedWineVariant {
-  type: 'winery' | 'relatedWinery' | 'region' | 'relatedRegion' | 'grapeVariety' | 'price'
+export interface FlatWineVariant {
+  id: string
+  originalVariant: number
+  wineID: string
+  wineryID: string
+  regionID: string
+  countryID: string
+  styleID: string
+  sku: string
+  wineTitle: string
+  wineryTitle: string
+  wineryCode: string
+  regionTitle: string
+  countryTitle: string
+  countryTitleEn: string
+  styleTitle: string
+  styleTitleEn: string
+  styleIconKey: string
+  styleSlug: string
+  size: string
+  vintage: string
+  price: number
+  stockOnHand: number
+  canBackorder: boolean
+  maxBackorderQuantity: number
+  servingTemp: string
+  decanting: boolean
+  tastingProfile: string
+  description: string
+  descriptionEn: string
+  tastingNotesDry: number
+  tastingNotesRipe: number
+  tastingNotesCreamy: number
+  tastingNotesOaky: number
+  tastingNotesComplex: number
+  tastingNotesLight: number
+  tastingNotesSmooth: number
+  tastingNotesYouthful: number
+  tastingNotesEnergetic: number
+  tastingNotesAlcohol: number
+  primaryImageUrl: string
+  slug: string
+  syncedAt: string
+  isPublished: boolean
+  updatedAt: string
+  createdAt: string
+  _status: string
+}
+
+export interface RelatedWineGroup {
+  type: string
   title: string
   variants: FlatWineVariant[]
 }
 
-export interface WineVariantData {
-  variant: FlatWineVariant | null
-  variants: FlatWineVariant[]
-  relatedVariants: RelatedWineVariant[]
-  error: string | null
-}
-
-/**
- * Unified service for all wine-related operations
- * Follows single responsibility principle and provides a clean API
- */
 export class WineService {
-  private payload = createPayloadService()
-  private cache = new Map<string, { data: any; timestamp: number }>()
-  private readonly CACHE_TTL = 5 * 60 * 1000 // 5 minutes
-
   /**
-   * Get wine variant data by slug (server-side)
+   * Convert snake_case database fields to camelCase
    */
-  async getWineVariantData(slug: string, locale: Locale): Promise<WineVariantData> {
-    try {
-      // Get the main variant
-      const variant = await this.getVariantBySlug(slug, locale)
-      if (!variant) {
-        return {
-          variant: null,
-          variants: [],
-          relatedVariants: [],
-          error: 'Variant not found',
-        }
-      }
-
-      // Get all variants for this wine
-      const variants = await this.getVariantsForWine(variant.wineTitle!, locale)
-
-      // Get related variants
-      const relatedVariants = await this.getRelatedVariants(variant, locale)
-
-      return {
-        variant,
-        variants,
-        relatedVariants,
-        error: null,
-      }
-    } catch (error) {
-      logger.error('Failed to fetch wine variant data', { error, slug, locale })
-      return {
-        variant: null,
-        variants: [],
-        relatedVariants: [],
-        error: 'Failed to load wine data',
-      }
+  private static mapSnakeToCamel(obj: any): any {
+    const mapped: any = {}
+    for (const [key, value] of Object.entries(obj)) {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+      mapped[camelKey] = value
     }
+    return mapped
   }
 
   /**
-   * Get a single variant by slug
+   * Get flat wine variants for a specific wine
    */
-  async getVariantBySlug(slug: string, locale: Locale): Promise<FlatWineVariant | null> {
-    const cacheKey = `variant:${slug}:${locale}`
-    this.cache.delete(cacheKey)
-    const cached = this.getFromCache<FlatWineVariant | null>(cacheKey)
-    if (cached) return cached
+  static async getFlatWineVariants(wineId: string): Promise<FlatWineVariant[]> {
+    const query = `
+      SELECT id, original_variant_id, wine_i_d, winery_i_d, region_i_d, country_i_d, style_i_d,
+        sku, wine_title, winery_title, winery_code, region_title, country_title, country_title_en,
+        style_title, style_title_en, style_icon_key, style_slug, size, vintage, price, stock_on_hand,
+        can_backorder, max_backorder_quantity, serving_temp, decanting, tasting_profile,
+        description, description_en, tasting_notes_dry, tasting_notes_ripe, tasting_notes_creamy,
+        tasting_notes_oaky, tasting_notes_complex, tasting_notes_light, tasting_notes_smooth,
+        tasting_notes_youthful, tasting_notes_energetic, tasting_notes_alcohol,
+        primary_image_url, slug, is_published, _status
+      FROM flat_wine_variants 
+      WHERE wine_i_d = $1 AND is_published = true
+      ORDER BY vintage DESC
+    `
 
-    try {
-      const result = await this.payload.find('flat-wine-variants', {
-        where: {
-          slug: { equals: slug },
-          isPublished: { equals: true },
-        },
-        limit: 1,
-        depth: 1,
-        locale,
-      })
-
-      const variant = result.docs[0] as unknown as FlatWineVariant
-      this.setCache(cacheKey, variant)
-      return variant || null
-    } catch (error) {
-      logger.error('Failed to fetch variant by slug', { error, slug, locale })
-      return null
-    }
+    const result = await db.query(query, [wineId])
+    return result.rows.map((row) => this.mapSnakeToCamel(row))
   }
 
   /**
-   * Get all variants for a specific wine
+   * Get related wine variants for a specific wine, grouped by type
    */
-  async getVariantsForWine(wineTitle: string, locale: Locale): Promise<FlatWineVariant[]> {
-    const cacheKey = `variants:${wineTitle}:${locale}`
-    const cached = this.getFromCache<FlatWineVariant[]>(cacheKey)
-    if (cached) return cached
-
-    try {
-      const result = await this.payload.find('flat-wine-variants', {
-        where: {
-          and: [{ wineTitle: { equals: wineTitle } }, { isPublished: { equals: true } }],
-        },
-        sort: 'vintage',
-        depth: 1,
-        locale,
-      })
-
-      const variants = result.docs as unknown as FlatWineVariant[]
-      this.setCache(cacheKey, variants)
-      return variants
-    } catch (error) {
-      logger.error('Failed to fetch variants for wine', { error, wineTitle, locale })
-      return []
-    }
-  }
-
-  /**
-   * Get related wine variants
-   */
-  async getRelatedVariants(
-    variant: FlatWineVariant,
-    locale: Locale,
-    limit: number = 20,
-  ): Promise<RelatedWineVariant[]> {
-    const cacheKey = `related:${variant.id}:${locale}:${limit}`
-    const cached = this.getFromCache<RelatedWineVariant[]>(cacheKey)
-    if (cached) return cached
-
-    try {
-      // Get the related-wine-variants document
-      const { docs } = await this.payload.find('related-wine-variants', {
-        where: {
-          variantId: { equals: variant.id },
-          _status: { equals: 'published' },
-        },
-        limit: 1,
-        depth: 1,
-        locale,
-      })
-
-      if (!docs.length) {
-        this.setCache(cacheKey, [])
-        return []
-      }
-
-      const relatedDoc = docs[0]
-
-      // Validate data integrity
-      if (relatedDoc.variantId !== variant.id) {
-        logger.error('Data integrity issue: wrong variantId', {
-          searchedFor: variant.id,
-          found: relatedDoc.variantId,
-          documentId: relatedDoc.id,
-        })
-        this.setCache(cacheKey, [])
-        return []
-      }
-
-      if (!relatedDoc.relatedVariants || !Array.isArray(relatedDoc.relatedVariants)) {
-        this.setCache(cacheKey, [])
-        return []
-      }
-
-      // Extract variant IDs
-      const variantIds = relatedDoc.relatedVariants
-        .slice(0, limit)
-        .map((rel) => {
-          if (typeof rel.relatedVariant === 'number') return rel.relatedVariant
-          if (
-            rel.relatedVariant &&
-            typeof rel.relatedVariant === 'object' &&
-            'id' in rel.relatedVariant
-          ) {
-            return rel.relatedVariant.id
-          }
-          return null
-        })
-        .filter((id): id is number => id !== null)
-
-      if (variantIds.length === 0) {
-        this.setCache(cacheKey, [])
-        return []
-      }
-
-      // Fetch the actual variants
-      const { docs: variantDocs } = await this.payload.find('flat-wine-variants', {
-        where: { id: { in: variantIds } },
-        limit: variantIds.length,
-        depth: 1,
-        locale,
-      })
-
-      const variantMap = new Map(
-        variantDocs.map((doc) => [doc.id, doc as unknown as FlatWineVariant]),
+  static async getRelatedWineVariants(wineId: string): Promise<RelatedWineGroup[]> {
+    const query = `
+      WITH wine_variants AS (
+        SELECT id FROM flat_wine_variants WHERE wine_i_d = $1 AND is_published = true
       )
+      SELECT 
+        fwv.id, fwv.original_variant_id, fwv.wine_i_d, fwv.winery_i_d, fwv.region_i_d, fwv.country_i_d, fwv.style_i_d,
+        fwv.sku, fwv.wine_title, fwv.winery_title, fwv.winery_code, fwv.region_title, fwv.country_title, fwv.country_title_en,
+        fwv.style_title, fwv.style_title_en, fwv.style_icon_key, fwv.style_slug, fwv.size, fwv.vintage, fwv.price, fwv.stock_on_hand,
+        fwv.can_backorder, fwv.max_backorder_quantity, fwv.serving_temp, fwv.decanting, fwv.tasting_profile,
+        fwv.description, fwv.description_en, fwv.tasting_notes_dry, fwv.tasting_notes_ripe, fwv.tasting_notes_creamy,
+        fwv.tasting_notes_oaky, fwv.tasting_notes_complex, fwv.tasting_notes_light, fwv.tasting_notes_smooth,
+        fwv.tasting_notes_youthful, fwv.tasting_notes_energetic, fwv.tasting_notes_alcohol,
+        fwv.primary_image_url, fwv.slug, fwv.is_published, fwv._status,
+        rwvr.type, rwvr.score, rwvr.reason
+      FROM related_wine_variants rwv
+      INNER JOIN related_wine_variants_related_variants rwvr ON rwv.id = rwvr._parent_id
+      INNER JOIN flat_wine_variants fwv ON rwvr.related_variant_id = fwv.id
+      INNER JOIN wine_variants wv ON rwv.variant_id = wv.id
+      WHERE fwv.is_published = true
+      ORDER BY rwvr.score DESC, rwvr._order ASC
+    `
 
-      // Group by type
-      const groups: Record<string, RelatedWineVariant> = {}
+    const result = await db.query(query, [wineId])
 
-      for (const rel of relatedDoc.relatedVariants.slice(0, limit)) {
-        const type = rel.type
-        if (!groups[type]) {
-          groups[type] = {
-            type,
-            title: this.getTypeTitle(type),
-            variants: [],
-          }
-        }
+    // Group by type and map to camelCase
+    const groupedByType = new Map<string, FlatWineVariant[]>()
 
-        const variantId =
-          typeof rel.relatedVariant === 'number' ? rel.relatedVariant : rel.relatedVariant?.id
+    result.rows.forEach((row) => {
+      const type = row.type || 'related'
+      const mappedVariant = this.mapSnakeToCamel(row)
 
-        if (variantId && variantMap.has(variantId)) {
-          groups[type].variants.push(variantMap.get(variantId)!)
-        }
+      if (!groupedByType.has(type)) {
+        groupedByType.set(type, [])
       }
-
-      const result = Object.values(groups)
-      this.setCache(cacheKey, result)
-      return result
-    } catch (error) {
-      logger.error('Failed to fetch related variants', { error, variantId: variant.id, locale })
-      return []
-    }
-  }
-
-  /**
-   * Get type title for display
-   */
-  private getTypeTitle(type: string): string {
-    const titles: Record<string, string> = {
-      winery: 'Related by Winery',
-      relatedWinery: 'Related Wineries',
-      region: 'Related by Region',
-      relatedRegion: 'Related Regions',
-      grapeVariety: 'Related by Grape Variety',
-      price: 'Similar Price Range',
-    }
-    return titles[type] || type
-  }
-
-  /**
-   * Cache management
-   */
-  private getFromCache<T>(key: string): T | null {
-    const cached = this.cache.get(key)
-    if (!cached) return null
-
-    if (Date.now() - cached.timestamp > this.CACHE_TTL) {
-      this.cache.delete(key)
-      return null
-    }
-
-    return cached.data as T
-  }
-
-  private setCache<T>(key: string, data: T): void {
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
+      groupedByType.get(type)!.push(mappedVariant)
     })
+
+    // Convert to the expected format
+    const relatedGroups: RelatedWineGroup[] = []
+
+    groupedByType.forEach((variants, type) => {
+      // Limit to 5 variants per group
+      const limitedVariants = variants.slice(0, 5)
+
+      relatedGroups.push({
+        type,
+        title: this.getTypeTitle(type),
+        variants: limitedVariants,
+      })
+    })
+
+    return relatedGroups
   }
 
   /**
-   * Clear cache (useful for debugging or when data changes)
+   * Get title for relationship type
    */
-  clearCache(): void {
-    this.cache.clear()
+  private static getTypeTitle(type: string): string {
+    switch (type) {
+      case 'winery':
+      case 'relatedWinery':
+        return 'Brothers & Sisters'
+      case 'region':
+      case 'relatedRegion':
+        return 'Neighbours'
+      case 'grapeVariety':
+        return 'Cousins'
+      case 'price':
+        return 'Budget Buds'
+      case 'style':
+        return 'Similar Style'
+      default:
+        return 'Related Wines'
+    }
+  }
+
+  /**
+   * Get both flat and related wine variants for a wine
+   */
+  static async getWineVariants(wineId: string) {
+    const [flatVariants, relatedVariants] = await Promise.all([
+      this.getFlatWineVariants(wineId),
+      this.getRelatedWineVariants(wineId),
+    ])
+
+    return {
+      flatVariants,
+      relatedVariants,
+    }
   }
 }
-
-// Export singleton instance
-export const wineService = new WineService()

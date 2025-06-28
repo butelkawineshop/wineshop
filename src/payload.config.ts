@@ -7,6 +7,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { createWineDetailResolver } from './lib/server/wineDetailResolver'
 
 import { Users } from './collections/Users/Users'
 import { Customers } from './collections/Users/Customers'
@@ -51,6 +52,7 @@ export default buildConfig({
   },
   graphQL: {
     schemaOutputFile: path.resolve(dirname, 'generated-schema.graphql'),
+    queries: createWineDetailResolver(),
   },
   db: postgresAdapter({
     pool: {

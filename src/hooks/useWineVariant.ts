@@ -54,17 +54,7 @@ export function useWineVariant({
     setError(null)
 
     try {
-      console.log('useWineVariant: Fetching data for slug:', slug, 'locale:', locale)
-
       const result = await fetchWineVariantData(slug, locale)
-
-      console.log('useWineVariant: Fetch result:', {
-        hasVariant: !!result.variant,
-        variantId: result.variant?.id,
-        variantsCount: result.variants.length,
-        relatedVariantsCount: result.relatedVariants.length,
-        error: result.error,
-      })
 
       setData(result)
 

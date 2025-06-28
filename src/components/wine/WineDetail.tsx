@@ -12,7 +12,7 @@ import { Icon } from '@/components/Icon'
 import { Media } from '@/components/Media'
 import { RelatedWineVariants } from './components/RelatedWineVariants'
 import { WINE_CONSTANTS } from '@/constants/wine'
-import type { RelatedWineVariant } from '@/services/WineService'
+import type { RelatedWineVariant } from '@/lib/graphql'
 
 interface WineDetailProps {
   variant: FlatWineVariant
@@ -38,12 +38,6 @@ export function WineDetail({
   const [openSection, setOpenSection] = useState<AccordionSection>('description')
   const [isEndOfContent, setIsEndOfContent] = useState(false)
   const endOfContentRef = useRef<HTMLDivElement>(null)
-
-  // Debug logging for relatedVariants
-  console.log('WineDetail: relatedVariants prop:', relatedVariants)
-  console.log('WineDetail: relatedVariants length:', relatedVariants?.length)
-  console.log('WineDetail: relatedVariants type:', typeof relatedVariants)
-  console.log('WineDetail: relatedVariants isArray:', Array.isArray(relatedVariants))
 
   // Intersection observer for end of content detection
   useEffect(() => {

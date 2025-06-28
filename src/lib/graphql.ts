@@ -29,12 +29,23 @@ export async function graphqlRequest<T = unknown>(
   request: GraphQLRequest,
 ): Promise<{ data: T | null; error: string | null }> {
   try {
+    console.log('graphqlRequest: Starting request', {
+      query: request.query.substring(0, 100) + '...',
+      variables: request.variables,
+    })
+
     const response = await fetch('/api/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
+    })
+
+    console.log('graphqlRequest: Response status', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
     })
 
     if (!response.ok) {
@@ -47,6 +58,14 @@ export async function graphqlRequest<T = unknown>(
     }
 
     const result: GraphQLResponse<T> = await response.json()
+
+    console.log('graphqlRequest: Parsed response', {
+      hasData: !!result.data,
+      hasErrors: !!result.errors,
+      errorsCount: result.errors?.length || 0,
+      dataKeys: result.data ? Object.keys(result.data) : null,
+      firstError: result.errors?.[0],
+    })
 
     if (result.errors && result.errors.length > 0) {
       logger.warn('GraphQL errors', {
@@ -900,6 +919,90 @@ export const RELATED_VARIANTS_BY_IDS_QUERY = `
 `
 
 /**
+ * GraphQL query for fetching complete wine detail data in a single call
+ * Replaces three separate queries (variant, variants, relatedVariants) with one efficient query
+ */
+export const WINE_DETAIL_QUERY = `
+  query WineDetail($slug: String!, $locale: String!) {
+    wineDetail(slug: $slug, locale: $locale) {
+      variant {
+        id
+        slug
+        wineTitle
+        vintage
+        size
+        price
+        stockOnHand
+        description
+        tastingProfile
+        servingTemp
+        decanting
+        primaryImageUrl
+        originalVariant { id slug }
+        wineryTitle
+        regionTitle
+        countryTitle
+        styleTitle
+        dishes {
+          id
+          title
+          titleEn
+        }
+        tastingNotes {
+          dry
+          ripe
+          creamy
+          oaky
+          complex
+          light
+          smooth
+          youthful
+          energetic
+          alcohol
+        }
+      }
+      variants {
+        id
+        slug
+        wineTitle
+        vintage
+        size
+        price
+        stockOnHand
+        originalVariant { id slug }
+        wineryTitle
+        regionTitle
+        countryTitle
+        styleTitle
+        primaryImageUrl
+      }
+      relatedVariants {
+        type
+        title
+        variants {
+          id
+          slug
+          wineTitle
+          vintage
+          size
+          price
+          stockOnHand
+          primaryImageUrl
+          wineryTitle
+          regionTitle
+          countryTitle
+          styleTitle
+          styleIconKey
+          styleSlug
+          originalVariant { id slug }
+        }
+      }
+      error
+    }
+  }
+`
+
+/**
  * GraphQL service functions for wine data
  */
 
@@ -927,6 +1030,22 @@ export interface RelatedWineVariant {
   type: 'winery' | 'relatedWinery' | 'region' | 'relatedRegion' | 'grapeVariety' | 'price'
   title: string
   variants: FlatWineVariant[]
+}
+
+interface WineVariantData {
+  variant: FlatWineVariant | null
+  variants: FlatWineVariant[]
+  relatedVariants: RelatedWineVariant[]
+  error: string | null
+}
+
+interface WineDetailResponse {
+  wineDetail: {
+    variant: FlatWineVariant | null
+    variants: FlatWineVariant[]
+    relatedVariants: RelatedWineVariant[]
+    error: string | null
+  }
 }
 
 /**
@@ -980,21 +1099,11 @@ export async function fetchRelatedWineVariants(
   variantId: number,
   locale: string,
 ): Promise<{ data: RelatedWineVariant[]; error: string | null }> {
-  console.log('fetchRelatedWineVariants: Starting with variantId:', variantId, 'locale:', locale)
-
   const { data: relatedData, error: relatedError } =
     await graphqlRequest<RelatedWineVariantsResponse>({
       query: RELATED_WINE_VARIANTS_QUERY,
       variables: { variantId, locale },
     })
-
-  console.log('fetchRelatedWineVariants: GraphQL response:', {
-    hasData: !!relatedData,
-    hasError: !!relatedError,
-    error: relatedError,
-    docsCount: relatedData?.RelatedWineVariants?.docs?.length || 0,
-    firstDoc: relatedData?.RelatedWineVariants?.docs?.[0],
-  })
 
   if (relatedError) {
     logger.error('Failed to fetch related wine variants document via GraphQL', {
@@ -1006,18 +1115,10 @@ export async function fetchRelatedWineVariants(
   }
 
   if (!relatedData?.RelatedWineVariants?.docs?.length) {
-    console.log('fetchRelatedWineVariants: No related documents found')
     return { data: [], error: null }
   }
 
   const relatedDoc = relatedData.RelatedWineVariants.docs[0]
-  console.log('fetchRelatedWineVariants: Found related document:', {
-    id: relatedDoc.id,
-    variantId: relatedDoc.variantId,
-    expectedVariantId: variantId,
-    relatedVariantsCount: relatedDoc.relatedVariants?.length || 0,
-    relatedVariants: relatedDoc.relatedVariants,
-  })
 
   if (relatedDoc.variantId !== variantId) {
     logger.error('Data integrity issue: wrong variantId', {
@@ -1029,7 +1130,6 @@ export async function fetchRelatedWineVariants(
   }
 
   if (!relatedDoc.relatedVariants || !Array.isArray(relatedDoc.relatedVariants)) {
-    console.log('fetchRelatedWineVariants: No relatedVariants array found')
     return { data: [], error: null }
   }
 
@@ -1047,10 +1147,7 @@ export async function fetchRelatedWineVariants(
     })
     .filter((id): id is number => id !== null)
 
-  console.log('fetchRelatedWineVariants: Extracted variant IDs:', variantIds)
-
   if (variantIds.length === 0) {
-    console.log('fetchRelatedWineVariants: No valid variant IDs found')
     return { data: [], error: null }
   }
 
@@ -1068,14 +1165,6 @@ export async function fetchRelatedWineVariants(
   const { data: variantData, error: variantError } = await graphqlRequest<WineVariantResponse>({
     query: RELATED_VARIANTS_BY_IDS_QUERY,
     variables,
-  })
-
-  console.log('fetchRelatedWineVariants: Variants by IDs response:', {
-    hasData: !!variantData,
-    hasError: !!variantError,
-    error: variantError,
-    docsCount: variantData?.FlatWineVariants?.docs?.length || 0,
-    requestedIds: limitedVariantIds,
   })
 
   if (variantError) {
@@ -1112,10 +1201,6 @@ export async function fetchRelatedWineVariants(
   }
 
   const result = Object.values(groups)
-  console.log('fetchRelatedWineVariants: Final result:', {
-    groupsCount: result.length,
-    groups: result.map((g) => ({ type: g.type, title: g.title, variantsCount: g.variants.length })),
-  })
 
   return { data: result, error: null }
 }
@@ -1136,89 +1221,39 @@ function getTypeTitle(type: string): string {
 }
 
 /**
- * Fetch complete wine variant data (variant, variants, related variants) using GraphQL
+ * Fetch complete wine variant data using the new wineDetail query
+ * Returns structured data for the Detail Wine View
  */
-export async function fetchWineVariantData(
-  slug: string,
-  locale: string,
-): Promise<{
-  variant: FlatWineVariant | null
-  variants: FlatWineVariant[]
-  relatedVariants: RelatedWineVariant[]
-  error: string | null
-}> {
-  try {
-    console.log('fetchWineVariantData: Starting with slug:', slug, 'locale:', locale)
+export async function fetchWineVariantData(slug: string, locale: string): Promise<WineVariantData> {
+  const { data, error } = await graphqlRequest<WineDetailResponse>({
+    query: WINE_DETAIL_QUERY,
+    variables: { slug, locale },
+  })
 
-    const { data: variant, error: variantError } = await fetchWineVariantBySlug(slug, locale)
-    console.log('fetchWineVariantData: Main variant result:', {
-      hasVariant: !!variant,
-      variantId: variant?.id,
-      wineTitle: variant?.wineTitle,
-      error: variantError,
-    })
-
-    if (variantError || !variant) {
-      return {
-        variant: null,
-        variants: [],
-        relatedVariants: [],
-        error: variantError || 'Variant not found',
-      }
-    }
-
-    const { data: variants, error: variantsError } = await fetchWineVariants(
-      variant.wineTitle!,
-      locale,
-    )
-    console.log('fetchWineVariantData: Variants result:', {
-      variantsCount: variants?.length || 0,
-      error: variantsError,
-    })
-
-    if (variantsError) {
-      logger.warn('Failed to fetch variants, continuing with main variant only', {
-        error: variantsError,
-      })
-    }
-
-    const { data: relatedVariants, error: relatedError } = await fetchRelatedWineVariants(
-      variant.id,
-      locale,
-    )
-    console.log('fetchWineVariantData: Related variants result:', {
-      relatedVariantsCount: relatedVariants?.length || 0,
-      error: relatedError,
-    })
-
-    if (relatedError) {
-      logger.warn('Failed to fetch related variants, continuing without them', {
-        error: relatedError,
-      })
-    }
-
-    const result = {
-      variant,
-      variants: variants || [],
-      relatedVariants: relatedVariants || [],
-      error: null,
-    }
-
-    console.log('fetchWineVariantData: Final result:', {
-      hasVariant: !!result.variant,
-      variantsCount: result.variants.length,
-      relatedVariantsCount: result.relatedVariants.length,
-      error: result.error,
-    })
-
-    return result
-  } catch (error) {
-    logger.error('Failed to fetch wine variant data via GraphQL', { error, slug, locale })
+  if (error) {
     return {
       variant: null,
       variants: [],
       relatedVariants: [],
-      error: 'Failed to load wine data',
+      error: error,
     }
+  }
+
+  if (!data?.wineDetail) {
+    return {
+      variant: null,
+      variants: [],
+      relatedVariants: [],
+      error: 'No data received from server',
+    }
+  }
+
+  const result = data.wineDetail
+
+  return {
+    variant: result.variant,
+    variants: result.variants || [],
+    relatedVariants: result.relatedVariants || [],
+    error: result.error,
   }
 }
