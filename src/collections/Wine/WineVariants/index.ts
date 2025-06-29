@@ -1,8 +1,7 @@
 import type { CollectionConfig, CollectionSlug } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
-import { generateWineVariantSlug } from '@/utils/generateWineVariantSlug'
-import { generateWineVariantSku } from '@/utils/generateWineVariantSku'
+import { generateWineVariantSlug, generateWineVariantSku } from '@/utils/wineGenerators'
 import { queueFlatWineVariantSync } from '@/hooks/queueFlatWineVariantSync'
 
 interface WineData {

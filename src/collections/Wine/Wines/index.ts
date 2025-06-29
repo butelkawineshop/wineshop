@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
-import { generateWineSlug } from '@/utils/generateWineSlug'
+import { generateWineSlug } from '@/utils/wineGenerators'
 import { queueRelatedWineVariants } from '@/tasks/queueRelatedWineVariants'
 
 const { afterChange, afterDelete } = queueRelatedWineVariants('wine')

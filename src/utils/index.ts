@@ -4,9 +4,7 @@
  */
 
 // Export specific functions to avoid conflicts
-export { generateWineSlug } from './generateWineSlug'
-export { generateWineVariantSku } from './generateWineVariantSku'
-export { generateWineVariantSlug } from './generateWineVariantSlug'
+export { generateWineSlug, generateWineVariantSku, generateWineVariantSlug } from './wineGenerators'
 export { formatPrice } from './formatters'
 
 // Export flat variant localization functions
