@@ -1,5 +1,5 @@
 import type { PayloadRequest } from 'payload'
-import type { WineVariant, Wine, FlatWineVariant } from '@/payload-types'
+import type { WineVariant, Wine, FlatWineVariant, Media } from '@/payload-types'
 import { createLogger } from '@/lib/logger'
 import { ValidationError } from '@/lib/errors'
 import { SYNC_CONSTANTS } from '@/constants/sync'
@@ -18,7 +18,7 @@ export class FlatWineVariantService {
     this.logger = createLogger(req, { task: 'FlatWineVariantService' })
     this.englishDataService = new EnglishDataService(req, this.logger)
     this.relatedDataService = new RelatedDataService(req, this.logger)
-    this.dataMappingService = new DataMappingService()
+    this.dataMappingService = DataMappingService.getInstance()
   }
 
   /**
@@ -41,8 +41,13 @@ export class FlatWineVariantService {
       })
 
       return wineVariant
-    } catch (error: any) {
-      if (error && typeof error === 'object' && 'name' in error && error.name === 'NotFound') {
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'name' in error &&
+        (error as { name: string }).name === 'NotFound'
+      ) {
         this.logger.info('Wine variant not found, deleting flat variant if exists')
         return null
       }
@@ -133,7 +138,9 @@ export class FlatWineVariantService {
       size: wineVariant.size,
     })
 
-    const primaryImageUrl = this.dataMappingService.extractPrimaryImageUrl(wineVariant.media)
+    const primaryImageUrl = this.dataMappingService.extractPrimaryImageUrl(
+      wineVariant.media as Media[] | null | undefined,
+    )
 
     return {
       originalVariant: wineVariant.id,
@@ -182,19 +189,44 @@ export class FlatWineVariantService {
           slugEn: tag.slugEn || '',
         }),
       ),
-      tastingNotes: this.dataMappingService.processTastingNotes(wineVariant.tastingNotes),
+      tastingNotes:
+        this.dataMappingService.processTastingNotes(wineVariant.tastingNotes) || undefined,
       aromas: this.dataMappingService.mapItemsWithEnglish(
-        wineVariant.aromas || undefined,
+        wineVariant.aromas as
+          | Array<{
+              id: string | number
+              title?: string
+              slug?: string
+              adjective?: { title?: string }
+              flavour?: { title?: string }
+            }>
+          | undefined,
         englishTitlesAndSlugs.englishAromaTitles,
         englishTitlesAndSlugs.englishAromaSlugs,
       ),
       tags: this.dataMappingService.mapItemsWithEnglish(
-        wineVariant.tags || undefined,
+        wineVariant.tags as
+          | Array<{
+              id: string | number
+              title?: string
+              slug?: string
+              adjective?: { title?: string }
+              flavour?: { title?: string }
+            }>
+          | undefined,
         englishTitlesAndSlugs.englishTagTitles,
         englishTitlesAndSlugs.englishTagSlugs,
       ),
       moods: this.dataMappingService.mapItemsWithEnglish(
-        wineVariant.moods || undefined,
+        wineVariant.moods as
+          | Array<{
+              id: string | number
+              title?: string
+              slug?: string
+              adjective?: { title?: string }
+              flavour?: { title?: string }
+            }>
+          | undefined,
         englishTitlesAndSlugs.englishMoodTitles,
         englishTitlesAndSlugs.englishMoodSlugs,
       ),
@@ -205,13 +237,27 @@ export class FlatWineVariantService {
       ),
       climates: regionClimate
         ? this.dataMappingService.mapItemsWithEnglish(
-            [regionClimate],
+            [
+              {
+                id: regionClimate.id,
+                title: regionClimate.title,
+                slug: regionClimate.slug || undefined,
+              },
+            ],
             englishTitlesAndSlugs.englishClimateTitles,
             englishTitlesAndSlugs.englishClimateSlugs,
           )
         : undefined,
       dishes: this.dataMappingService.mapItemsWithEnglish(
-        wineVariant.foodPairing || undefined,
+        wineVariant.foodPairing as
+          | Array<{
+              id: string | number
+              title?: string
+              slug?: string
+              adjective?: { title?: string }
+              flavour?: { title?: string }
+            }>
+          | undefined,
         englishTitlesAndSlugs.englishDishTitles,
         englishTitlesAndSlugs.englishDishSlugs,
       ),
@@ -230,9 +276,9 @@ export class FlatWineVariantService {
   ): Promise<void> {
     const cleanedData = this.dataMappingService.removeNestedIds(flatVariantData)
     Object.keys(cleanedData).forEach((key) => {
-      const value = (cleanedData as Record<string, any>)[key]
+      const value = (cleanedData as Record<string, unknown>)[key]
       if (Array.isArray(value) && value.length === 0) {
-        delete (cleanedData as Record<string, any>)[key]
+        delete (cleanedData as Record<string, unknown>)[key]
       }
     })
 
@@ -279,7 +325,7 @@ export class FlatWineVariantService {
           success: true,
         })
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw error
     }
   }
@@ -294,8 +340,13 @@ export class FlatWineVariantService {
         id: wineVariantId,
       })
       this.logger.info('Deleted existing flat variant', { id: wineVariantId })
-    } catch (error: any) {
-      if (error && typeof error === 'object' && 'name' in error && error.name === 'NotFound') {
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'name' in error &&
+        (error as { name: string }).name === 'NotFound'
+      ) {
         this.logger.info('Flat variant not found for deletion', { id: wineVariantId })
       } else {
         this.logger.warn('Error deleting flat variant', { id: wineVariantId, error: String(error) })

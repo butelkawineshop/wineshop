@@ -1,4 +1,5 @@
 import { db } from '../lib/db'
+import { mapSnakeToCamel } from '@/utils/dataTransformers'
 
 export interface FlatWineVariant {
   id: string
@@ -60,12 +61,7 @@ export class WineService {
    * Convert snake_case database fields to camelCase
    */
   private static mapSnakeToCamel(obj: Record<string, unknown>): Record<string, unknown> {
-    const mapped: Record<string, unknown> = {}
-    for (const [key, value] of Object.entries(obj)) {
-      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
-      mapped[camelKey] = value
-    }
-    return mapped
+    return mapSnakeToCamel(obj)
   }
 
   /**

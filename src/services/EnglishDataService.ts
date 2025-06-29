@@ -2,6 +2,24 @@ import type { PayloadRequest } from 'payload'
 import type { WineVariant, Wine } from '@/payload-types'
 import { SYNC_CONSTANTS } from '@/constants/sync'
 
+type CollectionName =
+  | 'aromas'
+  | 'tags'
+  | 'moods'
+  | 'grape-varieties'
+  | 'climates'
+  | 'dishes'
+  | 'wineCountries'
+  | 'styles'
+  | 'wines'
+  | 'wineries'
+  | 'regions'
+
+interface EnglishDataResult {
+  englishTitles: Record<string, string>
+  englishSlugs: Record<string, string>
+}
+
 export class EnglishDataService {
   constructor(
     private req: PayloadRequest,
@@ -9,16 +27,16 @@ export class EnglishDataService {
   ) {}
 
   /**
-   * Fetch English titles and slugs for collections
+   * Generic method to fetch English titles and slugs for any collection
    */
   async fetchEnglishTitlesAndSlugs(
     items: Array<{ id: string }>,
-    collection: 'aromas' | 'tags' | 'moods' | 'grape-varieties' | 'climates' | 'dishes',
-  ): Promise<{ englishTitles: Record<string, string>; englishSlugs: Record<string, string> }> {
+    collection: CollectionName,
+  ): Promise<EnglishDataResult> {
     const englishTitles: Record<string, string> = {}
     const englishSlugs: Record<string, string> = {}
 
-    for (const item of items) {
+    const fetchPromises = items.map(async (item) => {
       try {
         const englishItem = await this.req.payload.findByID({
           collection,
@@ -26,22 +44,13 @@ export class EnglishDataService {
           locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
         })
 
-        if (
-          englishItem &&
-          typeof englishItem === 'object' &&
-          'title' in englishItem &&
-          typeof englishItem.title === 'string'
-        ) {
-          englishTitles[item.id] = englishItem.title
-        }
-
-        if (
-          englishItem &&
-          typeof englishItem === 'object' &&
-          'slug' in englishItem &&
-          typeof englishItem.slug === 'string'
-        ) {
-          englishSlugs[item.id] = englishItem.slug
+        if (this.isValidEnglishItem(englishItem)) {
+          if (englishItem.title) {
+            englishTitles[item.id] = englishItem.title
+          }
+          if (englishItem.slug) {
+            englishSlugs[item.id] = englishItem.slug
+          }
         }
       } catch (error) {
         this.logger.warn(`Could not fetch English title/slug for ${collection}`, {
@@ -49,9 +58,59 @@ export class EnglishDataService {
           error: String(error),
         })
       }
-    }
+    })
+
+    await Promise.all(fetchPromises)
 
     return { englishTitles, englishSlugs }
+  }
+
+  /**
+   * Generic method to fetch English title for any collection
+   */
+  async fetchEnglishTitle(itemId: string, collection: CollectionName): Promise<string | undefined> {
+    try {
+      const englishItem = await this.req.payload.findByID({
+        collection,
+        id: itemId,
+        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
+      })
+
+      if (this.isValidEnglishItem(englishItem) && englishItem.title) {
+        return englishItem.title
+      }
+    } catch (error) {
+      this.logger.warn(`Could not fetch English title for ${collection}`, {
+        itemId,
+        error: String(error),
+      })
+    }
+
+    return undefined
+  }
+
+  /**
+   * Generic method to fetch English slug for any collection
+   */
+  async fetchEnglishSlug(itemId: string, collection: CollectionName): Promise<string | undefined> {
+    try {
+      const englishItem = await this.req.payload.findByID({
+        collection,
+        id: itemId,
+        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
+      })
+
+      if (this.isValidEnglishItem(englishItem) && englishItem.slug) {
+        return englishItem.slug
+      }
+    } catch (error) {
+      this.logger.warn(`Could not fetch English slug for ${collection}`, {
+        itemId,
+        error: String(error),
+      })
+    }
+
+    return undefined
   }
 
   /**
@@ -78,40 +137,18 @@ export class EnglishDataService {
 
     const [aromaResult, tagResult, moodResult, grapeVarietyResult, climateResult, dishResult] =
       await Promise.all([
+        this.fetchEnglishTitlesAndSlugs(this.extractIds(wineVariant.aromas), 'aromas'),
+        this.fetchEnglishTitlesAndSlugs(this.extractIds(wineVariant.tags), 'tags'),
+        this.fetchEnglishTitlesAndSlugs(this.extractIds(wineVariant.moods), 'moods'),
         this.fetchEnglishTitlesAndSlugs(
-          wineVariant.aromas?.map((a: any) => ({
-            id: typeof a === 'object' ? String(a.id) : String(a),
-          })) || [],
-          'aromas',
-        ),
-        this.fetchEnglishTitlesAndSlugs(
-          wineVariant.tags?.map((t: any) => ({
-            id: typeof t === 'object' ? String(t.id) : String(t),
-          })) || [],
-          'tags',
-        ),
-        this.fetchEnglishTitlesAndSlugs(
-          wineVariant.moods?.map((m: any) => ({
-            id: typeof m === 'object' ? String(m.id) : String(m),
-          })) || [],
-          'moods',
-        ),
-        this.fetchEnglishTitlesAndSlugs(
-          wineVariant.grapeVarieties?.map((gv: any) => ({
-            id: typeof gv.variety === 'object' ? String(gv.variety.id) : String(gv.variety),
-          })) || [],
+          this.extractGrapeVarietyIds(wineVariant.grapeVarieties),
           'grape-varieties',
         ),
         this.fetchEnglishTitlesAndSlugs(
           regionClimate ? [{ id: String(regionClimate.id) }] : [],
           'climates',
         ),
-        this.fetchEnglishTitlesAndSlugs(
-          wineVariant.foodPairing?.map((f: any) => ({
-            id: typeof f === 'object' ? String(f.id) : String(f),
-          })) || [],
-          'dishes',
-        ),
+        this.fetchEnglishTitlesAndSlugs(this.extractIds(wineVariant.foodPairing), 'dishes'),
       ])
 
     return {
@@ -134,202 +171,101 @@ export class EnglishDataService {
    * Fetch English country title
    */
   async fetchEnglishCountryTitle(countryId: string): Promise<string | undefined> {
-    try {
-      const englishCountry = await this.req.payload.findByID({
-        collection: 'wineCountries',
-        id: countryId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishCountry &&
-        typeof englishCountry === 'object' &&
-        'title' in englishCountry &&
-        typeof englishCountry.title === 'string'
-      ) {
-        return englishCountry.title
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English country title', {
-        countryId,
-        error: String(error),
-      })
-    }
-
-    return undefined
+    return this.fetchEnglishTitle(countryId, 'wineCountries')
   }
 
   /**
    * Fetch English style title
    */
   async fetchEnglishStyleTitle(styleId: string): Promise<string | undefined> {
-    try {
-      const englishStyle = await this.req.payload.findByID({
-        collection: 'styles',
-        id: styleId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishStyle &&
-        typeof englishStyle === 'object' &&
-        'title' in englishStyle &&
-        typeof englishStyle.title === 'string'
-      ) {
-        return englishStyle.title
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English style title', {
-        styleId,
-        error: String(error),
-      })
-    }
-
-    return undefined
+    return this.fetchEnglishTitle(styleId, 'styles')
   }
 
   /**
    * Fetch English style slug
    */
   async fetchEnglishStyleSlug(styleId: string): Promise<string | undefined> {
-    try {
-      const englishStyle = await this.req.payload.findByID({
-        collection: 'styles',
-        id: styleId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishStyle &&
-        typeof englishStyle === 'object' &&
-        'slug' in englishStyle &&
-        typeof englishStyle.slug === 'string'
-      ) {
-        return englishStyle.slug
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English style slug', {
-        styleId,
-        error: String(error),
-      })
-    }
-
-    return undefined
+    return this.fetchEnglishSlug(styleId, 'styles')
   }
 
   /**
    * Fetch English description
    */
   async fetchEnglishDescription(wineId: string): Promise<string | undefined> {
-    try {
-      const englishWine = await this.req.payload.findByID({
-        collection: 'wines',
-        id: wineId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishWine &&
-        typeof englishWine === 'object' &&
-        'description' in englishWine &&
-        typeof englishWine.description === 'string'
-      ) {
-        return englishWine.description
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English wine description', {
-        wineId,
-        error: String(error),
-      })
-    }
-
-    return undefined
+    return this.fetchEnglishTitle(wineId, 'wines')
   }
 
   /**
    * Fetch English winery slug
    */
   async fetchEnglishWinerySlug(wineryId: string): Promise<string | undefined> {
-    try {
-      const englishWinery = await this.req.payload.findByID({
-        collection: 'wineries',
-        id: wineryId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishWinery &&
-        typeof englishWinery === 'object' &&
-        'slug' in englishWinery &&
-        typeof englishWinery.slug === 'string'
-      ) {
-        return englishWinery.slug
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English winery slug', {
-        wineryId,
-        error: String(error),
-      })
-    }
-
-    return undefined
+    return this.fetchEnglishSlug(wineryId, 'wineries')
   }
 
   /**
    * Fetch English region slug
    */
   async fetchEnglishRegionSlug(regionId: string): Promise<string | undefined> {
-    try {
-      const englishRegion = await this.req.payload.findByID({
-        collection: 'regions',
-        id: regionId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
-
-      if (
-        englishRegion &&
-        typeof englishRegion === 'object' &&
-        'slug' in englishRegion &&
-        typeof englishRegion.slug === 'string'
-      ) {
-        return englishRegion.slug
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English region slug', {
-        regionId,
-        error: String(error),
-      })
-    }
-
-    return undefined
+    return this.fetchEnglishSlug(regionId, 'regions')
   }
 
   /**
    * Fetch English country slug
    */
   async fetchEnglishCountrySlug(countryId: string): Promise<string | undefined> {
-    try {
-      const englishCountry = await this.req.payload.findByID({
-        collection: 'wineCountries',
-        id: countryId,
-        locale: SYNC_CONSTANTS.ENGLISH_LOCALE,
-      })
+    return this.fetchEnglishSlug(countryId, 'wineCountries')
+  }
 
-      if (
-        englishCountry &&
-        typeof englishCountry === 'object' &&
-        'slug' in englishCountry &&
-        typeof englishCountry.slug === 'string'
-      ) {
-        return englishCountry.slug
-      }
-    } catch (error) {
-      this.logger.warn('Could not fetch English country slug', {
-        countryId,
-        error: String(error),
-      })
+  /**
+   * Extract IDs from array of items or references
+   */
+  private extractIds(items: unknown[] | null | undefined): Array<{ id: string }> {
+    if (!items || !Array.isArray(items)) {
+      return []
     }
 
-    return undefined
+    return items
+      .map((item) => {
+        if (typeof item === 'object' && item !== null && 'id' in item) {
+          return { id: String(item.id) }
+        }
+        if (typeof item === 'string' || typeof item === 'number') {
+          return { id: String(item) }
+        }
+        return null
+      })
+      .filter((item): item is { id: string } => item !== null)
+  }
+
+  /**
+   * Extract IDs from grape varieties array
+   */
+  private extractGrapeVarietyIds(
+    grapeVarieties: Array<{ variety?: unknown }> | null | undefined,
+  ): Array<{ id: string }> {
+    if (!grapeVarieties || !Array.isArray(grapeVarieties)) {
+      return []
+    }
+
+    return grapeVarieties
+      .map((item) => {
+        if (item.variety) {
+          if (typeof item.variety === 'object' && item.variety !== null && 'id' in item.variety) {
+            return { id: String(item.variety.id) }
+          }
+          if (typeof item.variety === 'string' || typeof item.variety === 'number') {
+            return { id: String(item.variety) }
+          }
+        }
+        return null
+      })
+      .filter((item): item is { id: string } => item !== null)
+  }
+
+  /**
+   * Check if an item has valid English data
+   */
+  private isValidEnglishItem(item: unknown): item is { title?: string; slug?: string } {
+    return item !== null && typeof item === 'object' && ('title' in item || 'slug' in item)
   }
 }

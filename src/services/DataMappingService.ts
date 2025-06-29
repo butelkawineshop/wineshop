@@ -1,45 +1,93 @@
+import type { Media, GrapeVariety } from '@/payload-types'
+import { deepCloneWithoutKeys } from '@/utils/dataTransformers'
+
+export interface MappedItem {
+  title: string | null
+  titleEn: string | null
+  id: string | null
+  slug: string | null
+  slugEn: string | null
+}
+
+export interface MappedGrapeVariety extends MappedItem {
+  percentage?: number | null
+}
+
 export class DataMappingService {
+  private static instance: DataMappingService
+
+  private constructor() {}
+
+  static getInstance(): DataMappingService {
+    if (!DataMappingService.instance) {
+      DataMappingService.instance = new DataMappingService()
+    }
+    return DataMappingService.instance
+  }
+
   /**
    * Extract primary image URL from media array
    * Returns the baseUrl if available, otherwise extracts baseUrl from full url
    */
-  extractPrimaryImageUrl(media: (number | any)[] | null | undefined): string | undefined {
-    if (Array.isArray(media) && media.length > 0) {
-      const media0 = media[0]
-      if (
-        media0 &&
-        typeof media0 === 'object' &&
-        'url' in media0 &&
-        typeof media0.url === 'string'
-      ) {
-        // If baseUrl is available, use it so the Media component can construct variant URLs
-        if ('baseUrl' in media0 && typeof media0.baseUrl === 'string') {
-          return media0.baseUrl
-        }
-
-        // If we have a full URL, extract the baseUrl by removing the variant suffix
-        const url = media0.url
-        const variantMatch = url.match(/\/(winecards|feature|hero|thumbnail|square)$/)
-        if (variantMatch) {
-          // Remove the variant suffix to get the baseUrl
-          return url.replace(/\/(winecards|feature|hero|thumbnail|square)$/, '')
-        }
-
-        // Otherwise return the full url
-        return url
-      }
+  extractPrimaryImageUrl(media: Media[] | null | undefined): string | undefined {
+    if (!Array.isArray(media) || media.length === 0) {
+      return undefined
     }
-    return undefined
+
+    const mediaItem = media[0]
+    if (!mediaItem || typeof mediaItem !== 'object' || !('url' in mediaItem)) {
+      return undefined
+    }
+
+    const url = mediaItem.url
+    if (typeof url !== 'string') {
+      return undefined
+    }
+
+    // If baseUrl is available, use it so the Media component can construct variant URLs
+    if ('baseUrl' in mediaItem && typeof mediaItem.baseUrl === 'string') {
+      return mediaItem.baseUrl
+    }
+
+    // If we have a full URL, extract the baseUrl by removing the variant suffix
+    const variantMatch = url.match(/\/(winecards|feature|hero|thumbnail|square)$/)
+    if (variantMatch) {
+      // Remove the variant suffix to get the baseUrl
+      return url.replace(/\/(winecards|feature|hero|thumbnail|square)$/, '')
+    }
+
+    // Otherwise return the full url
+    return url
   }
 
   /**
    * Process tasting notes to remove null values
    */
-  processTastingNotes(notes: any): any {
-    if (!notes || typeof notes !== 'object') return undefined
+  processTastingNotes(
+    notes:
+      | {
+          dry?: number | null
+          ripe?: number | null
+          creamy?: number | null
+          oaky?: number | null
+          complex?: number | null
+          light?: number | null
+          smooth?: number | null
+          youthful?: number | null
+          energetic?: number | null
+          alcohol?: number | null
+        }
+      | null
+      | undefined,
+  ): typeof notes {
+    if (!notes || typeof notes !== 'object') {
+      return undefined
+    }
 
     const allNull = Object.values(notes).every((value) => value === null)
-    if (allNull) return undefined
+    if (allNull) {
+      return undefined
+    }
 
     return notes
   }
@@ -48,17 +96,21 @@ export class DataMappingService {
    * Map items with English titles and slugs
    */
   mapItemsWithEnglish(
-    items: any[] | undefined,
+    items:
+      | Array<{
+          id: string | number
+          title?: string
+          slug?: string
+          adjective?: { title?: string }
+          flavour?: { title?: string }
+        }>
+      | undefined,
     englishTitles: Record<string, string>,
     englishSlugs: Record<string, string>,
-  ): Array<{
-    title: string | null
-    titleEn: string | null
-    id: string | null
-    slug: string | null
-    slugEn: string | null
-  }> {
-    if (!items || !Array.isArray(items)) return []
+  ): MappedItem[] {
+    if (!items || !Array.isArray(items)) {
+      return []
+    }
 
     return items
       .map((item) => {
@@ -78,10 +130,8 @@ export class DataMappingService {
               typeof item.flavour === 'object' &&
               item.flavour
             ) {
-              const adjectiveTitle =
-                typeof item.adjective.title === 'string' ? item.adjective.title : null
-              const flavourTitle =
-                typeof item.flavour.title === 'string' ? item.flavour.title : null
+              const adjectiveTitle = item.adjective.title || null
+              const flavourTitle = item.flavour.title || null
               if (adjectiveTitle && flavourTitle) {
                 title = `${adjectiveTitle} ${flavourTitle}`
               }
@@ -118,18 +168,19 @@ export class DataMappingService {
    * Map grape varieties with percentage and slugs
    */
   mapGrapeVarietiesWithEnglish(
-    items: any[] | undefined,
+    items:
+      | Array<{
+          variety?: GrapeVariety | number | null
+          percentage?: number | null
+          id?: string | null
+        }>
+      | undefined,
     englishTitles: Record<string, string>,
     englishSlugs: Record<string, string>,
-  ): Array<{
-    title: string | null
-    titleEn: string | null
-    id: string | null
-    percentage?: number | null
-    slug: string | null
-    slugEn: string | null
-  }> {
-    if (!items || !Array.isArray(items)) return []
+  ): MappedGrapeVariety[] {
+    if (!items || !Array.isArray(items)) {
+      return []
+    }
 
     return items
       .map((item) => {
@@ -172,19 +223,10 @@ export class DataMappingService {
   /**
    * Recursively remove all id fields from objects
    */
-  removeNestedIds(obj: any): any {
-    if (Array.isArray(obj)) {
-      return obj.map((item) => this.removeNestedIds(item))
-    }
-    if (obj && typeof obj === 'object') {
-      const cleaned: any = {}
-      for (const [key, value] of Object.entries(obj)) {
-        if (key !== 'id') {
-          cleaned[key] = this.removeNestedIds(value)
-        }
-      }
-      return cleaned
-    }
-    return obj
+  removeNestedIds<T>(obj: T): T {
+    return deepCloneWithoutKeys(obj, ['id'])
   }
 }
+
+// Export singleton instance
+export const dataMappingService = DataMappingService.getInstance()
