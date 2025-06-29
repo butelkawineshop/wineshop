@@ -37,7 +37,7 @@ export const syncTypesense: CollectionAfterChangeHook = async ({
   doc,
   req,
   operation,
-  previousDoc,
+  previousDoc: _previousDoc,
 }): Promise<typeof doc> => {
   const logger = createLogger(req, {
     task: 'syncTypesense',

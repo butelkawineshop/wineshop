@@ -1,6 +1,5 @@
 import { createLogger } from './logger'
 import type { PayloadRequest } from 'payload'
-import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import { GRAPHQL_CONSTANTS } from '@/constants/api'
 
 const PAYLOAD_API_URL = process.env.NEXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3000'

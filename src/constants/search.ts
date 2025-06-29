@@ -1,26 +1,106 @@
 export const SEARCH_CONSTANTS = {
-  // Search behavior
-  DEBOUNCE_DELAY: 600,
-  MIN_QUERY_LENGTH: 2,
-  MAX_RESULTS_PER_PAGE: 24,
-  MAX_POPUP_RESULTS: 8,
+  // Cache configuration
+  CACHE: {
+    TTL_MS: 30000, // 30 seconds
+  },
 
-  // Search collections
+  // Search parameters
+  SEARCH: {
+    MIN_QUERY_LENGTH: 2,
+    DEFAULT_NUM_TYPOS: 2,
+    DEFAULT_PREFIX: true,
+    RESULTS_THRESHOLD: 5, // Only search additional collections if results < this
+  },
+
+  // Page sizes for different collection types
+  PAGE_SIZES: {
+    WINE_VARIANTS: 4,
+    WINERIES: 3,
+    REGIONS: 3,
+    WINE_COUNTRIES: 3,
+    GRAPE_VARIETIES: 3,
+    TAGS: 3,
+  },
+
+  // Collection names
   COLLECTIONS: {
     WINE_VARIANTS: 'flat-wine-variants',
     WINERIES: 'wineries',
     REGIONS: 'regions',
-    COUNTRIES: 'wine-countries',
+    WINE_COUNTRIES: 'wineCountries',
     GRAPE_VARIETIES: 'grape-varieties',
-    AROMAS: 'aromas',
-    CLIMATES: 'climates',
-    FOODS: 'foods',
-    MOODS: 'moods',
     TAGS: 'tags',
+  },
+
+  // Search result types
+  RESULT_TYPES: {
+    AROMA: 'aroma',
+    CLIMATE: 'climate',
+    FOOD: 'food',
+    GRAPE_VARIETY: 'grapeVariety',
+    MOOD: 'mood',
+    REGION: 'region',
+    TAG: 'tag',
+    WINE_COUNTRY: 'wineCountry',
+    WINERY: 'winery',
+    WINE_VARIANT: 'wineVariant',
   } as const,
 
-  // Search field mappings
+  // Search field mappings by locale
   SEARCH_FIELDS: {
+    SL: {
+      WINE_VARIANTS: [
+        'wineTitle',
+        'wineryTitle',
+        'regionTitle',
+        'countryTitle',
+        'styleTitle',
+        'tastingProfile',
+        'description',
+      ],
+      GENERAL: ['title', 'description'],
+    },
+    EN: {
+      WINE_VARIANTS: [
+        'wineTitle',
+        'wineryTitle',
+        'regionTitle',
+        'countryTitleEn',
+        'styleTitleEn',
+        'tastingProfile',
+        'descriptionEn',
+      ],
+      GENERAL: ['titleEn', 'descriptionEn'],
+    },
+  },
+
+  // Sort configurations
+  SORT: {
+    WINE_VARIANTS: '_text_match:desc,price:asc',
+    GENERAL: '_text_match:desc,title:asc',
+  },
+
+  // Type priority for sorting (lower number = higher priority)
+  TYPE_PRIORITY: {
+    wineVariant: 1,
+    winery: 2,
+    region: 3,
+    wineCountry: 4,
+    grapeVariety: 5,
+    aroma: 6,
+    climate: 7,
+    food: 8,
+    mood: 9,
+    tag: 10,
+  } as const,
+
+  // Search behavior
+  DEBOUNCE_DELAY: 600,
+  MAX_RESULTS_PER_PAGE: 24,
+  MAX_POPUP_RESULTS: 8,
+
+  // Search field mappings
+  SEARCH_FIELDS_ALL: {
     WINE_VARIANTS: [
       'wineTitle',
       'wineryTitle',
@@ -52,20 +132,6 @@ export const SEARCH_CONSTANTS = {
     FOODS: ['title', 'titleEn', 'description', 'descriptionEn'],
     MOODS: ['title', 'titleEn', 'description', 'descriptionEn'],
     TAGS: ['title', 'titleEn', 'description', 'descriptionEn'],
-  } as const,
-
-  // Search result types
-  RESULT_TYPES: {
-    WINE_VARIANT: 'wineVariant',
-    WINERY: 'winery',
-    REGION: 'region',
-    WINE_COUNTRY: 'wineCountry',
-    GRAPE_VARIETY: 'grapeVariety',
-    AROMA: 'aroma',
-    CLIMATE: 'climate',
-    FOOD: 'food',
-    MOOD: 'mood',
-    TAG: 'tag',
   } as const,
 
   // UI constants

@@ -1,6 +1,5 @@
 import { db } from './db'
 import type { FlatWineVariant, RelatedWineVariant } from '../payload-types'
-import { DB_CONSTANTS } from '@/constants/api'
 
 /**
  * Database queries for wine-related operations
