@@ -478,7 +478,33 @@
     "theme": {
       "light": "Vklopi luči",
       "dark": "Izklopi luči"
-    }
+    },
+    "search": {
+      "placeholder": "Kaj iščeš?",
+      "button": "Išči",
+      "loading": "Iščem...",
+      "noResults": "Huh, tega nimamo... še?",
+      "viewAllResults": "V bistvu imam še več idej",
+      "similarWineries": "podobne kleti",
+      "regions": "sosednje regije",
+      "neighboringRegions": "sosednje regije",
+      "similarVarieties": "podobne sorte",
+      "search": "Išči",
+      "question": "Kaj te zanima?",
+      "didYouMean": "Misliš to?",
+      "orThis": "Ali pa to",
+      "also": "Imaš tudi",
+      "title": "Iskanje",
+      "whatAreYouLookingFor": "Kaj iščeš?",
+      "didYouMeanCategory": "Misliš tole?",
+      "orThisCategory": "Poglej si še {category}",
+      "searchPlaceholder": "Išči vino, klet, regijo..."
+    },
+    "wine": {
+      "button": "Vino"
+    },
+    "cart": "Cekarček",
+    "account": "Račun"
   },
   "filters": {
     "aromas": "Arome",

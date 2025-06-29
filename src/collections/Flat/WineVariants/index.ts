@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { syncTypesense, deleteFromTypesense } from '@/hooks/syncTypesense'
 
 export const FlatWineVariants: CollectionConfig = {
   slug: 'flat-wine-variants',
@@ -23,6 +24,10 @@ export const FlatWineVariants: CollectionConfig = {
     delete: () => true,
     read: () => true,
     update: () => true,
+  },
+  hooks: {
+    afterChange: [syncTypesense],
+    afterDelete: [deleteFromTypesense],
   },
   fields: [
     {

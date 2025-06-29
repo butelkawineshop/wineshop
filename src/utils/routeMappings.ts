@@ -29,6 +29,8 @@ export const routeMappings: Record<string, RouteMapping> = {
   vino: { sl: 'vino', en: 'wine', collection: 'wines' },
   wine: { sl: 'vino', en: 'wine', collection: 'wines' },
 
+  'flat-wine-variants': { sl: 'vinoteka', en: 'wineshop', collection: 'wines' },
+
   kleti: { sl: 'kleti', en: 'wineries', collection: 'wineries' },
   wineries: { sl: 'kleti', en: 'wineries', collection: 'wineries' },
 

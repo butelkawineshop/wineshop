@@ -81,14 +81,12 @@ async function populateRelatedWines(): Promise<void> {
 }
 
 // Run the script
-if (require.main === module) {
-  populateRelatedWines()
-    .then(() => {
-      console.log('✅ Related wines population completed successfully')
-      process.exit(0)
-    })
-    .catch((error) => {
-      console.error('❌ Related wines population failed:', error)
-      process.exit(1)
-    })
-}
+populateRelatedWines()
+  .then(() => {
+    console.log('✅ Related wines population completed successfully')
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error('❌ Related wines population failed:', error)
+    process.exit(1)
+  })

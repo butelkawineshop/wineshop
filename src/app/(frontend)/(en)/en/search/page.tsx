@@ -1,4 +1,4 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import SearchPageComponent from '@/components/SearchPage'
 
 export default async function SearchPage({
   params,
@@ -9,12 +9,6 @@ export default async function SearchPage({
 }) {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="en"
-      baseSegment="search"
-    />
-  )
+
+  return <SearchPageComponent locale="en" basePath="/en/search" />
 }

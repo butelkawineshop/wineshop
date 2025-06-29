@@ -82,3 +82,106 @@ pnpm payload run scripts/clear-failed-jobs.js
 - `fix-nextjs15-params.cjs` - One-time fix, no longer needed
 - `check-styles.ts` - Development only
 - `check-extensions.ts` - Development only
+
+## Typesense Setup
+
+Typesense is used for search functionality. Follow these steps to set it up:
+
+### 1. Start Typesense Services
+
+First, start the Typesense service using Docker Compose:
+
+```bash
+docker-compose up -d typesense
+```
+
+This will start Typesense on port 8108.
+
+### 2. Set Environment Variables
+
+Make sure you have the following environment variables set in your `.env` file:
+
+```env
+TYPESENSE_HOST=localhost
+TYPESENSE_PORT=8108
+TYPESENSE_API_KEY=xyz
+```
+
+### 3. Setup Typesense Collections
+
+Run the setup script to create the necessary collections:
+
+```bash
+pnpm typesense:setup
+```
+
+### 4. Sync Wine Data
+
+Sync wine data from Payload CMS to Typesense:
+
+```bash
+pnpm typesense:sync
+```
+
+### 5. Full Setup (Setup + Sync)
+
+Or run both setup and sync in one command:
+
+```bash
+pnpm typesense:full
+```
+
+### 6. Verify Setup
+
+You can verify that Typesense is working by:
+
+1. Checking the health endpoint: `http://localhost:8108/health`
+2. Testing the search functionality in your application
+3. Checking the Typesense logs: `docker-compose logs typesense`
+
+## Other Scripts
+
+### Data Seeding
+
+- `pnpm seed:all` - Seed all initial data
+- `pnpm seed:countries` - Seed wine countries
+- `pnpm seed:regions` - Seed wine regions
+- `pnpm seed:wineries` - Seed wineries
+- `pnpm seed:styles` - Seed wine styles
+- `pnpm seed:climates` - Seed climates
+- `pnpm seed:moods` - Seed moods
+- `pnpm seed:grape-varieties` - Seed grape varieties
+- `pnpm seed:tags` - Seed tags
+- `pnpm seed:wines` - Seed wines
+
+### Data Synchronization
+
+- `pnpm sync:flat-wine` - Sync flat wine variants
+- `pnpm populate:related-wines` - Populate related wines
+- `pnpm sync:cloud-images` - Sync cloud images
+- `pnpm sync:wine-images` - Sync wine images
+
+### Database Management
+
+- `pnpm db:backup` - Create a backup of the current database
+- `pnpm db:migrate-to-docker` - Migrate data from Brew PostgreSQL to Docker PostgreSQL
+
+### Image Management
+
+- `pnpm upload:wine-images` - Upload wine images
+- `pnpm verify:image-mapping` - Verify image mapping
+
+## Troubleshooting
+
+### Typesense Issues
+
+1. **Typesense not starting**: Check if port 8108 is available
+2. **Connection refused**: Ensure Typesense container is running
+3. **No search results**: Verify data has been synced using `pnpm typesense:sync`
+4. **Collection already exists**: This is normal, the script will handle it gracefully
+
+### Data Sync Issues
+
+1. **No wine variants found**: Ensure you have wine data in Payload CMS
+2. **Permission errors**: Check database connection and credentials
+3. **Memory issues**: Reduce the limit in the sync script if processing large datasets

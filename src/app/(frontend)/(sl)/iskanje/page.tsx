@@ -1,4 +1,4 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import SearchPage from '@/components/SearchPage'
 
 export default async function IskanjePage({
   params,
@@ -9,12 +9,6 @@ export default async function IskanjePage({
 }) {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="sl"
-      baseSegment="iskanje"
-    />
-  )
+
+  return <SearchPage locale="sl" basePath="/iskanje" />
 }

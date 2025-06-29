@@ -55,9 +55,6 @@ export async function CollectionPage({
     notFound()
   }
 
-  // Fetch collection items for filters
-  const collectionItems = await collectionService.fetchCollectionItems(locale)
-
   // Create translation function
   const t = TranslationUtils.createTranslator(locale)
 
@@ -98,7 +95,6 @@ export async function CollectionPage({
           config={config}
           locale={locale}
           collection={collection}
-          collectionItems={collectionItems}
           _searchParams={resolvedSearchParams}
         />
       ) : (
@@ -110,7 +106,6 @@ export async function CollectionPage({
           _searchParams={resolvedSearchParams}
           t={t}
           collection={collection}
-          collectionItems={collectionItems}
           prevUrl={paginationUrls.prevUrl}
           nextUrl={paginationUrls.nextUrl}
           _baseUrl={paginationUrls.baseUrl}
@@ -125,14 +120,12 @@ function SingleItemView({
   config,
   locale,
   collection,
-  collectionItems,
   _searchParams,
 }: {
   data: CollectionItem | null
   config: CollectionDisplayConfig
   locale: Locale
   collection: string
-  collectionItems: Record<string, CollectionItem[]>
   _searchParams: Record<string, string | string[] | undefined>
 }) {
   if (!data) return null
@@ -179,11 +172,7 @@ function SingleItemView({
       {/* Show FilterSortBar for wine-related collections */}
       {collectionService.isWineCollection(collection) && (
         <div className="mt-12">
-          <FilterSortBar
-            currentCollection={{ id: collection, type: collection }}
-            collectionItems={collectionItems}
-            locale={locale}
-          />
+          <FilterSortBar currentCollection={{ id: collection, type: collection }} locale={locale} />
         </div>
       )}
     </article>
@@ -198,7 +187,6 @@ function ListView({
   _searchParams,
   t,
   collection,
-  collectionItems,
   prevUrl,
   nextUrl,
   _baseUrl,
@@ -210,7 +198,6 @@ function ListView({
   _searchParams: Record<string, string | string[] | undefined>
   t: (key: string) => string
   collection: string
-  collectionItems: Record<string, CollectionItem[]>
   prevUrl: string | null
   nextUrl: string | null
   _baseUrl: string
@@ -359,11 +346,7 @@ function ListView({
       {/* Show FilterSortBar for wine-related collections at the bottom */}
       {collectionService.isWineCollection(collection) && (
         <div className="mt-12">
-          <FilterSortBar
-            currentCollection={{ id: collection, type: collection }}
-            collectionItems={collectionItems}
-            locale={locale}
-          />
+          <FilterSortBar currentCollection={{ id: collection, type: collection }} locale={locale} />
         </div>
       )}
     </div>

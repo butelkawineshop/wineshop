@@ -790,7 +790,6 @@
       "button": "Search",
       "loading": "Searching...",
       "noResults": "Huh, we don't have that...",
-      "viewAllResults": "Actually, I have more ideas here",
       "similarWineries": "similar wineries",
       "regions": "neighboring regions",
       "neighboringRegions": "neighboring regions",
@@ -799,7 +798,13 @@
       "question": "What interests you?",
       "didYouMean": "Did you mean",
       "orThis": "Or this",
-      "also": "You also have"
+      "also": "You also have",
+      "title": "Search",
+      "whatAreYouLookingFor": "What are you looking for?",
+      "didYouMeanCategory": "Did you mean {category}?",
+      "orThisCategory": "Or this {category}?",
+      "viewAllResults": "Actually, I have more ideas here",
+      "searchPlaceholder": "Search wine, winery, region..."
     },
     "wine": {
       "button": "Wine"

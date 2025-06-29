@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 // import { useTranslations } from 'next-intl' // Uncomment if using next-intl
 import { MobileMenu } from '@/components/Header/MobileMenu'
+import { SearchPopup } from '@/components/Header/SearchPopup'
 import { Logo } from '../Logo'
 import { TopBar } from '../TopBar'
 import { useTheme } from '@/providers/ThemeProvider'
@@ -22,6 +23,7 @@ export const Header = () => {
   const [showLogo, setShowLogo] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   // const t = useTranslations() // Uncomment if using next-intl
   const { theme } = useTheme()
 
@@ -104,6 +106,11 @@ export const Header = () => {
   const leftMenuItems = navItems.filter((item) => item.order < 4)
   const rightMenuItems = navItems.filter((item) => item.order >= 4)
 
+  const handleSearchClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsSearchOpen(true)
+  }
+
   return (
     <>
       <TopBar />
@@ -122,18 +129,37 @@ export const Header = () => {
             {/* Left Icons */}
             <nav className="flex items-center gap-4">
               {leftMenuItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.url}
-                  className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
-                >
-                  <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
-                    <Icon name={item.icon} width={32} height={32} variant="switch" />
-                  </div>
-                  {showLogo && (
-                    <span className="text-[10px] text-foreground/60 subtitle">{item.title}</span>
+                <div key={item.id}>
+                  {item.id === 'search' ? (
+                    <button
+                      onClick={handleSearchClick}
+                      className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
+                    >
+                      <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
+                        <Icon name={item.icon} width={32} height={32} variant="switch" />
+                      </div>
+                      {showLogo && (
+                        <span className="text-[10px] text-foreground/60 subtitle">
+                          {item.title}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.url}
+                      className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
+                    >
+                      <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
+                        <Icon name={item.icon} width={32} height={32} variant="switch" />
+                      </div>
+                      {showLogo && (
+                        <span className="text-[10px] text-foreground/60 subtitle">
+                          {item.title}
+                        </span>
+                      )}
+                    </Link>
                   )}
-                </Link>
+                </div>
               ))}
             </nav>
             {/* Center Logo */}
@@ -179,7 +205,9 @@ export const Header = () => {
               <Logo theme={theme} className="w-32 h-32" />
             </Link>
           </div>
-          <div className="w-12"></div>
+          <button onClick={handleSearchClick} className="p-4 button-secondary" aria-label="search">
+            <Icon name="search" width={24} height={24} />
+          </button>
         </div>
       </header>
       <MobileMenu
@@ -187,6 +215,7 @@ export const Header = () => {
         onClose={() => setIsMobileMenuOpen(false)}
         menuItems={navItems}
       />
+      <SearchPopup isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   )
 }
