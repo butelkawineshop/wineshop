@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { fetchWineVariantData, type RelatedWineVariant } from '@/lib/graphql'
+import { logger } from '@/lib/logger'
+import { HOOK_CONSTANTS } from '@/constants/hooks'
 import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
 
@@ -64,9 +66,9 @@ export function useWineVariant({
         setSelectedVariant(result.variant)
       }
     } catch (err) {
-      const errorMessage = 'Failed to load wine data'
+      const errorMessage = HOOK_CONSTANTS.ERROR_MESSAGES.WINE_DATA_LOAD_FAILED
       setError(errorMessage)
-      console.error('Wine variant fetch failed:', err)
+      logger.error({ error: err, slug, locale }, 'Wine variant fetch failed')
     } finally {
       setIsLoading(false)
     }
@@ -100,31 +102,6 @@ export function useWineVariant({
     isLoading,
     error,
     refetch,
-    selectVariant,
-  }
-}
-
-/**
- * Simplified hook for server-side data (SSR/SSG)
- * Use this when you have initial data from server
- */
-export function useWineVariantWithData(data: WineVariantData): UseWineVariantReturn {
-  const [selectedVariant, setSelectedVariant] = useState<FlatWineVariant | null>(data.variant)
-
-  const selectVariant = useCallback((variant: FlatWineVariant): void => {
-    setSelectedVariant(variant)
-  }, [])
-
-  const returnData = {
-    ...data,
-    variant: selectedVariant || data.variant,
-  }
-
-  return {
-    data: returnData,
-    isLoading: false,
-    error: data.error,
-    refetch: async () => {}, // No-op for server data
     selectVariant,
   }
 }

@@ -3,6 +3,7 @@ import { useWineStore } from '@/store/wine'
 import { createPayloadService } from '@/lib/payload'
 import { logger } from '@/lib/logger'
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
+import { HOOK_CONSTANTS } from '@/constants/hooks'
 import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
 
@@ -15,7 +16,18 @@ interface UseWineDataOptions {
   initialData?: FlatWineVariant[]
 }
 
-export function useWineData(options: UseWineDataOptions = {}) {
+interface UseWineDataReturn {
+  // Data
+  wineVariants: FlatWineVariant[]
+  totalVariants: FlatWineVariant[]
+  isLoading: boolean
+  error: string | null
+
+  // Actions
+  refetch: () => Promise<void>
+}
+
+export function useWineData(options: UseWineDataOptions = {}): UseWineDataReturn {
   const {
     variants,
     filteredVariants,
@@ -53,14 +65,10 @@ export function useWineData(options: UseWineDataOptions = {}) {
         const { type } = options.currentCollection
 
         // Map collection types to field names
-        const fieldMap: Record<string, string> = {
-          regions: 'regionTitle',
-          wineries: 'wineryTitle',
-          wineCountries: 'countryTitle',
-          styles: 'styleTitle',
-        }
-
-        const fieldName = fieldMap[type]
+        const fieldName =
+          HOOK_CONSTANTS.COLLECTION_TYPE_FIELDS[
+            type as keyof typeof HOOK_CONSTANTS.COLLECTION_TYPE_FIELDS
+          ]
         if (fieldName) {
           // For now, we'll fetch all and filter client-side
           // This could be optimized later with server-side filtering
@@ -89,7 +97,7 @@ export function useWineData(options: UseWineDataOptions = {}) {
 
       setVariants(response.docs as unknown as FlatWineVariant[])
     } catch (error) {
-      const errorMessage = 'Failed to fetch wine variants'
+      const errorMessage = HOOK_CONSTANTS.ERROR_MESSAGES.WINE_VARIANTS_FETCH_FAILED
       logger.error(errorMessage, { error, currentCollection: options.currentCollection?.type })
       setError(errorMessage)
     } finally {
@@ -141,14 +149,6 @@ export function useWineData(options: UseWineDataOptions = {}) {
     hasFetched,
     setHasFetched,
   ])
-
-  // Debug logging - only in development
-  if (process.env.NODE_ENV === 'development') {
-    logger.info('useWineData debug', {
-      variantsCount: variants.length,
-      filteredVariantsCount: filteredVariants.length,
-    })
-  }
 
   return {
     // Data

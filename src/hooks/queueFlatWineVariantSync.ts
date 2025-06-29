@@ -1,17 +1,18 @@
 import type { CollectionAfterChangeHook } from 'payload'
 import { createLogger } from '@/lib/logger'
 import { WineVariantSyncService } from '@/services/WineVariantSyncService'
+import { HOOK_CONSTANTS } from '@/constants/hooks'
 
 export const queueFlatWineVariantSync: CollectionAfterChangeHook = async ({
   doc,
   req,
   operation,
   previousDoc,
-}) => {
+}): Promise<typeof doc> => {
   const logger = createLogger(req, {
     task: 'queueFlatWineVariantSync',
     operation,
-    collection: 'wine-variants',
+    collection: HOOK_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
     id: doc.id,
   })
 
@@ -29,7 +30,9 @@ export const queueFlatWineVariantSync: CollectionAfterChangeHook = async ({
       await WineVariantSyncService.queueSyncJob({ doc, req, logger })
     }
   } catch (error) {
-    logger.error('Failed to queue flat wine variant job', error as Error)
+    logger.error(HOOK_CONSTANTS.ERROR_MESSAGES.FLAT_WINE_VARIANT_SYNC_FAILED, error as Error)
     throw error // Re-throw to let Payload handle the error
   }
+
+  return doc
 }
