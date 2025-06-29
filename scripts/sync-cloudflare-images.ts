@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
 import payloadConfig from '../src/payload.config'
+import { logger } from '../src/lib/logger'
 
 interface CloudflareImage {
   id: string
@@ -60,7 +61,7 @@ async function getAllCloudflareImages(): Promise<CloudflareImage[]> {
   let continuationToken: string | undefined
 
   do {
-    console.log(`📥 Fetching images${continuationToken ? ' (continued)' : ''}...`)
+    logger.info(`Fetching images${continuationToken ? ' (continued)' : ''}...`)
     const images = await fetchCloudflareImages(continuationToken)
     allImages.push(...images)
 
@@ -82,13 +83,15 @@ async function getAllCloudflareImages(): Promise<CloudflareImage[]> {
 }
 
 async function syncCloudflareImagesToPayload(): Promise<void> {
+  const taskLogger = logger.child({ task: 'syncCloudflareImages' })
+
   try {
     const payload = await getPayload({ config: payloadConfig })
 
-    console.log('🔄 Fetching images from Cloudflare...')
+    taskLogger.info('Fetching images from Cloudflare...')
     const cloudflareImages = await getAllCloudflareImages()
 
-    console.log(`📊 Found ${cloudflareImages.length} images in Cloudflare`)
+    taskLogger.info(`Found ${cloudflareImages.length} images in Cloudflare`)
 
     let created = 0
     let skipped = 0
@@ -108,7 +111,7 @@ async function syncCloudflareImagesToPayload(): Promise<void> {
         })
 
         if (existingMedia.docs.length > 0) {
-          console.log(`⏭️  Skipping ${image.filename} - already exists`)
+          taskLogger.debug(`Skipping ${image.filename} - already exists`)
           skipped++
           continue
         }
@@ -132,21 +135,22 @@ async function syncCloudflareImagesToPayload(): Promise<void> {
           data: mediaData,
         })
 
-        console.log(`✅ Created Media for ${image.filename}`)
+        taskLogger.info(`Created Media for ${image.filename}`)
         created++
       } catch (error) {
-        console.error(`❌ Error creating Media for ${image.filename}:`, error)
+        taskLogger.error(`Error creating Media for ${image.filename}:`, error)
         errors++
       }
     }
 
-    console.log('\n📈 Sync Summary:')
-    console.log(`✅ Created: ${created}`)
-    console.log(`⏭️  Skipped: ${skipped}`)
-    console.log(`❌ Errors: ${errors}`)
-    console.log(`📊 Total processed: ${cloudflareImages.length}`)
+    taskLogger.info('Sync Summary', {
+      created,
+      skipped,
+      errors,
+      total: cloudflareImages.length,
+    })
   } catch (error) {
-    console.error('❌ Error syncing Cloudflare images:', error)
+    taskLogger.error('Error syncing Cloudflare images:', error)
   }
 }
 

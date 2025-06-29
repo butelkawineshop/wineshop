@@ -3,7 +3,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
 import payloadConfig from '../src/payload.config'
-import { createLogger } from '../src/lib/logger'
+import { logger } from '../src/lib/logger'
 import { FlatWineVariantService } from '../src/services/FlatWineVariantService'
 import { RelatedWinesService } from '../src/services/RelatedWinesService'
 import type { FlatWineVariant } from '../src/payload-types'
@@ -24,12 +24,12 @@ async function populateRelatedWines(): Promise<void> {
   })
 
   const mockReq = { payload } as any
-  const logger = createLogger(mockReq, { task: 'populateRelatedWines' })
+  const taskLogger = logger.child({ task: 'populateRelatedWines' })
   const flatWineVariantService = new FlatWineVariantService(mockReq)
-  const relatedWinesService = new RelatedWinesService(mockReq, logger)
+  const relatedWinesService = new RelatedWinesService(mockReq, taskLogger)
 
   try {
-    logger.info('Starting related wines population')
+    taskLogger.info('Starting related wines population')
 
     // Get all flat wine variants
     const { docs: flatVariants } = await payload.find({
@@ -41,14 +41,14 @@ async function populateRelatedWines(): Promise<void> {
       depth: 1,
     })
 
-    logger.info(`Found ${flatVariants.length} flat wine variants to process`)
+    taskLogger.info(`Found ${flatVariants.length} flat wine variants to process`)
 
     let processedCount = 0
     let errorCount = 0
 
     for (const flatVariant of flatVariants as FlatWineVariant[]) {
       try {
-        logger.debug(`Processing variant ${flatVariant.id}`)
+        taskLogger.debug(`Processing variant ${flatVariant.id}`)
 
         // Find related wines using the service
         const relatedVariants = await relatedWinesService.findRelatedWinesIntelligently(flatVariant)
@@ -59,21 +59,21 @@ async function populateRelatedWines(): Promise<void> {
         processedCount++
 
         if (processedCount % 100 === 0) {
-          logger.info(`Processed ${processedCount}/${flatVariants.length} variants`)
+          taskLogger.info(`Processed ${processedCount}/${flatVariants.length} variants`)
         }
       } catch (error) {
         errorCount++
-        logger.error(`Error processing variant ${flatVariant.id}`, error as Error)
+        taskLogger.error(`Error processing variant ${flatVariant.id}`, error as Error)
       }
     }
 
-    logger.info(`Completed related wines population`, {
+    taskLogger.info(`Completed related wines population`, {
       total: flatVariants.length,
       processed: processedCount,
       errors: errorCount,
     })
   } catch (error) {
-    logger.error('Error in populateRelatedWines', error as Error)
+    taskLogger.error('Error in populateRelatedWines', error as Error)
     throw error
   } finally {
     await payload.destroy()

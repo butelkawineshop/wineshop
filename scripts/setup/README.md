@@ -1,240 +1,227 @@
 # Seeding Scripts
 
-This directory contains seeding scripts for the wineshop project. These scripts populate the database with initial data for wine countries, regions, wineries, tags, and moods.
+This directory contains scripts for seeding the wineshop database with initial data. All scripts follow a consistent pattern and use a shared utility for localized collections.
 
-## Scripts Overview
+## Structure
 
-### Individual Scripts
-
-- **`seed-wine-countries.ts`** - Seeds wine countries (Slovenia, Italy, France, Spain, Germany, etc.)
-- **`seed-tags.ts`** - Seeds wine tags (farming practices, characteristics, types, etc.)
-- **`seed-grape-varieties.ts`** - Seeds grape varieties (Cabernet Sauvignon, Merlot, Pinot Noir, etc.)
-- **`seed-wine-regions.ts`** - Seeds wine regions (Primorska, Tuscany, Bordeaux, etc.)
-- **`seed-wineries.ts`** - Seeds wineries (Movia, Antinori, Château Margaux, etc.)
-- **`seed-moods.ts`** - Seeds wine moods (social occasions, relaxation, celebrations, etc.)
-
-### Master Script
-
-- **`seed-all.ts`** - Runs all seeding scripts in the correct order
-
-## Usage
-
-### Prerequisites
-
-1. Make sure your database is running and accessible
-2. Ensure your environment variables are properly configured
-3. The application should be built and ready to run
-
-### Running Individual Scripts
-
-To run a specific seeding script:
-
-```bash
-# Using pnpm (recommended)
-pnpm tsx scripts/seed-wine-countries.ts
-pnpm tsx scripts/seed-tags.ts
-pnpm tsx scripts/seed-grape-varieties.ts
-pnpm tsx scripts/seed-wine-regions.ts
-pnpm tsx scripts/seed-wineries.ts
-pnpm tsx scripts/seed-moods.ts
-
-# Using node directly
-node --loader tsx scripts/seed-wine-countries.ts
 ```
-
-### Running All Scripts
-
-To run all seeding scripts in the correct order:
-
-```bash
-# Using pnpm (recommended)
-pnpm tsx scripts/seed-all.ts
-
-# Using node directly
-node --loader tsx scripts/seed-all.ts
+scripts/setup/
+├── README.md                           # This file
+├── seed-all.ts                         # Main script to run all seeding
+├── seedLocalizedCollection.ts          # Shared utility for localized seeding
+├── seed-climates.ts                    # Seed climate data
+├── climates.data.ts                    # Climate data definitions
+├── seed-moods.ts                       # Seed mood data
+├── moods.data.ts                       # Mood data definitions
+├── seed-styles.ts                      # Seed wine style data
+├── styles.data.ts                      # Style data definitions
+├── seed-tags.ts                        # Seed tag data
+├── tags.data.ts                        # Tag data definitions
+├── seed-wine-countries.ts              # Seed wine country data
+├── wine-countries.data.ts              # Wine country data definitions
+├── seed-wine-regions.ts                # Seed wine region data
+├── wine-regions.data.ts                # Wine region data definitions
+├── seed-wineries.ts                    # Seed winery data
+├── wineries.data.ts                    # Winery data definitions
+├── seed-grape-varieties.ts             # Seed grape variety data
+├── grape-varieties.data.ts             # Grape variety data definitions
+├── seed-wines.ts                       # Seed wine data
+└── wines.data.ts                       # Wine data definitions
 ```
-
-### Adding to package.json Scripts
-
-You can add these scripts to your `package.json` for easier access:
-
-```json
-{
-  "scripts": {
-    "seed:countries": "tsx scripts/seed-wine-countries.ts",
-    "seed:tags": "tsx scripts/seed-tags.ts",
-    "seed:grape-varieties": "tsx scripts/seed-grape-varieties.ts",
-    "seed:regions": "tsx scripts/seed-wine-regions.ts",
-    "seed:wineries": "tsx scripts/seed-wineries.ts",
-    "seed:moods": "tsx scripts/seed-moods.ts",
-    "seed:all": "tsx scripts/seed-all.ts"
-  }
-}
-```
-
-Then you can run them with:
-
-```bash
-pnpm run seed:all
-pnpm run seed:countries
-pnpm run seed:tags
-pnpm run seed:grape-varieties
-# etc.
-```
-
-## Data Structure
-
-### Wine Countries
-
-- **Slovenia** - Small but proud wine-growing country with unique varieties
-- **Italy** - One of the largest wine-producing countries with 350+ varieties
-- **France** - World capital of winemaking with prestigious regions
-- **Spain** - Largest vineyard area in the world
-- **Germany** - World-renowned for white wines, especially Riesling
-- **Austria** - High-quality white wines
-- **Croatia** - Rich tradition with indigenous varieties
-- **United States** - Diverse climate zones, especially California
-- **Australia** - Innovative approach to winemaking
-- **New Zealand** - Young but successful with unique climate
-
-### Grape Varieties
-
-- **Red varieties**: Cabernet Sauvignon, Merlot, Pinot Noir, Syrah, Grenache, Tempranillo, Sangiovese, Nebbiolo, Malbec, Refošk, Teran, Modra Frankinja
-- **White varieties**: Chardonnay, Riesling, Sauvignon Blanc, Pinot Grigio, Gewürztraminer, Malvazija, Laški Rizling, Gruner Veltliner
-- **Slovenian varieties**: Refošk, Teran, Modra Frankinja, Malvazija, Laški Rizling, Pinela, Zelen, Cviček
-- **International varieties**: Cabernet Sauvignon, Merlot, Pinot Noir, Chardonnay, Riesling, Sauvignon Blanc
-
-### Wine Regions
-
-- **Slovenia**: Primorska, Posavje, Podravje
-- **Italy**: Tuscany, Piedmont, Veneto
-- **France**: Bordeaux, Burgundy, Champagne
-- **Spain**: Rioja, Priorat
-- **Germany**: Mosel, Rheingau
-
-### Wineries
-
-- **Slovenia**: Movia, Klet Brda, Edi Simčič, Klet Krško, Klet Jeruzalem Ormož
-- **Italy**: Antinori, Tenuta San Guido, Gaja
-- **France**: Château Margaux, Château Lafite Rothschild, Domaine de la Romanée-Conti
-- **Spain**: Bodegas Vega Sicilia
-- **Germany**: Weingut Egon Müller
-
-### Tags
-
-Categories include:
-
-- **Farming practices**: Biodynamic, Organic, Natural, Traditional
-- **Wine characteristics**: Elegant, Complex, Powerful, Light, Refreshing, Mineral
-- **Wine types**: Red, White, Rosé, Sparkling, Sweet, Dry
-- **Special categories**: Cviček, Rebula, Teran, Refošk
-- **Quality indicators**: Prestigious, Quality, Exclusive, Long-aged
-- **Production methods**: Cooperative, Family, Innovative, Revolutionary
-- **Special classifications**: First Growth, Super Tuscan, Barolo, Sassicaia, Riesling
-
-### Moods
-
-Categories include:
-
-- **Social occasions**: Family Dinner, Romantic Dinner, Friends Gathering, Business Dinner
-- **Relaxation**: Relaxing by the Fire, Evening Chill, Weekend Relaxation, Spa Evening
-- **Celebration**: Birthday, Wedding, New Year, Holiday
-- **Food pairing**: Seafood, Grilled Meat, Italian Cuisine, Desserts
-- **Seasonal**: Spring, Summer, Autumn, Winter
-- **Activity-based**: Movie Night, Reading a Book, Music, Cooking
-- **Emotional**: Joy, Melancholy, Inspiration, Appreciation
-- **Lifestyle**: Wellness, Luxury, Adventure, Tradition
-- **Time-based**: Breakfast, Lunch, Dinner, Late Night
 
 ## Features
 
-### Error Handling
+- **Localized Collections**: All scripts support both Slovenian (sl) and English (en) locales
+- **Shared Utility**: Uses `seedLocalizedCollection.ts` to eliminate code duplication
+- **Data Separation**: Data definitions are separated into `.data.ts` files for better maintainability
+- **Structured Logging**: Consistent logging using the project's logger
+- **Error Handling**: Comprehensive error handling with detailed logging
+- **Dependency Management**: Scripts run in the correct order to handle relationships
 
-- Each script includes comprehensive error handling
-- Failed items are logged but don't stop the entire process
-- Duplicate checking prevents re-seeding existing data
+## Usage
 
-### Logging
+### Run All Seeding
 
-- Uses the project's logger system
-- Detailed logging for each operation
-- Context information for debugging
+```bash
+npm run seed:all
+# or
+pnpm seed:all
+```
 
-### Idempotency
+### Run Individual Scripts
 
-- Scripts check for existing data before creating new entries
-- Safe to run multiple times without creating duplicates
-- Uses Slovenian titles for duplicate checking
+```bash
+# Seed climates
+npm run seed:climates
 
-### Dependencies
+# Seed moods
+npm run seed:moods
 
-The scripts handle dependencies automatically:
+# Seed styles
+npm run seed:styles
 
-1. **Countries** must exist before **Regions** (regions reference countries)
-2. **Tags** must exist before **Wineries** (wineries reference tags)
-3. **Grape Varieties** must exist before **Regions** (regions can reference grape varieties)
-4. **Regions** must exist before **Wineries** (wineries reference regions)
+# Seed tags
+npm run seed:tags
+
+# Seed wine countries
+npm run seed:wine-countries
+
+# Seed wine regions
+npm run seed:wine-regions
+
+# Seed wineries
+npm run seed:wineries
+
+# Seed grape varieties
+npm run seed:grape-varieties
+
+# Seed wines
+npm run seed:wines
+```
+
+## Scripts Overview
+
+### `seed-all.ts`
+
+Main script that runs all seeding operations in the correct dependency order:
+
+1. Climates
+2. Moods
+3. Styles
+4. Tags
+5. Wine Countries
+6. Wine Regions
+7. Wineries
+8. Grape Varieties
+9. Wines
+
+### `seedLocalizedCollection.ts`
+
+Shared utility that handles:
+
+- Existence checking to avoid duplicates
+- Creation in Slovenian locale
+- Update in English locale
+- Structured logging
+- Error handling
+
+### Data Files
+
+Each seeding script has a corresponding `.data.ts` file containing:
+
+- TypeScript interfaces for type safety
+- Data arrays with localized content
+- Proper categorization and organization
+
+## Data Structure
+
+### Climates
+
+- Climate types (desert, maritime, mediterranean, continental, alpine)
+- Temperature ranges (cool, moderate, warm, hot)
+- Humidity levels (dry, moderate, humid)
+- Diurnal temperature ranges (low, medium, high)
+
+### Moods
+
+- Wine drinking occasions and moods
+- Netflix & Chill, Picnic, Date Night, etc.
+- Localized descriptions for each mood
+
+### Styles
+
+- Wine styles (White, Red, Rosé, Sparkling, etc.)
+- Icon keys for UI representation
+- Detailed descriptions of each style
+
+### Tags
+
+- Wine characteristics and production methods
+- Biodynamics, Organic, Natural, etc.
+- Educational content about wine making
+
+### Wine Countries
+
+- Major wine-producing countries
+- Country codes and descriptions
+- Historical and cultural context
+
+### Wine Regions
+
+- Specific wine regions within countries
+- Regional characteristics and specialties
+- Climate and terroir information
+
+### Wineries
+
+- Notable wineries from around the world
+- Founding dates and websites
+- Regional affiliations
+
+### Grape Varieties
+
+- White, red, and pink grape varieties
+- Origin countries and descriptions
+- Wine type classifications
+
+### Wines
+
+- Sample wines from various regions
+- Complete wine profiles with technical details
+- Pricing and vintage information
 
 ## Customization
 
 ### Adding New Data
 
-To add new data, edit the respective data arrays in each script:
+1. Create a new `.data.ts` file with your data structure
+2. Create a new seeding script using `seedLocalizedCollection`
+3. Add the script to `seed-all.ts` in the correct order
+4. Update this README with the new script
 
-1. **Wine Countries**: Add to `wineCountriesData` array in `seed-wine-countries.ts`
-2. **Tags**: Add to `tagsData` array in `seed-tags.ts`
-3. **Grape Varieties**: Add to `grapeVarietiesData` array in `seed-grape-varieties.ts`
-4. **Wine Regions**: Add to `wineRegionsData` array in `seed-wine-regions.ts`
-5. **Wineries**: Add to `wineriesData` array in `seed-wineries.ts`
-6. **Moods**: Add to `moodsData` array in `seed-moods.ts`
+### Modifying Existing Data
 
-### Data Structure
+1. Edit the appropriate `.data.ts` file
+2. Run the specific seeding script to update the database
+3. The script will handle existing records appropriately
 
-Each data item follows the collection's field structure:
+### Adding New Fields
 
-- Required fields must be provided
-- Optional fields can be omitted
-- Localized fields use `{ sl: 'Slovenian', en: 'English' }` format
-- Relationships use IDs or slugs as appropriate
+1. Update the TypeScript interface in the `.data.ts` file
+2. Update the `getSlData` and `getEnData` functions in the seeding script
+3. Ensure the Payload collection schema supports the new fields
 
-### Running in Development
+## Best Practices
 
-For development environments, you might want to add a development-specific script:
-
-```bash
-# Add to package.json
-"seed:dev": "cross-env NODE_ENV=development tsx scripts/seed-all.ts"
-```
+- **Data Consistency**: Ensure all localized content is provided for both languages
+- **Type Safety**: Use TypeScript interfaces for all data structures
+- **Logging**: Use structured logging with appropriate task and context information
+- **Error Handling**: Always handle errors gracefully and provide meaningful error messages
+- **Dependencies**: Consider the order of seeding when dealing with related collections
+- **Testing**: Test seeding scripts in a development environment before production
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Database Connection**: Ensure your database is running and accessible
-2. **Environment Variables**: Check that all required environment variables are set
-3. **Permissions**: Ensure the application has proper database permissions
-4. **Dependencies**: Make sure all required packages are installed
+1. **Missing Relationships**: Ensure all referenced entities exist before seeding dependent data
+2. **Duplicate Entries**: Scripts check for existing entries, but verify your unique field logic
+3. **Locale Issues**: Ensure both Slovenian and English content is provided
+4. **Type Errors**: Check that your data matches the TypeScript interfaces
 
-### Logs
+### Debugging
 
-Check the console output for detailed logs. Each operation is logged with:
+- Check the logs for detailed error information
+- Verify that all required collections exist in Payload
+- Ensure environment variables are properly configured
+- Test individual scripts before running the full seeding process
 
-- Success/failure status
-- Item being processed
-- Error details (if any)
-- Context information
+## Contributing
 
-### Partial Seeding
+When adding new seeding scripts or modifying existing ones:
 
-If a script fails partway through, you can:
-
-1. Fix the issue
-2. Run the script again (it will skip existing items)
-3. Or run individual scripts to complete the missing data
-
-## Notes
-
-- All text is provided in both Slovenian (sl) and English (en)
-- Scripts follow the project's coding conventions
-- Data is realistic and representative of actual wine industry
-- Scripts are designed to be maintainable and extensible
+1. Follow the established pattern using `seedLocalizedCollection`
+2. Separate data into `.data.ts` files
+3. Update this README with any new information
+4. Test thoroughly in development
+5. Ensure all TypeScript types are properly defined

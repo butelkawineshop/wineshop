@@ -3,6 +3,7 @@ import { readdir, readFile } from 'fs/promises'
 import { join } from 'path'
 import { getPayload } from 'payload'
 import payloadConfig from '../src/payload.config'
+import { logger } from '../src/lib/logger'
 
 interface WineImage {
   filename: string
@@ -31,7 +32,8 @@ function parseImageBaseName(baseName: string) {
 }
 
 async function uploadWineImages() {
-  console.log('🚀 Starting wine image upload via Payload CMS...\n')
+  const taskLogger = logger.child({ task: 'uploadWineImages' })
+  taskLogger.info('Starting wine image upload via Payload CMS...')
 
   try {
     // Initialize Payload
@@ -52,7 +54,7 @@ async function uploadWineImages() {
         filePath: join(wineImagesDir, file),
       }))
 
-    console.log(`📁 Found ${wineImages.length} wine images\n`)
+    taskLogger.info(`Found ${wineImages.length} wine images`)
 
     // Get all wine variants from the database
     const wineVariantsResponse = await payload.find({
@@ -62,7 +64,7 @@ async function uploadWineImages() {
     })
 
     const wineVariants = wineVariantsResponse.docs as WineVariant[]
-    console.log(`🍷 Found ${wineVariants.length} wine variants in database\n`)
+    taskLogger.info(`Found ${wineVariants.length} wine variants in database`)
 
     // Create a mapping of wine variant slugs to their IDs
     const wineVariantList = wineVariants
@@ -74,12 +76,12 @@ async function uploadWineImages() {
 
     for (const image of wineImages) {
       try {
-        console.log(`📸 Processing: ${image.filename}`)
+        taskLogger.debug(`Processing: ${image.filename}`)
 
         // Parse the image base name
         const parsed = parseImageBaseName(image.baseName)
         if (!parsed) {
-          console.log(`   ❌ Could not parse image base name: ${image.baseName}`)
+          taskLogger.warn(`Could not parse image base name: ${image.baseName}`)
           errorCount++
           continue
         }
@@ -92,17 +94,17 @@ async function uploadWineImages() {
         )
 
         if (matches.length === 0) {
-          console.log(`   ❌ No matching wine variant found for: ${image.baseName}`)
+          taskLogger.warn(`No matching wine variant found for: ${image.baseName}`)
           errorCount++
           continue
         }
         if (matches.length > 1) {
-          console.log(
-            `   ⚠️  Multiple matches for: ${image.baseName} -> [${matches.map((m) => m.slug).join(', ')}]`,
+          taskLogger.warn(
+            `Multiple matches for: ${image.baseName} -> [${matches.map((m) => m.slug).join(', ')}]`,
           )
         }
         const matchingVariant = matches[0]
-        console.log(`   ✅ Would match wine variant: ${matchingVariant.slug}`)
+        taskLogger.debug(`Would match wine variant: ${matchingVariant.slug}`)
 
         if (DRY_RUN) continue
 
@@ -118,7 +120,7 @@ async function uploadWineImages() {
         })
 
         if (existingMedia.docs.length > 0) {
-          console.log(`   ⏭️  Already exists, skipping`)
+          taskLogger.debug(`Already exists, skipping`)
           skippedCount++
           continue
         }
@@ -144,7 +146,7 @@ async function uploadWineImages() {
           file: file,
         })
 
-        console.log(`   ✅ Uploaded successfully! Media ID: ${mediaDoc.id}`)
+        taskLogger.info(`Uploaded successfully! Media ID: ${mediaDoc.id}`)
 
         // Update the wine variant with the image
         await payload.update({
@@ -155,21 +157,22 @@ async function uploadWineImages() {
           },
         })
 
-        console.log(`   ✅ Linked image to wine variant: ${matchingVariant.slug}`)
+        taskLogger.info(`Linked image to wine variant: ${matchingVariant.slug}`)
         uploadedCount++
       } catch (error) {
-        console.error(`   ❌ Error processing ${image.filename}:`, error)
+        taskLogger.error(`Error processing ${image.filename}:`, error)
         errorCount++
       }
     }
 
-    console.log('\n📊 Upload Summary:')
-    console.log(`   ✅ Successfully uploaded: ${uploadedCount}`)
-    console.log(`   ⏭️  Skipped (already exists): ${skippedCount}`)
-    console.log(`   ❌ Errors: ${errorCount}`)
-    console.log(`   📁 Total images processed: ${wineImages.length}`)
+    taskLogger.info('Upload Summary', {
+      uploaded: uploadedCount,
+      skipped: skippedCount,
+      errors: errorCount,
+      total: wineImages.length,
+    })
   } catch (error) {
-    console.error('❌ Script failed:', error)
+    taskLogger.error('Script failed:', error)
     process.exit(1)
   }
 }
@@ -192,10 +195,10 @@ function getMimeType(filename: string): string {
 // Run the script
 uploadWineImages()
   .then(() => {
-    console.log('\n🎉 Wine image upload completed!')
+    console.log('Wine image upload completed!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n💥 Script failed:', error)
+    console.error('Script failed:', error)
     process.exit(1)
   })

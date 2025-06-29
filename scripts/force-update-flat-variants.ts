@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
 import payloadConfig from '../src/payload.config'
-import { createLogger } from '../src/lib/logger'
+import { logger } from '../src/lib/logger'
 import { FlatWineVariantService } from '../src/services/FlatWineVariantService'
 import { RelatedWinesService } from '../src/services/RelatedWinesService'
 import { SYNC_CONSTANTS } from '../src/constants/sync'
@@ -16,12 +16,12 @@ async function forceUpdateFlatVariants(): Promise<void> {
   })
 
   const mockReq = { payload } as any
-  const logger = createLogger(mockReq, { task: 'forceUpdateFlatVariants' })
+  const taskLogger = logger.child({ task: 'forceUpdateFlatVariants' })
   const flatWineVariantService = new FlatWineVariantService(mockReq)
-  const relatedWinesService = new RelatedWinesService(mockReq, logger)
+  const relatedWinesService = new RelatedWinesService(mockReq, taskLogger)
 
   try {
-    logger.info('Starting force update of flat wine variants using services')
+    taskLogger.info('Starting force update of flat wine variants using services')
 
     // Get all wine variants with full depth
     const wineVariants = await payload.find({
@@ -31,7 +31,7 @@ async function forceUpdateFlatVariants(): Promise<void> {
       locale: SYNC_CONSTANTS.DEFAULT_LOCALE,
     })
 
-    logger.info(`Found ${wineVariants.docs.length} wine variants to process`)
+    taskLogger.info(`Found ${wineVariants.docs.length} wine variants to process`)
 
     let successCount = 0
     let errorCount = 0
@@ -40,7 +40,7 @@ async function forceUpdateFlatVariants(): Promise<void> {
     // Process all variants using the services
     for (const wineVariant of wineVariants.docs as WineVariant[]) {
       try {
-        logger.debug(`Processing wine variant ${wineVariant.id}`)
+        taskLogger.debug(`Processing wine variant ${wineVariant.id}`)
 
         // Use the service to sync the wine variant
         const syncResult = await flatWineVariantService.syncWineVariant(String(wineVariant.id))
@@ -68,39 +68,42 @@ async function forceUpdateFlatVariants(): Promise<void> {
                 flatVariant.id,
                 relatedVariants,
               )
-              logger.debug(`Related wines updated for variant ${wineVariant.id}`)
+              taskLogger.debug(`Related wines updated for variant ${wineVariant.id}`)
             } catch (error) {
-              logger.warn(`Failed to update related wines for variant ${wineVariant.id}:`, error)
+              taskLogger.warn(
+                `Failed to update related wines for variant ${wineVariant.id}:`,
+                error,
+              )
               // Don't fail the entire process for related wines errors
             }
           }
 
           successCount++
         } else {
-          logger.warn(`Failed to sync variant ${wineVariant.id}: ${syncResult.message}`)
+          taskLogger.warn(`Failed to sync variant ${wineVariant.id}: ${syncResult.message}`)
           errorCount++
         }
 
         if (successCount % 10 === 0) {
-          logger.info(`Processed ${successCount} flat variants`)
+          taskLogger.info(`Processed ${successCount} flat variants`)
         }
       } catch (error: any) {
         errorCount++
-        logger.error(
+        taskLogger.error(
           `Failed to process flat variant for ${wineVariant.id}:`,
           error && error.stack ? error.stack : error,
         )
 
         if (error.message && error.message.includes('Invalid wine data structure')) {
           skippedCount++
-          logger.warn(
+          taskLogger.warn(
             `Skipping variant ${wineVariant.id} - invalid data structure: ${error.message}`,
           )
         }
       }
     }
 
-    logger.info(
+    taskLogger.info(
       `Force update complete! Successfully processed ${successCount} flat variants, ${errorCount} errors, ${skippedCount} skipped`,
     )
 
@@ -110,9 +113,9 @@ async function forceUpdateFlatVariants(): Promise<void> {
       limit: 1000,
     })
 
-    logger.info(`Final count: ${finalFlatVariants.docs.length} flat variants`)
+    taskLogger.info(`Final count: ${finalFlatVariants.docs.length} flat variants`)
   } catch (error: any) {
-    logger.error('Failed to force update flat wine variants:', error)
+    taskLogger.error('Failed to force update flat wine variants:', error)
     throw error
   } finally {
     await payload.destroy()

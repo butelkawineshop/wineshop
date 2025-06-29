@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
 import payloadConfig from '../src/payload.config'
-import { createWineImageMapping, mapWineToImage } from '../src/utils/wineImageMapping'
+import { logger } from '../src/lib/logger'
 
 interface CloudflareImage {
   id: string
@@ -61,7 +61,7 @@ async function getAllCloudflareImages(): Promise<CloudflareImage[]> {
   let continuationToken: string | undefined
 
   do {
-    console.log(`📥 Fetching images${continuationToken ? ' (continued)' : ''}...`)
+    logger.info(`Fetching images${continuationToken ? ' (continued)' : ''}...`)
     const images = await fetchCloudflareImages(continuationToken)
     allImages.push(...images)
 
@@ -97,36 +97,35 @@ function findBestWineImageMatch(
   })
 
   // Debug: Show what's actually in the map
-  console.log(`\n🔍 Cloudflare image map contains ${cloudflareImageMap.size} images`)
-  console.log(`📝 Sample entries in map:`)
-  Array.from(cloudflareImageMap.entries())
-    .slice(0, 3)
-    .forEach(([key, img]) => {
-      console.log(`  "${key}" -> "${img.filename}"`)
-    })
+  logger.debug(`Cloudflare image map contains ${cloudflareImageMap.size} images`)
+  logger.debug('Sample entries in map:', {
+    sampleEntries: Array.from(cloudflareImageMap.entries())
+      .slice(0, 3)
+      .map(([key, img]) => ({ key, filename: img.filename })),
+  })
 
   // Generate multiple possible slug variations using intelligent pattern matching
   const possibleSlugs = generateIntelligentSlugs(wineSlug, vintage, size)
 
   // Debug: Show what we're trying to match
-  console.log(`\n🔍 Trying to match wine: ${wineSlug} (vintage: ${vintage}, size: ${size})`)
-  console.log(`📝 Generated slugs: ${possibleSlugs.slice(0, 5).join(', ')}`)
+  logger.debug(`Trying to match wine: ${wineSlug} (vintage: ${vintage}, size: ${size})`)
+  logger.debug(`Generated slugs: ${possibleSlugs.slice(0, 5).join(', ')}`)
 
   // Try each possible slug variation
   for (const slug of possibleSlugs) {
-    console.log(`  Trying: "${slug}"`)
+    logger.debug(`Trying: "${slug}"`)
 
     const match = cloudflareImageMap.get(slug.toLowerCase())
     if (match) {
-      console.log(`  ✅ MATCH FOUND: ${match.filename}`)
+      logger.debug(`MATCH FOUND: ${match.filename}`)
       return match
     }
   }
 
   // Debug: Show some available Cloudflare images for comparison
-  console.log(`  ❌ No match found. Available Cloudflare images (first 5):`)
-  const availableImages = Array.from(cloudflareImageMap.keys()).slice(0, 5)
-  availableImages.forEach((img) => console.log(`    - ${img}`))
+  logger.debug('No match found. Available Cloudflare images (first 5):', {
+    availableImages: Array.from(cloudflareImageMap.keys()).slice(0, 5),
+  })
 
   return null
 }
@@ -1164,48 +1163,51 @@ function generateLongNameSlugs(parts: string[], vintage: string, size: string): 
 }
 
 async function syncExistingWineImages(): Promise<void> {
+  const taskLogger = logger.child({ task: 'syncExistingWineImages' })
+
   try {
     const payload = await getPayload({ config: payloadConfig })
 
-    console.log('🔍 Fetching all Cloudflare images...')
+    taskLogger.info('Fetching all Cloudflare images...')
     const cloudflareImages = await getAllCloudflareImages()
-    console.log(`📊 Found ${cloudflareImages.length} images on Cloudflare`)
+    taskLogger.info(`Found ${cloudflareImages.length} images on Cloudflare`)
 
-    console.log('🍷 Fetching all wines...')
+    taskLogger.info('Fetching all wines...')
     const wines = await payload.find({
       collection: 'wines',
       limit: 1000,
     })
-    console.log(`📊 Found ${wines.docs.length} wines in database`)
+    taskLogger.info(`Found ${wines.docs.length} wines in database`)
 
-    console.log('📸 Fetching all Media records...')
+    taskLogger.info('Fetching all Media records...')
     const mediaRecords = await payload.find({
       collection: 'media',
       limit: 1000,
     })
-    console.log(`📊 Found ${mediaRecords.docs.length} Media records in database`)
+    taskLogger.info(`Found ${mediaRecords.docs.length} Media records in database`)
 
     // Debug: Show some Media record examples
-    console.log('📸 Sample Media records:')
-    mediaRecords.docs.slice(0, 5).forEach((media) => {
-      console.log(`  - ID: ${media.id}`)
-      console.log(`    Filename: ${media.filename}`)
-      console.log(`    OriginalFilename: ${media.originalFilename}`)
-      console.log(`    Alt: ${media.alt}`)
-      console.log(`    URL: ${media.url}`)
-      console.log(`    All fields:`, Object.keys(media))
-      console.log('')
+    taskLogger.debug('Sample Media records:', {
+      sampleRecords: mediaRecords.docs.slice(0, 5).map((media) => ({
+        id: media.id,
+        filename: media.filename,
+        originalFilename: media.originalFilename,
+        alt: media.alt,
+        url: media.url,
+        fields: Object.keys(media),
+      })),
     })
 
     // Debug: Show some Cloudflare image examples
-    console.log('🔍 Sample Cloudflare images:')
-    cloudflareImages.slice(0, 5).forEach((img) => {
-      const imgSlug = img.filename.replace(/\.(webp|jpg|png)$/, '').replace(/-\\d{13,}$/, '')
-      console.log(`  - ${imgSlug}`)
+    taskLogger.debug('Sample Cloudflare images:', {
+      sampleImages: cloudflareImages.slice(0, 5).map((img) => {
+        const imgSlug = img.filename.replace(/\.(webp|jpg|png)$/, '').replace(/-\\d{13,}$/, '')
+        return imgSlug
+      }),
     })
 
     // Now let's show which wines have images and which don't, and link them
-    console.log('\n🍷 Wine Image Status:')
+    taskLogger.info('Wine Image Status:')
     const winesWithImages = new Set()
     const matchedCloudflareImages = new Set()
     let linkedVariants = 0
@@ -1218,39 +1220,44 @@ async function syncExistingWineImages(): Promise<void> {
       // Check each variant of the wine
       if (wine.variants && wine.variants.docs && wine.variants.docs.length > 0) {
         for (const variant of wine.variants.docs) {
-          const vintage = variant.vintage?.toString() || ''
-          const size = variant.size || ''
+          // Type guard to ensure variant is an object with the expected properties
+          if (typeof variant === 'object' && variant !== null) {
+            const variantObj = variant as any
+            const vintage = variantObj.vintage?.toString() || ''
+            const size = variantObj.size || ''
 
-          // Use the intelligent matching function
-          const matchingCloudflareImage = findBestWineImageMatch(
-            wine.slug,
-            vintage,
-            size,
-            cloudflareImages,
-          )
-
-          if (matchingCloudflareImage) {
-            hasImage = true
-            matchedCloudflareImages.add(matchingCloudflareImage.filename)
-            console.log(
-              `✅ ${wine.title} (${wine.slug}) - Found image: ${matchingCloudflareImage.filename}`,
+            // Use the intelligent matching function
+            const matchingCloudflareImage = findBestWineImageMatch(
+              wine.slug,
+              vintage,
+              size,
+              cloudflareImages,
             )
 
-            // Now link the image to the wine variant
-            await linkWineVariantToImage(
-              payload,
-              wine,
-              variant,
-              matchingCloudflareImage,
-              mediaRecords.docs,
-            )
-            linkedVariants++
-          } else {
-            // Generate some example slugs for debugging
-            const exampleSlugs = generateIntelligentSlugs(wine.slug, vintage, size).slice(0, 3)
-            console.log(
-              `❌ ${wine.title} (${wine.slug}) - No image found. Tried slugs: ${exampleSlugs.join(', ')}`,
-            )
+            if (matchingCloudflareImage) {
+              hasImage = true
+              matchedCloudflareImages.add(matchingCloudflareImage.filename)
+              taskLogger.info(
+                `${wine.title} (${wine.slug}) - Found image: ${matchingCloudflareImage.filename}`,
+              )
+
+              // Now link the image to the wine variant
+              await linkWineVariantToImage(
+                payload,
+                wine,
+                variantObj,
+                matchingCloudflareImage,
+                mediaRecords.docs,
+                taskLogger,
+              )
+              linkedVariants++
+            } else {
+              // Generate some example slugs for debugging
+              const exampleSlugs = generateIntelligentSlugs(wine.slug, vintage, size).slice(0, 3)
+              taskLogger.warn(
+                `${wine.title} (${wine.slug}) - No image found. Tried slugs: ${exampleSlugs.join(', ')}`,
+              )
+            }
           }
         }
       }
@@ -1260,27 +1267,24 @@ async function syncExistingWineImages(): Promise<void> {
       }
     }
 
-    console.log(
-      `\n📊 Wine Image Coverage: ${winesWithImages.size}/${wines.docs.length} wines have images`,
-    )
-    console.log(
-      `📊 Matched Cloudflare Images: ${matchedCloudflareImages.size}/${cloudflareImages.length} images matched to wines`,
-    )
-    console.log(`🔗 Linked Variants: ${linkedVariants} wine variants linked to images`)
+    taskLogger.info('Wine Image Coverage', {
+      winesWithImages: winesWithImages.size,
+      totalWines: wines.docs.length,
+      matchedImages: matchedCloudflareImages.size,
+      totalImages: cloudflareImages.length,
+      linkedVariants,
+    })
 
     // Show unmatched Cloudflare images
     const unmatchedImages = cloudflareImages.filter(
       (img) => !matchedCloudflareImages.has(img.filename),
     )
-    console.log(`\n🔍 Unmatched Cloudflare Images (${unmatchedImages.length}):`)
-    unmatchedImages.slice(0, 20).forEach((img) => {
-      console.log(`  - ${img.filename}`)
+    taskLogger.info('Unmatched Cloudflare Images', {
+      count: unmatchedImages.length,
+      samples: unmatchedImages.slice(0, 20).map((img) => img.filename),
     })
-    if (unmatchedImages.length > 20) {
-      console.log(`  ... and ${unmatchedImages.length - 20} more`)
-    }
   } catch (error) {
-    console.error('❌ Error syncing Cloudflare images:', error)
+    taskLogger.error('Error syncing Cloudflare images:', error)
     process.exit(1)
   }
 }
@@ -1291,6 +1295,7 @@ async function linkWineVariantToImage(
   variant: any,
   cloudflareImage: CloudflareImage,
   mediaRecords: any[],
+  taskLogger: any,
 ): Promise<void> {
   try {
     // Extract the wine slug from the image filename
@@ -1318,7 +1323,7 @@ async function linkWineVariantToImage(
     let mediaId: number
 
     if (!mediaRecord) {
-      console.log(`  📸 Creating Media record for Cloudflare image: ${cloudflareImage.filename}`)
+      taskLogger.info(`Creating Media record for Cloudflare image: ${cloudflareImage.filename}`)
 
       // Create a new Media record for this Cloudflare image
       const newMediaRecord = await payload.create({
@@ -1338,16 +1343,16 @@ async function linkWineVariantToImage(
       })
 
       mediaId = newMediaRecord.id
-      console.log(`  ✅ Created Media record with ID: ${mediaId}`)
+      taskLogger.info(`Created Media record with ID: ${mediaId}`)
     } else {
       mediaId = mediaRecord.id
-      console.log(`  ✅ Found existing Media record with ID: ${mediaId}`)
+      taskLogger.info(`Found existing Media record with ID: ${mediaId}`)
     }
 
     // Check if the variant already has this media linked
     const currentMedia = variant.media || []
     if (currentMedia.some((m: any) => m.id === mediaId || m === mediaId)) {
-      console.log(`  ℹ️  Variant already has media linked: ${cloudflareImage.filename}`)
+      taskLogger.info(`Variant already has media linked: ${cloudflareImage.filename}`)
       return
     }
 
@@ -1363,9 +1368,9 @@ async function linkWineVariantToImage(
       },
     })
 
-    console.log(`  🔗 Linked image to variant: ${cloudflareImage.filename}`)
+    taskLogger.info(`Linked image to variant: ${cloudflareImage.filename}`)
   } catch (error) {
-    console.error(`  ❌ Error linking image to variant: ${error}`)
+    taskLogger.error(`Error linking image to variant: ${error}`)
   }
 }
 
