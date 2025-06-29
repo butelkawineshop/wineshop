@@ -19,10 +19,39 @@ import {
 } from '@/constants/filters'
 import { useWineStore } from '@/store/wine'
 import { ResetFilterButton } from './ResetFilterButton'
+import { logger } from '@/lib/logger'
+import type { FlatWineVariant } from '@/payload-types'
+
+// Use the actual structure from GraphQL function
+interface CollectionItem {
+  id: string
+  title:
+    | string
+    | {
+        sl: string
+        en?: string
+      }
+  slug?: string
+}
+
+type CollectionItemsMap = Record<string, CollectionItem[]>
+
+// Tasting notes range type - matches DEFAULT_TASTING_NOTES structure
+type TastingNotesRange = {
+  dry: [number, number]
+  ripe: [number, number]
+  creamy: [number, number]
+  oaky: [number, number]
+  complex: [number, number]
+  light: [number, number]
+  smooth: [number, number]
+  youthful: [number, number]
+  energetic: [number, number]
+  alcohol: [number, number]
+}
 
 interface WineFiltersClientProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  collectionItems: Record<string, any[]>
+  collectionItems: CollectionItemsMap
   currentCollection?: {
     id: string
     type: string
@@ -31,29 +60,18 @@ interface WineFiltersClientProps {
 }
 
 // Helper function to check if a filter key is an array filter
-const isArrayFilter = (key: string): boolean => {
-  return [
-    'regions',
-    'wineries',
-    'wineCountries',
-    'styles',
-    'aromas',
-    'moods',
-    'grape-varieties',
-    'tags',
-    'dishes',
-    'climates',
-  ].includes(key)
+const isArrayFilter = (key: string): key is (typeof FILTER_CONSTANTS.VALID_FILTER_KEYS)[number] => {
+  return FILTER_CONSTANTS.VALID_FILTER_KEYS.includes(key as any)
 }
 
 // Helper to get the effective price (future-proof for discounts)
-function getEffectivePrice(item: { price?: number | null }): number | undefined {
+function getEffectivePrice(item: FlatWineVariant): number | undefined {
   // In the future, check for discountedPrice here
   return typeof item.price === 'number' ? item.price : undefined
 }
 
 // Helper to get min/max price from wine variants in the store
-function getPriceBounds(wineVariants: { price?: number | null }[]): [number, number] {
+function getPriceBounds(wineVariants: FlatWineVariant[]): [number, number] {
   let min = Infinity
   let max = -Infinity
   wineVariants.forEach((item) => {
@@ -64,9 +82,17 @@ function getPriceBounds(wineVariants: { price?: number | null }[]): [number, num
     }
   })
   if (min === Infinity || max === -Infinity) {
-    return [0, 1000]
+    return [FILTER_CONSTANTS.PRICE.DEFAULT_MIN, FILTER_CONSTANTS.PRICE.DEFAULT_MAX]
   }
   return [Math.floor(min), Math.ceil(max)]
+}
+
+// Helper to get localized title from collection item
+function getLocalizedTitle(item: CollectionItem, locale: Locale): string {
+  if (typeof item.title === 'object') {
+    return locale === 'en' && item.title.en ? item.title.en : item.title.sl || item.title.en || ''
+  }
+  return item.title || ''
 }
 
 export default function WineFiltersClient({
@@ -86,22 +112,31 @@ export default function WineFiltersClient({
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
 
   // Debounced search queries for filtering
-  const debouncedSearchQueries = useDebounce(searchQueries, 200)
+  const debouncedSearchQueries = useDebounce(searchQueries, FILTER_CONSTANTS.DEBOUNCE.SEARCH)
 
   // Calculate price bounds from wine variants in the store
-  const [priceMin, priceMax] = React.useMemo(() => getPriceBounds(variants), [variants])
+  const [priceMin, priceMax] = React.useMemo(
+    () => getPriceBounds(variants as unknown as FlatWineVariant[]),
+    [variants],
+  )
 
   // Debounced state for immediate UI updates
   const [immediatePriceRange, setImmediatePriceRange] = useState<[number, number]>(
     filters?.priceRange || [priceMin, priceMax],
   )
-  const [immediateTastingNotes, setImmediateTastingNotes] = useState<typeof DEFAULT_TASTING_NOTES>(
+  const [immediateTastingNotes, setImmediateTastingNotes] = useState<TastingNotesRange>(
     filters?.tastingNotes || DEFAULT_TASTING_NOTES,
   )
 
   // Debounced values that will trigger API calls
-  const debouncedPriceRange = useDebounce(immediatePriceRange, 300)
-  const debouncedTastingNotes = useDebounce(immediateTastingNotes, 300)
+  const debouncedPriceRange = useDebounce(
+    immediatePriceRange,
+    FILTER_CONSTANTS.DEBOUNCE.PRICE_RANGE,
+  )
+  const debouncedTastingNotes = useDebounce(
+    immediateTastingNotes,
+    FILTER_CONSTANTS.DEBOUNCE.TASTING_NOTES,
+  )
 
   // If price bounds change and current range is out of bounds, update it
   React.useEffect(() => {
@@ -164,12 +199,12 @@ export default function WineFiltersClient({
   const toggleFilter = (key: string, value: string): void => {
     if (!isArrayFilter(key)) return
 
-    const currentValues = filters[key as keyof typeof filters] as string[]
+    const currentValues = filters[key] as string[]
     const newValues = currentValues.includes(value)
       ? currentValues.filter((v) => v !== value)
       : [...currentValues, value]
 
-    setFilter(key as keyof typeof filters, newValues)
+    setFilter(key, newValues)
   }
 
   const updateTastingNoteRange = (key: string, value: [number, number]): void => {
@@ -184,24 +219,10 @@ export default function WineFiltersClient({
   }
 
   const resetCollectionFilter = (key: string): void => {
-    // Ensure the key is a valid filter key
-    const validFilterKeys = [
-      'regions',
-      'wineries',
-      'wineCountries',
-      'styles',
-      'aromas',
-      'moods',
-      'grape-varieties',
-      'tags',
-      'dishes',
-      'climates',
-    ] as const
-
-    if (validFilterKeys.includes(key as any)) {
-      clearFilter(key as keyof typeof filters)
+    if (isArrayFilter(key)) {
+      clearFilter(key)
     } else {
-      console.warn(`Invalid filter key: ${key}`)
+      logger.warn(`Invalid filter key: ${key}`)
     }
   }
 
@@ -214,38 +235,31 @@ export default function WineFiltersClient({
   }
 
   const handleSearchChange = (collection: string, value: string): void => {
-    setSearchQueries((prev) => ({
+    setSearchQueries((prev: Record<string, string>) => ({
       ...prev,
       [collection]: value,
     }))
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getFilteredItems = (collection: string): any[] => {
+  const getFilteredItems = (collection: string): CollectionItem[] => {
     const items = collectionItems[collection] || []
     const searchQuery = debouncedSearchQueries[collection] || ''
 
     if (!searchQuery) return items
 
     return items.filter((item) => {
-      const title =
-        typeof item.title === 'object'
-          ? locale === 'en' && item.title.en
-            ? item.title.en
-            : item.title.sl || item.title.en
-          : item.title || ''
-
+      const title = getLocalizedTitle(item, locale)
       return title.toLowerCase().includes(searchQuery.toLowerCase())
     })
   }
 
   const toggleAccordion = (key: string): void => {
-    setOpenAccordion((prev) => (prev === key ? null : key))
+    setOpenAccordion((prev: string | null) => (prev === key ? null : key))
   }
 
   const getActiveFilters = (key: string): string[] => {
     if (!isArrayFilter(key)) return []
-    return filters[key as keyof typeof filters] as string[]
+    return filters[key] as string[]
   }
 
   const getTastingNoteRange = (key: string): [number, number] => {
@@ -308,27 +322,7 @@ export default function WineFiltersClient({
                       </div>
                       <div className={`${FILTER_CONSTANTS.DROPDOWN_MAX_HEIGHT} overflow-y-auto`}>
                         {filteredItems.map((item) => {
-                          // Get the appropriate value based on filter type
-                          const getFilterValue = (filterKey: string) => {
-                            // String-based filters use titles
-                            if (
-                              ['regions', 'wineries', 'wineCountries', 'styles'].includes(filterKey)
-                            ) {
-                              return typeof item.title === 'object'
-                                ? locale === 'en' && item.title.en
-                                  ? item.title.en
-                                  : item.title.sl || item.title.en
-                                : item.title || ''
-                            }
-                            // Array-based filters use titles (not IDs) for consistency with flat variants
-                            return typeof item.title === 'object'
-                              ? locale === 'en' && item.title.en
-                                ? item.title.en
-                                : item.title.sl || item.title.en
-                              : item.title || ''
-                          }
-
-                          const filterValue = getFilterValue(key)
+                          const filterValue = getLocalizedTitle(item, locale)
                           const isSelected = activeFilters.includes(filterValue)
                           const isLocked = isCurrentCollection && item.id === currentCollection.id
 
@@ -347,11 +341,7 @@ export default function WineFiltersClient({
                                 htmlFor={`${key}-${item.id}`}
                                 className="flex-1 cursor-pointer text-sm"
                               >
-                                {typeof item.title === 'object'
-                                  ? locale === 'en' && item.title.en
-                                    ? item.title.en
-                                    : item.title.sl || item.title.en
-                                  : item.title}
+                                {getLocalizedTitle(item, locale)}
                               </label>
                               {isLocked && (
                                 <Icon

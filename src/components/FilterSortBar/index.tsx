@@ -6,22 +6,188 @@ import type { Locale } from '@/i18n/locales'
 import type { FlatWineVariant } from '@/payload-types'
 import { FilterSortBarClient } from './FilterSortBar.client'
 
-type Props = {
+// Use the actual structure from GraphQL function
+interface CollectionItem {
+  id: string
+  title:
+    | string
+    | {
+        sl: string
+        en?: string
+      }
+  slug?: string
+}
+
+type CollectionItemsMap = Record<string, CollectionItem[]>
+
+interface Props {
   currentCollection?: {
     id: string
     type: string
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  collectionItems?: Record<string, any[]>
+  collectionItems?: CollectionItemsMap
   locale?: Locale
 }
 
 export default async function FilterSortBar({
   currentCollection,
-  collectionItems,
+  collectionItems: providedCollectionItems,
   locale,
 }: Props): Promise<React.JSX.Element> {
   const resolvedLocale = (locale || 'sl') as Locale
+
+  // Fetch collection items if not provided
+  let collectionItems: CollectionItemsMap = providedCollectionItems || {}
+
+  if (!providedCollectionItems) {
+    try {
+      const payload = createPayloadService()
+
+      // Fetch all collections in parallel
+      const [
+        aromas,
+        climates,
+        dishes,
+        grapeVarieties,
+        moods,
+        regions,
+        styles,
+        tags,
+        wineCountries,
+        wineries,
+      ] = await Promise.all([
+        payload.find('aromas', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('climates', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('dishes', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('grape-varieties', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('moods', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('regions', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('styles', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('tags', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('wineCountries', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+        payload.find('wineries', {
+          depth: 0,
+          limit: 1000,
+          locale: resolvedLocale,
+          where: { _status: { equals: 'published' } },
+        }),
+      ])
+
+      collectionItems = {
+        aromas: aromas.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        climates: climates.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        dishes: dishes.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        'grape-varieties': grapeVarieties.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        moods: moods.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        regions: regions.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        styles: styles.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        tags: tags.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        wineCountries: wineCountries.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+        wineries: wineries.docs.map((doc: any) => ({
+          id: String(doc.id),
+          title: doc.title,
+          slug: String(doc.slug || ''),
+        })),
+      }
+
+      logger.info('Collection items fetched successfully for filters', {
+        aromas: aromas.docs.length,
+        climates: climates.docs.length,
+        dishes: dishes.docs.length,
+        grapeVarieties: grapeVarieties.docs.length,
+        moods: moods.docs.length,
+        regions: regions.docs.length,
+        styles: styles.docs.length,
+        tags: tags.docs.length,
+        wineCountries: wineCountries.docs.length,
+        wineries: wineries.docs.length,
+      })
+    } catch (error) {
+      logger.error('Failed to fetch collection items for filters', { error })
+      collectionItems = {}
+    }
+  }
 
   // Fetch initial data server-side for SEO - but with reduced limit for performance
   let initialWineVariants: FlatWineVariant[] = []
@@ -85,7 +251,7 @@ export default async function FilterSortBar({
   return (
     <FilterSortBarClient
       currentCollection={currentCollection}
-      collectionItems={collectionItems || {}}
+      collectionItems={collectionItems}
       locale={resolvedLocale}
       initialWineVariants={initialWineVariants}
       error={error}

@@ -1,18 +1,45 @@
 // Filter component constants
 export const FILTER_CONSTANTS = {
+  // Debounce delays for different filter types
+  DEBOUNCE: {
+    SEARCH: 200, // Search input debounce
+    PRICE_RANGE: 300, // Price slider debounce
+    TASTING_NOTES: 300, // Tasting notes slider debounce
+  },
+
   // Dropdown dimensions
-  DROPDOWN_MAX_HEIGHT: 'max-h-[300px]',
+  DROPDOWN_MAX_HEIGHT: 'max-h-60',
 
   // Grid layouts
-  COLLECTION_GRID: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5',
+  COLLECTION_GRID: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
   TASTING_NOTES_GRID: 'grid-cols-1 sm:grid-cols-2',
-  GRID_GAP: 'gap-4',
+  GRID_GAP: 'gap-2',
 
   // Pagination
   DEFAULT_PAGE_LIMIT: 10000,
 
   // Search
   SEARCH_DEBOUNCE_MS: 300,
+
+  // Filter validation
+  VALID_FILTER_KEYS: [
+    'regions',
+    'wineries',
+    'wineCountries',
+    'styles',
+    'aromas',
+    'moods',
+    'grape-varieties',
+    'tags',
+    'dishes',
+    'climates',
+  ] as const,
+
+  // Price defaults
+  PRICE: {
+    DEFAULT_MIN: 0,
+    DEFAULT_MAX: 1000,
+  },
 } as const
 
 // Default tasting notes ranges

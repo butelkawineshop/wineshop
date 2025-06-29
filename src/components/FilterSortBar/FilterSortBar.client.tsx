@@ -9,13 +9,26 @@ import type { Locale } from '@/i18n/locales'
 import type { FlatWineVariant } from '@/payload-types'
 import { useTranslation } from '@/hooks/useTranslation'
 
-type Props = {
+// Use the same structure as server component
+interface CollectionItem {
+  id: string
+  title:
+    | string
+    | {
+        sl: string
+        en?: string
+      }
+  slug?: string
+}
+
+type CollectionItemsMap = Record<string, CollectionItem[]>
+
+interface Props {
   currentCollection?: {
     id: string
     type: string
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  collectionItems?: Record<string, any[]>
+  collectionItems?: CollectionItemsMap
   locale: Locale
   initialWineVariants: FlatWineVariant[]
   error: string | null
