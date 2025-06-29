@@ -5,6 +5,7 @@ import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import type { Locale } from '@/i18n/locales'
 import type { FlatWineVariant } from '@/payload-types'
 import { FilterSortBarClient } from './FilterSortBar.client'
+import { CollectionService } from '@/services/CollectionService'
 
 // Use the actual structure from GraphQL function
 interface CollectionItem {
@@ -41,147 +42,47 @@ export default async function FilterSortBar({
 
   if (!providedCollectionItems) {
     try {
-      const payload = createPayloadService()
+      // Use CollectionService with flat collections for better performance
+      const collectionService = new CollectionService()
 
-      // Fetch all collections in parallel
-      const [
-        aromas,
-        climates,
-        dishes,
-        grapeVarieties,
-        moods,
-        regions,
-        styles,
-        tags,
-        wineCountries,
-        wineries,
-      ] = await Promise.all([
-        payload.find('aromas', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('climates', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('dishes', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('grape-varieties', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('moods', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('regions', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('styles', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('tags', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('wineCountries', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-        payload.find('wineries', {
-          depth: 0,
-          limit: 1000,
-          locale: resolvedLocale,
-          where: { _status: { equals: 'published' } },
-        }),
-      ])
-
-      collectionItems = {
-        aromas: aromas.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        climates: climates.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        dishes: dishes.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        'grape-varieties': grapeVarieties.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        moods: moods.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        regions: regions.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        styles: styles.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        tags: tags.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        wineCountries: wineCountries.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
-        wineries: wineries.docs.map((doc: any) => ({
-          id: String(doc.id),
-          title: doc.title,
-          slug: String(doc.slug || ''),
-        })),
+      // Get collection type for filtering if we're on a specific collection page
+      let collectionType: string | undefined
+      if (currentCollection?.type) {
+        const typeMap = {
+          aromas: 'aroma',
+          climates: 'climate',
+          dishes: 'dish',
+          'grape-varieties': 'grapeVariety',
+          moods: 'mood',
+          regions: 'region',
+          styles: 'style',
+          tags: 'tag',
+          wineCountries: 'wineCountry',
+          wineries: 'winery',
+        }
+        collectionType = typeMap[currentCollection.type as keyof typeof typeMap]
       }
 
-      logger.info('Collection items fetched successfully for filters', {
-        aromas: aromas.docs.length,
-        climates: climates.docs.length,
-        dishes: dishes.docs.length,
-        grapeVarieties: grapeVarieties.docs.length,
-        moods: moods.docs.length,
-        regions: regions.docs.length,
-        styles: styles.docs.length,
-        tags: tags.docs.length,
-        wineCountries: wineCountries.docs.length,
-        wineries: wineries.docs.length,
+      const flatCollectionItems = await collectionService.fetchCollectionItems(
+        resolvedLocale,
+        collectionType,
+      )
+
+      // Transform flat collection items to the expected format
+      collectionItems = Object.entries(flatCollectionItems).reduce((acc, [collection, items]) => {
+        acc[collection] = items.map((item) => ({
+          id: String(item.id),
+          title: item.title,
+          slug: String(item.slug || ''),
+        }))
+        return acc
+      }, {} as CollectionItemsMap)
+
+      logger.info('Collection items fetched successfully for filters using flat collections', {
+        totalCollections: Object.keys(collectionItems).length,
+        totalItems: Object.values(collectionItems).reduce((sum, items) => sum + items.length, 0),
+        collectionType,
+        currentCollection: currentCollection?.type,
       })
     } catch (error) {
       logger.error('Failed to fetch collection items for filters', { error })

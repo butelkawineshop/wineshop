@@ -5,7 +5,7 @@ import { FLAT_COLLECTIONS_CONSTANTS } from '@/constants/flatCollections'
 type CollectionType =
   (typeof FLAT_COLLECTIONS_CONSTANTS.COLLECTION_TYPES)[keyof typeof FLAT_COLLECTIONS_CONSTANTS.COLLECTION_TYPES]
 
-interface FlatCollectionData {
+export interface FlatCollectionData {
   originalID: number
   collectionType: CollectionType
   originalSlug: string

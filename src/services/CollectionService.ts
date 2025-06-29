@@ -6,7 +6,11 @@ import {
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import type { Locale } from '@/constants/routes'
 import { fetchAllCollectionItemsForFilters } from '@/lib/graphql'
-import { CollectionDatabaseService, type FlatCollectionItem } from './CollectionDatabaseService'
+import { CollectionDatabaseService } from './CollectionDatabaseService'
+import { FLAT_COLLECTIONS_CONSTANTS } from '@/constants/flatCollections'
+
+// Import the rich interface from FlatCollectionService
+import type { FlatCollectionData } from './FlatCollectionService'
 
 export interface CollectionItem {
   id: string
@@ -39,50 +43,142 @@ export interface PaginationUrls {
 /**
  * Service class for collection-related business logic
  * Handles data fetching, pagination, and URL building
- * Now uses direct database queries for better performance
+ * Now uses flat collections for better performance and consistency
  */
 export class CollectionService {
   private payload = createPayloadService()
 
   /**
-   * Convert FlatCollectionItem to CollectionItem format for backward compatibility
+   * Convert FlatCollectionData to CollectionItem format for backward compatibility
    */
   private static convertToCollectionItem(
-    flatItem: FlatCollectionItem,
+    flatItem: FlatCollectionData,
     locale: Locale,
   ): CollectionItem {
-    // Use mediaBaseUrl if available, otherwise compute from mediaUrl
-    let mediaBaseUrl = flatItem.mediaBaseUrl || ''
-    if (flatItem.mediaUrl && !mediaBaseUrl) {
-      // Extract base URL from media URL if it's a Cloudflare URL
-      const urlMatch = flatItem.mediaUrl.match(/^(https:\/\/[^\/]+\/[^\/]+)\//)
-      if (urlMatch) {
-        mediaBaseUrl = urlMatch[1]
-      }
+    // Handle media - flat collections have media array instead of mediaBaseUrl/mediaUrl
+    let mediaArray: Array<{ url: string; baseUrl: string }> = []
+    if (flatItem.media && Array.isArray(flatItem.media) && flatItem.media.length > 0) {
+      mediaArray = flatItem.media.map((mediaItem: { url?: string }) => ({
+        url: mediaItem.url || '',
+        baseUrl: mediaItem.url || '', // Use url as baseUrl for Media component
+      }))
     }
 
     return {
-      id: flatItem.id,
-      title: locale === 'en' ? flatItem.titleEn : flatItem.title,
-      slug: locale === 'en' ? flatItem.slugEn : flatItem.slug,
+      id: String(flatItem.originalID), // Use originalID as id
+      title: locale === 'en' ? flatItem.titleEn || flatItem.title : flatItem.title,
+      slug: locale === 'en' ? flatItem.slugEn || flatItem.slug : flatItem.slug,
       description: locale === 'en' ? flatItem.descriptionEn : flatItem.description,
-      media: flatItem.mediaBaseUrl
-        ? [
-            {
-              url: flatItem.mediaBaseUrl, // Use baseUrl so Media component can construct variants
-              baseUrl: flatItem.mediaBaseUrl,
-            },
-          ]
-        : [],
-      updatedAt: flatItem.updatedAt,
-      createdAt: flatItem.createdAt,
-      _status: flatItem._status,
+      media: mediaArray,
+      // Include all the rich relationship data for InfoCarousel
+      whyCool: locale === 'en' ? flatItem.whyCoolEn : flatItem.whyCool,
+      typicalStyle: locale === 'en' ? flatItem.typicalStyleEn : flatItem.typicalStyle,
+      character: locale === 'en' ? flatItem.characterEn : flatItem.character,
+      iconKey: flatItem.iconKey,
+      wineryCode: flatItem.wineryCode,
+      priceRange: flatItem.priceRange,
+      skin: flatItem.skin,
+      climate: flatItem.climate,
+      climateTemperature: flatItem.climateTemperature,
+      category: flatItem.category,
+      colorGroup: flatItem.colorGroup,
+      adjective: flatItem.adjective,
+      flavour: flatItem.flavour,
+      country: flatItem.country,
+      climateData: flatItem.climateData,
+      statistics: flatItem.statistics,
+      climateConditions: flatItem.climateConditions,
+      social: flatItem.social,
+      synonyms: flatItem.synonyms,
+      bestGrapes: flatItem.bestGrapes,
+      bestRegions: flatItem.bestRegions,
+      legends: flatItem.legends,
+      neighbours: flatItem.neighbours,
+      relatedWineries: flatItem.relatedWineries,
+      distinctiveAromas: flatItem.distinctiveAromas,
+      blendingPartners: flatItem.blendingPartners,
+      similarVarieties: flatItem.similarVarieties,
+      tags: flatItem.tags,
+      seo: flatItem.seo,
+      updatedAt: flatItem.syncedAt.toISOString(),
+      createdAt: flatItem.syncedAt.toISOString(),
+      _status: flatItem.isPublished ? 'published' : 'draft',
     }
   }
 
   /**
+   * Convert FlatCollectionItem from database service to FlatCollectionData format
+   */
+  private static convertFlatCollectionItemToData(
+    item: import('./CollectionDatabaseService').FlatCollectionItem,
+    collectionType: string,
+  ): FlatCollectionData {
+    return {
+      // Required FlatCollectionData fields
+      title: item.title,
+      titleEn: item.titleEn,
+      slug: item.slug,
+      slugEn: item.slugEn,
+      description: item.description,
+      descriptionEn: item.descriptionEn,
+      isPublished: item.isPublished,
+      syncedAt: new Date(item.updatedAt),
+
+      // Additional fields from FlatCollectionData
+      collectionType,
+      originalID: parseInt(item.id),
+      originalSlug: item.slug,
+      media: item.mediaUrl
+        ? [{ url: item.mediaUrl, baseUrl: item.mediaBaseUrl || item.mediaUrl }]
+        : [],
+
+      // Optional fields that might not be present in FlatCollectionItem
+      whyCool: undefined,
+      whyCoolEn: undefined,
+      typicalStyle: undefined,
+      typicalStyleEn: undefined,
+      character: undefined,
+      characterEn: undefined,
+      iconKey: undefined,
+      wineryCode: undefined,
+      priceRange: undefined,
+      skin: undefined,
+      climate: undefined,
+      climateTemperature: undefined,
+      category: undefined,
+      colorGroup: undefined,
+      adjective: undefined,
+      flavour: undefined,
+      country: undefined,
+      climateData: undefined,
+      statistics: undefined,
+      climateConditions: undefined,
+      social: undefined,
+      synonyms: undefined,
+      bestGrapes: undefined,
+      bestRegions: undefined,
+      legends: undefined,
+      neighbours: undefined,
+      relatedWineries: undefined,
+      distinctiveAromas: undefined,
+      blendingPartners: undefined,
+      similarVarieties: undefined,
+      tags: undefined,
+      seo: undefined,
+    } as FlatCollectionData
+  }
+
+  /**
+   * Get the collection type for a given collection slug
+   */
+  private static getCollectionType(collection: string): string | null {
+    const typeMap = FLAT_COLLECTIONS_CONSTANTS.COLLECTION_TYPE_MAPPINGS
+    return typeMap[collection as keyof typeof typeMap] || null
+  }
+
+  /**
    * Fetch collection data (single item or list)
-   * Now uses direct database queries for better performance
+   * Now uses flat collections for better performance and consistency
    */
   async fetchCollectionData({
     collection,
@@ -107,7 +203,7 @@ export class CollectionService {
   }
 
   /**
-   * Fetch a single collection item using direct database query
+   * Fetch a single collection item using flat collections for better performance
    */
   private async fetchSingleItem({
     collection,
@@ -121,11 +217,62 @@ export class CollectionService {
     slug: string
   }): Promise<CollectionData> {
     try {
-      // Try direct database query first for better performance
+      console.log('CollectionService.fetchSingleItem:', {
+        collection,
+        slug,
+        locale,
+      })
+
+      const collectionType = CollectionService.getCollectionType(collection)
+
+      if (collectionType) {
+        // Use flat collections for supported collections
+        const result = await this.payload.find('flat-collections', {
+          depth: 1,
+          locale,
+          limit: 1000, // Get all items to filter
+          sort: config.sort || '-createdAt',
+        })
+
+        // Filter by collection type and slug in JavaScript
+        const filteredDocs = result.docs.filter((doc: Record<string, unknown>) => {
+          const docSlug =
+            locale === 'en' ? (doc.slugEn as string) || (doc.slug as string) : (doc.slug as string)
+          return doc.collectionType === collectionType && docSlug === slug
+        })
+
+        console.log('Flat collection single item query result:', {
+          timestamp: new Date().toISOString(),
+          totalDocs: filteredDocs.length,
+          collectionType,
+          foundSlug: filteredDocs[0]?.slug,
+          foundTitle: filteredDocs[0]?.title,
+        })
+
+        if (filteredDocs.length > 0) {
+          const item = CollectionService.convertToCollectionItem(
+            filteredDocs[0] as unknown as FlatCollectionData,
+            locale,
+          )
+          return {
+            data: item,
+            items: [],
+            pagination: null,
+            isSingleItem: true,
+          }
+        }
+      }
+
+      // Fallback to database service for unsupported collections
       const dbResult = await CollectionDatabaseService.getCollectionItem(collection, slug, locale)
 
       if (dbResult.item) {
-        const convertedItem = CollectionService.convertToCollectionItem(dbResult.item, locale)
+        const collectionType = CollectionService.getCollectionType(collection) || collection
+        const convertedData = CollectionService.convertFlatCollectionItemToData(
+          dbResult.item,
+          collectionType,
+        )
+        const convertedItem = CollectionService.convertToCollectionItem(convertedData, locale)
         return {
           data: convertedItem,
           items: [],
@@ -134,65 +281,16 @@ export class CollectionService {
         }
       }
 
-      // Fallback to Payload API if database query fails or item not found
+      // Final fallback to Payload API with different approach
       return this.fetchSingleItemFallback({ collection, config, locale, slug })
     } catch (error) {
-      console.warn('Database query failed, falling back to Payload API:', error)
+      console.warn('Flat collection query failed, falling back to database service:', error)
       return this.fetchSingleItemFallback({ collection, config, locale, slug })
     }
   }
 
   /**
-   * Fallback method using Payload API for single item
-   */
-  private async fetchSingleItemFallback({
-    collection,
-    config,
-    locale,
-    slug,
-  }: {
-    collection: string
-    config: CollectionDisplayConfig
-    locale: Locale
-    slug: string
-  }): Promise<CollectionData> {
-    // Ensure minimum depth of 2 to populate relationship fields properly
-    const depth = Math.max(config.depth || 1, 2)
-
-    const result = await this.payload.find(collection, {
-      depth,
-      locale,
-      limit: 100,
-      where: {
-        _status: {
-          equals: 'published',
-        },
-      },
-    })
-
-    const foundItem = result.docs.find((doc: Record<string, unknown>) => doc.slug === slug) as
-      | CollectionItem
-      | undefined
-
-    if (foundItem) {
-      // Log relationship fields specifically
-      config.fields.forEach((field) => {
-        if (field.type === 'relationship') {
-          const _value = foundItem[field.name]
-        }
-      })
-    }
-
-    return {
-      data: foundItem || null,
-      items: [],
-      pagination: null,
-      isSingleItem: true,
-    }
-  }
-
-  /**
-   * Fetch a list of collection items with pagination using direct database query
+   * Fetch a list of collection items with pagination using flat collections
    */
   private async fetchItemList({
     collection,
@@ -208,8 +306,74 @@ export class CollectionService {
     try {
       const currentPage = page || COLLECTION_CONSTANTS.PAGINATION.DEFAULT_PAGE
       const limit = config.listLimit || COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT
+      const collectionType = CollectionService.getCollectionType(collection)
 
-      // Use direct database query for better performance
+      console.log('CollectionService.fetchItemList:', {
+        collection,
+        collectionType,
+        currentPage,
+        limit,
+        locale,
+      })
+
+      if (collectionType) {
+        // Use flat collections for supported collections
+        // Fetch all items and filter in JavaScript since Payload queries are not working
+        const result = await this.payload.find('flat-collections', {
+          depth: 1,
+          locale,
+          limit: 1000, // Get all items to filter
+          sort: config.sort || '-createdAt',
+        })
+
+        // Filter by collection type in JavaScript
+        const filteredDocs = result.docs.filter(
+          (doc: Record<string, unknown>) => doc.collectionType === collectionType,
+        )
+
+        // Apply pagination manually
+        const startIndex = (currentPage - 1) * limit
+        const endIndex = startIndex + limit
+        const paginatedDocs = filteredDocs.slice(startIndex, endIndex)
+
+        console.log('Flat collection query result:', {
+          timestamp: new Date().toISOString(),
+          totalDocs: filteredDocs.length,
+          docsCount: paginatedDocs.length,
+          collectionType,
+          firstDoc: paginatedDocs[0]
+            ? {
+                id: paginatedDocs[0].id,
+                title: paginatedDocs[0].title,
+                collectionType: paginatedDocs[0].collectionType,
+              }
+            : null,
+          allDocs: paginatedDocs.map((doc: Record<string, unknown>) => ({
+            id: doc.id,
+            title: doc.title,
+            collectionType: doc.collectionType,
+          })),
+        })
+
+        const items = paginatedDocs.map((doc) =>
+          CollectionService.convertToCollectionItem(doc as unknown as FlatCollectionData, locale),
+        )
+
+        return {
+          data: null,
+          items,
+          pagination: {
+            page: currentPage,
+            totalPages: Math.ceil(filteredDocs.length / limit),
+            totalDocs: filteredDocs.length,
+            hasNextPage: endIndex < filteredDocs.length,
+            hasPrevPage: currentPage > 1,
+          },
+          isSingleItem: false,
+        }
+      }
+
+      // Fallback to original database service for unsupported collections
       const dbResult = await CollectionDatabaseService.getCollectionList(
         collection,
         locale,
@@ -217,9 +381,14 @@ export class CollectionService {
         limit,
       )
 
-      const items = dbResult.items.map((item) =>
-        CollectionService.convertToCollectionItem(item, locale),
-      )
+      const items = dbResult.items.map((item) => {
+        const collectionType = CollectionService.getCollectionType(collection) || collection
+        const convertedData = CollectionService.convertFlatCollectionItemToData(
+          item,
+          collectionType,
+        )
+        return CollectionService.convertToCollectionItem(convertedData, locale)
+      })
 
       return {
         data: null,
@@ -228,7 +397,7 @@ export class CollectionService {
         isSingleItem: false,
       }
     } catch (error) {
-      console.warn('Database query failed, falling back to Payload API:', error)
+      console.warn('Flat collection query failed, falling back to database service:', error)
       return this.fetchItemListFallback({ collection, config, locale, page })
     }
   }
@@ -321,28 +490,71 @@ export class CollectionService {
   }
 
   /**
-   * Fetch collection items for filters using direct database queries
-   * Replaces GraphQL with more efficient database queries
+   * Fetch collection items for filters using flat collections
+   * Replaces GraphQL with more efficient flat collection queries
    */
-  async fetchCollectionItems(locale: Locale): Promise<Record<string, CollectionItem[]>> {
+  async fetchCollectionItems(
+    locale: Locale,
+    collectionType?: string,
+  ): Promise<Record<string, CollectionItem[]>> {
     try {
-      // Use direct database queries for better performance
-      const dbResult = await CollectionDatabaseService.getAllCollectionsForFilters(locale)
+      // Build where clause
+      const where: Record<string, unknown> = {
+        isPublished: {
+          equals: true,
+        },
+      }
 
-      // Transform the result to match the expected format
-      const transformed: Record<string, CollectionItem[]> = {}
+      // Add collection type filter if specified
+      if (collectionType) {
+        where.collectionType = {
+          in: [collectionType],
+        }
+      }
 
-      Object.entries(dbResult).forEach(([collection, items]) => {
-        transformed[collection] = items.map((item: FlatCollectionItem) =>
-          CollectionService.convertToCollectionItem(item, locale),
-        )
+      // Use flat collections for better performance
+      const result = await this.payload.find('flat-collections', {
+        depth: 1,
+        locale,
+        limit: 1000, // Get all items for filters
+        where,
+        sort: 'title',
       })
 
-      return transformed
+      // Group items by collection type
+      const grouped: Record<string, CollectionItem[]> = {}
+
+      result.docs.forEach((doc) => {
+        const flatItem = doc as unknown as FlatCollectionData
+        const itemCollectionType = flatItem.collectionType
+
+        // Get the collection slug from the type
+        const collectionSlug = this.getCollectionSlugFromType(itemCollectionType)
+        if (!collectionSlug) return
+
+        if (!grouped[collectionSlug]) {
+          grouped[collectionSlug] = []
+        }
+
+        const convertedItem = CollectionService.convertToCollectionItem(flatItem, locale)
+        grouped[collectionSlug].push(convertedItem)
+      })
+
+      return grouped
     } catch (error) {
-      console.warn('Database queries failed, falling back to GraphQL:', error)
+      console.warn('Flat collection query failed, falling back to GraphQL:', error)
       return this.fetchCollectionItemsFallback(locale)
     }
+  }
+
+  /**
+   * Get collection slug from collection type
+   */
+  private getCollectionSlugFromType(collectionType: string): string | null {
+    const typeMap = FLAT_COLLECTIONS_CONSTANTS.COLLECTION_TYPE_MAPPINGS
+    const entries = Object.entries(typeMap)
+    const entry = entries.find(([_, type]) => type === collectionType)
+    return entry ? entry[0] : null
   }
 
   /**
@@ -448,6 +660,55 @@ export class CollectionService {
    */
   isWineCollection(collection: string): boolean {
     return (COLLECTION_CONSTANTS.WINE_COLLECTIONS as readonly string[]).includes(collection)
+  }
+
+  /**
+   * Fallback method using Payload API for single item
+   */
+  private async fetchSingleItemFallback({
+    collection,
+    config,
+    locale,
+    slug,
+  }: {
+    collection: string
+    config: CollectionDisplayConfig
+    locale: Locale
+    slug: string
+  }): Promise<CollectionData> {
+    // Ensure minimum depth of 2 to populate relationship fields properly
+    const depth = Math.max(config.depth || 1, 2)
+
+    const result = await this.payload.find(collection, {
+      depth,
+      locale,
+      limit: 100,
+      where: {
+        _status: {
+          equals: 'published',
+        },
+      },
+    })
+
+    const foundItem = result.docs.find((doc: Record<string, unknown>) => doc.slug === slug) as
+      | CollectionItem
+      | undefined
+
+    if (foundItem) {
+      // Log relationship fields specifically
+      config.fields.forEach((field) => {
+        if (field.type === 'relationship') {
+          const _value = foundItem[field.name]
+        }
+      })
+    }
+
+    return {
+      data: foundItem || null,
+      items: [],
+      pagination: null,
+      isSingleItem: true,
+    }
   }
 }
 
