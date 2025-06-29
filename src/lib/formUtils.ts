@@ -2,6 +2,8 @@ import { z } from 'zod/v4'
 import { useForm, type UseFormReturn, type FieldValues, type Path } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+// TODO: Move repeated error messages to a constants or i18n file for localization as per conventions.
+
 // Form schemas
 export const loginSchema = z.object({
   email: z.email({ message: 'Invalid email address' }),

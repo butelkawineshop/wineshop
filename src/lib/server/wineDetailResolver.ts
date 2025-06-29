@@ -1,6 +1,7 @@
 import { GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql'
 import { WineService } from '../../services/WineService'
 import { db } from '../../lib/db'
+import { logger } from '../../lib/logger'
 
 /**
  * Custom GraphQL resolver for wineDetail query
@@ -75,7 +76,7 @@ export function createWineDetailResolver() {
 
             return result
           } catch (error) {
-            console.error('wineDetail resolver: Error occurred:', error)
+            logger.error({ error }, 'wineDetail resolver: Error occurred')
             return {
               error: error instanceof Error ? error.message : 'Unknown error occurred',
               variant: null,

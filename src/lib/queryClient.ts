@@ -36,3 +36,5 @@ export const queryClient = new QueryClient({
     },
   },
 })
+
+// NOTE: If any of these config values are reused elsewhere, move them to a constants file as per conventions.

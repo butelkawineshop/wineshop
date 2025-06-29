@@ -1,5 +1,6 @@
 import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg'
 import { logger } from './logger'
+import { DB_CONSTANTS } from '@/constants/api'
 
 /**
  * Database connection pool for direct PostgreSQL queries
@@ -15,9 +16,9 @@ class DatabaseService {
     if (!this.pool) {
       this.pool = new Pool({
         connectionString: process.env.DATABASE_URI,
-        max: 20, // Maximum number of clients in the pool
-        idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-        connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+        max: DB_CONSTANTS.POOL_MAX, // Maximum number of clients in the pool
+        idleTimeoutMillis: DB_CONSTANTS.POOL_IDLE_TIMEOUT_MS, // Close idle clients after 30 seconds
+        connectionTimeoutMillis: DB_CONSTANTS.POOL_CONNECTION_TIMEOUT_MS, // Return an error after 2 seconds if connection could not be established
       })
 
       // Handle pool errors
@@ -45,7 +46,7 @@ class DatabaseService {
       const duration = Date.now() - startTime
 
       // Log slow queries
-      if (duration > 1000) {
+      if (duration > DB_CONSTANTS.SLOW_QUERY_THRESHOLD_MS) {
         logger.warn(
           { duration, context, query: text.substring(0, 100) },
           'Slow database query detected',

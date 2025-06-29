@@ -1,5 +1,6 @@
 import { db } from './db'
 import type { FlatWineVariant, RelatedWineVariant } from '../payload-types'
+import { DB_CONSTANTS } from '@/constants/api'
 
 /**
  * Database queries for wine-related operations
@@ -137,6 +138,13 @@ export async function getFallbackRelatedWines(
 ): Promise<RelatedWineVariantRow[]> {
   const results: RelatedWineVariantRow[] = []
 
+  // Use DB_CONSTANTS.POOL_MAX or define local constants for query limits and scores
+  const RELATED_WINE_LIMIT = 20 // Could move to DB_CONSTANTS if reused
+  const WINERY_LIMIT = Math.ceil(RELATED_WINE_LIMIT / 4)
+  const REGION_LIMIT = Math.ceil(RELATED_WINE_LIMIT / 4)
+  const GRAPE_LIMIT = Math.ceil(RELATED_WINE_LIMIT / 4)
+  const PRICE_LIMIT = Math.ceil(RELATED_WINE_LIMIT / 4)
+
   // Get wines from same winery (excluding same wine title)
   const wineryQuery = `
     SELECT 
@@ -162,7 +170,7 @@ export async function getFallbackRelatedWines(
 
   const wineryResult = await db.query<RelatedWineVariantRow>(
     wineryQuery,
-    [variant.wineryTitle, variant.wineTitle, Math.ceil(limit / 4)],
+    [variant.wineryTitle, variant.wineTitle, WINERY_LIMIT],
     'getFallbackWineryWines',
   )
   results.push(...wineryResult.rows)
@@ -192,7 +200,7 @@ export async function getFallbackRelatedWines(
 
   const regionResult = await db.query<RelatedWineVariantRow>(
     regionQuery,
-    [variant.regionTitle, variant.wineTitle, Math.ceil(limit / 4)],
+    [variant.regionTitle, variant.wineTitle, REGION_LIMIT],
     'getFallbackRegionWines',
   )
   results.push(...regionResult.rows)
@@ -222,7 +230,7 @@ export async function getFallbackRelatedWines(
 
   const grapeResult = await db.query<RelatedWineVariantRow>(
     grapeQuery,
-    [variant.grapeVarieties, variant.wineTitle, Math.ceil(limit / 4)],
+    [variant.grapeVarieties, variant.wineTitle, GRAPE_LIMIT],
     'getFallbackGrapeWines',
   )
   results.push(...grapeResult.rows)
@@ -253,12 +261,7 @@ export async function getFallbackRelatedWines(
 
   const priceResult = await db.query<RelatedWineVariantRow>(
     priceQuery,
-    [
-      variant.price - priceRange,
-      variant.price + priceRange,
-      variant.wineTitle,
-      Math.ceil(limit / 4),
-    ],
+    [variant.price - priceRange, variant.price + priceRange, variant.wineTitle, PRICE_LIMIT],
     'getFallbackPriceWines',
   )
   results.push(...priceResult.rows)

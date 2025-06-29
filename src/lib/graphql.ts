@@ -1,3 +1,4 @@
+import { GRAPHQL_CONSTANTS } from '@/constants/api'
 import { logger } from './logger'
 import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
@@ -29,11 +30,6 @@ export async function graphqlRequest<T = unknown>(
   request: GraphQLRequest,
 ): Promise<{ data: T | null; error: string | null }> {
   try {
-    console.log('graphqlRequest: Starting request', {
-      query: request.query.substring(0, 100) + '...',
-      variables: request.variables,
-    })
-
     const response = await fetch('/api/graphql', {
       method: 'POST',
       headers: {
@@ -42,30 +38,16 @@ export async function graphqlRequest<T = unknown>(
       body: JSON.stringify(request),
     })
 
-    console.log('graphqlRequest: Response status', {
-      status: response.status,
-      statusText: response.statusText,
-      ok: response.ok,
-    })
-
     if (!response.ok) {
       logger.warn('GraphQL request failed', {
         status: response.status,
         statusText: response.statusText,
         url: '/api/graphql',
       })
-      return { data: null, error: 'Failed to fetch data' }
+      return { data: null, error: GRAPHQL_CONSTANTS.ERROR_MESSAGES.FETCH_FAILED }
     }
 
     const result: GraphQLResponse<T> = await response.json()
-
-    console.log('graphqlRequest: Parsed response', {
-      hasData: !!result.data,
-      hasErrors: !!result.errors,
-      errorsCount: result.errors?.length || 0,
-      dataKeys: result.data ? Object.keys(result.data) : null,
-      firstError: result.errors?.[0],
-    })
 
     if (result.errors && result.errors.length > 0) {
       logger.warn('GraphQL errors', {
@@ -86,7 +68,7 @@ export async function graphqlRequest<T = unknown>(
       query: request.query,
       variables: request.variables,
     })
-    return { data: null, error: 'Network error' }
+    return { data: null, error: GRAPHQL_CONSTANTS.ERROR_MESSAGES.NETWORK_ERROR }
   }
 }
 

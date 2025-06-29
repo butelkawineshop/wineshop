@@ -77,3 +77,5 @@ export const logger = baseLogger
 export const createLogger = (req: PayloadRequest, context: LogContext = {}) => {
   return new Logger(req, context)
 }
+
+// NOTE: Consider adding request ID or user ID to logger context by default if available for better traceability.

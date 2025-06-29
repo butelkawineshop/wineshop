@@ -83,3 +83,6 @@ export const handleError = async (
     },
   }
 }
+
+// NOTE: Always include as much context as possible in error logs (route, user, etc.) for traceability.
+// Consider using a union type for error codes in the future for better type safety.

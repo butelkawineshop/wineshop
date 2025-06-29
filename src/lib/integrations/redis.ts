@@ -1,9 +1,10 @@
 import Redis from 'ioredis'
 import { logger } from '@/lib/logger'
+import { REDIS_CONSTANTS } from '@/constants/api'
 
 // Validate required environment variable
 if (!process.env.REDIS_URL) {
-  throw new Error('REDIS_URL is not set')
+  throw new Error(REDIS_CONSTANTS.ERROR_MESSAGES.URL_NOT_SET)
 }
 
 /**
@@ -30,18 +31,21 @@ if (!process.env.REDIS_URL) {
  * ```
  */
 export const redis = new Redis(process.env.REDIS_URL, {
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: REDIS_CONSTANTS.MAX_RETRIES_PER_REQUEST,
   retryStrategy: (times) => {
-    const delay = Math.min(times * 50, 2000)
+    const delay = Math.min(
+      times * REDIS_CONSTANTS.RETRY_DELAY_BASE_MS,
+      REDIS_CONSTANTS.RETRY_DELAY_MAX_MS,
+    )
     return delay
   },
 })
 
 // Event listeners for monitoring and debugging
 redis.on('error', (error) => {
-  logger.error({ error }, 'Redis connection error')
+  logger.error({ error, host: process.env.REDIS_URL?.split('@')[1] }, 'Redis connection error')
 })
 
 redis.on('connect', () => {
-  logger.info('Connected to Redis')
+  logger.info({ host: process.env.REDIS_URL?.split('@')[1] }, 'Connected to Redis')
 })

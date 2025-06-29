@@ -36,3 +36,5 @@ if (!process.env.RESEND_API_KEY) {
  * ```
  */
 export const resend = new Resend(process.env.RESEND_API_KEY)
+
+// If error handling is added here, use the pino logger for all errors as per conventions.
