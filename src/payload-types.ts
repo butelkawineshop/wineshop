@@ -93,6 +93,7 @@ export interface Config {
     dishes: Dish
     'related-wine-variants': RelatedWineVariant
     'flat-wine-variants': FlatWineVariant
+    'flat-collections': FlatCollection
     'payload-jobs': PayloadJob
     'payload-locked-documents': PayloadLockedDocument
     'payload-preferences': PayloadPreference
@@ -132,6 +133,7 @@ export interface Config {
     dishes: DishesSelect<false> | DishesSelect<true>
     'related-wine-variants': RelatedWineVariantsSelect<false> | RelatedWineVariantsSelect<true>
     'flat-wine-variants': FlatWineVariantsSelect<false> | FlatWineVariantsSelect<true>
+    'flat-collections': FlatCollectionsSelect<false> | FlatCollectionsSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-locked-documents':
       | PayloadLockedDocumentsSelect<false>
@@ -155,6 +157,7 @@ export interface Config {
   jobs: {
     tasks: {
       syncFlatWineVariant: TaskSyncFlatWineVariant
+      syncFlatCollection: TaskSyncFlatCollection
       schedulePublish: TaskSchedulePublish
       inline: {
         input: unknown
@@ -163,6 +166,7 @@ export interface Config {
     }
     workflows: {
       queueAllFlatWineVariants: WorkflowQueueAllFlatWineVariants
+      queueAllFlatCollections: WorkflowQueueAllFlatCollections
     }
   }
 }
@@ -1375,6 +1379,332 @@ export interface FlatWineVariant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flat-collections".
+ */
+export interface FlatCollection {
+  id: number
+  /**
+   * Reference to the original collection item
+   */
+  originalID: number
+  /**
+   * Type of collection this item belongs to
+   */
+  collectionType:
+    | 'aroma'
+    | 'climate'
+    | 'dish'
+    | 'grapeVariety'
+    | 'mood'
+    | 'region'
+    | 'style'
+    | 'tag'
+    | 'wineCountry'
+    | 'winery'
+  /**
+   * Original collection slug for reference
+   */
+  originalSlug: string
+  /**
+   * Slovenian title
+   */
+  title: string
+  /**
+   * Slovenian slug for URL generation
+   */
+  slug: string
+  /**
+   * Slovenian description
+   */
+  description?: string | null
+  /**
+   * English title
+   */
+  titleEn?: string | null
+  /**
+   * English slug for URL generation
+   */
+  slugEn?: string | null
+  /**
+   * English description
+   */
+  descriptionEn?: string | null
+  /**
+   * Slovenian whyCool (Regions, Wineries, WineCountries, GrapeVarieties)
+   */
+  whyCool?: string | null
+  /**
+   * English whyCool
+   */
+  whyCoolEn?: string | null
+  /**
+   * Slovenian typicalStyle (GrapeVarieties)
+   */
+  typicalStyle?: string | null
+  /**
+   * English typicalStyle
+   */
+  typicalStyleEn?: string | null
+  /**
+   * Slovenian character (GrapeVarieties)
+   */
+  character?: string | null
+  /**
+   * English character
+   */
+  characterEn?: string | null
+  /**
+   * Icon key for styles
+   */
+  iconKey?: string | null
+  /**
+   * Winery code (Wineries)
+   */
+  wineryCode?: string | null
+  /**
+   * Price range (Regions)
+   */
+  priceRange?: ('8-12' | '12-18' | '18-24' | '24-30' | '30-40' | '40-50' | '50-60') | null
+  /**
+   * Grape skin color (GrapeVarieties)
+   */
+  skin?: ('red' | 'white') | null
+  /**
+   * Climate type (Climates)
+   */
+  climate?: ('desert' | 'maritime' | 'mediterranean' | 'continental' | 'alpine') | null
+  /**
+   * Climate temperature (Climates)
+   */
+  climateTemperature?: ('cool' | 'moderate' | 'warm' | 'hot') | null
+  /**
+   * Flavour category (Flavours)
+   */
+  category?:
+    | ('fruit' | 'floral' | 'herbal' | 'mineral' | 'creamy' | 'earth' | 'wood' | 'other')
+    | null
+  /**
+   * Color group for fruits and flowers (Flavours)
+   */
+  colorGroup?: ('red' | 'green' | 'yellow' | 'orange' | 'blue' | 'black' | 'white') | null
+  /**
+   * Adjective data for aromas
+   */
+  adjective?: {
+    id?: string | null
+    title?: string | null
+    titleEn?: string | null
+    slug?: string | null
+    slugEn?: string | null
+  }
+  /**
+   * Flavour data for aromas
+   */
+  flavour?: {
+    id?: string | null
+    title?: string | null
+    titleEn?: string | null
+    slug?: string | null
+    slugEn?: string | null
+    category?: string | null
+    colorGroup?: string | null
+  }
+  /**
+   * Country data for regions
+   */
+  country?: {
+    id?: string | null
+    title?: string | null
+    titleEn?: string | null
+    slug?: string | null
+    slugEn?: string | null
+  }
+  /**
+   * Climate data for regions
+   */
+  climateData?: {
+    id?: string | null
+    title?: string | null
+    titleEn?: string | null
+    slug?: string | null
+    slugEn?: string | null
+  }
+  /**
+   * Statistics for wine countries
+   */
+  statistics?: {
+    landArea?: number | null
+    wineriesCount?: number | null
+  }
+  /**
+   * Climate conditions for climates
+   */
+  climateConditions?: {
+    diurnalRange?: string | null
+    humidity?: string | null
+  }
+  /**
+   * Social media links for wineries
+   */
+  social?: {
+    instagram?: string | null
+    website?: string | null
+  }
+  /**
+   * Synonyms for grape varieties
+   */
+  synonyms?:
+    | {
+        title?: string | null
+        titleEn?: string | null
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Best grape varieties (Regions, WineCountries, Climates)
+   */
+  bestGrapes?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Best regions (WineCountries, Climates, GrapeVarieties)
+   */
+  bestRegions?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Legendary wineries (Regions, WineCountries)
+   */
+  legends?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+        wineryCode?: string | null
+      }[]
+    | null
+  /**
+   * Neighbouring regions (Regions)
+   */
+  neighbours?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Related wineries (Wineries)
+   */
+  relatedWineries?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+        wineryCode?: string | null
+      }[]
+    | null
+  /**
+   * Distinctive aromas (GrapeVarieties)
+   */
+  distinctiveAromas?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Blending partner grape varieties (GrapeVarieties)
+   */
+  blendingPartners?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Similar grape varieties (GrapeVarieties)
+   */
+  similarVarieties?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Tags (Wineries)
+   */
+  tags?:
+    | {
+        id?: string | null
+        title?: string | null
+        titleEn?: string | null
+        slug?: string | null
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Media files
+   */
+  media?:
+    | {
+        id?: string | null
+        alt?: string | null
+        url?: string | null
+        thumbnailURL?: string | null
+      }[]
+    | null
+  /**
+   * SEO metadata
+   */
+  seo?: {
+    title?: string | null
+    titleEn?: string | null
+    description?: string | null
+    descriptionEn?: string | null
+    image?: string | null
+  }
+  /**
+   * When this record was last synced
+   */
+  syncedAt?: string | null
+  /**
+   * Whether the original item is published
+   */
+  isPublished?: boolean | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
@@ -1425,7 +1755,7 @@ export interface PayloadJob {
     | {
         executedAt: string
         completedAt: string
-        taskSlug: 'inline' | 'syncFlatWineVariant' | 'schedulePublish'
+        taskSlug: 'inline' | 'syncFlatWineVariant' | 'syncFlatCollection' | 'schedulePublish'
         taskID: string
         input?:
           | {
@@ -1458,8 +1788,8 @@ export interface PayloadJob {
         id?: string | null
       }[]
     | null
-  workflowSlug?: 'queueAllFlatWineVariants' | null
-  taskSlug?: ('inline' | 'syncFlatWineVariant' | 'schedulePublish') | null
+  workflowSlug?: ('queueAllFlatWineVariants' | 'queueAllFlatCollections') | null
+  taskSlug?: ('inline' | 'syncFlatWineVariant' | 'syncFlatCollection' | 'schedulePublish') | null
   queue?: string | null
   waitUntil?: string | null
   processing?: boolean | null
@@ -1572,6 +1902,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'flat-wine-variants'
         value: number | FlatWineVariant
+      } | null)
+    | ({
+        relationTo: 'flat-collections'
+        value: number | FlatCollection
       } | null)
     | ({
         relationTo: 'payload-jobs'
@@ -2371,6 +2705,203 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flat-collections_select".
+ */
+export interface FlatCollectionsSelect<T extends boolean = true> {
+  originalID?: T
+  collectionType?: T
+  originalSlug?: T
+  title?: T
+  slug?: T
+  description?: T
+  titleEn?: T
+  slugEn?: T
+  descriptionEn?: T
+  whyCool?: T
+  whyCoolEn?: T
+  typicalStyle?: T
+  typicalStyleEn?: T
+  character?: T
+  characterEn?: T
+  iconKey?: T
+  wineryCode?: T
+  priceRange?: T
+  skin?: T
+  climate?: T
+  climateTemperature?: T
+  category?: T
+  colorGroup?: T
+  adjective?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  flavour?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+        category?: T
+        colorGroup?: T
+      }
+  country?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  climateData?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  statistics?:
+    | T
+    | {
+        landArea?: T
+        wineriesCount?: T
+      }
+  climateConditions?:
+    | T
+    | {
+        diurnalRange?: T
+        humidity?: T
+      }
+  social?:
+    | T
+    | {
+        instagram?: T
+        website?: T
+      }
+  synonyms?:
+    | T
+    | {
+        title?: T
+        titleEn?: T
+        id?: T
+      }
+  bestGrapes?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  bestRegions?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  legends?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+        wineryCode?: T
+      }
+  neighbours?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  relatedWineries?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+        wineryCode?: T
+      }
+  distinctiveAromas?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  blendingPartners?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  similarVarieties?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  tags?:
+    | T
+    | {
+        id?: T
+        title?: T
+        titleEn?: T
+        slug?: T
+        slugEn?: T
+      }
+  media?:
+    | T
+    | {
+        id?: T
+        alt?: T
+        url?: T
+        thumbnailURL?: T
+      }
+  seo?:
+    | T
+    | {
+        title?: T
+        titleEn?: T
+        description?: T
+        descriptionEn?: T
+        image?: T
+      }
+  syncedAt?: T
+  isPublished?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs_select".
  */
 export interface PayloadJobsSelect<T extends boolean = true> {
@@ -2448,6 +2979,20 @@ export interface TaskSyncFlatWineVariant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSyncFlatCollection".
+ */
+export interface TaskSyncFlatCollection {
+  input: {
+    collectionId: string
+  }
+  output: {
+    success?: boolean | null
+    message?: string | null
+    collectionId?: string | null
+  }
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -2468,6 +3013,13 @@ export interface TaskSchedulePublish {
  * via the `definition` "WorkflowQueueAllFlatWineVariants".
  */
 export interface WorkflowQueueAllFlatWineVariants {
+  input?: unknown
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WorkflowQueueAllFlatCollections".
+ */
+export interface WorkflowQueueAllFlatCollections {
   input?: unknown
 }
 /**

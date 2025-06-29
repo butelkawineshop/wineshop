@@ -3,6 +3,7 @@ import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
 import { generateWineSlug } from '@/utils/wineGenerators'
 import { queueRelatedWineVariants } from '@/tasks/queueRelatedWineVariants'
+import { queueFlatWineVariantSync } from '@/hooks/queueFlatWineVariantSync'
 
 const { afterChange, afterDelete } = queueRelatedWineVariants('wine')
 
@@ -20,7 +21,7 @@ export const Wines: CollectionConfig = {
     update: isAdmin,
   },
   hooks: {
-    afterChange: [afterChange],
+    afterChange: [afterChange, queueFlatWineVariantSync],
     afterDelete: [afterDelete],
   },
   fields: [

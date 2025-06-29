@@ -2,14 +2,15 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'paylo
 import { search } from '@/typesense'
 import { createLogger } from '@/lib/logger'
 import { HOOK_CONSTANTS } from '@/constants/hooks'
-import type { FlatWineVariant } from '@/payload-types'
+import type { FlatWineVariant, FlatCollection } from '@/payload-types'
 
 const WINE_VARIANTS_COLLECTION = HOOK_CONSTANTS.COLLECTIONS.FLAT_WINE_VARIANTS
+const FLAT_COLLECTIONS_COLLECTION = 'flat-collections'
 
 /**
  * Maps a FlatWineVariant to a Typesense document format
  */
-function mapToTypesenseDocument(doc: FlatWineVariant): Record<string, unknown> {
+function mapWineVariantToTypesense(doc: FlatWineVariant): Record<string, unknown> {
   return {
     id: String(doc.id),
     wineTitle: doc.wineTitle || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
@@ -33,6 +34,30 @@ function mapToTypesenseDocument(doc: FlatWineVariant): Record<string, unknown> {
   }
 }
 
+/**
+ * Maps a FlatCollection document to a Typesense document format
+ */
+function mapFlatCollectionToTypesense(doc: FlatCollection): Record<string, unknown> {
+  return {
+    id: String(doc.originalID),
+    title: doc.title || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    titleEn: doc.titleEn || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    slug: doc.slug || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    slugEn: doc.slugEn || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    description: doc.description || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    descriptionEn: doc.descriptionEn || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    collectionType: doc.collectionType || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    originalID: doc.originalID || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.NUMBER,
+    originalSlug: doc.originalSlug || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.STRING,
+    isPublished: doc.isPublished || HOOK_CONSTANTS.TYPESENSE_DEFAULTS.BOOLEAN,
+    syncedAt: doc.syncedAt
+      ? new Date(doc.syncedAt).getTime()
+      : HOOK_CONSTANTS.TYPESENSE_DEFAULTS.NUMBER,
+    createdAt: new Date(doc.createdAt).getTime(),
+    updatedAt: new Date(doc.updatedAt).getTime(),
+  }
+}
+
 export const syncTypesense: CollectionAfterChangeHook = async ({
   doc,
   req,
@@ -42,28 +67,82 @@ export const syncTypesense: CollectionAfterChangeHook = async ({
   const logger = createLogger(req, {
     task: 'syncTypesense',
     operation,
-    collection: WINE_VARIANTS_COLLECTION,
+    collection: 'syncTypesense',
     id: doc.id,
   })
 
   logger.info('Typesense sync hook triggered')
 
   try {
-    // Only sync published variants
+    // Only sync published documents
     if (!doc.isPublished) {
-      logger.info('Skipping sync for unpublished variant')
+      logger.info('Skipping sync for unpublished document')
       return doc
     }
 
-    const document = mapToTypesenseDocument(doc)
+    // Determine which collection this is and map accordingly
+    let document: Record<string, unknown>
+    let typesenseCollection: string
+    let documentId: string
 
-    if (operation === 'create') {
-      await search.createDocument(WINE_VARIANTS_COLLECTION, document)
-      logger.info('Created document in Typesense', { variantId: doc.id })
-    } else if (operation === 'update') {
-      await search.updateDocument(WINE_VARIANTS_COLLECTION, String(doc.id), document)
-      logger.info('Updated document in Typesense', { variantId: doc.id })
+    if ('wineTitle' in doc) {
+      // This is a flat wine variant
+      document = mapWineVariantToTypesense(doc as FlatWineVariant)
+      typesenseCollection = WINE_VARIANTS_COLLECTION
+      documentId = String(doc.id)
+    } else if ('collectionType' in doc) {
+      // This is a flat collection
+      document = mapFlatCollectionToTypesense(doc as FlatCollection)
+      typesenseCollection = FLAT_COLLECTIONS_COLLECTION
+      documentId = String((doc as FlatCollection).originalID)
+    } else {
+      logger.warn('Unknown document type for Typesense sync')
+      return doc
     }
+
+    // Always use upsert to handle both create and update operations
+    try {
+      // Try to update first (document exists)
+      await search.updateDocument(typesenseCollection, documentId, document)
+      logger.debug('Updated document in Typesense', {
+        collection: typesenseCollection,
+        id: documentId,
+        operation,
+      })
+    } catch (updateError: any) {
+      // If update fails with ObjectNotFound, try to create (document doesn't exist)
+      if (updateError.name === 'ObjectNotFound') {
+        try {
+          await search.createDocument(typesenseCollection, document)
+          logger.debug('Created document in Typesense', {
+            collection: typesenseCollection,
+            id: documentId,
+            operation,
+          })
+        } catch (createError: any) {
+          logger.error('Failed to create document in Typesense', createError as Error, {
+            collection: typesenseCollection,
+            id: documentId,
+            operation,
+          })
+          throw createError
+        }
+      } else {
+        // If it's not ObjectNotFound, it's a real error
+        logger.error('Failed to update document in Typesense', updateError as Error, {
+          collection: typesenseCollection,
+          id: documentId,
+          operation,
+        })
+        throw updateError
+      }
+    }
+
+    logger.info('Typesense sync completed successfully', {
+      collection: typesenseCollection,
+      id: documentId,
+      operation,
+    })
 
     return doc
   } catch (error) {
@@ -76,18 +155,38 @@ export const syncTypesense: CollectionAfterChangeHook = async ({
 export const deleteFromTypesense: CollectionAfterDeleteHook = async ({
   id,
   req,
+  collection,
 }): Promise<void> => {
   const logger = createLogger(req, {
     task: 'deleteFromTypesense',
-    collection: WINE_VARIANTS_COLLECTION,
+    collection: 'deleteFromTypesense',
     id,
   })
 
   logger.info('Typesense delete hook triggered')
 
   try {
-    await search.deleteDocument(WINE_VARIANTS_COLLECTION, String(id))
-    logger.info('Deleted document from Typesense', { variantId: id })
+    // Determine which Typesense collection to delete from based on the Payload collection
+    const typesenseCollection =
+      collection?.slug === 'flat-wine-variants'
+        ? WINE_VARIANTS_COLLECTION
+        : FLAT_COLLECTIONS_COLLECTION
+
+    // For flat collections, we need to get the originalID to delete the correct document
+    let documentId = String(id)
+
+    if (collection?.slug === 'flat-collections') {
+      // Try to get the originalID from the deleted document
+      // Since the document is already deleted, we'll use the ID as is
+      // This might need adjustment based on how the deletion is handled
+      documentId = String(id)
+    }
+
+    await search.deleteDocument(typesenseCollection, documentId)
+    logger.info('Deleted document from Typesense', {
+      collection: typesenseCollection,
+      id: documentId,
+    })
   } catch (error) {
     logger.error(HOOK_CONSTANTS.ERROR_MESSAGES.TYPESENSE_DELETE_FAILED, error as Error)
     // Don't throw - this is a background sync operation

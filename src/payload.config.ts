@@ -103,6 +103,32 @@ export default buildConfig({
         ],
         retries: 2,
       },
+      {
+        slug: 'syncFlatCollection',
+        handler: path.resolve(dirname, 'tasks/syncFlatCollection.ts') + '#syncFlatCollection',
+        inputSchema: [
+          {
+            name: 'collectionId',
+            type: 'text',
+            required: true,
+          },
+        ],
+        outputSchema: [
+          {
+            name: 'success',
+            type: 'checkbox',
+          },
+          {
+            name: 'message',
+            type: 'text',
+          },
+          {
+            name: 'collectionId',
+            type: 'text',
+          },
+        ],
+        retries: 2,
+      },
     ],
     workflows: [
       {
@@ -111,12 +137,23 @@ export default buildConfig({
           path.resolve(dirname, 'tasks/queueAllFlatWineVariants.ts') + '#queueAllFlatWineVariants',
         inputSchema: [],
       },
+      {
+        slug: 'queueAllFlatCollections',
+        handler:
+          path.resolve(dirname, 'tasks/queueAllFlatCollections.ts') + '#queueAllFlatCollections',
+        inputSchema: [],
+      },
     ],
     autoRun: [
       {
         cron: '*/5 * * * *',
         limit: 100,
         queue: 'syncFlatWineVariant',
+      },
+      {
+        cron: '*/10 * * * *',
+        limit: 50,
+        queue: 'syncFlatCollection',
       },
       {
         cron: '0 3 * * *',

@@ -6,6 +6,7 @@ export const HOOK_CONSTANTS = {
   COLLECTIONS: {
     WINE_VARIANTS: 'wine-variants',
     FLAT_WINE_VARIANTS: 'flat-wine-variants',
+    FLAT_COLLECTIONS: 'flat-collections',
   },
 
   // Default delays and timeouts
@@ -28,6 +29,7 @@ export const HOOK_CONSTANTS = {
     TYPESENSE_SYNC_FAILED: 'Failed to sync to Typesense',
     TYPESENSE_DELETE_FAILED: 'Failed to delete from Typesense',
     FLAT_WINE_VARIANT_SYNC_FAILED: 'Failed to queue flat wine variant job',
+    FLAT_COLLECTION_SYNC_FAILED: 'Failed to queue flat collection job',
     RELATED_WINES_UPDATE_FAILED: 'Failed to queue related wines update',
   },
 

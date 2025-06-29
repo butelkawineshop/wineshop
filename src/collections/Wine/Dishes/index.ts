@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { slugField } from '@/fields/slug'
 import { seoField } from '@/fields/seo'
+import { queueFlatCollectionSync } from '@/hooks/queueFlatCollectionSync'
+import { queueFlatWineVariantSync } from '@/hooks/queueFlatWineVariantSync'
 
 export const Dishes: CollectionConfig = {
   slug: 'dishes',
@@ -15,6 +17,9 @@ export const Dishes: CollectionConfig = {
     delete: isAdmin,
     read: () => true,
     update: isAdmin,
+  },
+  hooks: {
+    afterChange: [queueFlatCollectionSync, queueFlatWineVariantSync],
   },
   fields: [
     {

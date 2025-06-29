@@ -38,110 +38,22 @@ const wineVariantsSchema: CollectionCreateSchema = {
 const COLLECTION_SCHEMAS: CollectionCreateSchema[] = [
   wineVariantsSchema,
   {
-    name: 'wineries',
+    name: 'flat-collections',
     fields: [
       { name: 'id', type: 'string' },
       { name: 'title', type: 'string', sort: true },
       { name: 'titleEn', type: 'string' },
+      { name: 'slug', type: 'string' },
+      { name: 'slugEn', type: 'string' },
       { name: 'description', type: 'string' },
       { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'regions',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'wineCountries',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'grape-varieties',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'tags',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'moods',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'dishes',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'climates',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
-    ],
-    default_sorting_field: 'title',
-  },
-  {
-    name: 'aromas',
-    fields: [
-      { name: 'id', type: 'string' },
-      { name: 'title', type: 'string', sort: true },
-      { name: 'titleEn', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'descriptionEn', type: 'string' },
-      { name: 'slug', type: 'string' },
+      { name: 'collectionType', type: 'string' },
+      { name: 'originalID', type: 'int32' },
+      { name: 'originalSlug', type: 'string' },
+      { name: 'isPublished', type: 'bool' },
+      { name: 'syncedAt', type: 'int64' },
+      { name: 'createdAt', type: 'int64' },
+      { name: 'updatedAt', type: 'int64' },
     ],
     default_sorting_field: 'title',
   },
@@ -178,27 +90,48 @@ async function setupTypesense() {
 async function syncCollection(payload: any, collection: string, transform: (doc: any) => any) {
   const docs = await payload.find({ collection, limit: 1000 })
   logger.info(`Found ${docs.docs.length} docs to sync for ${collection}`)
+
+  let created = 0
+  let updated = 0
+  let errors = 0
+
   for (const doc of docs.docs) {
     const document = transform(doc)
     try {
-      await search.createDocument(collection, document)
-      logger.debug(`Indexed ${collection} doc: ${doc.title || doc.id}`)
-    } catch (error: any) {
-      if (error.message?.includes('already exists')) {
-        await search.updateDocument(collection, String(doc.id), document)
-        logger.debug(`Updated ${collection} doc: ${doc.title || doc.id}`)
+      // Try to update first (document exists)
+      await search.updateDocument(collection, String(document.id), document)
+      updated++
+      logger.debug(`Updated ${collection} doc: ${doc.title || doc.id}`)
+    } catch (updateError: any) {
+      // If update fails with ObjectNotFound, try to create (document doesn't exist)
+      if (updateError.name === 'ObjectNotFound') {
+        try {
+          await search.createDocument(collection, document)
+          created++
+          logger.debug(`Created ${collection} doc: ${doc.title || doc.id}`)
+        } catch (createError: any) {
+          errors++
+          logger.error({ err: createError, docId: doc.id }, `Failed to create ${collection} doc`)
+        }
       } else {
-        logger.error({ err: error, docId: doc.id }, `Failed to index ${collection} doc`)
+        // If it's not ObjectNotFound, it's a real error
+        errors++
+        logger.error({ err: updateError, docId: doc.id }, `Failed to update ${collection} doc`)
       }
     }
   }
+
+  logger.info(
+    `Sync completed for ${collection}: ${created} created, ${updated} updated, ${errors} errors`,
+  )
 }
 
 async function syncWineData() {
   try {
     logger.info('Starting wine data sync...')
     const payload = await getPayload({ config: payloadConfig })
-    // flat-wine-variants
+
+    // Sync flat wine variants
     await syncCollection(payload, 'flat-wine-variants', (variant) => ({
       id: String(variant.id),
       wineTitle: variant.wineTitle || '',
@@ -220,24 +153,25 @@ async function syncWineData() {
       createdAt: new Date(variant.createdAt).getTime(),
       updatedAt: new Date(variant.updatedAt).getTime(),
     }))
-    // Other collections
-    const simpleTransform = (doc: any) => ({
-      id: String(doc.id),
+
+    // Sync flat collections
+    await syncCollection(payload, 'flat-collections', (doc) => ({
+      id: String(doc.originalID), // Use originalID for flat collections
       title: doc.title || '',
       titleEn: doc.titleEn || '',
       description: doc.description || '',
       descriptionEn: doc.descriptionEn || '',
       slug: doc.slug || '',
-    })
-    await syncCollection(payload, 'wineries', simpleTransform)
-    await syncCollection(payload, 'regions', simpleTransform)
-    await syncCollection(payload, 'wineCountries', simpleTransform)
-    await syncCollection(payload, 'grape-varieties', simpleTransform)
-    await syncCollection(payload, 'tags', simpleTransform)
-    await syncCollection(payload, 'moods', simpleTransform)
-    await syncCollection(payload, 'dishes', simpleTransform)
-    await syncCollection(payload, 'climates', simpleTransform)
-    await syncCollection(payload, 'aromas', simpleTransform)
+      slugEn: doc.slugEn || '',
+      collectionType: doc.collectionType || '',
+      originalID: doc.originalID || 0,
+      originalSlug: doc.originalSlug || '',
+      isPublished: doc.isPublished || false,
+      syncedAt: doc.syncedAt ? new Date(doc.syncedAt).getTime() : 0,
+      createdAt: new Date(doc.createdAt).getTime(),
+      updatedAt: new Date(doc.updatedAt).getTime(),
+    }))
+
     logger.info('Wine data sync completed successfully')
   } catch (error) {
     logger.error({ err: error }, 'Failed to sync wine data')
