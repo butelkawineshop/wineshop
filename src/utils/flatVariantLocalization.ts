@@ -4,6 +4,7 @@
 
 import type { Locale } from '@/i18n/locales'
 import type { FlatWineVariant } from '@/payload-types'
+import { TRANSLATION_CONSTANTS } from '@/constants/translation'
 
 /**
  * Gets the localized value for a field that has both default and English versions
@@ -18,7 +19,7 @@ export function getLocalizedFlatVariantField(
   fieldName: string,
   locale: Locale,
 ): string | null {
-  if (locale === 'en') {
+  if (locale === TRANSLATION_CONSTANTS.LOCALES.ENGLISH) {
     // Check for English version first
     const englishField = `${fieldName}En` as keyof FlatWineVariant
     if (englishField in variant && variant[englishField]) {
@@ -64,7 +65,7 @@ export function getLocalizedArrayTitles(
 
   return items
     .map((item) => {
-      if (locale === 'en' && item.titleEn) {
+      if (locale === TRANSLATION_CONSTANTS.LOCALES.ENGLISH && item.titleEn) {
         return item.titleEn
       }
       return item.title || ''
@@ -80,7 +81,12 @@ export function getLocalizedArrayTitles(
  * @returns The localized wine title
  */
 export function getLocalizedWineTitle(variant: FlatWineVariant, locale: Locale): string {
-  return getLocalizedFlatVariantFieldWithFallback(variant, 'wineTitle', locale, 'Unknown Wine')
+  return getLocalizedFlatVariantFieldWithFallback(
+    variant,
+    'wineTitle',
+    locale,
+    TRANSLATION_CONSTANTS.FALLBACK_MESSAGES.UNKNOWN_WINE,
+  )
 }
 
 /**
@@ -95,7 +101,7 @@ export function getLocalizedCountryTitle(variant: FlatWineVariant, locale: Local
     variant,
     'countryTitle',
     locale,
-    'Unknown Country',
+    TRANSLATION_CONSTANTS.FALLBACK_MESSAGES.UNKNOWN_COUNTRY,
   )
 }
 
@@ -107,7 +113,12 @@ export function getLocalizedCountryTitle(variant: FlatWineVariant, locale: Local
  * @returns The localized style title
  */
 export function getLocalizedStyleTitle(variant: FlatWineVariant, locale: Locale): string {
-  return getLocalizedFlatVariantFieldWithFallback(variant, 'styleTitle', locale, 'Unknown Style')
+  return getLocalizedFlatVariantFieldWithFallback(
+    variant,
+    'styleTitle',
+    locale,
+    TRANSLATION_CONSTANTS.FALLBACK_MESSAGES.UNKNOWN_STYLE,
+  )
 }
 
 /**

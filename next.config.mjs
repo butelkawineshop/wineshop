@@ -54,7 +54,7 @@ const nextConfig = {
     ]
   },
 
-  // Image optimizations
+  // Image optimizations (simplified for Cloudflare Images)
   images: {
     remotePatterns: [
       {
@@ -63,11 +63,11 @@ const nextConfig = {
         pathname: '/IKofPtuWtzCFF1OLH7356g/**',
       },
     ],
-    // Optimize image formats
-    formats: ['image/webp', 'image/avif'],
-    // Image optimization settings
-    quality: 80,
-    sizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    // Minimal config since Cloudflare handles optimization
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Disable Next.js optimization since Cloudflare handles it
+    unoptimized: false, // Keep false to use Next.js Image component benefits
   },
 
   // Webpack optimizations

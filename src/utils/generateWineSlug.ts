@@ -1,4 +1,5 @@
 import { generateSlug } from '@/lib/slug'
+import { VALIDATION_CONSTANTS } from '@/constants/validation'
 
 interface GenerateWineSlugArgs {
   wineryName: string
@@ -38,16 +39,16 @@ export function generateWineSlug({
 }: GenerateWineSlugArgs): string {
   // Validate required fields
   if (!wineryName?.trim()) {
-    throw new Error('Winery name is required')
+    throw new Error(VALIDATION_CONSTANTS.REQUIRED_FIELDS.WINERY_NAME)
   }
   if (!wineName?.trim()) {
-    throw new Error('Wine name is required')
+    throw new Error(VALIDATION_CONSTANTS.REQUIRED_FIELDS.WINE_NAME)
   }
   if (!regionName?.trim()) {
-    throw new Error('Region name is required')
+    throw new Error(VALIDATION_CONSTANTS.REQUIRED_FIELDS.REGION_NAME)
   }
   if (!countryName?.trim()) {
-    throw new Error('Country name is required')
+    throw new Error(VALIDATION_CONSTANTS.REQUIRED_FIELDS.COUNTRY_NAME)
   }
 
   try {
@@ -55,14 +56,14 @@ export function generateWineSlug({
       .map((part) => generateSlug(part))
       .filter(Boolean)
 
-    if (parts.length === 0) {
-      throw new Error('No valid parts found to generate slug')
+    if (parts.length < VALIDATION_CONSTANTS.SLUG.MIN_PARTS) {
+      throw new Error(VALIDATION_CONSTANTS.SLUG.NO_VALID_PARTS)
     }
 
     return parts.join('-')
   } catch (error) {
     throw new Error(
-      `Failed to generate wine slug: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      `${VALIDATION_CONSTANTS.ERRORS.GENERATION_FAILED} wine slug: ${error instanceof Error ? error.message : 'Unknown error'}`,
     )
   }
 }
