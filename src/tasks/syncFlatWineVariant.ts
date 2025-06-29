@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TaskHandler } from 'payload'
+import type { FlatWineVariant } from '@/payload-types'
 import { createLogger } from '@/lib/logger'
 import { handleError } from '@/lib/errors'
 import { FlatWineVariantService } from '@/services/FlatWineVariantService'
 import { RelatedWinesService } from '@/services/RelatedWinesService'
+import { QUEUE_CONSTANTS } from '@/constants/queue'
 
 // Main task handler
 export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ input, req }) => {
@@ -27,7 +28,7 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
     if (syncResult.success) {
       // Find the flat variant ID for related wines update
       const existingFlatVariants = await req.payload.find({
-        collection: 'flat-wine-variants',
+        collection: QUEUE_CONSTANTS.COLLECTIONS.FLAT_WINE_VARIANTS,
         where: {
           originalVariant: {
             equals: input.wineVariantId,
@@ -37,7 +38,7 @@ export const syncFlatWineVariant: TaskHandler<'syncFlatWineVariant'> = async ({ 
       })
 
       if (existingFlatVariants.docs.length > 0) {
-        const flatVariant = existingFlatVariants.docs[0] as any
+        const flatVariant = existingFlatVariants.docs[0] as FlatWineVariant
 
         // Update related wines for this variant
         const relatedVariants = await relatedWinesService.findRelatedWinesIntelligently(flatVariant)

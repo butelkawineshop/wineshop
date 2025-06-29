@@ -1,14 +1,7 @@
 import type { PayloadRequest } from 'payload'
 import { createLogger } from '../lib/logger'
 import { handleError } from '../lib/errors'
-
-// Constants
-const QUEUE_CONSTANTS = {
-  COLLECTION_NAME: 'wine-variants',
-  TASK_NAME: 'syncFlatWineVariant',
-  DEFAULT_LIMIT: 1000,
-  DEFAULT_DEPTH: 0,
-} as const
+import { QUEUE_CONSTANTS } from '@/constants/queue'
 
 // Types
 interface QueueResult {
@@ -30,9 +23,9 @@ async function fetchAllWineVariants(
   logger: ReturnType<typeof createLogger>,
 ): Promise<WineVariant[]> {
   const result = await req.payload.find({
-    collection: QUEUE_CONSTANTS.COLLECTION_NAME,
-    limit: QUEUE_CONSTANTS.DEFAULT_LIMIT,
-    depth: QUEUE_CONSTANTS.DEFAULT_DEPTH,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    limit: QUEUE_CONSTANTS.DEFAULTS.LIMIT,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   logger.debug('Found wine variants', { count: result.docs.length })
@@ -49,7 +42,7 @@ async function queueWineVariant(
   }
 
   await req.payload.jobs.queue({
-    task: QUEUE_CONSTANTS.TASK_NAME,
+    task: QUEUE_CONSTANTS.TASKS.SYNC_FLAT_WINE_VARIANT,
     input: taskInput,
   })
 

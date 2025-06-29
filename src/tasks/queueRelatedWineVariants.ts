@@ -1,30 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from 'payload'
-
-// Constants
-const QUEUE_RELATED_CONSTANTS = {
-  TASK_NAME: 'syncFlatWineVariant',
-  DEFAULT_DEPTH: 0,
-  COLLECTIONS: {
-    WINES: 'wines',
-    REGIONS: 'regions',
-    WINE_VARIANTS: 'wine-variants',
-  },
-  LOOKUP_FIELDS: {
-    WINE: 'wine',
-    WINERY: 'winery',
-    REGION: 'region',
-    COUNTRY: 'country',
-    AROMA: 'aroma',
-    TAG: 'tag',
-    MOOD: 'mood',
-    GRAPE_VARIETY: 'grapeVariety',
-  },
-} as const
+import { QUEUE_CONSTANTS, type LookupField, type CollectionName } from '@/constants/queue'
 
 // Types
-type LookupField =
-  (typeof QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS)[keyof typeof QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS]
-
 interface TaskInput {
   wineVariantId: string
 }
@@ -37,19 +14,24 @@ interface WineWithId {
   id: number
 }
 
+// Helper function to get lookup field from collection
+function getLookupFieldFromCollection(collection: string): LookupField | null {
+  return QUEUE_CONSTANTS.COLLECTION_MAPPINGS[collection as CollectionName] || null
+}
+
 // Helper functions
 async function findWineVariantsByWines(
   req: PayloadRequest,
   wineIds: string[],
 ): Promise<WineVariantWithId[]> {
   const result = await req.payload.find({
-    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
     where: {
       wine: {
         in: wineIds,
       },
     },
-    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   return result.docs as WineVariantWithId[]
@@ -60,13 +42,13 @@ async function findWinesByWinery(
   wineryId: string | number,
 ): Promise<WineWithId[]> {
   const result = await req.payload.find({
-    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINES,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINES,
     where: {
       winery: {
         equals: wineryId,
       },
     },
-    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   return result.docs as WineWithId[]
@@ -91,13 +73,13 @@ async function findWinesByRegion(
   regionId: string | number,
 ): Promise<WineWithId[]> {
   const result = await req.payload.find({
-    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINES,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINES,
     where: {
       region: {
         equals: regionId,
       },
     },
-    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   return result.docs as WineWithId[]
@@ -122,13 +104,13 @@ async function findWinesByCountry(
   countryId: string | number,
 ): Promise<WineWithId[]> {
   const result = await req.payload.find({
-    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINES,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINES,
     where: {
       'region.country': {
         equals: countryId,
       },
     },
-    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   return result.docs as WineWithId[]
@@ -140,13 +122,13 @@ async function findWineVariantsByDirectField(
   docId: string | number,
 ): Promise<WineVariantWithId[]> {
   const result = await req.payload.find({
-    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
     where: {
       [field]: {
         equals: docId,
       },
     },
-    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   return result.docs as WineVariantWithId[]
@@ -157,13 +139,13 @@ async function findWineVariantsByGrapeVariety(
   grapeVarietyId: string | number,
 ): Promise<WineVariantWithId[]> {
   const result = await req.payload.find({
-    collection: QUEUE_RELATED_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
+    collection: QUEUE_CONSTANTS.COLLECTIONS.WINE_VARIANTS,
     where: {
       'grapeVarieties.variety': {
         equals: grapeVarietyId,
       },
     },
-    depth: QUEUE_RELATED_CONSTANTS.DEFAULT_DEPTH,
+    depth: QUEUE_CONSTANTS.DEFAULTS.DEPTH,
   })
 
   return result.docs as WineVariantWithId[]
@@ -176,7 +158,7 @@ async function queueWineVariantSyncJobs(
   await Promise.allSettled(
     variants.map((variant) =>
       req.payload.jobs.queue({
-        task: QUEUE_RELATED_CONSTANTS.TASK_NAME,
+        task: QUEUE_CONSTANTS.TASKS.SYNC_FLAT_WINE_VARIANT,
         input: {
           wineVariantId: String(variant.id),
         } as TaskInput,
@@ -276,24 +258,24 @@ async function processLookupField(
 ): Promise<void> {
   try {
     switch (lookupField) {
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINE:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.WINE:
         await handleWineLookup(req, docId)
         break
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINERY:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.WINERY:
         await handleWineryLookup(req, docId)
         break
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.REGION:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.REGION:
         await handleRegionLookup(req, docId)
         break
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.COUNTRY:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.COUNTRY:
         await handleCountryLookup(req, docId)
         break
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.AROMA:
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.TAG:
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.MOOD:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.AROMA:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.TAG:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.MOOD:
         await handleDirectFieldLookup(req, lookupField, docId)
         break
-      case QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY:
+      case QUEUE_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY:
         await handleGrapeVarietyLookup(req, docId)
         break
       default:
@@ -320,41 +302,14 @@ export const queueRelatedWineVariants = (collection: string) => {
     }
 
     // Determine the lookup field based on the collection
-    let lookupField: LookupField | null = null
+    const lookupField = getLookupFieldFromCollection(collection)
 
-    switch (collection) {
-      case 'wines':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINE
-        break
-      case 'wineries':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINERY
-        break
-      case 'regions':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.REGION
-        break
-      case 'wineCountries':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.COUNTRY
-        break
-      case 'aromas':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.AROMA
-        break
-      case 'tags':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.TAG
-        break
-      case 'moods':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.MOOD
-        break
-      case 'grape-varieties':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY
-        break
-      default:
-        req.payload.logger?.warn?.(`[queueRelatedWineVariants] Unknown collection: ${collection}`)
-        return
+    if (!lookupField) {
+      req.payload.logger?.warn?.(`[queueRelatedWineVariants] Unknown collection: ${collection}`)
+      return
     }
 
-    if (lookupField) {
-      await processLookupField(req, lookupField, docId)
-    }
+    await processLookupField(req, lookupField, docId)
   }
 
   const afterDelete: CollectionAfterDeleteHook = async ({ id, req }) => {
@@ -364,41 +319,14 @@ export const queueRelatedWineVariants = (collection: string) => {
     }
 
     // Determine the lookup field based on the collection
-    let lookupField: LookupField | null = null
+    const lookupField = getLookupFieldFromCollection(collection)
 
-    switch (collection) {
-      case 'wines':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINE
-        break
-      case 'wineries':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.WINERY
-        break
-      case 'regions':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.REGION
-        break
-      case 'wineCountries':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.COUNTRY
-        break
-      case 'aromas':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.AROMA
-        break
-      case 'tags':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.TAG
-        break
-      case 'moods':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.MOOD
-        break
-      case 'grape-varieties':
-        lookupField = QUEUE_RELATED_CONSTANTS.LOOKUP_FIELDS.GRAPE_VARIETY
-        break
-      default:
-        req.payload.logger?.warn?.(`[queueRelatedWineVariants] Unknown collection: ${collection}`)
-        return
+    if (!lookupField) {
+      req.payload.logger?.warn?.(`[queueRelatedWineVariants] Unknown collection: ${collection}`)
+      return
     }
 
-    if (lookupField) {
-      await processLookupField(req, lookupField, id)
-    }
+    await processLookupField(req, lookupField, id)
   }
 
   return { afterChange, afterDelete }
