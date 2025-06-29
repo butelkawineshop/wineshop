@@ -17,7 +17,6 @@ interface WineGridProps {
 
 export function WineGrid({ variants, locale, className = '' }: WineGridProps): React.JSX.Element {
   const t = useTranslations('wine')
-  const [collectionItemsLoaded, setCollectionItemsLoaded] = useState(false)
   const [loadedRows, setLoadedRows] = useState(5) // Start with 5 rows
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -32,12 +31,10 @@ export function WineGrid({ variants, locale, className = '' }: WineGridProps): R
           moods: result.moods.length,
           grapeVarieties: result.grapeVarieties.length,
         })
-        setCollectionItemsLoaded(true)
       } catch (error) {
         console.error('WineGrid: Failed to load collection items', error)
         logger.error('Failed to load collection items', { error })
         // Still set as loaded to prevent infinite retries
-        setCollectionItemsLoaded(true)
       }
     }
 

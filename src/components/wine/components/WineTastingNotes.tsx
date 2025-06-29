@@ -89,10 +89,10 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
   // Get tasting values from variant data
   const getTastingValue = (key: string): number => {
     try {
-      // Check if variant has tastingProfile data
-      if (variant.tastingProfile && typeof variant.tastingProfile === 'object') {
-        const profile = variant.tastingProfile as Record<string, unknown>
-        const value = profile[key]
+      // Check if variant has tastingNotes data
+      if (variant.tastingNotes && typeof variant.tastingNotes === 'object') {
+        const notes = variant.tastingNotes as Record<string, unknown>
+        const value = notes[key]
 
         // Return the value if it's a number, otherwise return default
         if (typeof value === 'number' && value >= 0) {
@@ -101,15 +101,15 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
       }
 
       // Fallback to default value if no data is available
-      return 5
+      return 0
     } catch (_error) {
       // Return default value if there's an error
-      return 5
+      return 0
     }
   }
 
   return (
-    <div className="bg-background flex flex-col w-full h-full px-2">
+    <div className="bg-background flex flex-col w-full h-full px-2 justify-between">
       <div className="grid grid-cols-1 gap-4 px-2 sm:px-0">
         {currentPagePairs.map(({ key, left, right }) => {
           const value = getTastingValue(key)
@@ -120,7 +120,7 @@ export function WineTastingNotes({ variant, page = 1 }: WineTastingNotesProps): 
           const percentage = (value / maxValue) * 100
 
           return (
-            <div key={key} className="flex flex-col gap-1">
+            <div key={key} className="flex flex-col gap-1 justify-between h-full">
               <div className="flex items-center justify-between text-xs text-foreground/70">
                 <div className="flex items-center gap-2">
                   <Icon

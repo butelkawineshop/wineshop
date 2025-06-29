@@ -571,6 +571,7 @@ function prepareFlatVariantData(
     englishDishTitles: Record<string, string>
     englishDishSlugs: Record<string, string>
   },
+  logger: any,
 ): Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'> {
   // Extract region and country info
   const wineRegion = typeof wine.region === 'object' ? wine.region : null
@@ -647,7 +648,6 @@ function prepareFlatVariantData(
       const notes = wineVariant.tastingNotes
       if (!notes || typeof notes !== 'object') return undefined
 
-      // Check if all values are null
       const allNull = Object.values(notes).every((value) => value === null)
       if (allNull) return undefined
 
@@ -860,6 +860,80 @@ async function fetchEnglishCountrySlug(
   }
 
   return undefined
+}
+
+/**
+ * Update related wines for a specific variant (simplified version)
+ */
+async function updateRelatedWinesForVariant(
+  payload: any,
+  flatVariantData: Omit<FlatWineVariant, 'id' | 'updatedAt' | 'createdAt'>,
+  logger: any,
+): Promise<void> {
+  try {
+    // Find the flat variant ID
+    const existingFlatVariants = await payload.find({
+      collection: 'flat-wine-variants',
+      where: {
+        originalVariant: {
+          equals: flatVariantData.originalVariant,
+        },
+      },
+      limit: 1,
+    })
+
+    if (existingFlatVariants.docs.length === 0) {
+      logger.warn('Flat variant not found for related wines update', {
+        originalVariant: String(flatVariantData.originalVariant),
+      })
+      return
+    }
+
+    const flatVariantId = existingFlatVariants.docs[0].id
+
+    // For now, just create a basic related wines record
+    // In a full implementation, this would use the intelligent matching logic
+    const relatedWinesData = {
+      variantId: flatVariantId,
+      relatedVariants: [],
+      relatedCount: 0,
+      lastComputed: new Date().toISOString(),
+      computationVersion: '1.0.0',
+      _status: 'published' as const,
+    }
+
+    // Check if related wines record already exists
+    const existing = await payload.find({
+      collection: 'related-wine-variants',
+      where: { variantId: { equals: flatVariantId } },
+      limit: 1,
+    })
+
+    if (existing.docs.length > 0) {
+      // Update existing record
+      await payload.update({
+        collection: 'related-wine-variants',
+        id: existing.docs[0].id,
+        data: relatedWinesData,
+      })
+    } else {
+      // Create new record
+      await payload.create({
+        collection: 'related-wine-variants',
+        data: relatedWinesData,
+      })
+    }
+
+    logger.info('Successfully updated related wines', {
+      variantId: flatVariantId,
+      relatedCount: 0,
+    })
+  } catch (error) {
+    logger.error('Error updating related wines', error as Error, {
+      originalVariant: String(flatVariantData.originalVariant),
+    })
+    // Don't throw - this is a background optimization
+  }
 }
 
 async function forceUpdateFlatVariants() {
@@ -1082,6 +1156,7 @@ async function forceUpdateFlatVariants() {
           relatedRegions,
           wineryTags,
           englishTitlesAndSlugs,
+          taskLogger,
         )
 
         taskLogger.debug(`Flat variant data prepared for variant ${wineVariant.id}`)
@@ -1090,6 +1165,15 @@ async function forceUpdateFlatVariants() {
         await createOrUpdateFlatVariant(payload, flatVariantData, taskLogger)
 
         taskLogger.debug(`Flat variant created/updated for variant ${wineVariant.id}`)
+
+        // Update related wines for this variant (similar to sync task)
+        try {
+          await updateRelatedWinesForVariant(payload, flatVariantData, taskLogger)
+          taskLogger.debug(`Related wines updated for variant ${wineVariant.id}`)
+        } catch (error) {
+          taskLogger.warn(`Failed to update related wines for variant ${wineVariant.id}:`, error)
+          // Don't fail the entire process for related wines errors
+        }
 
         successCount++
 

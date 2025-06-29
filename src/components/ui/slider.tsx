@@ -15,6 +15,8 @@ interface SliderProps {
   'aria-labelledby'?: string
 }
 
+const HORIZONTAL_PADDING = 16 // px, adjust as needed for breathing room
+
 /**
  * Range slider component with dual handles for minimum and maximum values
  *
@@ -52,6 +54,19 @@ export function Slider({
   const [isDragging, setIsDragging] = useState(false)
   const [dragType, setDragType] = useState<'min' | 'max' | null>(null)
   const sliderRef = useRef<HTMLDivElement>(null)
+  const [trackWidth, setTrackWidth] = useState<number>(0)
+
+  // Measure track width on mount and resize
+  useEffect(() => {
+    function updateWidth() {
+      if (sliderRef.current) {
+        setTrackWidth(sliderRef.current.offsetWidth)
+      }
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   // Validate input values
   const validatedMin = Math.min(min, max)
@@ -64,23 +79,35 @@ export function Slider({
     [validatedMin, validatedMax, value],
   )
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, type: 'min' | 'max'): void => {
-    setIsDragging(true)
-    setDragType(type)
-    e.preventDefault()
-  }, [])
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent): void => {
-      if (!isDragging || !sliderRef.current || !dragType) return
+  const calculateValueFromPosition = useCallback(
+    (clientX: number): number => {
+      if (!sliderRef.current) return validatedValue[0]
 
       const rect = sliderRef.current.getBoundingClientRect()
       const percentage = Math.max(
         UI_CONSTANTS.SLIDER_MIN_PERCENTAGE,
-        Math.min(UI_CONSTANTS.SLIDER_MAX_PERCENTAGE, (e.clientX - rect.left) / rect.width),
+        Math.min(UI_CONSTANTS.SLIDER_MAX_PERCENTAGE, (clientX - rect.left) / rect.width),
       )
-      const newValue =
-        Math.round((validatedMin + (validatedMax - validatedMin) * percentage) / step) * step
+      return Math.round((validatedMin + (validatedMax - validatedMin) * percentage) / step) * step
+    },
+    [validatedMin, validatedMax, validatedValue, step],
+  )
+
+  const handleStart = useCallback(
+    (e: React.MouseEvent | React.TouchEvent, type: 'min' | 'max'): void => {
+      setIsDragging(true)
+      setDragType(type)
+      e.preventDefault()
+    },
+    [],
+  )
+
+  const handleMove = useCallback(
+    (e: MouseEvent | TouchEvent): void => {
+      if (!isDragging || !sliderRef.current || !dragType) return
+
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+      const newValue = calculateValueFromPosition(clientX)
 
       if (dragType === 'min') {
         const newMin = Math.min(newValue, validatedValue[1] - step)
@@ -90,10 +117,10 @@ export function Slider({
         onValueChange([validatedValue[0], newMax])
       }
     },
-    [isDragging, dragType, validatedMin, validatedMax, validatedValue, step, onValueChange],
+    [isDragging, dragType, validatedValue, step, onValueChange, calculateValueFromPosition],
   )
 
-  const handleMouseUp = useCallback((): void => {
+  const handleEnd = useCallback((): void => {
     setIsDragging(false)
     setDragType(null)
   }, [])
@@ -135,19 +162,52 @@ export function Slider({
     [validatedMin, validatedMax, validatedValue, step, onValueChange],
   )
 
+  // Handle click/tap on slider track
+  const handleTrackClick = useCallback(
+    (e: React.MouseEvent | React.TouchEvent): void => {
+      if (isDragging) return
+
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+      const newValue = calculateValueFromPosition(clientX)
+
+      // Determine which handle to move based on which is closer
+      const distanceToMin = Math.abs(newValue - validatedValue[0])
+      const distanceToMax = Math.abs(newValue - validatedValue[1])
+
+      if (distanceToMin <= distanceToMax) {
+        const newMin = Math.min(newValue, validatedValue[1] - step)
+        onValueChange([newMin, validatedValue[1]])
+      } else {
+        const newMax = Math.max(newValue, validatedValue[0] + step)
+        onValueChange([validatedValue[0], newMax])
+      }
+    },
+    [isDragging, validatedValue, step, onValueChange, calculateValueFromPosition],
+  )
+
   useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('mousemove', handleMove)
+      document.addEventListener('mouseup', handleEnd)
+      document.addEventListener('touchmove', handleMove, { passive: false })
+      document.addEventListener('touchend', handleEnd)
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
+        document.removeEventListener('mousemove', handleMove)
+        document.removeEventListener('mouseup', handleEnd)
+        document.removeEventListener('touchmove', handleMove)
+        document.removeEventListener('touchend', handleEnd)
       }
     }
-  }, [isDragging, handleMouseMove, handleMouseUp])
+  }, [isDragging, handleMove, handleEnd])
 
-  const minPercentage = ((validatedValue[0] - validatedMin) / (validatedMax - validatedMin)) * 100
-  const maxPercentage = ((validatedValue[1] - validatedMin) / (validatedMax - validatedMin)) * 100
+  // Calculate pixel positions for handles and fill
+  const availableWidth = Math.max(trackWidth - 2 * HORIZONTAL_PADDING, 1)
+  const minPos =
+    HORIZONTAL_PADDING +
+    ((validatedValue[0] - validatedMin) / (validatedMax - validatedMin)) * availableWidth
+  const maxPos =
+    HORIZONTAL_PADDING +
+    ((validatedValue[1] - validatedMin) / (validatedMax - validatedMin)) * availableWidth
 
   const sliderId = React.useId()
   const minHandleId = `${sliderId}-min`
@@ -160,44 +220,55 @@ export function Slider({
         `relative ${UI_CONSTANTS.SLIDER_TRACK_HEIGHT} bg-gray-200 rounded-full cursor-pointer`,
         className,
       )}
+      style={{ paddingLeft: HORIZONTAL_PADDING, paddingRight: HORIZONTAL_PADDING }}
       role="group"
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
       tabIndex={-1}
+      onClick={handleTrackClick}
+      onTouchStart={handleTrackClick}
     >
       <div
         className="absolute h-full bg-primary rounded-full"
         style={{
-          left: `${minPercentage}%`,
-          width: `${maxPercentage - minPercentage}%`,
+          left: minPos,
+          width: maxPos - minPos,
         }}
       />
       <div
         id={minHandleId}
-        className={`absolute top-1/2 ${UI_CONSTANTS.SLIDER_HANDLE_SIZE} bg-primary rounded-full border-2 border-white transform -translate-y-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
-        style={{ left: `${minPercentage}%` }}
+        className="absolute top-1/2 w-7 h-7 sm:w-6 sm:h-6 lg:w-5 lg:h-5 bg-primary rounded-full border-2 border-white transform -translate-y-1/2 -translate-x-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 touch-manipulation"
+        style={{ left: minPos }}
         role="slider"
         aria-label="Minimum value"
         aria-valuemin={validatedMin}
         aria-valuemax={validatedValue[1] - step}
         aria-valuenow={validatedValue[0]}
         tabIndex={0}
-        onMouseDown={(e) => handleMouseDown(e, 'min')}
+        onMouseDown={(e) => handleStart(e, 'min')}
+        onTouchStart={(e) => handleStart(e, 'min')}
         onKeyDown={(e) => handleKeyDown(e, 'min')}
-      />
+      >
+        {/* Invisible touch area for better mobile interaction */}
+        <div className="absolute inset-0 w-10 h-10 sm:w-8 sm:h-8 lg:w-7 lg:h-7 transform -translate-x-1/2 -translate-y-1/2" />
+      </div>
       <div
         id={maxHandleId}
-        className={`absolute top-1/2 ${UI_CONSTANTS.SLIDER_HANDLE_SIZE} bg-primary rounded-full border-2 border-white transform -translate-y-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
-        style={{ left: `${maxPercentage}%` }}
+        className="absolute top-1/2 w-7 h-7 sm:w-6 sm:h-6 lg:w-5 lg:h-5 bg-primary rounded-full border-2 border-white transform -translate-y-1/2 -translate-x-1/2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 touch-manipulation"
+        style={{ left: maxPos }}
         role="slider"
         aria-label="Maximum value"
         aria-valuemin={validatedValue[0] + step}
         aria-valuemax={validatedMax}
         aria-valuenow={validatedValue[1]}
         tabIndex={0}
-        onMouseDown={(e) => handleMouseDown(e, 'max')}
+        onMouseDown={(e) => handleStart(e, 'max')}
+        onTouchStart={(e) => handleStart(e, 'max')}
         onKeyDown={(e) => handleKeyDown(e, 'max')}
-      />
+      >
+        {/* Invisible touch area for better mobile interaction */}
+        <div className="absolute inset-0 w-10 h-10 sm:w-8 sm:h-8 lg:w-7 lg:h-7 transform -translate-x-1/2 -translate-y-1/2" />
+      </div>
     </div>
   )
 }

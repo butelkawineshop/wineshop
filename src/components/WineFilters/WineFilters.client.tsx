@@ -10,12 +10,12 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Accordion } from '@/components/Accordion'
 import type { Locale } from '@/i18n/locales'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useDebounce } from '@/hooks/useDebounce'
 import {
   FILTER_CONSTANTS,
   FILTER_COLLECTIONS,
   TASTING_NOTES,
   DEFAULT_TASTING_NOTES,
-  DEFAULT_PRICE_RANGE,
 } from '@/constants/filters'
 import { useWineStore } from '@/store/wineStore'
 import { ResetFilterButton } from './ResetFilterButton'
@@ -46,13 +46,36 @@ const isArrayFilter = (key: string): boolean => {
   ].includes(key)
 }
 
+// Helper to get the effective price (future-proof for discounts)
+function getEffectivePrice(item: { price?: number | null }): number | undefined {
+  // In the future, check for discountedPrice here
+  return typeof item.price === 'number' ? item.price : undefined
+}
+
+// Helper to get min/max price from wine variants in the store
+function getPriceBounds(wineVariants: { price?: number | null }[]): [number, number] {
+  let min = Infinity
+  let max = -Infinity
+  wineVariants.forEach((item) => {
+    const price = getEffectivePrice(item)
+    if (typeof price === 'number') {
+      if (price < min) min = price
+      if (price > max) max = price
+    }
+  })
+  if (min === Infinity || max === -Infinity) {
+    return [0, 1000]
+  }
+  return [Math.floor(min), Math.ceil(max)]
+}
+
 export default function WineFiltersClient({
   collectionItems,
   currentCollection,
   locale,
 }: WineFiltersClientProps): React.JSX.Element {
   const { t } = useTranslation()
-  const { filters, setFilter, clearFilter, _migrateFilters } = useWineStore()
+  const { filters, setFilter, clearFilter, _migrateFilters, wineVariants } = useWineStore()
 
   // Migrate filters if needed (for persisted data)
   React.useEffect(() => {
@@ -61,6 +84,64 @@ export default function WineFiltersClient({
 
   const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
+
+  // Debounced search queries for filtering
+  const debouncedSearchQueries = useDebounce(searchQueries, 200)
+
+  // Calculate price bounds from wine variants in the store
+  const [priceMin, priceMax] = React.useMemo(() => getPriceBounds(wineVariants), [wineVariants])
+
+  // Debounced state for immediate UI updates
+  const [immediatePriceRange, setImmediatePriceRange] = useState<[number, number]>(
+    filters?.priceRange || [priceMin, priceMax],
+  )
+  const [immediateTastingNotes, setImmediateTastingNotes] = useState<typeof DEFAULT_TASTING_NOTES>(
+    filters?.tastingNotes || DEFAULT_TASTING_NOTES,
+  )
+
+  // Debounced values that will trigger API calls
+  const debouncedPriceRange = useDebounce(immediatePriceRange, 300)
+  const debouncedTastingNotes = useDebounce(immediateTastingNotes, 300)
+
+  // If price bounds change and current range is out of bounds, update it
+  React.useEffect(() => {
+    if (
+      immediatePriceRange[0] < priceMin ||
+      immediatePriceRange[1] > priceMax ||
+      immediatePriceRange[0] > immediatePriceRange[1] ||
+      immediatePriceRange[0] === immediatePriceRange[1]
+    ) {
+      setImmediatePriceRange([priceMin, priceMax])
+    }
+  }, [priceMin, priceMax, immediatePriceRange])
+
+  // Update filters when debounced values change
+  React.useEffect(() => {
+    if (filters?.priceRange !== debouncedPriceRange) {
+      setFilter('priceRange', debouncedPriceRange)
+    }
+  }, [debouncedPriceRange, setFilter, filters?.priceRange])
+
+  React.useEffect(() => {
+    if (JSON.stringify(filters?.tastingNotes) !== JSON.stringify(debouncedTastingNotes)) {
+      setFilter('tastingNotes', debouncedTastingNotes)
+    }
+  }, [debouncedTastingNotes, setFilter, filters?.tastingNotes])
+
+  // Update immediate state when filters change externally
+  React.useEffect(() => {
+    if (filters?.priceRange) {
+      setImmediatePriceRange(filters.priceRange)
+    } else {
+      setImmediatePriceRange([priceMin, priceMax])
+    }
+  }, [filters?.priceRange, priceMin, priceMax])
+
+  React.useEffect(() => {
+    if (filters?.tastingNotes) {
+      setImmediateTastingNotes(filters.tastingNotes)
+    }
+  }, [filters?.tastingNotes])
 
   // Safety check - ensure filters are properly initialized
   if (!filters) {
@@ -92,13 +173,14 @@ export default function WineFiltersClient({
   }
 
   const updateTastingNoteRange = (key: string, value: [number, number]): void => {
-    const currentTastingNotes = { ...(filters.tastingNotes || {}) }
-    currentTastingNotes[key as keyof typeof currentTastingNotes] = value
-    setFilter('tastingNotes', currentTastingNotes)
+    setImmediateTastingNotes((prev) => ({
+      ...prev,
+      [key]: value,
+    }))
   }
 
   const updatePriceRange = (value: [number, number]): void => {
-    setFilter('priceRange', value)
+    setImmediatePriceRange(value)
   }
 
   const resetCollectionFilter = (key: string): void => {
@@ -106,11 +188,11 @@ export default function WineFiltersClient({
   }
 
   const resetPriceFilter = (): void => {
-    setFilter('priceRange', DEFAULT_PRICE_RANGE)
+    setImmediatePriceRange([priceMin, priceMax])
   }
 
   const resetTastingNotesFilter = (): void => {
-    setFilter('tastingNotes', DEFAULT_TASTING_NOTES)
+    setImmediateTastingNotes(DEFAULT_TASTING_NOTES)
   }
 
   const handleSearchChange = (collection: string, value: string): void => {
@@ -123,7 +205,7 @@ export default function WineFiltersClient({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getFilteredItems = (collection: string): any[] => {
     const items = collectionItems[collection] || []
-    const searchQuery = searchQueries[collection] || ''
+    const searchQuery = debouncedSearchQueries[collection] || ''
 
     if (!searchQuery) return items
 
@@ -149,15 +231,14 @@ export default function WineFiltersClient({
   }
 
   const getTastingNoteRange = (key: string): [number, number] => {
-    const tastingNotes = filters.tastingNotes || {}
     return (
-      tastingNotes[key as keyof typeof tastingNotes] ||
+      immediateTastingNotes[key as keyof typeof immediateTastingNotes] ||
       DEFAULT_TASTING_NOTES[key as keyof typeof DEFAULT_TASTING_NOTES]
     )
   }
 
   const getPriceRange = (): [number, number] => {
-    return filters.priceRange || DEFAULT_PRICE_RANGE
+    return immediatePriceRange
   }
 
   return (
@@ -281,24 +362,31 @@ export default function WineFiltersClient({
           className="border-0"
         >
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center justify-between text-sm flex-1">
-                <span>€{getPriceRange()[0]}</span>
-                <span>€{getPriceRange()[1]}</span>
+            {priceMin === priceMax ? (
+              <div className="text-sm text-muted-foreground text-center py-4">
+                {t('filters.noPricesFound')}
               </div>
-              {getPriceRange()[0] !== DEFAULT_PRICE_RANGE[0] ||
-              getPriceRange()[1] !== DEFAULT_PRICE_RANGE[1] ? (
-                <ResetFilterButton onReset={resetPriceFilter} className="ml-2" />
-              ) : null}
-            </div>
-            <Slider
-              value={getPriceRange()}
-              onValueChange={updatePriceRange}
-              min={0}
-              max={1000}
-              step={10}
-              className="w-full"
-            />
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between text-sm flex-1">
+                    <span>€{getPriceRange()[0]}</span>
+                    <span>€{getPriceRange()[1]}</span>
+                  </div>
+                  {getPriceRange()[0] !== priceMin || getPriceRange()[1] !== priceMax ? (
+                    <ResetFilterButton onReset={resetPriceFilter} className="ml-2" />
+                  ) : null}
+                </div>
+                <Slider
+                  value={getPriceRange()}
+                  onValueChange={updatePriceRange}
+                  min={priceMin}
+                  max={priceMax}
+                  step={1}
+                  className="w-full"
+                />
+              </>
+            )}
           </div>
         </Accordion>
 
@@ -351,7 +439,7 @@ export default function WineFiltersClient({
 
             {/* Reset button for tasting notes */}
             {(() => {
-              const hasNonDefaultRanges = Object.entries(filters.tastingNotes || {}).some(
+              const hasNonDefaultRanges = Object.entries(immediateTastingNotes).some(
                 ([key, range]) => {
                   const defaultRange =
                     DEFAULT_TASTING_NOTES[key as keyof typeof DEFAULT_TASTING_NOTES]

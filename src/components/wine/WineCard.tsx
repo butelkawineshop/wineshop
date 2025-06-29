@@ -72,7 +72,7 @@ export function WineCard({
         ref={swiperRef}
         nested={true}
         onSlideChange={handleSlideChange}
-        className="w-full bg-background flex-shrink-0"
+        className="w-full bg-background flex-shrink-0 aspect-square"
         role="region"
         aria-label="Wine details slideshow"
       >
@@ -123,7 +123,7 @@ export function WineCard({
 
         {/* First tasting notes page */}
         <SwiperSlide>
-          <div className="w-full h-full flex aspect-square flex-col">
+          <div className="w-full h-full flex flex-col">
             <div className="text-center px-4 font-accent text-sm">
               {t('wine.tastingNotes.tasteProfile')}
             </div>
@@ -133,7 +133,7 @@ export function WineCard({
 
         {/* Second tasting notes page */}
         <SwiperSlide>
-          <div className="w-full h-full flex aspect-square flex-col">
+          <div className="w-full h-full flex  flex-col">
             <div className="text-center px-4 font-accent text-sm">
               {t('wine.tastingNotes.characterNotes')}
             </div>

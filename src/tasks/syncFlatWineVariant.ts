@@ -736,7 +736,8 @@ async function createOrUpdateFlatVariant(
   })
 
   try {
-    const existingFlatVariants = await (req.payload as any).find('flat-wine-variants', {
+    const existingFlatVariants = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         originalVariant: {
           equals: cleanedData.originalVariant,
@@ -1041,7 +1042,8 @@ async function updateRelatedWinesForVariant(
 ): Promise<void> {
   try {
     // Find the flat variant ID
-    const existingFlatVariants = await (req.payload as any).find('flat-wine-variants', {
+    const existingFlatVariants = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         originalVariant: {
           equals: flatVariantData.originalVariant,
@@ -1174,27 +1176,31 @@ async function updateRelatedWinesCollection(
       variantId,
       relatedVariants,
       relatedCount: relatedVariants.length,
-      lastComputed: new Date(),
+      lastComputed: new Date().toISOString(),
       computationVersion: '1.0.0',
-      _status: 'published',
+      _status: 'published' as const,
     }
 
     // Check if related wines record already exists
-    const existing = await (req.payload as any).find('related-wine-variants', {
+    const existing = await req.payload.find({
+      collection: 'related-wine-variants',
       where: { variantId: { equals: variantId } },
       limit: 1,
     })
 
     if (existing.docs.length > 0) {
       // Update existing record
-      await (req.payload as any).update(
-        'related-wine-variants',
-        existing.docs[0].id,
-        relatedWinesData,
-      )
+      await req.payload.update({
+        collection: 'related-wine-variants',
+        id: existing.docs[0].id,
+        data: relatedWinesData,
+      })
     } else {
       // Create new record
-      await (req.payload as any).create('related-wine-variants', relatedWinesData)
+      await req.payload.create({
+        collection: 'related-wine-variants',
+        data: relatedWinesData,
+      })
     }
   } catch (error) {
     logger.error('Error updating related wines collection', error as Error, { variantId })
@@ -1376,7 +1382,8 @@ async function findSingleGrapeVarietyWines(
   logger: ReturnType<typeof createLogger>,
 ): Promise<Array<{ relatedVariant: FlatWineVariant }>> {
   try {
-    const { docs } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { grapeVarieties__title: { equals: grapeTitle } },
@@ -1410,7 +1417,8 @@ async function findWinesWithGrapeVariety(
   logger: ReturnType<typeof createLogger>,
 ): Promise<Array<{ relatedVariant: FlatWineVariant }>> {
   try {
-    const { docs } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { grapeVarieties__title: { equals: grapeTitle } },
@@ -1444,7 +1452,8 @@ async function findExactCompositionMatches(
     // Get all wines that contain all the grape varieties
     const grapeTitles = grapeVarieties.map((gv) => gv.title)
 
-    const { docs } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { grapeVarieties__title: { in: grapeTitles } },
@@ -1505,7 +1514,8 @@ async function findWinesWithGrapeVarietyByPercentage(
   logger: ReturnType<typeof createLogger>,
 ): Promise<Array<{ relatedVariant: FlatWineVariant }>> {
   try {
-    const { docs } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { grapeVarieties__title: { equals: grapeTitle } },
@@ -1553,7 +1563,8 @@ async function findWineryMatches(
 
   try {
     // Same winery wines
-    const { docs: sameWineryVariants } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs: sameWineryVariants } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { wineryID: { equals: variant.wineryID } },
@@ -1596,22 +1607,20 @@ async function findWineryMatches(
             wineryID: { equals: wineryId },
           }))
 
-          const { docs: relatedWineryVariants } = await (req.payload as any).find(
-            'flat-wine-variants',
-            {
-              where: {
-                and: [
-                  { or: orConditions },
-                  { id: { not_equals: variant.id } },
-                  { isPublished: { equals: true } },
-                  { stockOnHand: { greater_than: 0 } },
-                ],
-              },
-              limit: 5 - matches.length,
-              sort: '-createdAt',
-              depth: 1,
+          const { docs: relatedWineryVariants } = await req.payload.find({
+            collection: 'flat-wine-variants',
+            where: {
+              and: [
+                { or: orConditions },
+                { id: { not_equals: variant.id } },
+                { isPublished: { equals: true } },
+                { stockOnHand: { greater_than: 0 } },
+              ],
             },
-          )
+            limit: 5 - matches.length,
+            sort: '-createdAt',
+            depth: 1,
+          })
 
           for (const relatedVariant of relatedWineryVariants as FlatWineVariant[]) {
             if (!seenVariantIds.has(relatedVariant.id) && matches.length < 5) {
@@ -1647,7 +1656,8 @@ async function findRegionMatches(
 
   try {
     // Same region wines
-    const { docs: sameRegionVariants } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs: sameRegionVariants } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { regionID: { equals: variant.regionID } },
@@ -1690,22 +1700,20 @@ async function findRegionMatches(
             regionID: { equals: regionId },
           }))
 
-          const { docs: relatedRegionVariants } = await (req.payload as any).find(
-            'flat-wine-variants',
-            {
-              where: {
-                and: [
-                  { or: orConditions },
-                  { id: { not_equals: variant.id } },
-                  { isPublished: { equals: true } },
-                  { stockOnHand: { greater_than: 0 } },
-                ],
-              },
-              limit: 5 - matches.length,
-              sort: '-createdAt',
-              depth: 1,
+          const { docs: relatedRegionVariants } = await req.payload.find({
+            collection: 'flat-wine-variants',
+            where: {
+              and: [
+                { or: orConditions },
+                { id: { not_equals: variant.id } },
+                { isPublished: { equals: true } },
+                { stockOnHand: { greater_than: 0 } },
+              ],
             },
-          )
+            limit: 5 - matches.length,
+            sort: '-createdAt',
+            depth: 1,
+          })
 
           for (const relatedVariant of relatedRegionVariants as FlatWineVariant[]) {
             if (!seenVariantIds.has(relatedVariant.id) && matches.length < 5) {
@@ -1747,7 +1755,8 @@ async function findPriceMatches(
       max: Math.ceil(variant.price * 1.2),
     }
 
-    const { docs: priceVariants } = await (req.payload as any).find('flat-wine-variants', {
+    const { docs: priceVariants } = await req.payload.find({
+      collection: 'flat-wine-variants',
       where: {
         and: [
           { price: { greater_than_equal: priceRange.min } },

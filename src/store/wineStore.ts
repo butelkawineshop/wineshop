@@ -226,11 +226,14 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
 
       for (const key of tastingNoteKeys) {
         const variantValue = variant.tastingNotes[key]
-        if (variantValue !== null && variantValue !== undefined) {
-          const [minValue, maxValue] = filters.tastingNotes[key]
-          if (variantValue < minValue || variantValue > maxValue) {
-            return false
-          }
+        const [minValue, maxValue] = filters.tastingNotes[key]
+        if (
+          variantValue === null ||
+          variantValue === undefined ||
+          variantValue < minValue ||
+          variantValue > maxValue
+        ) {
+          return false
         }
       }
     }
