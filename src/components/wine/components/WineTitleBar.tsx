@@ -35,9 +35,9 @@ export function WineTitleBar({ variant, locale }: WineTitleBarProps): React.JSX.
           collection="wines"
           slug={variant.slug || String(variant.id)}
           locale={locale}
-          className="interactive-text"
+          className="block"
         >
-          <h3 className="line-clamp-2 text-left text-lg md:text-sm font-accent lowercase transition-colors">
+          <h3 className="line-clamp-2 text-left text-lg md:text-sm font-accent lowercase transition-all hover:scale-110 transform-gpu origin-left">
             {variant.wineTitle || t('wine.unknownWine')}
           </h3>
         </CollectionLink>

@@ -184,7 +184,25 @@ export default function WineFiltersClient({
   }
 
   const resetCollectionFilter = (key: string): void => {
-    clearFilter(key as keyof typeof filters)
+    // Ensure the key is a valid filter key
+    const validFilterKeys = [
+      'regions',
+      'wineries',
+      'wineCountries',
+      'styles',
+      'aromas',
+      'moods',
+      'grape-varieties',
+      'tags',
+      'dishes',
+      'climates',
+    ] as const
+
+    if (validFilterKeys.includes(key as any)) {
+      clearFilter(key as keyof typeof filters)
+    } else {
+      console.warn(`Invalid filter key: ${key}`)
+    }
   }
 
   const resetPriceFilter = (): void => {

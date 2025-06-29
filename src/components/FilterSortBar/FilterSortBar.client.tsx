@@ -7,9 +7,7 @@ import { WineGrid } from '@/components/wine/WineGrid'
 import { useWineData } from '@/hooks/useWineData'
 import type { Locale } from '@/i18n/locales'
 import type { FlatWineVariant } from '@/payload-types'
-import { useWineStore } from '@/store/wineStore'
 import { useTranslation } from '@/hooks/useTranslation'
-import { ResetFilterButton } from '../WineFilters/ResetFilterButton'
 
 type Props = {
   currentCollection?: {
@@ -42,9 +40,6 @@ export function FilterSortBarClient({
     currentCollection,
     initialData: initialWineVariants,
   })
-
-  // Get clearAllFilters from the store
-  const { clearAllFilters, hasActiveFilters } = useWineStore()
 
   // Use initial error if no client error
   const error = clientError || initialError
@@ -92,12 +87,6 @@ export function FilterSortBarClient({
       />
       <Sorting />
       <WineGrid variants={wineVariants} locale={locale} />
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
-          {t('wine.showingWinesCount', { count: wineVariants.length })}
-        </span>
-        {hasActiveFilters() && <ResetFilterButton onReset={clearAllFilters} />}
-      </div>
     </div>
   )
 }

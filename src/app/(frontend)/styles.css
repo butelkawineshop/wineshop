@@ -189,7 +189,7 @@ body {
     @apply cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95;
   }
   .interactive-text {
-    @apply cursor-pointer transition-colors hover:text-primary;
+    @apply cursor-pointer  hover:text-foreground hover:scale-105 transition-all duration-300 transform-gpu;
   }
 
   /* ===== DECORATIVE ELEMENTS ===== */
@@ -474,24 +474,27 @@ body {
   transform: translateZ(0);
   backface-visibility: hidden;
   /* Allow page scrolling when needed */
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
 }
 
 .wine-scroll-container::-webkit-scrollbar {
-  width: 6px;
+  width: 0px;
+  display: none;
 }
 
 .wine-scroll-container::-webkit-scrollbar-track {
   background: transparent;
+  display: none;
 }
 
 .wine-scroll-container::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 3px;
+  background: transparent;
+  display: none;
 }
 
 .wine-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: transparent;
+  display: none;
 }
 
 /* Ensure snap-start works properly */

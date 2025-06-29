@@ -6,6 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { Icon } from '@/components/Icon'
 import { SORT_CONSTANTS, SORT_OPTIONS } from '@/constants/sorting'
 import { useWineStore } from '@/store/wineStore'
+import { Button } from '@/components/ui/button'
 
 export default function Sorting(): React.JSX.Element {
   const { t } = useTranslation()
@@ -29,12 +30,14 @@ export default function Sorting(): React.JSX.Element {
       aria-label="Sorting options"
     >
       {SORT_OPTIONS.map((option) => (
-        <button
+        <Button
           key={option.value}
           onClick={() => handleSort(option.value)}
           onKeyDown={(e) => handleKeyDown(e, option.value)}
+          variant="ghost"
+          size="sm"
           className={cn(
-            `grid items-center justify-items-center p-2 w-24 h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`,
+            'grid items-center justify-items-center p-2 w-24 h-16',
             sort.field === option.value && 'text-foreground',
           )}
           title={t(`sorting.${option.value}.label`)}
@@ -48,7 +51,7 @@ export default function Sorting(): React.JSX.Element {
               ? t(`sorting.${option.value}.${sort.direction}`)
               : t(`sorting.${option.value}.label`)}
           </span>
-        </button>
+        </Button>
       ))}
     </div>
   )

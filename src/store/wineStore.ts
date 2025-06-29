@@ -209,8 +209,30 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       }
     }
 
-    // Tasting notes filters
-    if (variant.tastingNotes) {
+    // Tasting notes filters - only apply if user has set non-default ranges
+    const defaultRanges = {
+      dry: [0, 10],
+      ripe: [0, 10],
+      creamy: [0, 10],
+      oaky: [0, 10],
+      complex: [0, 10],
+      light: [0, 10],
+      smooth: [0, 10],
+      youthful: [0, 10],
+      energetic: [0, 10],
+      alcohol: [0, 20],
+    }
+
+    // Check if any tasting notes filters are active (non-default ranges)
+    const hasActiveTastingNotesFilters = Object.entries(filters.tastingNotes).some(
+      ([key, range]) => {
+        const defaultRange = defaultRanges[key as keyof typeof defaultRanges]
+        return range[0] !== defaultRange[0] || range[1] !== defaultRange[1]
+      },
+    )
+
+    // Only apply tasting notes filtering if user has set non-default ranges
+    if (hasActiveTastingNotesFilters && variant.tastingNotes) {
       const tastingNoteKeys = [
         'dry',
         'ripe',
@@ -227,13 +249,20 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       for (const key of tastingNoteKeys) {
         const variantValue = variant.tastingNotes[key]
         const [minValue, maxValue] = filters.tastingNotes[key]
-        if (
-          variantValue === null ||
-          variantValue === undefined ||
-          variantValue < minValue ||
-          variantValue > maxValue
-        ) {
-          return false
+
+        // Only filter if the user has set a non-default range for this specific tasting note
+        const defaultRange = defaultRanges[key]
+        const isFilterActive = minValue !== defaultRange[0] || maxValue !== defaultRange[1]
+
+        if (isFilterActive) {
+          if (
+            variantValue === null ||
+            variantValue === undefined ||
+            variantValue < minValue ||
+            variantValue > maxValue
+          ) {
+            return false
+          }
         }
       }
     }
@@ -328,102 +357,6 @@ export const useWineStore = create<WineStore>()(
           const filteredVariants = applyFilters(variants, filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
-          // Debug logging
-          console.log('🔍 WineStore: Setting wine variants', {
-            totalVariants: variants.length,
-            filteredVariants: filteredVariants.length,
-            sortedVariants: sortedAndFilteredVariants.length,
-            filters: Object.keys(filters).filter((key) => {
-              const value = filters[key as keyof WineFilters]
-              if (Array.isArray(value)) return value.length > 0
-              return false
-            }),
-            sort: { field: sort.field, direction: sort.direction },
-          })
-
-          // More explicit logging
-          console.log(`🍷 Total wines loaded: ${variants.length}`)
-          console.log(`🍷 Filtered wines: ${filteredVariants.length}`)
-          console.log(`🍷 Sorted wines: ${sortedAndFilteredVariants.length}`)
-          console.log(
-            `🍷 Active filters: ${
-              Object.keys(filters).filter((key) => {
-                const value = filters[key as keyof WineFilters]
-                if (Array.isArray(value)) return value.length > 0
-                return false
-              }).length
-            }`,
-          )
-
-          // Log sample wine variant data structure for debugging
-          if (variants.length > 0) {
-            const sampleVariant = variants[0]
-            console.log('🔍 Sample wine variant data structure:', {
-              id: sampleVariant.id,
-              wineTitle: sampleVariant.wineTitle,
-              aromas: sampleVariant.aromas,
-              moods: sampleVariant.moods,
-              tags: sampleVariant.tags,
-              grapeVarieties: sampleVariant.grapeVarieties,
-              climates: sampleVariant.climates,
-              dishes: sampleVariant.dishes,
-            })
-
-            // Check if array fields are populated
-            const arrayFields = ['aromas', 'moods', 'tags', 'grapeVarieties', 'climates', 'dishes']
-            const populatedFields = arrayFields.filter((field) => {
-              const value = sampleVariant[field as keyof FlatWineVariant]
-              return value && Array.isArray(value) && value.length > 0
-            })
-
-            console.log('🔍 Array fields status:', {
-              totalFields: arrayFields.length,
-              populatedFields: populatedFields.length,
-              populatedFieldNames: populatedFields,
-              emptyFields: arrayFields.filter((field) => !populatedFields.includes(field)),
-            })
-          }
-
-          // Log which specific filters are active
-          const activeFilters = Object.entries(filters).filter(([key, value]) => {
-            if (Array.isArray(value)) return value.length > 0
-            if (key === 'priceRange') return value[0] !== 0 || value[1] !== 1000
-            if (key === 'tastingNotes') {
-              const defaultRanges = {
-                dry: [0, 10],
-                ripe: [0, 10],
-                creamy: [0, 10],
-                oaky: [0, 10],
-                complex: [0, 10],
-                light: [0, 10],
-                smooth: [0, 10],
-                youthful: [0, 10],
-                energetic: [0, 10],
-                alcohol: [0, 20],
-              }
-              return Object.entries(value).some(([noteKey, range]) => {
-                const defaultRange = defaultRanges[noteKey as keyof typeof defaultRanges]
-                const typedRange = range as [number, number]
-                return typedRange[0] !== defaultRange[0] || typedRange[1] !== defaultRange[1]
-              })
-            }
-            return false
-          })
-
-          if (activeFilters.length > 0) {
-            console.log(
-              '🍷 Active filters:',
-              activeFilters.map(([key, value]) => `${key}: ${JSON.stringify(value)}`),
-            )
-          } else {
-            console.log('🍷 No active filters')
-          }
-
-          // Log success message when all wines are loaded
-          if (variants.length > 0) {
-            console.log(`✅ Successfully loaded ${variants.length} wines for filtering`)
-          }
-
           set({
             wineVariants: variants,
             filteredVariants: sortedAndFilteredVariants,
@@ -484,8 +417,6 @@ export const useWineStore = create<WineStore>()(
           const filteredVariants = applyFilters(wineVariants, filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, newSort)
 
-          console.log('🍷 Setting sort:', { field, direction: newSort.direction })
-
           set({
             sort: newSort,
             filteredVariants: sortedAndFilteredVariants,
@@ -500,8 +431,6 @@ export const useWineStore = create<WineStore>()(
           }
           const filteredVariants = applyFilters(wineVariants, filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, newSort)
-
-          console.log('🍷 Toggling sort direction:', newSort.direction)
 
           set({
             sort: newSort,
