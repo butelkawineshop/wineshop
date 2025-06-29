@@ -1,6 +1,36 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 import createNextIntlPlugin from 'next-intl/plugin'
 
+// Cloudflare configuration
+const cloudflareConfig = {
+  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+  apiToken: process.env.CLOUDFLARE_API_TOKEN,
+  zoneId: process.env.CLOUDFLARE_ZONE_ID,
+  domain: process.env.CLOUDFLARE_DOMAIN,
+}
+
+// Cache settings
+const cacheConfig = {
+  staticAssets: {
+    maxAge: 31536000, // 1 year
+    staleWhileRevalidate: 86400, // 1 day
+  },
+  apiResponses: {
+    maxAge: 3600, // 1 hour
+    staleWhileRevalidate: 300, // 5 minutes
+  },
+}
+
+// Security headers
+const securityHeaders = {
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Build optimizations
@@ -10,6 +40,19 @@ const nextConfig = {
   // experimental: {
   //   bundlePagesExternals: true,
   // },
+
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: Object.entries(securityHeaders).map(([key, value]) => ({
+          key,
+          value,
+        })),
+      },
+    ]
+  },
 
   // Image optimizations
   images: {
@@ -22,6 +65,9 @@ const nextConfig = {
     ],
     // Optimize image formats
     formats: ['image/webp', 'image/avif'],
+    // Image optimization settings
+    quality: 80,
+    sizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
   },
 
   // Webpack optimizations
@@ -80,3 +126,6 @@ export default async () => {
   }
   return baseConfig
 }
+
+// Export config for use in other parts of the application
+export { cloudflareConfig, cacheConfig, securityHeaders }

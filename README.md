@@ -33,20 +33,23 @@ A modern e-commerce platform for fine wines, built with Next.js and Payload CMS.
 src/
 ├── app/(frontend)      ← Pages & UI for customers
 ├── app/(payload)       ← Payload-admin specific SSR/custom UI
-├── app/api             ← Local API endpoints
+├── app/api             ← Local API endpoints (preferred over REST)
 ├── auth/               ← Customer auth (NextAuth logic)
-├── collections/        ← Payload collections
-├── components/         ← Reusable UI components
+├── collections/        ← Payload collections grouped by function
+│   ├── ecommerce/
+│   ├── wine/
+│   └── content/
+├── components/         ← Reusable UI components by domain
 ├── contexts/           ← React contexts
-├── features/           ← Feature-specific logic
-├── fields/             ← Custom Payload fields
-├── hooks/              ← Reusable hooks
-├── i18n/               ← Internationalization
-├── lib/                ← Shared logic
-├── middleware/         ← Middleware
-├── providers/          ← App-level providers
+├── features/           ← Feature-specific logic (KGB, tastings, etc.)
+├── fields/             ← Custom Payload field components
+├── hooks/              ← Reusable hooks (React + server)
+├── i18n/               ← Internationalization utils
+├── lib/                ← Shared logic (formatters, integrations, analytics)
+├── middleware/         ← Middleware (Redis cache, guards)
+├── providers/          ← App-level providers (QueryClient, Theme)
 ├── store/              ← Zustand stores
-├── tasks/              ← Background tasks
+├── tasks/              ← Background tasks (cron, sync)
 └── utils/              ← Pure utility functions
 ```
 
@@ -85,7 +88,7 @@ src/
    pnpm dev
    ```
 
-> **Note:** If you're migrating from Brew PostgreSQL, see [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed instructions.
+> **Note:** If you're migrating from Brew PostgreSQL, see [docs/MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md) for detailed instructions.
 
 ## 🔍 Search Setup (Typesense)
 
@@ -157,6 +160,42 @@ Usage:
 
 ```tsx
 <Media src="image-id" alt="Description" width={400} height={300} fill={false} priority={false} />
+```
+
+## 🧪 Testing
+
+Run tests with:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test --watch
+
+# Run tests with coverage
+pnpm test --coverage
+```
+
+## 🚀 Deployment
+
+### Development
+
+```bash
+pnpm dev
+```
+
+### Production Build
+
+```bash
+pnpm build
+pnpm start
+```
+
+### Docker Deployment
+
+```bash
+docker-compose up -d
 ```
 
 ## 📄 License

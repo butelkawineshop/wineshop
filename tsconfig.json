@@ -31,15 +31,20 @@
       "@/fields/*": ["./src/fields/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/i18n/*": ["./src/i18n/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/middleware/*": ["./src/middleware/*"],
       "@/providers/*": ["./src/providers/*"],
       "@/schemas/*": ["./src/schemas/*"],
       "@/services/*": ["./src/services/*"],
-      "@/stores/*": ["./src/stores/*"],
+      "@/store/*": ["./src/store/*"],
       "@/tasks/*": ["./src/tasks/*"],
       "@/types/*": ["./src/types/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/utils/*": ["./src/utils/*"],
+      "@/constants/*": ["./src/constants/*"],
+      "@/containers/*": ["./src/containers/*"],
+      "@/utilities/*": ["./src/utilities/*"]
     }
   },
   "include": ["src", "types", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"]
 }

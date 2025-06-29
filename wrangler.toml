@@ -2,15 +2,27 @@ name = "wineshop-cdn"
 main = "workers/cdn.ts"
 compatibility_date = "2024-01-01"
 
-[vars]
-# Add your environment variables here
+# Environment variables will be set via wrangler secret or environment
+# Example: wrangler secret put CDN_API_KEY
 
+# KV namespace for caching (create via wrangler kv:namespace create)
+# Example: wrangler kv:namespace create "CDN_CACHE"
+# Then replace the ID below with your actual namespace ID
 [[kv_namespaces]]
 binding = "CDN_CACHE"
-id = "your-kv-namespace-id"
+id = "your-kv-namespace-id" # Replace with actual ID from wrangler kv:namespace create
 
+# Cron triggers for cache invalidation (optional)
 [triggers]
 crons = []
 
+# Static assets
 [site]
-bucket = "./public" 
+bucket = "./public"
+
+# Environment-specific configurations
+[env.production]
+name = "wineshop-cdn-prod"
+
+[env.staging]
+name = "wineshop-cdn-staging" 
