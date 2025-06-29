@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react'
-import { useWineStore } from '@/store/wineStore'
+import { useWineStore } from '@/store/wine'
 import { createPayloadService } from '@/lib/payload'
 import { logger } from '@/lib/logger'
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
@@ -17,11 +17,11 @@ interface UseWineDataOptions {
 
 export function useWineData(options: UseWineDataOptions = {}) {
   const {
-    wineVariants,
+    variants,
     filteredVariants,
     isLoading,
     error,
-    setWineVariants,
+    setVariants,
     setLoading,
     setError,
     hasFetched,
@@ -87,7 +87,7 @@ export function useWineData(options: UseWineDataOptions = {}) {
         currentCollection: options.currentCollection?.type,
       })
 
-      setWineVariants(response.docs as unknown as FlatWineVariant[])
+      setVariants(response.docs as unknown as FlatWineVariant[])
     } catch (error) {
       const errorMessage = 'Failed to fetch wine variants'
       logger.error(errorMessage, { error, currentCollection: options.currentCollection?.type })
@@ -101,7 +101,7 @@ export function useWineData(options: UseWineDataOptions = {}) {
     hasFetched,
     options.locale,
     options.currentCollection,
-    setWineVariants,
+    setVariants,
     setLoading,
     setError,
     setHasFetched,
@@ -116,18 +116,18 @@ export function useWineData(options: UseWineDataOptions = {}) {
         locale: options.locale,
         currentCollection: options.currentCollection?.type,
       })
-      setWineVariants(options.initialData)
+      setVariants(options.initialData)
       setHasFetched(true)
       return // Don't fetch if we have initial data
     }
 
     // Only fetch if we don't have any data in the store
-    if (wineVariants.length === 0 && !hasFetched) {
+    if (variants.length === 0 && !hasFetched) {
       logger.info('No initial data and no store data, fetching wines...')
       fetchWineVariants()
     } else {
       logger.info('Using existing store data, skipping fetch', {
-        storeDataCount: wineVariants.length,
+        storeDataCount: variants.length,
       })
     }
   }, [
@@ -135,8 +135,8 @@ export function useWineData(options: UseWineDataOptions = {}) {
     options.currentCollection?.id,
     options.currentCollection?.type,
     options.initialData,
-    wineVariants.length, // Add this dependency to check store state
-    setWineVariants,
+    variants.length, // Add this dependency to check store state
+    setVariants,
     fetchWineVariants,
     hasFetched,
     setHasFetched,
@@ -145,7 +145,7 @@ export function useWineData(options: UseWineDataOptions = {}) {
   // Debug logging - only in development
   if (process.env.NODE_ENV === 'development') {
     logger.info('useWineData debug', {
-      wineVariantsCount: wineVariants.length,
+      variantsCount: variants.length,
       filteredVariantsCount: filteredVariants.length,
     })
   }

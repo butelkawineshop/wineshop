@@ -12,6 +12,7 @@ export const STORE_CONSTANTS = {
   // Store names
   LANGUAGE_STORE_NAME: 'language-store',
   WINE_GRID_STORE_NAME: 'wine-grid-store',
+  WINE_STORE_NAME: 'wine-store',
   AUTH_STORE_NAME: 'auth-store',
   CART_STORE_NAME: 'cart-store',
   UI_STORE_NAME: 'ui-store',
@@ -20,6 +21,7 @@ export const STORE_CONSTANTS = {
   AUTH_STORAGE_KEY: 'wineshop-auth',
   CART_STORAGE_KEY: 'wineshop-cart',
   LANGUAGE_STORAGE_KEY: 'wineshop-language',
+  WINE_STORAGE_KEY: 'wineshop-wine',
 
   // Default values
   DEFAULT_PAGE: 1,

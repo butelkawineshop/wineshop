@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { useTranslation } from '@/hooks/useTranslation'
 import { Icon } from '@/components/Icon'
 import { SORT_CONSTANTS, SORT_OPTIONS } from '@/constants/sorting'
-import { useWineStore } from '@/store/wineStore'
+import { useWineStore } from '@/store/wine'
 import { Button } from '@/components/ui/button'
 
 export default function Sorting(): React.JSX.Element {

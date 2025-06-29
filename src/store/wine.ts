@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import { devtools, persist, createJSONStorage } from 'zustand/middleware'
+import { STORE_CONSTANTS } from '@/constants/store'
 import type { FlatWineVariant } from '@/payload-types'
 
 // Types
-interface WineFilters {
+export interface WineFilters {
   regions: string[]
   wineries: string[]
   wineCountries: string[]
@@ -14,9 +15,7 @@ interface WineFilters {
   tags: string[]
   dishes: string[]
   climates: string[]
-  // Price range
   priceRange: [number, number]
-  // Tasting notes ranges
   tastingNotes: {
     dry: [number, number]
     ripe: [number, number]
@@ -31,27 +30,43 @@ interface WineFilters {
   }
 }
 
-interface SortState {
+export interface SortState {
   field: 'createdAt' | 'price' | 'name'
   direction: 'asc' | 'desc'
 }
 
-interface WineState {
+export interface WineState {
   // Data
-  wineVariants: FlatWineVariant[]
+  variants: FlatWineVariant[]
   filteredVariants: FlatWineVariant[]
   isLoading: boolean
   error: string | null
   hasFetched: boolean
+
+  // Pagination
+  totalDocs: number
+  totalPages: number
+  currentPage: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+
   // Filters
   filters: WineFilters
+
   // Sorting
   sort: SortState
 }
 
-interface WineActions {
+export interface WineActions {
   // Data actions
-  setWineVariants: (variants: FlatWineVariant[]) => void
+  setVariants: (variants: FlatWineVariant[]) => void
+  setPaginationInfo: (info: {
+    totalDocs: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+  }) => void
+  setCurrentPage: (page: number) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   setHasFetched: (hasFetched: boolean) => void
@@ -65,29 +80,57 @@ interface WineActions {
   setSort: (field: SortState['field'], direction?: SortState['direction']) => void
   toggleSortDirection: () => void
 
-  // Migration function
-  _migrateFilters: () => void
+  // Utility actions
+  reset: () => void
+  clearError: () => void
+  updatePage: (newPage: number) => void
 }
 
-interface WineSelectors {
+export interface WineSelectors {
+  // Data selectors
+  getVariants: () => FlatWineVariant[]
+  getFilteredVariants: () => FlatWineVariant[]
   getFilteredCount: () => number
   getTotalCount: () => number
+  getIsEmpty: () => boolean
+  getVariantCount: () => number
+
+  // Pagination selectors
+  getTotalDocs: () => number
+  getTotalPages: () => number
+  getCurrentPage: () => number
+  getHasNextPage: () => boolean
+  getHasPrevPage: () => boolean
+  getPageInfo: () => { current: number; total: number; hasNext: boolean; hasPrev: boolean }
+
+  // Status selectors
+  getIsLoading: () => boolean
+  getError: () => string | null
+  hasError: () => boolean
+  getHasFetched: () => boolean
+
+  // Filter selectors
   isFilterActive: (key: keyof WineFilters) => boolean
   isPriceFilterActive: () => boolean
   isTastingNotesFilterActive: () => boolean
   hasActiveFilters: () => boolean
+
+  // Sort selectors
   getCurrentSort: () => SortState
 }
 
-type WineStore = WineState & WineActions & WineSelectors
-
 // Initial state
 const initialState: WineState = {
-  wineVariants: [],
+  variants: [],
   filteredVariants: [],
   isLoading: false,
   error: null,
   hasFetched: false,
+  totalDocs: 0,
+  totalPages: 0,
+  currentPage: STORE_CONSTANTS.DEFAULT_PAGE,
+  hasNextPage: false,
+  hasPrevPage: false,
   filters: {
     regions: [],
     wineries: [],
@@ -157,7 +200,7 @@ const applySort = (variants: FlatWineVariant[], sort: SortState): FlatWineVarian
 // Filter logic
 const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWineVariant[] => {
   return variants.filter((variant) => {
-    // Region filter - string matching only
+    // Region filter
     if (filters.regions.length > 0 && variant.regionTitle) {
       const regionMatch = filters.regions.some((filterRegion) => {
         if (typeof filterRegion === 'string' && filterRegion.length > 0) {
@@ -168,7 +211,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       if (!regionMatch) return false
     }
 
-    // Winery filter - string matching only
+    // Winery filter
     if (filters.wineries.length > 0 && variant.wineryTitle) {
       const wineryMatch = filters.wineries.some((filterWinery) => {
         if (typeof filterWinery === 'string' && filterWinery.length > 0) {
@@ -179,7 +222,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       if (!wineryMatch) return false
     }
 
-    // Country filter - string matching only
+    // Country filter
     if (filters.wineCountries.length > 0 && variant.countryTitle) {
       const countryMatch = filters.wineCountries.some((filterCountry) => {
         if (typeof filterCountry === 'string' && filterCountry.length > 0) {
@@ -190,7 +233,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       if (!countryMatch) return false
     }
 
-    // Style filter - string matching only
+    // Style filter
     if (filters.styles.length > 0 && variant.styleTitle) {
       const styleMatch = filters.styles.some((filterStyle) => {
         if (typeof filterStyle === 'string' && filterStyle.length > 0) {
@@ -209,7 +252,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       }
     }
 
-    // Tasting notes filters - only apply if user has set non-default ranges
+    // Tasting notes filters
     const defaultRanges = {
       dry: [0, 10],
       ripe: [0, 10],
@@ -223,7 +266,6 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       alcohol: [0, 20],
     }
 
-    // Check if any tasting notes filters are active (non-default ranges)
     const hasActiveTastingNotesFilters = Object.entries(filters.tastingNotes).some(
       ([key, range]) => {
         const defaultRange = defaultRanges[key as keyof typeof defaultRanges]
@@ -231,7 +273,6 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       },
     )
 
-    // Only apply tasting notes filtering if user has set non-default ranges
     if (hasActiveTastingNotesFilters && variant.tastingNotes) {
       const tastingNoteKeys = [
         'dry',
@@ -250,7 +291,6 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
         const variantValue = variant.tastingNotes[key]
         const [minValue, maxValue] = filters.tastingNotes[key]
 
-        // Only filter if the user has set a non-default range for this specific tasting note
         const defaultRange = defaultRanges[key]
         const isFilterActive = minValue !== defaultRange[0] || maxValue !== defaultRange[1]
 
@@ -267,7 +307,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
       }
     }
 
-    // Array filters (aromas, moods, grape varieties, tags, climates, dishes) - these are always IDs
+    // Array filters
     const arrayFilters = [
       { key: 'aromas' as const, field: variant.aromas },
       { key: 'moods' as const, field: variant.moods },
@@ -279,10 +319,8 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
 
     for (const { key, field, additionalField } of arrayFilters) {
       if (filters[key].length > 0 && (field || additionalField)) {
-        // For array filters, we now use titles for both filter values and matching
-        const filterTitles = filters[key] // These are now titles, not IDs
+        const filterTitles = filters[key]
 
-        // For tags, also include winery tags
         let fieldTitles: string[] = []
         if (field) {
           fieldTitles = field
@@ -296,7 +334,6 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
           fieldTitles = [...fieldTitles, ...wineryTagTitles]
         }
 
-        // Match by title
         const hasMatch = filterTitles.some((filterTitle) => {
           return fieldTitles.some((title) => title === filterTitle)
         })
@@ -312,69 +349,48 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
 }
 
 // Create store
-export const useWineStore = create<WineStore>()(
+export const useWineStore = create<WineState & WineActions & WineSelectors>()(
   devtools(
     persist(
       (set, get) => ({
         ...initialState,
 
-        // Migration function to ensure proper initialization
-        _migrateFilters: () => {
-          const { filters } = get()
-          if (!filters.priceRange) {
-            set({ filters: { ...filters, priceRange: [0, 1000] } })
-          }
-          if (!filters.tastingNotes) {
-            set({
-              filters: {
-                ...filters,
-                tastingNotes: {
-                  dry: [0, 10],
-                  ripe: [0, 10],
-                  creamy: [0, 10],
-                  oaky: [0, 10],
-                  complex: [0, 10],
-                  light: [0, 10],
-                  smooth: [0, 10],
-                  youthful: [0, 10],
-                  energetic: [0, 10],
-                  alcohol: [0, 20],
-                },
-              },
-            })
-          }
-
-          // Reset price range if it's too restrictive (less than 100)
-          if (filters.priceRange && filters.priceRange[1] < 100) {
-            console.log('🍷 Resetting restrictive price range filter')
-            set({ filters: { ...filters, priceRange: [0, 1000] } })
-          }
-        },
-
         // Data actions
-        setWineVariants: (variants) => {
+        setVariants: (variants) => {
           const { filters, sort } = get()
           const filteredVariants = applyFilters(variants, filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
-            wineVariants: variants,
+            variants,
             filteredVariants: sortedAndFilteredVariants,
             hasFetched: true,
           })
         },
 
+        setPaginationInfo: (info) =>
+          set((state) => ({
+            ...state,
+            ...info,
+          })),
+
+        setCurrentPage: (page) =>
+          set((state) => ({
+            ...state,
+            currentPage: page,
+          })),
+
         setLoading: (loading) => set({ isLoading: loading }),
 
         setError: (error) => set({ error }),
 
-        setHasFetched: (hasFetched: boolean) => set({ hasFetched }),
+        setHasFetched: (hasFetched) => set({ hasFetched }),
 
         // Filter actions
         setFilter: (key, values) => {
-          const { wineVariants, filters, sort } = get()
+          const { variants, filters, sort } = get()
           const newFilters = { ...filters, [key]: values }
-          const filteredVariants = applyFilters(wineVariants, newFilters)
+          const filteredVariants = applyFilters(variants, newFilters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
@@ -384,9 +400,9 @@ export const useWineStore = create<WineStore>()(
         },
 
         clearFilter: (key) => {
-          const { wineVariants, filters, sort } = get()
+          const { variants, filters, sort } = get()
           const newFilters = { ...filters, [key]: [] }
-          const filteredVariants = applyFilters(wineVariants, newFilters)
+          const filteredVariants = applyFilters(variants, newFilters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
@@ -396,8 +412,8 @@ export const useWineStore = create<WineStore>()(
         },
 
         clearAllFilters: () => {
-          const { wineVariants, sort } = get()
-          const filteredVariants = applyFilters(wineVariants, initialState.filters)
+          const { variants, sort } = get()
+          const filteredVariants = applyFilters(variants, initialState.filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
@@ -408,13 +424,13 @@ export const useWineStore = create<WineStore>()(
 
         // Sort actions
         setSort: (field, direction) => {
-          const { wineVariants, filters, sort } = get()
+          const { variants, filters, sort } = get()
           const newSort: SortState = {
             field,
             direction:
               direction || (sort.field === field && sort.direction === 'asc' ? 'desc' : 'asc'),
           }
-          const filteredVariants = applyFilters(wineVariants, filters)
+          const filteredVariants = applyFilters(variants, filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, newSort)
 
           set({
@@ -424,12 +440,12 @@ export const useWineStore = create<WineStore>()(
         },
 
         toggleSortDirection: () => {
-          const { wineVariants, filters, sort } = get()
+          const { variants, filters, sort } = get()
           const newSort: SortState = {
             ...sort,
             direction: sort.direction === 'asc' ? 'desc' : 'asc',
           }
-          const filteredVariants = applyFilters(wineVariants, filters)
+          const filteredVariants = applyFilters(variants, filters)
           const sortedAndFilteredVariants = applySort(filteredVariants, newSort)
 
           set({
@@ -438,16 +454,44 @@ export const useWineStore = create<WineStore>()(
           })
         },
 
+        // Utility actions
+        reset: () => set(initialState),
+
+        clearError: () => set({ error: null }),
+
+        updatePage: (newPage) => {
+          const { isLoading, currentPage } = get()
+          if (isLoading || newPage === currentPage) return
+          set({ currentPage: newPage })
+        },
+
         // Selectors
+        getVariants: () => get().variants,
+        getFilteredVariants: () => get().filteredVariants,
         getFilteredCount: () => get().filteredVariants.length,
-
-        getTotalCount: () => get().wineVariants.length,
-
-        getCurrentSort: () => get().sort,
-
+        getTotalCount: () => get().variants.length,
+        getIsEmpty: () => get().filteredVariants.length === 0,
+        getVariantCount: () => get().filteredVariants.length,
+        getTotalDocs: () => get().totalDocs,
+        getTotalPages: () => get().totalPages,
+        getCurrentPage: () => get().currentPage,
+        getHasNextPage: () => get().hasNextPage,
+        getHasPrevPage: () => get().hasPrevPage,
+        getPageInfo: () => {
+          const state = get()
+          return {
+            current: state.currentPage,
+            total: state.totalPages,
+            hasNext: state.hasNextPage,
+            hasPrev: state.hasPrevPage,
+          }
+        },
+        getIsLoading: () => get().isLoading,
+        getError: () => get().error,
+        hasError: () => get().error !== null,
+        getHasFetched: () => get().hasFetched,
         isFilterActive: (key) => {
           const { filters } = get()
-          // Only check array-based filters
           const arrayFilterKeys = [
             'regions',
             'wineries',
@@ -467,12 +511,10 @@ export const useWineStore = create<WineStore>()(
           }
           return false
         },
-
         isPriceFilterActive: () => {
           const { filters } = get()
           return filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000
         },
-
         isTastingNotesFilterActive: () => {
           const { filters } = get()
           const defaultRanges = {
@@ -493,11 +535,9 @@ export const useWineStore = create<WineStore>()(
             return range[0] !== defaultRange[0] || range[1] !== defaultRange[1]
           })
         },
-
         hasActiveFilters: () => {
           const { filters } = get()
 
-          // Check array filters (these are string arrays)
           const hasArrayFilters =
             filters.regions.length > 0 ||
             filters.wineries.length > 0 ||
@@ -510,10 +550,8 @@ export const useWineStore = create<WineStore>()(
             filters.dishes.length > 0 ||
             filters.climates.length > 0
 
-          // Check price range (if not default)
           const hasPriceFilter = filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000
 
-          // Check tasting notes (if any are not at default range)
           const defaultRanges = {
             dry: [0, 10],
             ripe: [0, 10],
@@ -536,12 +574,15 @@ export const useWineStore = create<WineStore>()(
 
           return hasArrayFilters || hasPriceFilter || hasTastingNotesFilter
         },
+        getCurrentSort: () => get().sort,
       }),
       {
-        name: 'wine-store',
+        name: STORE_CONSTANTS.WINE_STORE_NAME,
+        storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
           filters: state.filters,
           sort: state.sort,
+          currentPage: state.currentPage,
         }),
       },
     ),
@@ -550,3 +591,10 @@ export const useWineStore = create<WineStore>()(
     },
   ),
 )
+
+// Export store structure following conventions
+export const wine = {
+  state: initialState,
+  actions: {} as WineActions, // Implemented in useWineStore
+  selectors: {} as WineSelectors, // Implemented in useWineStore
+}

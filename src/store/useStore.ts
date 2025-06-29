@@ -3,7 +3,7 @@ import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { auth, AuthState, AuthActions, AuthSelectors } from './auth'
 import { cart, CartState, CartActions, CartSelectors } from './cart'
 import { ui, UIState, UIActions, UISelectors } from './ui'
-import { wineGrid, WineGridState, WineGridActions, WineGridSelectors } from './wineGrid'
+import { wine, WineState, WineActions, WineSelectors } from './wine'
 import { language, LanguageState, LanguageActions, LanguageSelectors } from './language'
 import { STORE_CONSTANTS } from '@/constants/store'
 import type { DomainStore } from './types'
@@ -14,7 +14,7 @@ export interface RootStore {
   auth: DomainStore<AuthState, AuthActions, AuthSelectors>
   cart: DomainStore<CartState, CartActions, CartSelectors>
   ui: DomainStore<UIState, UIActions, UISelectors>
-  wineGrid: DomainStore<WineGridState, WineGridActions, WineGridSelectors>
+  wine: DomainStore<WineState, WineActions, WineSelectors>
   language: DomainStore<LanguageState, LanguageActions, LanguageSelectors>
 }
 
@@ -183,66 +183,117 @@ export const useStore = create<RootStore>()(
             hasError: () => get().ui.state.error !== null,
           },
         },
-        wineGrid: {
-          state: { ...wineGrid.state },
+        wine: {
+          state: { ...wine.state },
           actions: {
             setVariants: (variants) =>
               set((state) => ({
-                wineGrid: { ...state.wineGrid, state: { ...state.wineGrid.state, variants } },
+                wine: { ...state.wine, state: { ...state.wine.state, variants } },
               })),
             setPaginationInfo: (info) =>
               set((state) => ({
-                wineGrid: { ...state.wineGrid, state: { ...state.wineGrid.state, ...info } },
+                wine: { ...state.wine, state: { ...state.wine.state, ...info } },
               })),
             setCurrentPage: (page) =>
               set((state) => ({
-                wineGrid: {
-                  ...state.wineGrid,
-                  state: { ...state.wineGrid.state, currentPage: page },
+                wine: {
+                  ...state.wine,
+                  state: { ...state.wine.state, currentPage: page },
                 },
               })),
             setLoading: (loading) =>
               set((state) => ({
-                wineGrid: {
-                  ...state.wineGrid,
-                  state: { ...state.wineGrid.state, isLoading: loading },
+                wine: {
+                  ...state.wine,
+                  state: { ...state.wine.state, isLoading: loading },
                 },
               })),
             setError: (error) =>
               set((state) => ({
-                wineGrid: { ...state.wineGrid, state: { ...state.wineGrid.state, error } },
+                wine: { ...state.wine, state: { ...state.wine.state, error } },
+              })),
+            setHasFetched: (hasFetched) =>
+              set((state) => ({
+                wine: { ...state.wine, state: { ...state.wine.state, hasFetched } },
+              })),
+            setFilter: (key, values) =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: {
+                    ...state.wine.state,
+                    filters: { ...state.wine.state.filters, [key]: values },
+                  },
+                },
+              })),
+            clearFilter: (key) =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: {
+                    ...state.wine.state,
+                    filters: { ...state.wine.state.filters, [key]: [] },
+                  },
+                },
+              })),
+            clearAllFilters: () =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: { ...state.wine.state, filters: wine.state.filters },
+                },
+              })),
+            setSort: (field, direction) =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: { ...state.wine.state, sort: { field, direction: direction || 'desc' } },
+                },
+              })),
+            toggleSortDirection: () =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: {
+                    ...state.wine.state,
+                    sort: {
+                      ...state.wine.state.sort,
+                      direction: state.wine.state.sort.direction === 'asc' ? 'desc' : 'asc',
+                    },
+                  },
+                },
+              })),
+            reset: () => set((_state) => ({ wine: { ...wine, state: { ...wine.state } } })),
+            clearError: () =>
+              set((state) => ({
+                wine: { ...state.wine, state: { ...state.wine.state, error: null } },
               })),
             updatePage: (newPage) =>
               set((state) => {
-                if (state.wineGrid.state.isLoading || newPage === state.wineGrid.state.currentPage)
+                if (state.wine.state.isLoading || newPage === state.wine.state.currentPage)
                   return {}
                 return {
-                  wineGrid: {
-                    ...state.wineGrid,
-                    state: { ...state.wineGrid.state, currentPage: newPage },
+                  wine: {
+                    ...state.wine,
+                    state: { ...state.wine.state, currentPage: newPage },
                   },
                 }
               }),
-            reset: () =>
-              set((_state) => ({ wineGrid: { ...wineGrid, state: { ...wineGrid.state } } })),
-            clearError: () =>
-              set((state) => ({
-                wineGrid: { ...state.wineGrid, state: { ...state.wineGrid.state, error: null } },
-              })),
           },
           selectors: {
-            getVariants: () => get().wineGrid.state.variants,
-            getTotalDocs: () => get().wineGrid.state.totalDocs,
-            getTotalPages: () => get().wineGrid.state.totalPages,
-            getCurrentPage: () => get().wineGrid.state.currentPage,
-            getHasNextPage: () => get().wineGrid.state.hasNextPage,
-            getHasPrevPage: () => get().wineGrid.state.hasPrevPage,
-            getIsLoading: () => get().wineGrid.state.isLoading,
-            getError: () => get().wineGrid.state.error,
-            getIsEmpty: () => get().wineGrid.state.variants.length === 0,
-            getVariantCount: () => get().wineGrid.state.variants.length,
+            getVariants: () => get().wine.state.variants,
+            getFilteredVariants: () => get().wine.state.filteredVariants,
+            getFilteredCount: () => get().wine.state.filteredVariants.length,
+            getTotalCount: () => get().wine.state.variants.length,
+            getIsEmpty: () => get().wine.state.filteredVariants.length === 0,
+            getVariantCount: () => get().wine.state.filteredVariants.length,
+            getTotalDocs: () => get().wine.state.totalDocs,
+            getTotalPages: () => get().wine.state.totalPages,
+            getCurrentPage: () => get().wine.state.currentPage,
+            getHasNextPage: () => get().wine.state.hasNextPage,
+            getHasPrevPage: () => get().wine.state.hasPrevPage,
             getPageInfo: () => {
-              const state = get().wineGrid.state
+              const state = get().wine.state
               return {
                 current: state.currentPage,
                 total: state.totalPages,
@@ -250,7 +301,95 @@ export const useStore = create<RootStore>()(
                 hasPrev: state.hasPrevPage,
               }
             },
-            hasError: () => get().wineGrid.state.error !== null,
+            getIsLoading: () => get().wine.state.isLoading,
+            getError: () => get().wine.state.error,
+            hasError: () => get().wine.state.error !== null,
+            getHasFetched: () => get().wine.state.hasFetched,
+            isFilterActive: (key) => {
+              const { filters } = get().wine.state
+              const arrayFilterKeys = [
+                'regions',
+                'wineries',
+                'wineCountries',
+                'styles',
+                'aromas',
+                'moods',
+                'grape-varieties',
+                'tags',
+                'dishes',
+                'climates',
+              ] as const
+
+              if (arrayFilterKeys.includes(key as (typeof arrayFilterKeys)[number])) {
+                const filterValue = filters[key] as string[]
+                return filterValue.length > 0
+              }
+              return false
+            },
+            isPriceFilterActive: () => {
+              const { filters } = get().wine.state
+              return filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000
+            },
+            isTastingNotesFilterActive: () => {
+              const { filters } = get().wine.state
+              const defaultRanges = {
+                dry: [0, 10],
+                ripe: [0, 10],
+                creamy: [0, 10],
+                oaky: [0, 10],
+                complex: [0, 10],
+                light: [0, 10],
+                smooth: [0, 10],
+                youthful: [0, 10],
+                energetic: [0, 10],
+                alcohol: [0, 20],
+              }
+
+              return Object.entries(filters.tastingNotes).some(([key, range]) => {
+                const defaultRange = defaultRanges[key as keyof typeof defaultRanges]
+                return range[0] !== defaultRange[0] || range[1] !== defaultRange[1]
+              })
+            },
+            hasActiveFilters: () => {
+              const { filters } = get().wine.state
+
+              const hasArrayFilters =
+                filters.regions.length > 0 ||
+                filters.wineries.length > 0 ||
+                filters.wineCountries.length > 0 ||
+                filters.styles.length > 0 ||
+                filters.aromas.length > 0 ||
+                filters.moods.length > 0 ||
+                filters['grape-varieties'].length > 0 ||
+                filters.tags.length > 0 ||
+                filters.dishes.length > 0 ||
+                filters.climates.length > 0
+
+              const hasPriceFilter = filters.priceRange[0] !== 0 || filters.priceRange[1] !== 1000
+
+              const defaultRanges = {
+                dry: [0, 10],
+                ripe: [0, 10],
+                creamy: [0, 10],
+                oaky: [0, 10],
+                complex: [0, 10],
+                light: [0, 10],
+                smooth: [0, 10],
+                youthful: [0, 10],
+                energetic: [0, 10],
+                alcohol: [0, 20],
+              }
+
+              const hasTastingNotesFilter = Object.entries(filters.tastingNotes).some(
+                ([key, range]) => {
+                  const defaultRange = defaultRanges[key as keyof typeof defaultRanges]
+                  return range[0] !== defaultRange[0] || range[1] !== defaultRange[1]
+                },
+              )
+
+              return hasArrayFilters || hasPriceFilter || hasTastingNotesFilter
+            },
+            getCurrentSort: () => get().wine.state.sort,
           },
         },
         language: {

@@ -17,7 +17,7 @@ import {
   TASTING_NOTES,
   DEFAULT_TASTING_NOTES,
 } from '@/constants/filters'
-import { useWineStore } from '@/store/wineStore'
+import { useWineStore } from '@/store/wine'
 import { ResetFilterButton } from './ResetFilterButton'
 
 interface WineFiltersClientProps {
@@ -75,12 +75,12 @@ export default function WineFiltersClient({
   locale,
 }: WineFiltersClientProps): React.JSX.Element {
   const { t } = useTranslation()
-  const { filters, setFilter, clearFilter, _migrateFilters, wineVariants } = useWineStore()
+  const { filters, setFilter, clearFilter, variants } = useWineStore()
 
-  // Migrate filters if needed (for persisted data)
+  // Migrate filters if needed (for persisted data) - removed _migrateFilters as it's not in new store
   React.useEffect(() => {
-    _migrateFilters()
-  }, [_migrateFilters])
+    // Migration is handled automatically in the new store
+  }, [])
 
   const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
@@ -89,7 +89,7 @@ export default function WineFiltersClient({
   const debouncedSearchQueries = useDebounce(searchQueries, 200)
 
   // Calculate price bounds from wine variants in the store
-  const [priceMin, priceMax] = React.useMemo(() => getPriceBounds(wineVariants), [wineVariants])
+  const [priceMin, priceMax] = React.useMemo(() => getPriceBounds(variants), [variants])
 
   // Debounced state for immediate UI updates
   const [immediatePriceRange, setImmediatePriceRange] = useState<[number, number]>(
