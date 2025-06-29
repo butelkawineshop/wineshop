@@ -235,9 +235,12 @@ function ListView({
               const mediaObj = mediaArr[0]
               const imageBase = mediaObj?.baseUrl || mediaObj?.url
 
+              // Create a more unique key by combining multiple identifiers
+              const uniqueKey = [item.id, item.slug, title, idx].filter(Boolean).join('-')
+
               return (
                 <motion.div
-                  key={item.id || item.slug || idx}
+                  key={uniqueKey}
                   className="relative w-full aspect-square min-h-[200px] h-full flex items-center justify-center group overflow-hidden"
                   variants={{
                     hidden: {

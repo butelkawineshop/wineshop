@@ -72,10 +72,15 @@ function renderFieldValue(
               (typeof itemObj === 'number' ? String(itemObj) : '')
             const slug = itemObj.slug as string
 
+            // Create a more unique key by combining multiple identifiers
+            const uniqueKey = [itemObj.id, itemObj.title, itemObj.name, slug, index]
+              .filter(Boolean)
+              .join('-')
+
             if (linkTo && slug) {
               return (
                 <CollectionLink
-                  key={String(itemObj.id || index)}
+                  key={uniqueKey}
                   collection={linkTo}
                   slug={slug}
                   locale={locale}
@@ -87,7 +92,7 @@ function renderFieldValue(
             }
 
             return (
-              <span key={String(itemObj.id || index)} className="hashtag">
+              <span key={uniqueKey} className="hashtag">
                 {displayValue}
               </span>
             )
@@ -109,8 +114,13 @@ function renderFieldValue(
               ? (getNestedValue(itemObj, field.arrayConfig.displayField) as string)
               : (itemObj.title as string) || (itemObj.name as string) || String(itemObj)
 
+            // Create a more unique key by combining multiple identifiers
+            const uniqueKey = [itemObj.id, itemObj.title, itemObj.name, index]
+              .filter(Boolean)
+              .join('-')
+
             return (
-              <span key={index} className="hashtag">
+              <span key={uniqueKey} className="hashtag">
                 {displayValue}
               </span>
             )

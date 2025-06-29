@@ -1,6 +1,7 @@
 export class DataMappingService {
   /**
    * Extract primary image URL from media array
+   * Returns the baseUrl if available, otherwise extracts baseUrl from full url
    */
   extractPrimaryImageUrl(media: (number | any)[] | null | undefined): string | undefined {
     if (Array.isArray(media) && media.length > 0) {
@@ -11,7 +12,21 @@ export class DataMappingService {
         'url' in media0 &&
         typeof media0.url === 'string'
       ) {
-        return media0.url
+        // If baseUrl is available, use it so the Media component can construct variant URLs
+        if ('baseUrl' in media0 && typeof media0.baseUrl === 'string') {
+          return media0.baseUrl
+        }
+
+        // If we have a full URL, extract the baseUrl by removing the variant suffix
+        const url = media0.url
+        const variantMatch = url.match(/\/(winecards|feature|hero|thumbnail|square)$/)
+        if (variantMatch) {
+          // Remove the variant suffix to get the baseUrl
+          return url.replace(/\/(winecards|feature|hero|thumbnail|square)$/, '')
+        }
+
+        // Otherwise return the full url
+        return url
       }
     }
     return undefined

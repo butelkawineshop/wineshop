@@ -6,6 +6,7 @@ import {
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
 import type { Locale } from '@/utils/routeMappings'
 import { fetchAllCollectionItemsForFilters } from '@/lib/graphql'
+import { CollectionDatabaseService, type FlatCollectionItem } from './CollectionDatabaseService'
 
 export interface CollectionItem {
   id: string
@@ -38,12 +39,50 @@ export interface PaginationUrls {
 /**
  * Service class for collection-related business logic
  * Handles data fetching, pagination, and URL building
+ * Now uses direct database queries for better performance
  */
 export class CollectionService {
   private payload = createPayloadService()
 
   /**
+   * Convert FlatCollectionItem to CollectionItem format for backward compatibility
+   */
+  private static convertToCollectionItem(
+    flatItem: FlatCollectionItem,
+    locale: Locale,
+  ): CollectionItem {
+    // Use mediaBaseUrl if available, otherwise compute from mediaUrl
+    let mediaBaseUrl = flatItem.mediaBaseUrl || ''
+    if (flatItem.mediaUrl && !mediaBaseUrl) {
+      // Extract base URL from media URL if it's a Cloudflare URL
+      const urlMatch = flatItem.mediaUrl.match(/^(https:\/\/[^\/]+\/[^\/]+)\//)
+      if (urlMatch) {
+        mediaBaseUrl = urlMatch[1]
+      }
+    }
+
+    return {
+      id: flatItem.id,
+      title: locale === 'en' ? flatItem.titleEn : flatItem.title,
+      slug: locale === 'en' ? flatItem.slugEn : flatItem.slug,
+      description: locale === 'en' ? flatItem.descriptionEn : flatItem.description,
+      media: flatItem.mediaBaseUrl
+        ? [
+            {
+              url: flatItem.mediaBaseUrl, // Use baseUrl so Media component can construct variants
+              baseUrl: flatItem.mediaBaseUrl,
+            },
+          ]
+        : [],
+      updatedAt: flatItem.updatedAt,
+      createdAt: flatItem.createdAt,
+      _status: flatItem._status,
+    }
+  }
+
+  /**
    * Fetch collection data (single item or list)
+   * Now uses direct database queries for better performance
    */
   async fetchCollectionData({
     collection,
@@ -68,9 +107,45 @@ export class CollectionService {
   }
 
   /**
-   * Fetch a single collection item
+   * Fetch a single collection item using direct database query
    */
   private async fetchSingleItem({
+    collection,
+    config,
+    locale,
+    slug,
+  }: {
+    collection: string
+    config: CollectionDisplayConfig
+    locale: Locale
+    slug: string
+  }): Promise<CollectionData> {
+    try {
+      // Try direct database query first for better performance
+      const dbResult = await CollectionDatabaseService.getCollectionItem(collection, slug, locale)
+
+      if (dbResult.item) {
+        const convertedItem = CollectionService.convertToCollectionItem(dbResult.item, locale)
+        return {
+          data: convertedItem,
+          items: [],
+          pagination: null,
+          isSingleItem: true,
+        }
+      }
+
+      // Fallback to Payload API if database query fails or item not found
+      return this.fetchSingleItemFallback({ collection, config, locale, slug })
+    } catch (error) {
+      console.warn('Database query failed, falling back to Payload API:', error)
+      return this.fetchSingleItemFallback({ collection, config, locale, slug })
+    }
+  }
+
+  /**
+   * Fallback method using Payload API for single item
+   */
+  private async fetchSingleItemFallback({
     collection,
     config,
     locale,
@@ -117,9 +192,51 @@ export class CollectionService {
   }
 
   /**
-   * Fetch a list of collection items with pagination
+   * Fetch a list of collection items with pagination using direct database query
    */
   private async fetchItemList({
+    collection,
+    config,
+    locale,
+    page,
+  }: {
+    collection: string
+    config: CollectionDisplayConfig
+    locale: Locale
+    page?: number
+  }): Promise<CollectionData> {
+    try {
+      const currentPage = page || COLLECTION_CONSTANTS.PAGINATION.DEFAULT_PAGE
+      const limit = config.listLimit || COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT
+
+      // Use direct database query for better performance
+      const dbResult = await CollectionDatabaseService.getCollectionList(
+        collection,
+        locale,
+        currentPage,
+        limit,
+      )
+
+      const items = dbResult.items.map((item) =>
+        CollectionService.convertToCollectionItem(item, locale),
+      )
+
+      return {
+        data: null,
+        items,
+        pagination: dbResult.pagination,
+        isSingleItem: false,
+      }
+    } catch (error) {
+      console.warn('Database query failed, falling back to Payload API:', error)
+      return this.fetchItemListFallback({ collection, config, locale, page })
+    }
+  }
+
+  /**
+   * Fallback method using Payload API for item list
+   */
+  private async fetchItemListFallback({
     collection,
     config,
     locale,
@@ -204,10 +321,36 @@ export class CollectionService {
   }
 
   /**
-   * Fetch collection items for filters using GraphQL
-   * Replaces 10 REST API calls with 1 efficient GraphQL query
+   * Fetch collection items for filters using direct database queries
+   * Replaces GraphQL with more efficient database queries
    */
   async fetchCollectionItems(locale: Locale): Promise<Record<string, CollectionItem[]>> {
+    try {
+      // Use direct database queries for better performance
+      const dbResult = await CollectionDatabaseService.getAllCollectionsForFilters(locale)
+
+      // Transform the result to match the expected format
+      const transformed: Record<string, CollectionItem[]> = {}
+
+      Object.entries(dbResult).forEach(([collection, items]) => {
+        transformed[collection] = items.map((item: FlatCollectionItem) =>
+          CollectionService.convertToCollectionItem(item, locale),
+        )
+      })
+
+      return transformed
+    } catch (error) {
+      console.warn('Database queries failed, falling back to GraphQL:', error)
+      return this.fetchCollectionItemsFallback(locale)
+    }
+  }
+
+  /**
+   * Fallback method using GraphQL for collection items
+   */
+  private async fetchCollectionItemsFallback(
+    locale: Locale,
+  ): Promise<Record<string, CollectionItem[]>> {
     try {
       const result = await fetchAllCollectionItemsForFilters(locale)
 

@@ -132,12 +132,17 @@ function RelationshipField({
             (itemObj.name as string)
           const slug = itemObj.slug as string
 
+          // Create a more unique key by combining multiple identifiers
+          const uniqueKey = [itemObj.id, itemObj.title, itemObj.name, slug, index]
+            .filter(Boolean)
+            .join('-')
+
           if (linkTo && slug) {
             const localizedSegment = getLocalizedRouteSegment(linkTo, locale)
             const localePrefix = locale === 'en' ? '/en' : ''
             return (
               <a
-                key={String(itemObj.id || index)}
+                key={uniqueKey}
                 href={`${localePrefix}/${localizedSegment}/${slug}`}
                 className="hashtag interactive"
               >
@@ -147,7 +152,7 @@ function RelationshipField({
           }
 
           return (
-            <span key={String(itemObj.id || index)} className="hashtag">
+            <span key={uniqueKey} className="hashtag">
               {displayValue}
             </span>
           )
@@ -197,8 +202,14 @@ function ArrayField({
             displayValue = String(item)
           }
 
+          // Create a more unique key by combining multiple identifiers
+          const itemObj = item as Record<string, unknown>
+          const uniqueKey = [itemObj.id, itemObj.title, itemObj.name, displayValue, index]
+            .filter(Boolean)
+            .join('-')
+
           return (
-            <span key={index} className="hashtag">
+            <span key={uniqueKey} className="hashtag">
               {displayValue}
             </span>
           )
@@ -274,9 +285,15 @@ function MediaField({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((item, index) => {
           const itemObj = item as Record<string, unknown>
+
+          // Create a more unique key by combining multiple identifiers
+          const uniqueKey = [itemObj.id, itemObj.url, itemObj.filename, index]
+            .filter(Boolean)
+            .join('-')
+
           return (
             <Image
-              key={String(itemObj.id || index)}
+              key={uniqueKey}
               src={itemObj.url as string}
               alt={(itemObj.alt || itemObj.filename) as string}
               width={400}

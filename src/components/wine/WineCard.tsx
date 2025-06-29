@@ -179,7 +179,7 @@ export function WineCard({
             <div className="flex gap-2">
               {WINE_CONSTANTS.SLIDE_INDICATORS.map((index) => (
                 <button
-                  key={index}
+                  key={`${variant.id}-slide-${index}`}
                   onClick={() => handleSlideIndicatorClick(index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   className={`${WINE_CONSTANTS.INDICATOR_SIZE} rounded-full transition-colors duration-300 focus-ring ${

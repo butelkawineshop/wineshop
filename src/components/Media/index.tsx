@@ -26,10 +26,10 @@ const getImageUrl = (src: string | null | undefined, size?: string): string => {
   if (!src) return ''
 
   // If the URL already ends with a known size, replace it with the new size
-  const sizeMatch = src.match(/\/(winecards|feature|hero|thumbnail)$/)
+  const sizeMatch = src.match(/\/(winecards|feature|hero|thumbnail|square)$/)
   if (sizeMatch && size) {
     // Replace the existing size with the new requested size
-    return src.replace(/\/(winecards|feature|hero|thumbnail)$/, `/${size}`)
+    return src.replace(/\/(winecards|feature|hero|thumbnail|square)$/, `/${size}`)
   }
 
   // If the URL already ends with a known size but no new size requested, return as is
@@ -39,7 +39,15 @@ const getImageUrl = (src: string | null | undefined, size?: string): string => {
 
   // If the URL is a full URL and a size is provided, append the size
   if (src.startsWith('http')) {
-    return size ? `${src}/${size}` : src
+    // If it's a baseUrl (doesn't end with a variant), append the size
+    if (size && !sizeMatch) {
+      return `${src}/${size}`
+    }
+    // If no size requested, default to winecards
+    if (!size && !sizeMatch) {
+      return `${src}/winecards`
+    }
+    return src
   }
 
   // If we don't have a Cloudflare URL, return the placeholder
@@ -55,8 +63,8 @@ const getImageUrl = (src: string | null | undefined, size?: string): string => {
     return `${CLOUDFLARE_IMAGES_URL}/${src}/${size}`
   }
 
-  // Otherwise, construct the Cloudflare Images URL as is
-  return `${CLOUDFLARE_IMAGES_URL}/${src}`
+  // Otherwise, construct the Cloudflare Images URL with default winecards variant
+  return `${CLOUDFLARE_IMAGES_URL}/${src}/winecards`
 }
 
 export const Media: React.FC<MediaProps> = ({

@@ -143,10 +143,14 @@ export function WineCollectionTags({
     <div className="flex flex-wrap gap-1">
       {displayTags.map((tag, index) => {
         const hashtagText = hashtagifyTag(tag.text)
+
+        // Create a more unique key by combining multiple identifiers
+        const uniqueKey = [tag.type, tag.text, tag.slug, index].filter(Boolean).join('-')
+
         if (tag.slug && tag.collection) {
           return (
             <CollectionLink
-              key={`${tag.type}-${index}`}
+              key={uniqueKey}
               collection={tag.collection}
               slug={tag.slug}
               locale={locale}
@@ -157,7 +161,7 @@ export function WineCollectionTags({
           )
         } else {
           return (
-            <span key={`${tag.type}-${index}`} className="hashtag">
+            <span key={uniqueKey} className="hashtag">
               #{hashtagText}
             </span>
           )
