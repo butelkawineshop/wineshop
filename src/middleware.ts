@@ -1,4 +1,4 @@
-import { detectLocaleFromPath } from './utils/routeMappings'
+import { detectLocaleFromPath } from './utils/routeUtils'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 

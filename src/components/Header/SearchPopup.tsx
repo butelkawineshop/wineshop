@@ -9,9 +9,9 @@ import type { SearchResult } from '@/features/search/types'
 import { search } from '@/features/search/actions'
 import { SEARCH_CONSTANTS } from '@/constants/search'
 import Image from 'next/image'
-import { routeMappings } from '@/utils/routeMappings'
+import { ROUTE_MAPPINGS } from '@/constants/routes'
 import { usePathname } from 'next/navigation'
-import { detectLocaleFromPath } from '@/utils/routeMappings'
+import { detectLocaleFromPath } from '@/utils/routeUtils'
 import { useTranslation } from '@/hooks/useTranslation'
 import Link from 'next/link'
 
@@ -100,7 +100,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
     if (type === 'wineCountry' && locale === 'sl') {
       return 'države'
     }
-    const mapping = Object.entries(routeMappings).find(([, m]) => m.collection === collection)?.[1]
+    const mapping = Object.entries(ROUTE_MAPPINGS).find(([, m]) => m.collection === collection)?.[1]
     if (!mapping) return ''
     return mapping[locale]
   }
@@ -252,7 +252,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
                   {results.length > 0 && (
                     <div className="text-sm text-black bg-green-400 hover:bg-green-500 w-fit underline rounded-xl p-2">
                       <Link
-                        href={`/${locale === 'en' ? 'en/' : ''}${routeMappings.search[locale]}?q=${encodeURIComponent(
+                        href={`/${locale === 'en' ? 'en/' : ''}${ROUTE_MAPPINGS.search[locale]}?q=${encodeURIComponent(
                           debouncedQuery,
                         )}`}
                         className="text-black hover:text-black/80"

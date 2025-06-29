@@ -1,5 +1,5 @@
 import { db } from '../lib/db'
-import type { Locale } from '@/utils/routeMappings'
+import type { Locale } from '@/constants/routes'
 
 export interface FlatCollectionItem {
   id: string

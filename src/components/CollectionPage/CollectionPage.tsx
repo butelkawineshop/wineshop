@@ -1,10 +1,7 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import {
-  routeMappings as _routeMappings,
-  type Locale,
-  getCollectionForRouteSegment,
-} from '@/utils/routeMappings'
+import { ROUTE_MAPPINGS, type Locale } from '@/constants/routes'
+import { getCollectionForRouteSegment } from '@/utils/routeUtils'
 import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'
 import { Pagination } from '../Layout/Pagination'

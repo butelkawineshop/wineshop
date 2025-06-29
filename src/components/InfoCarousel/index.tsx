@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import type { FieldConfig } from '../CollectionPage/CollectionConfig'
 import { Media } from '../Media'
-import type { Locale } from '@/utils/routeMappings'
+import type { Locale } from '@/constants/routes'
 import { CollectionLink } from '@/components/ui/CollectionLink'
 
 interface InfoCarouselProps {

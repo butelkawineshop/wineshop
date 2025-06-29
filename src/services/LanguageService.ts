@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger'
-import { routeMappings, getCollectionForRouteSegment } from '@/utils/routeMappings'
+import { ROUTE_MAPPINGS } from '@/constants/routes'
+import { getCollectionForRouteSegment } from '@/utils/routeUtils'
 import { PROVIDER_CONSTANTS } from '@/constants/providers'
 import type { Locale } from '@/i18n/locales'
 
@@ -66,7 +67,7 @@ export class LanguageService {
         newLanguage,
       })
 
-      const newBase = Object.entries(routeMappings).find(
+      const newBase = Object.entries(ROUTE_MAPPINGS).find(
         ([, val]) => val[currentLocale] === base && val.collection === collection,
       )?.[1]?.[newLanguage]
 

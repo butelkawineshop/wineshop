@@ -7,7 +7,7 @@ import 'swiper/css'
 import 'swiper/css/free-mode'
 import 'swiper/css/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
-import { routeMappings, Locale } from '@/utils/routeMappings'
+import { ROUTE_MAPPINGS, type Locale } from '@/constants/routes'
 
 // Canonical list of wine navigation collections and their i18n keys
 const WINE_NAV_CONFIG = [
@@ -26,7 +26,7 @@ const WINE_NAV_CONFIG = [
 
 function getSegmentForCollection(collection: string, locale: Locale): string | null {
   // Find the first routeMappings entry with this collection
-  const entry = Object.entries(routeMappings).find(([, v]) => v.collection === collection)
+  const entry = Object.entries(ROUTE_MAPPINGS).find(([, v]) => v.collection === collection)
   return entry ? entry[1][locale] : null
 }
 

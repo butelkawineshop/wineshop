@@ -1,6 +1,6 @@
 import React from 'react'
 import { ItemNavigation } from './ItemNavigation'
-import { type Locale } from '@/utils/routeMappings'
+import { type Locale } from '@/constants/routes'
 
 interface ItemNavigationWrapperProps {
   locale: Locale

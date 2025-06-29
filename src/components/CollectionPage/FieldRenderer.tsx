@@ -1,8 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 import type { FieldConfig } from './CollectionConfig'
-import type { Locale } from '@/utils/routeMappings'
-import { getTranslatedSegment } from '@/utils/routeMappings'
+import type { Locale } from '@/constants/routes'
+import { getTranslatedSegment } from '@/utils/routeUtils'
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
 
 interface FieldRendererProps {

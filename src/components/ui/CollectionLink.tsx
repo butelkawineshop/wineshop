@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { routeMappings, RouteMapping, Locale } from '@/utils/routeMappings'
+import { ROUTE_MAPPINGS, type RouteMapping, type Locale } from '@/constants/routes'
 
 interface CollectionLinkProps {
   collection: string
@@ -18,7 +18,7 @@ export function CollectionLink({
   className,
 }: CollectionLinkProps) {
   // Find the route segment for the collection
-  const mappingEntry = Object.entries(routeMappings).find(
+  const mappingEntry = Object.entries(ROUTE_MAPPINGS).find(
     ([, mapping]) => (mapping as RouteMapping).collection === collection,
   )
   const segment = mappingEntry

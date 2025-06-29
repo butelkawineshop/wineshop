@@ -30,15 +30,24 @@ export {
 
 // Export route mapping functions
 export {
-  routeMappings,
   getTranslatedSegment,
   getCollectionForRouteSegment,
   detectLocaleFromPath,
   getLocalizedRouteSegment,
   getAlternatePathWithSlug,
+} from './routeUtils'
+
+// Export route mapping constants
+export {
+  ROUTE_MAPPINGS,
+  COLLECTION_NAMES,
+  localeNames,
+  defaultLocale,
+  type Locale,
   type RouteMapping,
-  type Locale as RouteLocale,
-} from './routeMappings'
+  type RouteMappingKey,
+  type CollectionName,
+} from '@/constants/routes'
 
 // Export translation service (preferred over individual translation files)
 export {
@@ -59,7 +68,6 @@ export {
 } from './localizedFields'
 
 // Re-export commonly used types
-export type { Locale } from '@/constants/translation'
 export type { ImageFormat } from '@/constants/formatting'
 
 // Export constants for convenience

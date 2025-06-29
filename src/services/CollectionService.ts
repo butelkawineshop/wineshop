@@ -4,7 +4,7 @@ import {
   type CollectionDisplayConfig,
 } from '@/components/CollectionPage/CollectionConfig'
 import { COLLECTION_CONSTANTS } from '@/constants/collections'
-import type { Locale } from '@/utils/routeMappings'
+import type { Locale } from '@/constants/routes'
 import { fetchAllCollectionItemsForFilters } from '@/lib/graphql'
 import { CollectionDatabaseService, type FlatCollectionItem } from './CollectionDatabaseService'
 

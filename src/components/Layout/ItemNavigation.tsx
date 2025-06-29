@@ -3,7 +3,7 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
-import { routeMappings, type Locale } from '@/utils/routeMappings'
+import { ROUTE_MAPPINGS, type Locale } from '@/constants/routes'
 import { createPayloadService } from '@/lib/payload'
 import { NAVIGATION_CONSTANTS } from '@/constants/navigation'
 import * as motion from 'motion/react-client'
@@ -41,7 +41,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
   React.useEffect(() => {
     const determineCollection = () => {
       // Find the collection from route mappings
-      const foundCollection = Object.entries(routeMappings).find(
+      const foundCollection = Object.entries(ROUTE_MAPPINGS).find(
         ([, mapping]) => mapping[locale] === collectionSegment,
       )?.[1]?.collection
 
@@ -74,7 +74,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
         })
 
         // Get the route segment for this collection
-        const routeEntry = Object.entries(routeMappings).find(
+        const routeEntry = Object.entries(ROUTE_MAPPINGS).find(
           ([, mapping]) => mapping.collection === collection,
         )
         const routeSegment = routeEntry ? routeEntry[1][locale] : null

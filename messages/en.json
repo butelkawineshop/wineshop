@@ -340,6 +340,10 @@
     "website": "Website"
   },
   "region": {
+    "list": {
+      "title": "Regions",
+      "description": "Explore the regions behind our wines"
+    },
     "whyCool": "Why is it cool for us?",
     "climate": "Climates",
     "priceRange": "Best price range",
@@ -390,7 +394,7 @@
     "landArea": "Total vineyard area",
     "stats": "Statistics",
     "list": {
-      "title": "Wine Countries",
+      "title": "Countries",
       "description": "Explore wine countries and their traditions"
     },
     "fields": {
@@ -442,7 +446,7 @@
   "style": {
     "winesFrom": "Wines with this style",
     "list": {
-      "title": "Wine Styles",
+      "title": "Styles",
       "description": "Explore different wine styles"
     },
     "fields": {

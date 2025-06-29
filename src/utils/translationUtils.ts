@@ -1,6 +1,6 @@
 import slMessages from '../../messages/sl.json'
 import enMessages from '../../messages/en.json'
-import type { Locale } from '@/utils/routeMappings'
+import type { Locale } from '@/constants/routes'
 
 /**
  * Utility functions for handling translations
