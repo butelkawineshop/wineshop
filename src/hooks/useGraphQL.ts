@@ -206,7 +206,7 @@ export function useWineGridVariants(
     limit?: number
   } = {},
 ) {
-  const { where, sort = '-syncedAt', page = 1, limit = 24 } = options
+  const { where, sort = 'slug', page = 1, limit = 24 } = options
 
   return useQuery({
     queryKey: ['wineGridVariants', locale, where, sort, page, limit],

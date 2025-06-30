@@ -21,6 +21,7 @@ import { useWineStore } from '@/store/wine'
 import { ResetFilterButton } from './ResetFilterButton'
 import { logger } from '@/lib/logger'
 import type { FlatWineVariant } from '@/payload-types'
+import type { ValidFilterKey } from '@/types/filters'
 
 // Use the actual structure from GraphQL function
 interface CollectionItem {
@@ -52,16 +53,12 @@ type TastingNotesRange = {
 
 interface WineFiltersClientProps {
   collectionItems: CollectionItemsMap
-  currentCollection?: {
-    id: string
-    type: string
-  }
   locale: Locale
 }
 
 // Helper function to check if a filter key is an array filter
-const isArrayFilter = (key: string): key is (typeof FILTER_CONSTANTS.VALID_FILTER_KEYS)[number] => {
-  return FILTER_CONSTANTS.VALID_FILTER_KEYS.includes(key as any)
+const isArrayFilter = (key: string): key is ValidFilterKey => {
+  return FILTER_CONSTANTS.VALID_FILTER_KEYS.includes(key as ValidFilterKey)
 }
 
 // Helper to get the effective price (future-proof for discounts)
@@ -97,7 +94,6 @@ function getLocalizedTitle(item: CollectionItem, locale: Locale): string {
 
 export default function WineFiltersClient({
   collectionItems,
-  currentCollection,
   locale,
 }: WineFiltersClientProps): React.JSX.Element {
   const { t } = useTranslation()
@@ -294,7 +290,6 @@ export default function WineFiltersClient({
             {FILTER_COLLECTIONS.map(({ key, icon, translationKey, collection }) => {
               const filteredItems = getFilteredItems(collection)
               const activeFilters = getActiveFilters(key)
-              const isCurrentCollection = currentCollection?.type === collection
 
               return (
                 <DropdownMenu

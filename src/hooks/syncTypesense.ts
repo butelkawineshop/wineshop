@@ -62,7 +62,6 @@ export const syncTypesense: CollectionAfterChangeHook = async ({
   doc,
   req,
   operation,
-  previousDoc: _previousDoc,
 }): Promise<typeof doc> => {
   const logger = createLogger(req, {
     task: 'syncTypesense',
@@ -109,6 +108,7 @@ export const syncTypesense: CollectionAfterChangeHook = async ({
         id: documentId,
         operation,
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (updateError: any) {
       // If update fails with ObjectNotFound, try to create (document doesn't exist)
       if (updateError.name === 'ObjectNotFound') {
@@ -119,6 +119,7 @@ export const syncTypesense: CollectionAfterChangeHook = async ({
             id: documentId,
             operation,
           })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (createError: any) {
           logger.error('Failed to create document in Typesense', createError as Error, {
             collection: typesenseCollection,

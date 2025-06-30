@@ -1,26 +1,26 @@
 query GetCollectionItems($locale: LocaleInputType) {
-  Aromas(limit: 1000, locale: $locale) {
+  Aromas(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Tags(limit: 1000, locale: $locale) {
+  Tags(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Moods(limit: 1000, locale: $locale) {
+  Moods(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  GrapeVarieties(limit: 1000, locale: $locale) {
+  GrapeVarieties(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
@@ -30,70 +30,70 @@ query GetCollectionItems($locale: LocaleInputType) {
 }
 
 query GetAllCollectionItems($locale: LocaleInputType) {
-  Aromas(limit: 1000, locale: $locale) {
+  Aromas(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Climates(limit: 1000, locale: $locale) {
+  Climates(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Dishes(limit: 1000, locale: $locale) {
+  Dishes(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  GrapeVarieties(limit: 1000, locale: $locale) {
+  GrapeVarieties(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Moods(limit: 1000, locale: $locale) {
+  Moods(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Regions(limit: 1000, locale: $locale) {
+  Regions(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Styles(limit: 1000, locale: $locale) {
+  Styles(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Tags(limit: 1000, locale: $locale) {
+  Tags(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  WineCountries(limit: 1000, locale: $locale) {
+  WineCountries(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title
       slug
     }
   }
-  Wineries(limit: 1000, locale: $locale) {
+  Wineries(limit: 1000, sort: "slug", locale: $locale) {
     docs {
       id
       title

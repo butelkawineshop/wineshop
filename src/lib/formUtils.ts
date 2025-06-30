@@ -80,7 +80,7 @@ export const useZodForm = <T extends FieldValues>(
     mode?: 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all'
     defaultValues?: Partial<T>
   },
-): UseFormReturn<T> => {
+) => {
   return useForm<T>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema as any),

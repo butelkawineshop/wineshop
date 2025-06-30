@@ -2,7 +2,7 @@ import type { PayloadRequest } from 'payload'
 import { BaseSyncService, type SyncResult } from './BaseSyncService'
 import { FLAT_COLLECTIONS_CONSTANTS } from '@/constants/flatCollections'
 
-type CollectionType =
+export type CollectionType =
   (typeof FLAT_COLLECTIONS_CONSTANTS.COLLECTION_TYPES)[keyof typeof FLAT_COLLECTIONS_CONSTANTS.COLLECTION_TYPES]
 
 export interface FlatCollectionData {

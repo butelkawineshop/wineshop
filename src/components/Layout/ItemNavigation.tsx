@@ -395,7 +395,7 @@ export const ItemNavigation: React.FC<ItemNavigationProps> = ({
             </div>
             <div className="max-h-80 overflow-y-auto overscroll-contain">
               {filteredItems.length > 0 ? (
-                filteredItems.map((doc, index) => {
+                filteredItems.map((doc) => {
                   // Find the original index for highlighting current item
                   const originalIndex = navigationData.docs.findIndex((item) => item.id === doc.id)
                   const isCurrentItem = originalIndex === currentIndex

@@ -60,16 +60,24 @@ export function WineDetailWrapper({ slug, locale }: WineDetailWrapperProps) {
   }
 
   // Create a variant selector function
-  const selectVariant = (variant: FlatWineVariant) => {
+  const selectVariant = () => {
     // For now, we'll just use the same variant since we don't have multiple variants loaded
     // This could be enhanced to load different variants when needed
   }
+
+  // Transform relatedVariants to match the expected format
+  const transformedRelatedVariants =
+    data.relatedVariants?.map((related) => ({
+      type: related.type || '',
+      title: related.title || '',
+      variants: (related.variants || []) as FlatWineVariant[],
+    })) || []
 
   return (
     <WineDetail
       variant={data.variant as FlatWineVariant}
       variants={data.variants as FlatWineVariant[]}
-      relatedVariants={data.relatedVariants as unknown as any}
+      relatedVariants={transformedRelatedVariants}
       selectedVariant={data.variant as FlatWineVariant}
       onVariantSelect={selectVariant}
       locale={locale}

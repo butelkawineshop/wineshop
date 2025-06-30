@@ -16,6 +16,7 @@ import type {
 } from '@/generated/graphql'
 import { graphqlRequest } from '@/lib/graphql-client'
 import { GetFlatCollection, GetFlatCollections, GetAllCollectionItems } from '@/generated/graphql'
+import type { CollectionType } from './FlatCollectionService'
 
 export interface CollectionItem {
   id: string
@@ -223,7 +224,7 @@ export class CollectionService {
         const { data, error } = await graphqlRequest<GetFlatCollectionsQueryResult>({
           query: GetFlatCollections,
           variables: {
-            collectionType: collectionType as any,
+            collectionType: collectionType as CollectionType,
             locale: locale as 'sl' | 'en',
             limit,
             page: currentPage,
@@ -316,6 +317,11 @@ export class CollectionService {
     locale: Locale,
     _collectionType?: string,
   ): Promise<Record<string, CollectionItem[]>> {
+    // During build time, skip GraphQL requests and return empty collections
+    if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+      return this.fetchCollectionItemsFallback(locale)
+    }
+
     try {
       // Use the new GraphQL query to fetch all collection items
       const { data, error } = await graphqlRequest<GetAllCollectionItemsQueryResult>({

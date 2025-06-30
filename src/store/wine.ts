@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { STORE_CONSTANTS } from '@/constants/store'
 import type { FlatWineVariant } from '@/payload-types'
+import type { ValidFilterKey } from '@/types/filters'
 
 // Types
 export interface WineFilters {
@@ -431,7 +432,7 @@ export const useWineStore = create<WineState & WineActions & WineSelectors>()(
             'climates',
           ] as const
 
-          if (lockedValue && stringArrayFilterKeys.includes(key as any)) {
+          if (lockedValue && stringArrayFilterKeys.includes(key as ValidFilterKey)) {
             const stringValues = values as string[]
             // If the locked value is not in the new values, add it
             if (!stringValues.includes(lockedValue)) {
@@ -482,8 +483,8 @@ export const useWineStore = create<WineState & WineActions & WineSelectors>()(
           ] as const
 
           Object.entries(lockedFilters).forEach(([key, lockedValue]) => {
-            if (lockedValue && stringArrayFilterKeys.includes(key as any)) {
-              ;(newFilters as any)[key] = [lockedValue]
+            if (lockedValue && stringArrayFilterKeys.includes(key as ValidFilterKey)) {
+              newFilters[key as ValidFilterKey] = [lockedValue]
             }
           })
 

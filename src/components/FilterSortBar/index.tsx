@@ -3,20 +3,7 @@ import { logger } from '@/lib/logger'
 import type { Locale } from '@/i18n/locales'
 import { FilterSortBarClient } from './FilterSortBar.client'
 import { CollectionService } from '@/services/CollectionService'
-
-// Use the actual structure from GraphQL function
-interface CollectionItem {
-  id: string
-  title:
-    | string
-    | {
-        sl: string
-        en?: string
-      }
-  slug?: string
-}
-
-type CollectionItemsMap = Record<string, CollectionItem[]>
+import type { CollectionItemsMap, CollectionItem } from '@/types/filters'
 
 interface Props {
   currentCollection?: {
@@ -71,18 +58,33 @@ export default async function FilterSortBar({
             acc[key] = items.slice(0, 3).map((item) => ({ id: item.id, title: item.title }))
             return acc
           },
-          {} as Record<string, any>,
+          {} as Record<string, CollectionItem[]>,
         ),
       })
     } catch (error) {
-      logger.error('Failed to fetch collection items for filters', { error })
-      collectionItems = {}
+      // During build time, GraphQL might not be available, so use empty collections
+      logger.info('Using empty collection items for filters (build time or GraphQL unavailable)', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        currentCollection: currentCollection?.type,
+      })
+      collectionItems = {
+        aromas: [],
+        climates: [],
+        dishes: [],
+        'grape-varieties': [],
+        moods: [],
+        regions: [],
+        styles: [],
+        tags: [],
+        wineCountries: [],
+        wineries: [],
+      }
     }
   }
 
   return (
     <FilterSortBarClient
-      currentCollection={currentCollection}
+      _currentCollection={currentCollection}
       collectionItems={collectionItems}
       locale={resolvedLocale}
     />

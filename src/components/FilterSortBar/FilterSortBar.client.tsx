@@ -9,18 +9,20 @@ import { useWineStore } from '@/store/wine'
 import { useTranslation } from '@/hooks/useTranslation'
 import { logger } from '@/lib/logger'
 import type { Locale } from '@/i18n/locales'
+import type { CollectionItem } from '@/types/filters'
+import type { FlatWineVariant } from '@/payload-types'
 
 interface Props {
-  currentCollection?: {
+  _currentCollection?: {
     id: string
     type: string
   }
-  collectionItems?: Record<string, any[]>
+  collectionItems?: Record<string, CollectionItem[]>
   locale: Locale
 }
 
 export function FilterSortBarClient({
-  currentCollection,
+  _currentCollection,
   collectionItems,
   locale,
 }: Props): React.JSX.Element {
@@ -37,9 +39,9 @@ export function FilterSortBarClient({
   } = useWineStore()
 
   // Use the wine grid hook to fetch initial data and populate the store
-  const { wineVariants, isLoading, error, pagination } = useWineGrid({
+  const { wineVariants, isLoading, error } = useWineGrid({
     locale,
-    currentCollection,
+    currentCollection: _currentCollection,
     // Add any additional filters here if needed
   })
 
@@ -49,12 +51,12 @@ export function FilterSortBarClient({
       logger.info('Updating wine store with fetched variants', {
         count: wineVariants.length,
         locale,
-        currentCollection: currentCollection?.type,
+        currentCollection: _currentCollection?.type,
       })
-      setVariants(wineVariants)
+      setVariants(wineVariants as FlatWineVariant[])
       setHasFetched(true)
     }
-  }, [wineVariants, locale, currentCollection, setVariants, setHasFetched])
+  }, [wineVariants, locale, _currentCollection, setVariants, setHasFetched])
 
   // Update loading and error states
   useEffect(() => {
@@ -76,7 +78,7 @@ export function FilterSortBarClient({
     return (
       <div className="flex flex-col gap-2 w-full container-narrow">
         <WineFilters
-          currentCollection={currentCollection}
+          _currentCollection={_currentCollection}
           locale={locale}
           collectionItems={collectionItems || {}}
         />
@@ -93,7 +95,7 @@ export function FilterSortBarClient({
     return (
       <div className="flex flex-col gap-2 w-full container-narrow">
         <WineFilters
-          currentCollection={currentCollection}
+          _currentCollection={_currentCollection}
           locale={locale}
           collectionItems={collectionItems || {}}
         />
@@ -108,7 +110,7 @@ export function FilterSortBarClient({
   return (
     <div className="flex flex-col gap-2 w-full container-narrow">
       <WineFilters
-        currentCollection={currentCollection}
+        _currentCollection={_currentCollection}
         locale={locale}
         collectionItems={collectionItems || {}}
       />

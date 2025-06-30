@@ -6,17 +6,15 @@ import { useTheme } from '@/providers/ThemeProvider'
 import { Icon } from '@/components/Icon'
 import { useStore } from '@/store'
 import { useTranslation } from '@/hooks/useTranslation'
-import { useLocale } from 'next-intl'
-import { type Locale } from '@/i18n/locales'
 import { LanguageService } from '@/services/LanguageService'
 import { logger } from '@/lib/logger'
+import type { Locale } from '@/i18n/locales'
 
 export const TopBar: React.FC = (): React.ReactElement => {
   const pathname = usePathname()
   const { theme, toggleTheme } = useTheme()
   const language = useStore((state) => state.language)
   const { t } = useTranslation()
-  const locale = useLocale() as Locale
 
   // Detect current locale from pathname and initialize store
   useEffect(() => {

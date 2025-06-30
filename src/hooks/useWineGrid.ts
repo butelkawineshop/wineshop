@@ -5,6 +5,7 @@ import { useWineStore } from '@/store/wine'
 import { useEffect } from 'react'
 import { logger } from '@/lib/logger'
 import type { Locale } from '@/i18n/locales'
+import type { FlatWineVariant } from '@/payload-types'
 
 interface UseWineGridOptions {
   locale: Locale
@@ -20,8 +21,8 @@ interface UseWineGridOptions {
 
 interface UseWineGridReturn {
   // Data
-  wineVariants: any[]
-  totalVariants: any[]
+  wineVariants: unknown[]
+  totalVariants: unknown[]
   isLoading: boolean
   error: string | null
   pagination: {
@@ -84,8 +85,8 @@ export function useWineGrid(options: UseWineGridOptions): UseWineGridReturn {
         locale,
         currentCollection: currentCollection?.type,
       })
-      // Cast to the expected type for the store
-      setVariants(data.FlatWineVariants.docs as any)
+      // Cast to FlatWineVariant[] for the store, even though the GraphQL result may not match exactly
+      setVariants(data.FlatWineVariants.docs as FlatWineVariant[])
       setHasFetched(true)
     }
   }, [data, locale, currentCollection, setVariants, setHasFetched])

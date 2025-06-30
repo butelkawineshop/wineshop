@@ -279,6 +279,34 @@ export const useStore = create<RootStore>()(
                   },
                 }
               }),
+            setLockedFilter: (key, value) =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: {
+                    ...state.wine.state,
+                    lockedFilters: { ...state.wine.state.lockedFilters, [key]: value },
+                  },
+                },
+              })),
+            clearLockedFilter: (key) =>
+              set((state) => {
+                const newLockedFilters = { ...state.wine.state.lockedFilters }
+                delete newLockedFilters[key]
+                return {
+                  wine: {
+                    ...state.wine,
+                    state: { ...state.wine.state, lockedFilters: newLockedFilters },
+                  },
+                }
+              }),
+            clearAllLockedFilters: () =>
+              set((state) => ({
+                wine: {
+                  ...state.wine,
+                  state: { ...state.wine.state, lockedFilters: {} },
+                },
+              })),
           },
           selectors: {
             getVariants: () => get().wine.state.variants,
@@ -390,6 +418,9 @@ export const useStore = create<RootStore>()(
               return hasArrayFilters || hasPriceFilter || hasTastingNotesFilter
             },
             getCurrentSort: () => get().wine.state.sort,
+            getLockedFilters: () => get().wine.state.lockedFilters,
+            isFilterLocked: (key) => get().wine.state.lockedFilters[key] !== undefined,
+            getLockedFilterValue: (key) => get().wine.state.lockedFilters[key],
           },
         },
         language: {

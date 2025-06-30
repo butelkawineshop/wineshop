@@ -17,7 +17,7 @@ interface CollectionItem {
 type CollectionItemsMap = Record<string, CollectionItem[]>
 
 interface Props {
-  currentCollection?: {
+  _currentCollection?: {
     id: string
     type: string
   }
@@ -26,15 +26,9 @@ interface Props {
 }
 
 export default function WineFilters({
-  currentCollection,
+  _currentCollection,
   locale = 'sl',
   collectionItems,
 }: Props): React.JSX.Element {
-  return (
-    <WineFiltersClient
-      collectionItems={collectionItems || {}}
-      currentCollection={currentCollection}
-      locale={locale}
-    />
-  )
+  return <WineFiltersClient collectionItems={collectionItems || {}} locale={locale} />
 }
