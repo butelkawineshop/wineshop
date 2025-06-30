@@ -17,13 +17,12 @@ fragment RelatedWineVariantFields on RelatedWineVariant {
         size
         price
         stockOnHand
-        primaryImageUrl
         wineryTitle
         regionTitle
-        countryTitle
         styleTitle
         styleIconKey
         styleSlug
+        primaryImageUrl
         originalVariant { id slug }
       }
     }

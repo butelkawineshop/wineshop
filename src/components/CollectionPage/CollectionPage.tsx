@@ -1,6 +1,6 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { ROUTE_MAPPINGS, type Locale } from '@/constants/routes'
+import { type Locale } from '@/i18n/locales'
 import { getCollectionForRouteSegment } from '@/utils/routeUtils'
 import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'

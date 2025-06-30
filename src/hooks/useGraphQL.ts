@@ -1,32 +1,24 @@
-import { useQuery, useMutation, useQueryClient, queryOptions } from '@tanstack/react-query'
+import { useQuery, queryOptions } from '@tanstack/react-query'
 import { graphqlRequest } from '@/lib/graphql-client'
 import {
-  GetFlatCollectionDocument,
-  GetFlatCollectionsDocument,
-  GetFlatWineVariantDocument,
-  GetFlatWineVariantsDocument,
-  GetWineVariantDocument,
-  GetWineVariantsDocument,
-  WineDetailDocument,
-  GetRelatedWineVariantsDocument,
-} from '@/graphql/documents'
+  GetFlatCollection,
+  GetFlatCollections,
+  GetFlatWineVariant,
+  GetFlatWineVariants,
+  GetWineGridVariants,
+  GetWineVariant,
+  GetWineVariants,
+  GetRelatedWineVariants,
+} from '@/generated/graphql'
 import type {
   GetFlatCollectionQueryResult,
-  GetFlatCollectionQueryVariables,
   GetFlatCollectionsQueryResult,
-  GetFlatCollectionsQueryVariables,
   GetFlatWineVariantQueryResult,
-  GetFlatWineVariantQueryVariables,
   GetFlatWineVariantsQueryResult,
-  GetFlatWineVariantsQueryVariables,
+  GetWineGridVariantsQueryResult,
   GetWineVariantQueryResult,
-  GetWineVariantQueryVariables,
   GetWineVariantsQueryResult,
-  GetWineVariantsQueryVariables,
-  WineDetailQueryResult,
-  WineDetailQueryVariables,
   GetRelatedWineVariantsQueryResult,
-  GetRelatedWineVariantsQueryVariables,
 } from '@/generated/graphql'
 import type { Locale } from '@/constants/routes'
 
@@ -36,8 +28,8 @@ export function useFlatCollection(slug: string, locale: Locale) {
     queryKey: ['flatCollection', slug, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetFlatCollectionQueryResult>({
-        query: GetFlatCollectionDocument,
-        variables: { slug, locale: locale as any },
+        query: GetFlatCollection,
+        variables: { slug, locale },
       })
       if (error) throw new Error(error)
       return data
@@ -56,10 +48,10 @@ export function useFlatCollections(
     queryKey: ['flatCollections', collectionType, locale, limit, page],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetFlatCollectionsQueryResult>({
-        query: GetFlatCollectionsDocument,
+        query: GetFlatCollections,
         variables: {
-          collectionType: collectionType as any,
-          locale: locale as any,
+          collectionType,
+          locale,
           limit,
           page,
         },
@@ -77,8 +69,8 @@ export function useFlatWineVariant(slug: string, locale: Locale) {
     queryKey: ['flatWineVariant', slug, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetFlatWineVariantQueryResult>({
-        query: GetFlatWineVariantDocument,
-        variables: { slug, locale: locale as any },
+        query: GetFlatWineVariant,
+        variables: { slug, locale },
       })
       if (error) throw new Error(error)
       return data
@@ -92,8 +84,8 @@ export function useFlatWineVariants(wineTitle: string, locale: Locale) {
     queryKey: ['flatWineVariants', wineTitle, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetFlatWineVariantsQueryResult>({
-        query: GetFlatWineVariantsDocument,
-        variables: { wineTitle, locale: locale as any },
+        query: GetFlatWineVariants,
+        variables: { wineTitle, locale },
       })
       if (error) throw new Error(error)
       return data
@@ -108,8 +100,8 @@ export function useWineVariant(slug: string, locale: Locale) {
     queryKey: ['wineVariant', slug, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetWineVariantQueryResult>({
-        query: GetWineVariantDocument,
-        variables: { slug, locale: locale as any },
+        query: GetWineVariant,
+        variables: { slug, locale },
       })
       if (error) throw new Error(error)
       return data
@@ -123,29 +115,13 @@ export function useWineVariants(wineTitle: string, locale: Locale) {
     queryKey: ['wineVariants', wineTitle, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetWineVariantsQueryResult>({
-        query: GetWineVariantsDocument,
-        variables: { wineTitle, locale: locale as any },
+        query: GetWineVariants,
+        variables: { wineTitle, locale },
       })
       if (error) throw new Error(error)
       return data
     },
     enabled: Boolean(wineTitle && locale),
-  })
-}
-
-// WineDetail hook (custom resolver)
-export function useWineDetail(slug: string, locale: Locale) {
-  return useQuery({
-    queryKey: ['wineDetail', slug, locale],
-    queryFn: async () => {
-      const { data, error } = await graphqlRequest<WineDetailQueryResult>({
-        query: WineDetailDocument,
-        variables: { slug, locale },
-      })
-      if (error) throw new Error(error)
-      return data
-    },
-    enabled: Boolean(slug && locale),
   })
 }
 
@@ -155,8 +131,8 @@ export function useRelatedWineVariants(variantId: number, locale: Locale) {
     queryKey: ['relatedWineVariants', variantId, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetRelatedWineVariantsQueryResult>({
-        query: GetRelatedWineVariantsDocument,
-        variables: { variantId, locale: locale as any },
+        query: GetRelatedWineVariants,
+        variables: { variantId, locale },
       })
       if (error) throw new Error(error)
       return data
@@ -171,8 +147,8 @@ export const flatCollectionOptions = (slug: string, locale: Locale) =>
     queryKey: ['flatCollection', slug, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetFlatCollectionQueryResult>({
-        query: GetFlatCollectionDocument,
-        variables: { slug, locale: locale as any },
+        query: GetFlatCollection,
+        variables: { slug, locale },
       })
       if (error) throw new Error(error)
       return data
@@ -190,10 +166,10 @@ export const flatCollectionsOptions = (
     queryKey: ['flatCollections', collectionType, locale, limit, page],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetFlatCollectionsQueryResult>({
-        query: GetFlatCollectionsDocument,
+        query: GetFlatCollections,
         variables: {
-          collectionType: collectionType as any,
-          locale: locale as any,
+          collectionType,
+          locale,
           limit,
           page,
         },
@@ -209,21 +185,7 @@ export const wineVariantOptions = (slug: string, locale: Locale) =>
     queryKey: ['wineVariant', slug, locale],
     queryFn: async () => {
       const { data, error } = await graphqlRequest<GetWineVariantQueryResult>({
-        query: GetWineVariantDocument,
-        variables: { slug, locale: locale as any },
-      })
-      if (error) throw new Error(error)
-      return data
-    },
-    enabled: Boolean(slug && locale),
-  })
-
-export const wineDetailOptions = (slug: string, locale: Locale) =>
-  queryOptions({
-    queryKey: ['wineDetail', slug, locale],
-    queryFn: async () => {
-      const { data, error } = await graphqlRequest<WineDetailQueryResult>({
-        query: WineDetailDocument,
+        query: GetWineVariant,
         variables: { slug, locale },
       })
       if (error) throw new Error(error)
@@ -231,3 +193,29 @@ export const wineDetailOptions = (slug: string, locale: Locale) =>
     },
     enabled: Boolean(slug && locale),
   })
+
+// WineGrid hook for fetching wine variants with filtering and pagination
+export function useWineGridVariants(
+  locale: Locale,
+  options: {
+    where?: Record<string, unknown>
+    sort?: string
+    page?: number
+    limit?: number
+  } = {},
+) {
+  const { where, sort = '-syncedAt', page = 1, limit = 24 } = options
+
+  return useQuery({
+    queryKey: ['wineGridVariants', locale, where, sort, page, limit],
+    queryFn: async () => {
+      const { data, error } = await graphqlRequest<GetWineGridVariantsQueryResult>({
+        query: GetWineGridVariants,
+        variables: { locale, where, sort, page, limit },
+      })
+      if (error) throw new Error(error)
+      return data
+    },
+    enabled: Boolean(locale),
+  })
+}

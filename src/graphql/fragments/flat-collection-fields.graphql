@@ -6,9 +6,6 @@ fragment FlatCollectionFields on FlatCollection {
   title
   slug
   description
-  titleEn
-  slugEn
-  descriptionEn
   whyCool
   whyCoolEn
   typicalStyle
@@ -23,25 +20,24 @@ fragment FlatCollectionFields on FlatCollection {
   climateTemperature
   category
   colorGroup
-  adjective { id title titleEn slug slugEn }
-  flavour { id title titleEn slug slugEn category colorGroup }
-  country { id title titleEn slug slugEn }
-  climateData { id title titleEn slug slugEn }
+  adjective { id title slug }
+  flavour { id title slug category colorGroup }
+  country { id title slug }
+  climateData { id title slug }
   statistics { landArea wineriesCount }
   climateConditions { diurnalRange humidity }
   social { instagram website }
-  synonyms { title titleEn }
-  bestGrapes { id title titleEn slug slugEn }
-  bestRegions { id title titleEn slug slugEn }
-  legends { id title titleEn slug slugEn wineryCode }
-  neighbours { id title titleEn slug slugEn }
-  relatedWineries { id title titleEn slug slugEn wineryCode }
-  distinctiveAromas { id title titleEn slug slugEn }
-  blendingPartners { id title titleEn slug slugEn }
-  similarVarieties { id title titleEn slug slugEn }
-  tags { id title titleEn slug slugEn }
+  synonyms { title }
+  bestGrapes { id title slug }
+  bestRegions { id title slug }
+  legends { id title slug wineryCode }
+  neighbours { id title slug }
+  relatedWineries { id title slug wineryCode }
+  distinctiveAromas { id title slug }
+  blendingPartners { id title slug }
+  similarVarieties { id title slug }
+  tags { id title slug }
   media { id alt url thumbnailURL }
-  seo { title titleEn description descriptionEn image }
+  seo { title description image }
   syncedAt
-  isPublished
 } 

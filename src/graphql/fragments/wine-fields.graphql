@@ -9,7 +9,6 @@ fragment WineCardFields on FlatWineVariant {
   primaryImageUrl
   wineryTitle
   regionTitle
-  countryTitle
   styleTitle
   originalVariant { id slug }
 }
@@ -30,12 +29,10 @@ fragment WineDetailFields on FlatWineVariant {
   originalVariant { id slug }
   wineryTitle
   regionTitle
-  countryTitle
   styleTitle
   dishes {
     id
     title
-    titleEn
   }
   tastingNotes {
     dry
@@ -62,7 +59,6 @@ fragment RelatedWineFields on FlatWineVariant {
   primaryImageUrl
   wineryTitle
   regionTitle
-  countryTitle
   styleTitle
   styleIconKey
   styleSlug

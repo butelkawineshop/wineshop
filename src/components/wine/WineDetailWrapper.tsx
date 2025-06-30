@@ -2,7 +2,6 @@
 
 import { useWineVariant } from '@/hooks/useWineVariant'
 import { WineDetail } from './WineDetail'
-import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { notFound } from 'next/navigation'
 import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
@@ -10,22 +9,10 @@ import type { Locale } from '@/i18n/locales'
 interface WineDetailWrapperProps {
   slug: string
   locale: Locale
-  initialData?: FlatWineVariant
 }
 
-export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapperProps) {
-  const { data, isLoading, error, selectVariant } = useWineVariant({
-    slug,
-    locale,
-    initialData: initialData
-      ? {
-          variant: initialData,
-          variants: [],
-          relatedVariants: [],
-          error: null,
-        }
-      : undefined,
-  })
+export function WineDetailWrapper({ slug, locale }: WineDetailWrapperProps) {
+  const { data, isLoading, error } = useWineVariant(slug, locale)
 
   // Show loading state
   if (isLoading) {
@@ -42,7 +29,7 @@ export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapp
   // Handle errors
   if (error) {
     // If it's a "not found" error, trigger Next.js 404
-    if (error === 'Variant not found' || error === 'Failed to load wine data') {
+    if (error.message?.includes('not found') || error.message?.includes('Failed to load')) {
       notFound()
     }
 
@@ -50,7 +37,7 @@ export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapp
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-500 mb-4">Failed to load wine data</p>
-          <p className="text-foreground/60 text-sm">{error}</p>
+          <p className="text-foreground/60 text-sm">{error.message}</p>
         </div>
       </div>
     )
@@ -72,16 +59,21 @@ export function WineDetailWrapper({ slug, locale, initialData }: WineDetailWrapp
     notFound()
   }
 
+  // Create a variant selector function
+  const selectVariant = (variant: FlatWineVariant) => {
+    // For now, we'll just use the same variant since we don't have multiple variants loaded
+    // This could be enhanced to load different variants when needed
+    console.log('Variant selected:', variant)
+  }
+
   return (
-    <ErrorBoundary>
-      <WineDetail
-        variant={data.variant}
-        variants={data.variants}
-        relatedVariants={data.relatedVariants}
-        selectedVariant={data.variant}
-        onVariantSelect={selectVariant}
-        locale={locale}
-      />
-    </ErrorBoundary>
+    <WineDetail
+      variant={data.variant as FlatWineVariant}
+      variants={data.variants as FlatWineVariant[]}
+      relatedVariants={data.relatedVariants as unknown as any}
+      selectedVariant={data.variant as FlatWineVariant}
+      onVariantSelect={selectVariant}
+      locale={locale}
+    />
   )
 }

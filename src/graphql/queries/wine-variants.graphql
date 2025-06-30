@@ -1,7 +1,7 @@
 #import "../fragments/flat-wine-variant-fields.graphql"
 
 query GetWineVariant($slug: String!, $locale: LocaleInputType!) {
-  FlatWineVariants(where: { slug: { equals: $slug }, isPublished: { equals: true } }, limit: 1, locale: $locale) {
+  FlatWineVariants(where: { slug: { equals: $slug } }, limit: 1, locale: $locale) {
     docs {
       ...FlatWineVariantFields
     }
@@ -12,8 +12,7 @@ query GetWineVariants($wineTitle: String!, $locale: LocaleInputType!) {
   FlatWineVariants(
     where: { 
       AND: [
-        { wineTitle: { equals: $wineTitle } }, 
-        { isPublished: { equals: true } }
+        { wineTitle: { equals: $wineTitle } }
       ] 
     }, 
     sort: "vintage", 
@@ -22,24 +21,5 @@ query GetWineVariants($wineTitle: String!, $locale: LocaleInputType!) {
     docs {
       ...FlatWineVariantFields
     }
-  }
-}
-
-query WineDetail($slug: String!, $locale: String!) {
-  wineDetail(slug: $slug, locale: $locale) {
-    variant {
-      ...FlatWineVariantFields
-    }
-    variants {
-      ...FlatWineVariantFields
-    }
-    relatedVariants {
-      type
-      title
-      variants {
-        ...FlatWineVariantFields
-      }
-    }
-    error
   }
 } 

@@ -7,9 +7,6 @@ import type { Locale } from '@/constants/routes'
 import { CollectionDatabaseService } from './CollectionDatabaseService'
 import { FLAT_COLLECTIONS_CONSTANTS } from '@/constants/flatCollections'
 
-// Import the rich interface from FlatCollectionService
-import type { FlatCollectionData } from './FlatCollectionService'
-
 // Import the new GraphQL types and client
 import type {
   GetFlatCollectionQueryResult,
@@ -17,7 +14,7 @@ import type {
   FlatCollectionFieldsFragment,
 } from '@/generated/graphql'
 import { graphqlRequest } from '@/lib/graphql-client'
-import { GetFlatCollectionDocument, GetFlatCollectionsDocument } from '@/graphql/documents'
+import { GetFlatCollection, GetFlatCollections } from '@/generated/graphql'
 
 export interface CollectionItem {
   id: string
@@ -58,7 +55,7 @@ export class CollectionService {
    */
   private static convertToCollectionItem(
     graphqlItem: FlatCollectionFieldsFragment,
-    locale: Locale,
+    _locale: Locale,
   ): CollectionItem {
     // Handle media - GraphQL returns media array
     let mediaArray: Array<{ url: string; baseUrl: string }> = []
@@ -165,7 +162,7 @@ export class CollectionService {
       if (collectionType) {
         // Use the new GraphQL client to fetch a single collection item
         const { data, error } = await graphqlRequest<GetFlatCollectionQueryResult>({
-          query: GetFlatCollectionDocument,
+          query: GetFlatCollection,
           variables: {
             slug,
             locale: locale as 'sl' | 'en',
@@ -223,7 +220,7 @@ export class CollectionService {
       if (collectionType) {
         // Use the new GraphQL client to fetch collection items
         const { data, error } = await graphqlRequest<GetFlatCollectionsQueryResult>({
-          query: GetFlatCollectionsDocument,
+          query: GetFlatCollections,
           variables: {
             collectionType: collectionType as any,
             locale: locale as 'sl' | 'en',
@@ -316,7 +313,7 @@ export class CollectionService {
    */
   async fetchCollectionItems(
     locale: Locale,
-    collectionType?: string,
+    _collectionType?: string,
   ): Promise<Record<string, CollectionItem[]>> {
     try {
       // For now, return empty collections since the old functions are removed
@@ -343,7 +340,7 @@ export class CollectionService {
    * Fallback method for collection items
    */
   private async fetchCollectionItemsFallback(
-    locale: Locale,
+    _locale: Locale,
   ): Promise<Record<string, CollectionItem[]>> {
     // Return empty collections as fallback
     // This can be updated later to use the new GraphQL queries
@@ -380,7 +377,7 @@ export class CollectionService {
    */
   private async fetchSingleItemFallback({
     collection,
-    config,
+    config: _config,
     locale,
     slug,
   }: {

@@ -6,6 +6,7 @@ import { Icon } from '@/components/Icon'
 import { useDebounce } from '@/hooks/useDebounce'
 import { CollectionLink } from '@/components/ui/CollectionLink'
 import type { SearchResult } from '@/features/search/types'
+import { isWineVariantResult } from '@/features/search/types'
 import { search } from '@/features/search/actions'
 import { SEARCH_CONSTANTS } from '@/constants/search'
 import Image from 'next/image'
@@ -61,7 +62,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
 
   useEffect(() => {
     const performSearch = async () => {
-      if (!debouncedQuery || debouncedQuery.length < SEARCH_CONSTANTS.MIN_QUERY_LENGTH) {
+      if (!debouncedQuery || debouncedQuery.length < SEARCH_CONSTANTS.SEARCH.MIN_QUERY_LENGTH) {
         setResults([])
         setIsLoading(false)
         return
@@ -146,26 +147,17 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
             locale={locale}
             className="flex items-center gap-4"
           >
-            {result.media?.media &&
-              typeof result.media.media !== 'number' &&
-              'url' in result.media.media && (
-                <SearchImage
-                  src={
-                    typeof result.media.media === 'object' &&
-                    result.media.media &&
-                    'url' in result.media.media
-                      ? result.media.media.url || ''
-                      : ''
-                  }
-                  alt={result.title || ''}
-                />
-              )}
+            {result.media?.url && (
+              <SearchImage src={result.media.url} alt={result.media.alt || result.title || ''} />
+            )}
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm text-black">{getWineVariantTitle(result)}</h3>
               </div>
               {result.description && <p className="text-sm text-black">{result.description}</p>}
-              {result.price && <p className="text-sm text-black">€{result.price.toFixed(2)}</p>}
+              {isWineVariantResult(result) && result.price && (
+                <p className="text-sm text-black">€{result.price.toFixed(2)}</p>
+              )}
             </div>
           </CollectionLink>
         </div>
@@ -242,7 +234,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
                       </div>
                     ))
                   ) : debouncedQuery &&
-                    debouncedQuery.length >= SEARCH_CONSTANTS.MIN_QUERY_LENGTH ? (
+                    debouncedQuery.length >= SEARCH_CONSTANTS.SEARCH.MIN_QUERY_LENGTH ? (
                     <div className="text-sm text-black bg-green-400 w-fit rounded-xl p-2">
                       {t('header.search.noResults')}
                     </div>

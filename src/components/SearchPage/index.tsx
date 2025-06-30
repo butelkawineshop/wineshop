@@ -9,6 +9,7 @@ import { SEARCH_CONSTANTS } from '@/constants/search'
 import { Icon } from '@/components/Icon'
 import { CollectionLink } from '@/components/ui/CollectionLink'
 import Image from 'next/image'
+import { isWineVariantResult } from '@/features/search/types'
 
 type SearchPageProps = {
   locale: 'sl' | 'en'
@@ -198,12 +199,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ locale, basePath }) => {
           className={`grid ${SEARCH_CONSTANTS.UI.GRID_BREAKPOINTS.MOBILE} ${SEARCH_CONSTANTS.UI.GRID_BREAKPOINTS.TABLET} ${SEARCH_CONSTANTS.UI.GRID_BREAKPOINTS.DESKTOP} ${SEARCH_CONSTANTS.UI.GRID_BREAKPOINTS.WIDE} gap-6`}
         >
           {results.map((result, index) => {
-            const imageUrl =
-              result.media?.media &&
-              typeof result.media.media === 'object' &&
-              'url' in result.media.media
-                ? result.media.media.url
-                : undefined
+            const imageUrl = result.media?.url
 
             const isLastResult = index === results.length - 1
             const collection = getCollectionForType(result.type)
@@ -245,7 +241,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ locale, basePath }) => {
                         {result.description}
                       </p>
                     )}
-                    {result.price && (
+                    {isWineVariantResult(result) && result.price && (
                       <p
                         className={`text-sm font-medium ${imageUrl ? 'text-white' : 'text-primary'} mt-2`}
                       >

@@ -14,9 +14,6 @@ import { RelatedWineVariants } from './components/RelatedWineVariants'
 import { WINE_CONSTANTS } from '@/constants/wine'
 import { CollectionLink } from '@/components/ui/CollectionLink'
 
-// Import the new GraphQL types
-import type { GetRelatedWineVariantsQueryResult } from '@/generated/graphql'
-
 // Type for related wine variants using the new GraphQL structure
 type RelatedWineVariant = {
   type: string

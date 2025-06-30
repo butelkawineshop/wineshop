@@ -4,58 +4,32 @@ import React from 'react'
 import WineFilters from '@/components/WineFilters'
 import Sorting from '@/components/Sorting'
 import { WineGrid } from '@/components/wine/WineGrid'
-import { useWineData } from '@/hooks/useWineData'
-import type { Locale } from '@/i18n/locales'
-import type { FlatWineVariant } from '@/payload-types'
+import { useWineGrid } from '@/hooks/useWineGrid'
 import { useTranslation } from '@/hooks/useTranslation'
-
-// Use the same structure as server component
-interface CollectionItem {
-  id: string
-  title:
-    | string
-    | {
-        sl: string
-        en?: string
-      }
-  slug?: string
-}
-
-type CollectionItemsMap = Record<string, CollectionItem[]>
+import type { Locale } from '@/i18n/locales'
 
 interface Props {
   currentCollection?: {
     id: string
     type: string
   }
-  collectionItems?: CollectionItemsMap
+  collectionItems?: Record<string, any[]>
   locale: Locale
-  initialWineVariants: FlatWineVariant[]
-  error: string | null
 }
 
 export function FilterSortBarClient({
   currentCollection,
   collectionItems,
   locale,
-  initialWineVariants,
-  error: initialError,
 }: Props): React.JSX.Element {
   const { t } = useTranslation()
 
-  // Use the wine data hook for client-side filtering
-  const {
-    wineVariants,
-    isLoading,
-    error: clientError,
-  } = useWineData({
+  // Use the new GraphQL wine grid hook
+  const { wineVariants, isLoading, error, pagination } = useWineGrid({
     locale,
     currentCollection,
-    initialData: initialWineVariants,
+    // Add any additional filters here if needed
   })
-
-  // Use initial error if no client error
-  const error = clientError || initialError
 
   // Handle loading state
   if (isLoading) {

@@ -1,22 +1,10 @@
 'use client'
 
 import { useWineVariant as useWineVariantNew, useRelatedWineVariants } from '@/hooks/useGraphQL'
-import type { FlatWineVariant } from '@/payload-types'
 import type { Locale } from '@/i18n/locales'
 
 // Import generated types (will be available after running codegen)
 // import { useWineDetailQuery, WineDetailQuery } from '@/generated/graphql'
-
-interface WineVariantData {
-  variant: FlatWineVariant | null
-  variants: FlatWineVariant[]
-  relatedVariants: Array<{
-    type: string
-    title: string
-    variants: FlatWineVariant[]
-  }>
-  error: string | null
-}
 
 /**
  * Hook for fetching wine variant data using GraphQL Codegen
@@ -62,7 +50,7 @@ export function useWineVariant(slug: string, locale: Locale) {
  *
  * This hook will be updated to use the new collection queries when they're implemented
  */
-export function useCollectionItems(locale: Locale) {
+export function useCollectionItems(_locale: Locale) {
   // For now, return empty data since collection items are handled differently
   // This can be updated when we implement the collection item queries
   return {

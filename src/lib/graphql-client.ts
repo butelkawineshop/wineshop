@@ -1,5 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
 import { GraphQLClient } from 'graphql-request'
+import { DocumentNode } from 'graphql'
+import { print } from 'graphql'
 import { logger } from './logger'
 import { GRAPHQL_CONSTANTS } from '@/constants/api'
 // Import generated types (will be available after running codegen)
@@ -15,7 +17,7 @@ interface GraphQLResponse<T = unknown> {
 }
 
 interface GraphQLRequest {
-  query: string
+  query: string | DocumentNode
   variables?: Record<string, unknown>
 }
 
@@ -93,6 +95,9 @@ export async function graphqlRequest<T = unknown>(
   request: GraphQLRequest,
 ): Promise<{ data: T | null; error: string | null }> {
   try {
+    // Convert DocumentNode to string if needed
+    const queryString = typeof request.query === 'string' ? request.query : print(request.query)
+
     // Use absolute URL on server, relative on client
     const baseUrl = typeof window === 'undefined' ? getApiBaseUrl() : ''
     const response = await fetch(`${baseUrl}/api/graphql`, {
@@ -100,7 +105,10 @@ export async function graphqlRequest<T = unknown>(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify({
+        query: queryString,
+        variables: request.variables,
+      }),
     })
 
     if (!response.ok) {
@@ -117,7 +125,7 @@ export async function graphqlRequest<T = unknown>(
     if (result.errors && result.errors.length > 0) {
       logger.warn('GraphQL errors', {
         errors: result.errors,
-        query: request.query,
+        query: queryString,
         variables: request.variables,
       })
       return {
@@ -130,7 +138,7 @@ export async function graphqlRequest<T = unknown>(
   } catch (error) {
     logger.error('GraphQL request error', {
       error,
-      query: request.query,
+      query: typeof request.query === 'string' ? request.query : 'DocumentNode',
       variables: request.variables,
     })
     return { data: null, error: GRAPHQL_CONSTANTS.ERROR_MESSAGES.NETWORK_ERROR }
@@ -157,13 +165,19 @@ export async function serverGraphqlRequest<T = unknown>(
   request: GraphQLRequest,
 ): Promise<{ data: T | null; error: string | null }> {
   try {
+    // Convert DocumentNode to string if needed
+    const queryString = typeof request.query === 'string' ? request.query : print(request.query)
+
     const baseUrl = getApiBaseUrl()
     const response = await fetch(`${baseUrl}/api/graphql`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify({
+        query: queryString,
+        variables: request.variables,
+      }),
     })
 
     if (!response.ok) {
@@ -180,7 +194,7 @@ export async function serverGraphqlRequest<T = unknown>(
     if (result.errors && result.errors.length > 0) {
       logger.warn('Server GraphQL errors', {
         errors: result.errors,
-        query: request.query,
+        query: queryString,
         variables: request.variables,
       })
       return {
@@ -193,7 +207,7 @@ export async function serverGraphqlRequest<T = unknown>(
   } catch (error) {
     logger.error('Server GraphQL request error', {
       error,
-      query: request.query,
+      query: typeof request.query === 'string' ? request.query : 'DocumentNode',
       variables: request.variables,
     })
     return { data: null, error: GRAPHQL_CONSTANTS.ERROR_MESSAGES.NETWORK_ERROR }

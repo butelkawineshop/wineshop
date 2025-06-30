@@ -14,4 +14,23 @@ query GetFlatWineVariants($wineTitle: String!, $locale: LocaleInputType!) {
       ...FlatWineVariantFields
     }
   }
+}
+
+query GetWineGridVariants($locale: LocaleInputType!, $where: FlatWineVariant_where, $sort: String, $page: Int, $limit: Int) {
+  FlatWineVariants(
+    where: $where
+    sort: $sort
+    page: $page
+    limit: $limit
+    locale: $locale
+  ) {
+    docs {
+      ...FlatWineVariantFields
+    }
+    totalDocs
+    totalPages
+    page
+    hasNextPage
+    hasPrevPage
+  }
 } 
