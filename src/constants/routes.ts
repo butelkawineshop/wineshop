@@ -49,6 +49,10 @@ export const ROUTE_MAPPINGS = {
   tastings: { sl: 'tejstingi', en: 'tastings', collection: 'tastings' },
   enciklopedija: { sl: 'enciklopedija', en: 'encyclopedia', collection: 'posts' },
   encyclopedia: { sl: 'enciklopedija', en: 'encyclopedia', collection: 'posts' },
+  blog: { sl: 'enciklopedija', en: 'encyclopedia', collection: 'posts' },
+
+  // Special routes
+  kgb: { sl: 'kgb', en: 'kgb', collection: 'pages' },
 
   // E-commerce routes
   'darilni-boni': { sl: 'darilni-boni', en: 'gift-cards', collection: 'gift-cards' },
@@ -74,6 +78,7 @@ export const ROUTE_MAPPINGS = {
   blagajna: { sl: 'blagajna', en: 'checkout', collection: 'pages' },
   checkout: { sl: 'blagajna', en: 'checkout', collection: 'pages' },
   cekar: { sl: 'cekar', en: 'hamper', collection: 'pages' },
+  cart: { sl: 'cekar', en: 'hamper', collection: 'pages' },
   hamper: { sl: 'cekar', en: 'hamper', collection: 'pages' },
   profil: { sl: 'profil', en: 'profile', collection: 'pages' },
   profile: { sl: 'profil', en: 'profile', collection: 'pages' },

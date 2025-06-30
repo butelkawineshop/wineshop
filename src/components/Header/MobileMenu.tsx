@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-// import { useTranslations } from 'next-intl' // Uncomment if using next-intl
+import { useTranslations } from 'next-intl'
 import { Icon } from '@/components/Icon'
 
 interface NavItem {
@@ -20,7 +20,7 @@ interface MobileMenuProps {
 }
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, menuItems }) => {
-  // const t = useTranslations() // Uncomment if using next-intl
+  const t = useTranslations('common')
 
   if (!isOpen) return null
 
@@ -31,7 +31,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, menuIte
           <button
             onClick={onClose}
             className="p-2 hover:text-primary button-secondary"
-            aria-label="close"
+            aria-label={t('menu')}
           >
             <Icon name="close" width={24} height={24} />
           </button>

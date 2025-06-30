@@ -63,7 +63,8 @@
     "page": "Page",
     "logo": "Butelka logo",
     "reset": "Clear",
-    "item": "Item"
+    "item": "Item",
+    "menu": "Menu"
   },
   "auth": {
     "login": "Login",
@@ -784,11 +785,21 @@
   },
   "header": {
     "language": {
-      "switch": "English"
+      "switch": "Slovenščina"
     },
     "theme": {
       "light": "Turn on lights",
       "dark": "Turn off lights"
+    },
+    "navigation": {
+      "search": "Search",
+      "wineshop": "Wineshop",
+      "tastings": "Tastings",
+      "kgb": "KGB",
+      "butelka": "Butelka",
+      "blog": "Blog",
+      "account": "Account",
+      "cart": "Cart"
     },
     "search": {
       "placeholder": "What are you looking for?",

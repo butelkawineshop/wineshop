@@ -17,7 +17,8 @@
     "page": "Stran",
     "logo": "Butelka logo",
     "reset": "Počisti",
-    "item": "Element"
+    "item": "Element",
+    "menu": "Meni"
   },
   "auth": {
     "login": "Prijava",
@@ -479,6 +480,16 @@
     "theme": {
       "light": "Vklopi luči",
       "dark": "Izklopi luči"
+    },
+    "navigation": {
+      "search": "Iskanje",
+      "wineshop": "Trgovina",
+      "tastings": "Degustacije",
+      "kgb": "KGB",
+      "butelka": "Butelka",
+      "blog": "Enciklopedija",
+      "account": "Račun",
+      "cart": "Cekarček"
     },
     "search": {
       "placeholder": "Kaj iščeš?",

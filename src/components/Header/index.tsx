@@ -2,19 +2,22 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Icon } from '@/components/Icon'
-// import { useTranslations } from 'next-intl' // Uncomment if using next-intl
+import { useTranslations } from 'next-intl'
 import { MobileMenu } from '@/components/Header/MobileMenu'
 import { SearchPopup } from '@/components/Header/SearchPopup'
 import { Logo } from '../Logo'
 import { TopBar } from '../TopBar'
 import { useTheme } from '@/providers/ThemeProvider'
+import { getLocalizedRouteSegment, detectLocaleFromPath } from '@/utils/routeUtils'
 
 interface NavItem {
   id: string
-  title: string
+  titleKey: string
   icon: string
-  url: string
+  routeKey?: string // Only for items that are links
+  isPopup?: boolean
   order: number
 }
 
@@ -24,8 +27,11 @@ export const Header = () => {
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  // const t = useTranslations() // Uncomment if using next-intl
+  const t = useTranslations('header.navigation')
+  const tCommon = useTranslations('common')
   const { theme } = useTheme()
+  const pathname = usePathname()
+  const locale = detectLocaleFromPath(pathname)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,62 +49,62 @@ export const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [lastScrollY])
 
-  // Navigation items (replace t('...') with strings or your translation function)
+  // Navigation items with translation keys
   const navItems: NavItem[] = [
     {
       id: 'search',
-      title: 'Search',
+      titleKey: 'search',
       icon: 'search',
-      url: '/search',
+      isPopup: true,
       order: 0,
     },
     {
       id: 'wineshop',
-      title: 'Wineshop',
+      titleKey: 'wineshop',
       icon: 'wine',
-      url: '/wineshop',
+      routeKey: 'wineshop',
       order: 1,
     },
     {
       id: 'tastings',
-      title: 'Tastings',
+      titleKey: 'tastings',
       icon: 'tastings',
-      url: '/tastings',
+      routeKey: 'tastings',
       order: 2,
     },
     {
       id: 'kgb',
-      title: 'KGB',
+      titleKey: 'kgb',
       icon: 'kgb',
-      url: '/kgb',
+      routeKey: 'kgb',
       order: 3,
     },
     {
       id: 'butelka',
-      title: 'Butelka',
+      titleKey: 'butelka',
       icon: 'butelka',
-      url: '/butelka',
+      routeKey: 'storija',
       order: 4,
     },
     {
       id: 'blog',
-      title: 'Blog',
+      titleKey: 'blog',
       icon: 'blog',
-      url: '/encyclopedia',
+      routeKey: 'blog',
       order: 5,
     },
     {
       id: 'account',
-      title: 'Account',
+      titleKey: 'account',
       icon: 'account',
-      url: '/account',
+      routeKey: 'profile',
       order: 6,
     },
     {
       id: 'cart',
-      title: 'Cart',
+      titleKey: 'cart',
       icon: 'cart',
-      url: '/cart',
+      routeKey: 'cekar',
       order: 7,
     },
   ]
@@ -109,6 +115,13 @@ export const Header = () => {
   const handleSearchClick = (e: React.MouseEvent) => {
     e.preventDefault()
     setIsSearchOpen(true)
+  }
+
+  // Helper to get URL for a nav item
+  const getNavUrl = (item: NavItem) => {
+    if (!item.routeKey) return '#'
+    const segment = getLocalizedRouteSegment(item.routeKey, locale)
+    return locale === 'en' ? `/en/${segment}` : `/${segment}`
   }
 
   return (
@@ -130,7 +143,7 @@ export const Header = () => {
             <nav className="flex items-center gap-4">
               {leftMenuItems.map((item) => (
                 <div key={item.id}>
-                  {item.id === 'search' ? (
+                  {item.isPopup ? (
                     <button
                       onClick={handleSearchClick}
                       className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
@@ -140,13 +153,13 @@ export const Header = () => {
                       </div>
                       {showLogo && (
                         <span className="text-[10px] text-foreground/60 subtitle">
-                          {item.title}
+                          {t(item.titleKey)}
                         </span>
                       )}
                     </button>
                   ) : (
                     <Link
-                      href={item.url}
+                      href={getNavUrl(item)}
                       className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
                     >
                       <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
@@ -154,7 +167,7 @@ export const Header = () => {
                       </div>
                       {showLogo && (
                         <span className="text-[10px] text-foreground/60 subtitle">
-                          {item.title}
+                          {t(item.titleKey)}
                         </span>
                       )}
                     </Link>
@@ -174,20 +187,39 @@ export const Header = () => {
             </div>
             {/* Right Icons */}
             <nav className="flex items-center gap-4">
-              {rightMenuItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.url}
-                  className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
-                >
-                  <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
-                    <Icon name={item.icon} width={32} height={32} variant="switch" />
-                  </div>
-                  {showLogo && (
-                    <span className="text-[10px] text-foreground/60 subtitle">{item.title}</span>
-                  )}
-                </Link>
-              ))}
+              {rightMenuItems.map((item) =>
+                item.isPopup ? (
+                  <button
+                    key={item.id}
+                    onClick={handleSearchClick}
+                    className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
+                  >
+                    <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
+                      <Icon name={item.icon} width={32} height={32} variant="switch" />
+                    </div>
+                    {showLogo && (
+                      <span className="text-[10px] text-foreground/60 subtitle">
+                        {t(item.titleKey)}
+                      </span>
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    key={item.id}
+                    href={getNavUrl(item)}
+                    className="text-foreground hover:text-primary flex flex-col items-center icon-container group"
+                  >
+                    <div className="h-12 w-12 p-1 rounded-full flex items-center justify-center">
+                      <Icon name={item.icon} width={32} height={32} variant="switch" />
+                    </div>
+                    {showLogo && (
+                      <span className="text-[10px] text-foreground/60 subtitle">
+                        {t(item.titleKey)}
+                      </span>
+                    )}
+                  </Link>
+                ),
+              )}
             </nav>
           </div>
         </div>
@@ -196,7 +228,7 @@ export const Header = () => {
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="p-4 button-secondary"
-            aria-label="menu"
+            aria-label={tCommon('menu')}
           >
             <Icon name="menu" width={24} height={24} />
           </button>
@@ -213,7 +245,11 @@ export const Header = () => {
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
-        menuItems={navItems}
+        menuItems={navItems.map((item) => ({
+          ...item,
+          title: t(item.titleKey),
+          url: item.routeKey ? getNavUrl(item) : '#',
+        }))}
       />
       <SearchPopup isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>

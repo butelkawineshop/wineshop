@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import { WineNavBar } from '@/components/Layout/WineNavBar'
 import FilterSortBar from '@/components/FilterSortBar'
