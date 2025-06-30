@@ -36,11 +36,6 @@ const nextConfig = {
   // Build optimizations
   compress: true,
 
-  // Bundle analyzer (uncomment for debugging)
-  // experimental: {
-  //   bundlePagesExternals: true,
-  // },
-
   // Security headers
   async headers() {
     return [
@@ -116,7 +111,7 @@ const withNextIntl = createNextIntlPlugin()
 const baseConfig = withPayload(withNextIntl(nextConfig), {
   devBundleServerPackages: false,
   // Optimize Payload bundle
-  bundleServerPackages: ['payload', '@payloadcms/ui'],
+  bundleServerPackages: ['payload'],
 })
 
 export default async () => {

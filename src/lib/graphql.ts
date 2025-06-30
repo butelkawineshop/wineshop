@@ -1350,11 +1350,8 @@ export async function fetchFlatCollectionFilters(locale: Locale): Promise<FlatCo
   // Check cache first
   const cached = filterCache.get(cacheKey)
   if (cached && now - cached.timestamp < CACHE_DURATION) {
-    console.log('Using cached filter data')
     return cached.data
   }
-
-  console.log('Fetching fresh filter data from GraphQL')
 
   // Use individual collection queries since flatCollections doesn't exist in GraphQL schema
   const queries = [
@@ -1568,8 +1565,6 @@ export async function fetchFlatCollectionItem({
   locale: Locale
   collectionType: string
 }): Promise<FlatCollectionItem | null> {
-  console.log('fetchFlatCollectionItem called with:', { id, locale, collectionType })
-
   // Debug: Check if the item exists in the individual collection
   const debugQuery = `
     query Debug${getSingularCollectionName(collectionType)}($slug: String!, $locale: LocaleInputType!) {
@@ -1600,17 +1595,6 @@ export async function fetchFlatCollectionItem({
   })
 
   const debugResult = await debugResponse.json()
-  console.log('Debug - Individual collection result:', {
-    hasData: !!debugResult.data?.[getCollectionNameFromType(collectionType)]?.docs?.length,
-    docsCount: debugResult.data?.[getCollectionNameFromType(collectionType)]?.docs?.length || 0,
-    firstDoc: debugResult.data?.[getCollectionNameFromType(collectionType)]?.docs?.[0]
-      ? {
-          id: debugResult.data[getCollectionNameFromType(collectionType)].docs[0].id,
-          title: debugResult.data[getCollectionNameFromType(collectionType)].docs[0].title,
-          slug: debugResult.data[getCollectionNameFromType(collectionType)].docs[0].slug,
-        }
-      : null,
-  })
 
   const collectionName = getCollectionNameFromType(collectionType)
 

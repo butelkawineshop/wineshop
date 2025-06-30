@@ -161,13 +161,6 @@ export class CollectionService {
     try {
       const collectionType = CollectionService.getCollectionType(collection)
 
-      console.log('CollectionService.fetchSingleItem:', {
-        collection,
-        collectionType,
-        slug,
-        locale,
-      })
-
       if (collectionType) {
         // First, get the item ID from the filters data
         const filters = await fetchFlatCollectionFilters(locale)
@@ -176,61 +169,12 @@ export class CollectionService {
           return item.collectionType === collectionType && item.slug === slug
         })
 
-        console.log('CollectionService.fetchSingleItem - targetItem:', {
-          found: !!targetItem,
-          targetItem: targetItem
-            ? {
-                id: targetItem.id,
-                title: targetItem.title,
-                slug: targetItem.slug,
-                collectionType: targetItem.collectionType,
-              }
-            : null,
-          filtersCount: filters.length,
-          matchingFilters: filters
-            .filter((item) => item.collectionType === collectionType)
-            .map((item) => ({
-              id: item.id,
-              title: item.title,
-              slug: item.slug,
-            })),
-        })
-
         if (targetItem) {
           // Fetch the full item data using GraphQL
           const result = await fetchFlatCollectionItem({
             id: targetItem.id, // Pass the ID back since we're using individual collection queries
             locale,
             collectionType,
-          })
-
-          console.log('GraphQL single item query result:', {
-            timestamp: new Date().toISOString(),
-            hasData: !!result,
-            dataKeys: result ? Object.keys(result) : [],
-            sampleData: result
-              ? {
-                  id: result.id,
-                  title: result.title,
-                  description: result.description,
-                  whyCool: result.whyCool,
-                  statistics: result.statistics,
-                  regions: (result as any).regions,
-                  bestRegions: (result as any).bestRegions,
-                  bestGrapes: (result as any).bestGrapes,
-                  legends: (result as any).legends,
-                  typicalStyle: (result as any).typicalStyle,
-                  character: (result as any).character,
-                  synonyms: (result as any).synonyms,
-                  distinctiveAromas: (result as any).distinctiveAromas,
-                  blendingPartners: (result as any).blendingPartners,
-                  similarVarieties: (result as any).similarVarieties,
-                  climateConditions: (result as any).climateConditions,
-                  tags: (result as any).tags,
-                  social: (result as any).social,
-                  relatedWineries: (result as any).relatedWineries,
-                }
-              : null,
           })
 
           if (result) {
@@ -245,7 +189,7 @@ export class CollectionService {
           }
         } else {
           // Fallback: Try to query the individual collection directly by slug
-          console.log('Target item not found in filters, trying direct query by slug:', slug)
+
           const result = await fetchFlatCollectionItem({
             id: slug, // Pass the slug directly
             locale,
@@ -334,14 +278,6 @@ export class CollectionService {
       const limit = config.listLimit || COLLECTION_CONSTANTS.PAGINATION.DEFAULT_LIMIT
       const collectionType = CollectionService.getCollectionType(collection)
 
-      console.log('CollectionService.fetchItemList:', {
-        collection,
-        collectionType,
-        currentPage,
-        limit,
-        locale,
-      })
-
       if (collectionType) {
         // Use GraphQL for supported collections
         const result = await fetchFlatCollectionItems({
@@ -349,19 +285,6 @@ export class CollectionService {
           locale,
           limit,
           page: currentPage,
-        })
-
-        console.log('GraphQL collection query result:', {
-          timestamp: new Date().toISOString(),
-          totalDocs: result.flatCollections.totalDocs,
-          docsCount: result.flatCollections.docs.length,
-          collectionType,
-          firstDoc: result.flatCollections.docs[0]
-            ? {
-                id: result.flatCollections.docs[0].id,
-                title: result.flatCollections.docs[0].title,
-              }
-            : null,
         })
 
         const items = result.flatCollections.docs.map((doc) =>

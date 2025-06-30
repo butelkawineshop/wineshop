@@ -40,7 +40,7 @@
     "verify:image-mapping": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/verify-image-mapping.ts"
   },
   "dependencies": {
-    "@auth/core": "^0.39.1",
+    "@auth/core": "0.34.2",
     "@conform-to/react": "^1.7.2",
     "@conform-to/zod": "^1.7.2",
     "@hookform/resolvers": "^5.1.1",
@@ -55,7 +55,6 @@
     "@tailwindcss/postcss": "^4.1.10",
     "@tanstack/react-query": "^5.81.2",
     "@tanstack/react-query-devtools": "^5.81.2",
-    "@types/bcryptjs": "^3.0.0",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
@@ -82,7 +81,7 @@
     "react-router-dom": "^7.6.2",
     "react-toastify": "^11.0.5",
     "resend": "^4.6.0",
-    "sharp": "0.32.6",
+    "sharp": "0.34.2",
     "stripe": "^18.2.1",
     "swiper": "^11.2.8",
     "tailwind-merge": "^3.3.1",
@@ -96,7 +95,7 @@
     "@cloudflare/workers-types": "^4.20250620.0",
     "@eslint/eslintrc": "^3.3.1",
     "@next/bundle-analyzer": "^15.3.4",
-    "@payloadcms/graphql": "^3.43.0",
+    "@payloadcms/graphql": "3.43.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
@@ -123,6 +122,17 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "sharp": "0.34.2",
+      "@payloadcms/graphql": "3.43.0",
+      "payload": "3.43.0",
+      "@payloadcms/next": "3.43.0",
+      "@payloadcms/ui": "3.43.0",
+      "@payloadcms/richtext-lexical": "3.43.0",
+      "@payloadcms/storage-s3": "3.43.0",
+      "@payloadcms/payload-cloud": "3.43.0",
+      "@payloadcms/db-postgres": "3.43.0"
+    }
   }
 }
