@@ -136,3 +136,6 @@ Thumbs.db
 # Documentation (keep docs/ but ignore generated docs)
 /docs/generated/
 /docs/build/
+
+# Generated GraphQL types (generated during build)
+src/generated/

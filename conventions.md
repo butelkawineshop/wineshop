@@ -260,6 +260,239 @@ src/
 
 ---
 
+## 🚀 GraphQL Codegen Standards
+
+### **GraphQL Codegen Requirements**
+
+- **Use GraphQL Codegen** for all GraphQL operations to ensure type safety
+- **Generate types from schema** - never write manual GraphQL type definitions
+- **Use generated React Query hooks** instead of manual implementations
+- **Keep GraphQL documents in dedicated files** under `src/graphql/`
+- **Run codegen during build** to ensure types are always up-to-date
+
+### **GraphQL File Structure**
+
+```
+src/
+├── graphql/                    ← GraphQL documents
+│   ├── queries/               ← Query operations
+│   │   ├── collection-items.graphql
+│   │   ├── wine-variants.graphql
+│   │   └── flat-collections.graphql
+│   ├── mutations/             ← Mutation operations
+│   └── fragments/             ← Reusable field selections
+├── generated/                  ← Generated files (gitignored)
+│   ├── graphql.ts             ← Generated types and hooks
+│   └── graphql.schema.json    ← Schema introspection
+└── lib/
+    └── graphql-client.ts      ← GraphQL client utilities
+```
+
+### **GraphQL Document Conventions**
+
+- **Use descriptive names** for queries and mutations
+- **Group related operations** in the same file
+- **Use fragments** for shared field selections
+- **Keep queries focused** - don't fetch unnecessary fields
+- **Use proper variable typing** with GraphQL schema types
+
+```graphql
+# ✅ Good: Well-structured GraphQL document
+query GetWineVariant($slug: String!, $locale: LocaleInputType!) {
+  FlatWineVariants(where: { slug: { equals: $slug } }) {
+    docs {
+      id
+      slug
+      wineTitle
+      vintage
+      size
+      price
+      stockOnHand
+      primaryImageUrl
+      wineryTitle
+      regionTitle
+      countryTitle
+      styleTitle
+    }
+  }
+}
+
+# ✅ Good: Using fragments for shared fields
+fragment WineCardFields on FlatWineVariant {
+  id
+  slug
+  wineTitle
+  vintage
+  size
+  price
+  stockOnHand
+  primaryImageUrl
+}
+
+query GetWineVariants($wineTitle: String!, $locale: LocaleInputType!) {
+  FlatWineVariants(where: { wineTitle: { equals: $wineTitle } }) {
+    docs {
+      ...WineCardFields
+      wineryTitle
+      regionTitle
+    }
+  }
+}
+```
+
+### **Generated Types Usage**
+
+- **Import generated types** instead of defining manual interfaces
+- **Use generated React Query hooks** for data fetching
+- **Leverage TypeScript's type checking** for GraphQL operations
+- **Use proper error handling** with generated error types
+
+```typescript
+// ✅ Good: Using generated types and hooks
+import { useGetWineVariantQuery, useGetWineVariantsQuery } from '@/generated/graphql'
+import type { Locale } from '@/i18n/locales'
+
+export function useWineVariant(slug: string, locale: Locale) {
+  return useGetWineVariantQuery({
+    variables: { slug, locale },
+    skip: !slug,
+  })
+}
+
+export function useWineVariants(wineTitle: string, locale: Locale) {
+  return useGetWineVariantsQuery({
+    variables: { wineTitle, locale },
+    skip: !wineTitle,
+  })
+}
+
+// ❌ Bad: Manual type definitions
+interface WineVariantResponse {
+  FlatWineVariants: { docs: FlatWineVariant[] }
+}
+
+export function useWineVariant(slug: string) {
+  return useQuery({
+    queryKey: ['wine-variant', slug],
+    queryFn: async () => {
+      const { data, error } = await graphqlRequest<WineVariantResponse>({
+        query: WINE_VARIANT_QUERY,
+        variables: { slug, locale },
+      })
+      // Manual error handling and type casting
+    },
+  })
+}
+```
+
+### **GraphQL Client Utilities**
+
+- **Use `graphqlRequest`** for client-side operations
+- **Use `serverGraphqlRequest`** for server-side operations
+- **Implement proper error handling** with structured logging
+- **Follow consistent response format** across all operations
+
+```typescript
+// ✅ Good: Proper GraphQL client usage
+import { graphqlRequest } from '@/lib/graphql-client'
+import { logger } from '@/lib/logger'
+
+export async function fetchWineData(slug: string, locale: Locale) {
+  const { data, error } = await graphqlRequest({
+    query: GET_WINE_VARIANT_QUERY,
+    variables: { slug, locale },
+  })
+
+  if (error) {
+    logger.error('Failed to fetch wine data', { error, slug, locale })
+    return { data: null, error }
+  }
+
+  return { data, error: null }
+}
+```
+
+### **Codegen Configuration**
+
+- **Use `codegen.yml`** for configuration
+- **Generate TypeScript types** and React Query hooks
+- **Include schema introspection** for tooling support
+- **Configure proper scalars** for custom types
+
+```yaml
+# codegen.yml
+overwrite: true
+schema: 'src/generated-schema.graphql'
+documents: 'src/**/*.{ts,tsx}'
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-query'
+    config:
+      withHooks: true
+      scalars:
+        DateTime: string
+        EmailAddress: string
+        JSON: Record<string, any>
+```
+
+### **Development Workflow**
+
+1. **Add GraphQL documents** to `src/graphql/`
+2. **Run codegen** to generate types: `pnpm codegen`
+3. **Use generated hooks** in components
+4. **Commit generated files** (or add to CI/CD)
+
+### **Performance Considerations**
+
+- **Codegen generates only used types** (tree-shaking friendly)
+- **No runtime overhead** - types are compile-time only
+- **Better caching** with React Query hooks
+- **Reduced bundle size** compared to manual type definitions
+
+### **Migration from Manual Types**
+
+- **Gradually migrate** existing GraphQL operations
+- **Move queries to `.graphql` files**
+- **Replace manual interfaces** with generated types
+- **Update imports** throughout the codebase
+- **Remove unused GraphQL constants**
+
+### **Testing with Generated Types**
+
+- **Use generated types** in test files
+- **Mock generated hooks** for component testing
+- **Test GraphQL operations** with proper type checking
+- **Validate schema changes** with codegen
+
+```typescript
+// ✅ Good: Testing with generated types
+import { useGetWineVariantQuery } from '@/generated/graphql'
+import { renderHook } from '@testing-library/react'
+
+jest.mock('@/generated/graphql', () => ({
+  useGetWineVariantQuery: jest.fn(),
+}))
+
+describe('useWineVariant', () => {
+  it('should fetch wine variant data', () => {
+    const mockData = { wineVariant: { id: '1', title: 'Test Wine' } }
+    ;(useGetWineVariantQuery as jest.Mock).mockReturnValue({
+      data: mockData,
+      loading: false,
+      error: null,
+    })
+
+    const { result } = renderHook(() => useWineVariant('test-slug', 'sl'))
+    expect(result.current.data).toEqual(mockData)
+  })
+})
+```
+
+---
+
 ## 🔐 Authentication
 
 ### Admins

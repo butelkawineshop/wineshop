@@ -5,6 +5,7 @@ import localFont from 'next/font/local'
 import { headers } from 'next/headers'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
+import { GraphQLProvider } from '@/providers/GraphQLProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { type Locale } from '@/i18n/locales'
 import slMessages from '../../../messages/sl.json'
@@ -77,9 +78,11 @@ export default async function Layout({ children }: LayoutProps): Promise<React.R
           <ErrorBoundary>
             <LanguageProvider locale={locale}>
               <ThemeProvider>
-                <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">
-                  {children}
-                </main>
+                <GraphQLProvider>
+                  <main className="mb-[20px] md:pb-0 h-full w-full flex flex-1 flex-col">
+                    {children}
+                  </main>
+                </GraphQLProvider>
               </ThemeProvider>
             </LanguageProvider>
           </ErrorBoundary>

@@ -1,0 +1,103 @@
+query GetCollectionItems($locale: LocaleInputType) {
+  Aromas(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Tags(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Moods(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  GrapeVarieties(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+}
+
+query GetAllCollectionItems($locale: LocaleInputType) {
+  Aromas(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Climates(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Dishes(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  GrapeVarieties(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Moods(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Regions(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Styles(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Tags(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  WineCountries(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+  Wineries(limit: 1000, locale: $locale) {
+    docs {
+      id
+      title
+      slug
+    }
+  }
+} 

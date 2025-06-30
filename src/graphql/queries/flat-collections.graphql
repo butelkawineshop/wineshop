@@ -1,0 +1,22 @@
+#import "../fragments/flat-collection-fields.graphql"
+
+query GetFlatCollection($slug: String!, $locale: LocaleInputType!) {
+  FlatCollections(where: { slug: { equals: $slug } }, limit: 1, locale: $locale) {
+    docs {
+      ...FlatCollectionFields
+    }
+  }
+}
+
+query GetFlatCollections($collectionType: FlatCollection_collectionType_Input!, $locale: LocaleInputType!, $limit: Int = 18, $page: Int = 1) {
+  FlatCollections(where: { collectionType: { equals: $collectionType } }, limit: $limit, page: $page, locale: $locale) {
+    docs {
+      ...FlatCollectionFields
+    }
+    totalDocs
+    totalPages
+    page
+    hasNextPage
+    hasPrevPage
+  }
+} 

@@ -1,0 +1,70 @@
+fragment WineCardFields on FlatWineVariant {
+  id
+  slug
+  wineTitle
+  vintage
+  size
+  price
+  stockOnHand
+  primaryImageUrl
+  wineryTitle
+  regionTitle
+  countryTitle
+  styleTitle
+  originalVariant { id slug }
+}
+
+fragment WineDetailFields on FlatWineVariant {
+  id
+  slug
+  wineTitle
+  vintage
+  size
+  price
+  stockOnHand
+  description
+  tastingProfile
+  servingTemp
+  decanting
+  primaryImageUrl
+  originalVariant { id slug }
+  wineryTitle
+  regionTitle
+  countryTitle
+  styleTitle
+  dishes {
+    id
+    title
+    titleEn
+  }
+  tastingNotes {
+    dry
+    ripe
+    creamy
+    oaky
+    complex
+    light
+    smooth
+    youthful
+    energetic
+    alcohol
+  }
+}
+
+fragment RelatedWineFields on FlatWineVariant {
+  id
+  slug
+  wineTitle
+  vintage
+  size
+  price
+  stockOnHand
+  primaryImageUrl
+  wineryTitle
+  regionTitle
+  countryTitle
+  styleTitle
+  styleIconKey
+  styleSlug
+  originalVariant { id slug }
+} 

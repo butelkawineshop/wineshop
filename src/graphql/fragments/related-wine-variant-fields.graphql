@@ -1,0 +1,31 @@
+fragment RelatedWineVariantFields on RelatedWineVariant {
+  id
+  variantId
+  relatedCount
+  lastComputed
+  computationVersion
+  relatedVariants {
+    type
+    score
+    reason
+    relatedVariant {
+      ... on FlatWineVariant {
+        id
+        slug
+        wineTitle
+        vintage
+        size
+        price
+        stockOnHand
+        primaryImageUrl
+        wineryTitle
+        regionTitle
+        countryTitle
+        styleTitle
+        styleIconKey
+        styleSlug
+        originalVariant { id slug }
+      }
+    }
+  }
+} 

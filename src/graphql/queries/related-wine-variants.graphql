@@ -1,0 +1,15 @@
+#import "../fragments/related-wine-variant-fields.graphql"
+
+query GetRelatedWineVariants($variantId: Float!, $locale: LocaleInputType!) {
+  RelatedWineVariants(
+    where: { 
+      variantId: { equals: $variantId }
+    }, 
+    limit: 1, 
+    locale: $locale
+  ) {
+    docs {
+      ...RelatedWineVariantFields
+    }
+  }
+} 

@@ -1,0 +1,17 @@
+#import "../fragments/flat-wine-variant-fields.graphql"
+
+query GetFlatWineVariant($slug: String!, $locale: LocaleInputType!) {
+  FlatWineVariants(where: { slug: { equals: $slug } }, limit: 1, locale: $locale) {
+    docs {
+      ...FlatWineVariantFields
+    }
+  }
+}
+
+query GetFlatWineVariants($wineTitle: String!, $locale: LocaleInputType!) {
+  FlatWineVariants(where: { wineTitle: { equals: $wineTitle } }, sort: "vintage", locale: $locale) {
+    docs {
+      ...FlatWineVariantFields
+    }
+  }
+} 

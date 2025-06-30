@@ -1,0 +1,22 @@
+overwrite: true
+schema: 'src/generated-schema.graphql'
+documents: 'src/graphql/**/*.graphql'
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+    config:
+      scalars:
+        DateTime: string
+        EmailAddress: string
+        JSON: Record<string, any>
+      skipTypename: false
+      dedupeOperationSuffix: true
+      omitOperationSuffix: false
+      operationResultSuffix: 'Result'
+      namingConvention:
+        enumValues: keep
+  src/generated/graphql.schema.json:
+    plugins:
+      - 'introspection'

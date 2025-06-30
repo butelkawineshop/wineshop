@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import type { FlatWineVariant } from '@/payload-types'
 import { WineCard } from './WineCard'
 import { WINE_CONSTANTS } from '@/constants/wine'
-import { fetchAllCollectionItems } from '@/lib/graphql'
 import { logger } from '@/lib/logger'
 import type { Locale } from '@/i18n/locales'
 
@@ -20,28 +19,9 @@ export function WineGrid({ variants, locale, className = '' }: WineGridProps): R
   const [loadedRows, setLoadedRows] = useState(5) // Start with 5 rows
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Fetch all collection items once for all variants
-  useEffect(() => {
-    const loadCollectionItems = async () => {
-      try {
-        const result = await fetchAllCollectionItems(variants, locale)
-        logger.info('Collection items loaded for WineGrid', {
-          aromas: result.aromas.length,
-          tags: result.tags.length,
-          moods: result.moods.length,
-          grapeVarieties: result.grapeVarieties.length,
-        })
-      } catch (error) {
-        console.error('WineGrid: Failed to load collection items', error)
-        logger.error('Failed to load collection items', { error })
-        // Still set as loaded to prevent infinite retries
-      }
-    }
-
-    if (variants.length > 0) {
-      loadCollectionItems()
-    }
-  }, [variants, locale])
+  // Note: Collection items are now handled by the new GraphQL hooks
+  // The WineCard component will fetch its own collection data as needed
+  // This is more efficient as it only fetches what's actually displayed
 
   // Responsive grid configuration
   const { cardsPerRow, gridClasses, containerHeight } = useMemo(() => {

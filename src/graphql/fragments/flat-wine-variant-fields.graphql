@@ -1,0 +1,63 @@
+fragment FlatWineVariantFields on FlatWineVariant {
+  id
+  slug
+  sku
+  wineID
+  wineTitle
+  wineryID
+  wineryTitle
+  wineryCode
+  winerySlug
+  regionID
+  regionTitle
+  regionSlug
+  countryID
+  countryTitle
+  countrySlug
+  styleID
+  styleTitle
+  styleIconKey
+  styleSlug
+  size
+  vintage
+  price
+  stockOnHand
+  canBackorder
+  maxBackorderQuantity
+  servingTemp
+  decanting
+  tastingProfile
+  description
+  descriptionEn
+  primaryImageUrl
+  isPublished
+  syncedAt
+  originalVariant { id slug }
+  relatedWineries { id }
+  relatedRegions { id }
+  wineryTags {
+    title
+    titleEn
+    id
+    slug
+    slugEn
+  }
+  tastingNotes {
+    dry
+    ripe
+    creamy
+    oaky
+    complex
+    light
+    smooth
+    youthful
+    energetic
+    alcohol
+  }
+  aromas { id title slug }
+  tags { id title slug }
+  moods { id title slug }
+  grapeVarieties { id title slug percentage }
+  climates { id title slug }
+  dishes { id title slug }
+} 

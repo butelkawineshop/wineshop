@@ -1,0 +1,47 @@
+fragment FlatCollectionFields on FlatCollection {
+  id
+  originalID
+  collectionType
+  originalSlug
+  title
+  slug
+  description
+  titleEn
+  slugEn
+  descriptionEn
+  whyCool
+  whyCoolEn
+  typicalStyle
+  typicalStyleEn
+  character
+  characterEn
+  iconKey
+  wineryCode
+  priceRange
+  skin
+  climate
+  climateTemperature
+  category
+  colorGroup
+  adjective { id title titleEn slug slugEn }
+  flavour { id title titleEn slug slugEn category colorGroup }
+  country { id title titleEn slug slugEn }
+  climateData { id title titleEn slug slugEn }
+  statistics { landArea wineriesCount }
+  climateConditions { diurnalRange humidity }
+  social { instagram website }
+  synonyms { title titleEn }
+  bestGrapes { id title titleEn slug slugEn }
+  bestRegions { id title titleEn slug slugEn }
+  legends { id title titleEn slug slugEn wineryCode }
+  neighbours { id title titleEn slug slugEn }
+  relatedWineries { id title titleEn slug slugEn wineryCode }
+  distinctiveAromas { id title titleEn slug slugEn }
+  blendingPartners { id title titleEn slug slugEn }
+  similarVarieties { id title titleEn slug slugEn }
+  tags { id title titleEn slug slugEn }
+  media { id alt url thumbnailURL }
+  seo { title titleEn description descriptionEn image }
+  syncedAt
+  isPublished
+} 
