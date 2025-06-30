@@ -231,6 +231,9 @@ const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 let lastFetchTime = 0
 let lastAllCollectionItemsFetchTime = 0
 
+// Cache for filter data to avoid repeated GraphQL requests
+const filterCache = new Map<string, { data: FlatCollectionFilters[]; timestamp: number }>()
+
 /**
  * Extract all unique collection item IDs from wine variants
  */
@@ -942,6 +945,24 @@ export const WINE_DETAIL_QUERY = `
           energetic
           alcohol
         }
+        climateData {
+          temperature
+          rainfall
+          humidity
+          sunshine
+        }
+        statistics {
+          landArea
+          wineriesCount
+          vineyardsCount
+          productionVolume
+        }
+        climateConditions {
+          temperature
+          rainfall
+          humidity
+          sunshine
+        }
       }
       variants {
         id
@@ -1238,4 +1259,816 @@ export async function fetchWineVariantData(slug: string, locale: string): Promis
     relatedVariants: result.relatedVariants || [],
     error: result.error,
   }
+}
+
+/**
+ * GraphQL queries for flat collections
+ * Replaces REST API calls for better performance and type safety
+ */
+
+export interface FlatCollectionFilters {
+  id: string
+  title: string
+  slug: string
+  collectionType: string
+}
+
+export interface FlatCollectionItem {
+  id: string
+  title: string
+  slug: string
+  media?: Array<{ url: string; alt?: string }>
+  description?: string
+  // Rich relationship fields for detail view
+  whyCool?: string
+  typicalStyle?: string
+  character?: string
+  iconKey?: string
+  wineryCode?: string
+  priceRange?: string
+  skin?: string
+  climate?: string
+  climateTemperature?: string
+  category?: string
+  colorGroup?: string
+  adjective?: string
+  flavour?: string
+  country?: string
+  climateData?: any
+  statistics?: any
+  climateConditions?: any
+  social?: any
+  synonyms?: string[]
+  bestGrapes?: string[]
+  bestRegions?: string[]
+  legends?: string[]
+  neighbours?: string[]
+  relatedWineries?: any[]
+  distinctiveAromas?: string[]
+  blendingPartners?: string[]
+  similarVarieties?: string[]
+  tags?: string[]
+  seo?: any
+}
+
+export interface FlatCollectionsResponse {
+  flatCollections: {
+    docs: FlatCollectionItem[]
+    totalDocs: number
+    totalPages: number
+    page: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+  }
+}
+
+export interface FlatCollectionResponse {
+  flatCollection: FlatCollectionItem
+}
+
+/**
+ * Get the base URL for API calls (works in both client and server)
+ */
+function getApiBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    // Client-side: use relative URL
+    return ''
+  } else {
+    // Server-side: use absolute URL
+    return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  }
+}
+
+/**
+ * Fetch all collection items for filters using individual collection queries
+ * Now with caching to avoid repeated requests
+ */
+export async function fetchFlatCollectionFilters(locale: Locale): Promise<FlatCollectionFilters[]> {
+  const cacheKey = `filters_${locale}`
+  const now = Date.now()
+
+  // Check cache first
+  const cached = filterCache.get(cacheKey)
+  if (cached && now - cached.timestamp < CACHE_DURATION) {
+    console.log('Using cached filter data')
+    return cached.data
+  }
+
+  console.log('Fetching fresh filter data from GraphQL')
+
+  // Use individual collection queries since flatCollections doesn't exist in GraphQL schema
+  const queries = [
+    'WineCountries',
+    'Styles',
+    'Regions',
+    'Aromas',
+    'Climates',
+    'Dishes',
+    'GrapeVarieties',
+    'Moods',
+    'Tags',
+    'Wineries',
+  ]
+
+  const allItems: FlatCollectionFilters[] = []
+
+  for (const collectionName of queries) {
+    try {
+      const query = `
+        query Get${collectionName}($locale: LocaleInputType!) {
+          ${collectionName}(
+            where: { _status: { equals: published } }
+            sort: "title"
+            locale: $locale
+          ) {
+            docs {
+              id
+              title
+              slug
+            }
+          }
+        }
+      `
+
+      const baseUrl = getApiBaseUrl()
+      const response = await fetch(`${baseUrl}/api/graphql`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          variables: { locale },
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+
+        if (result.data && result.data[collectionName]) {
+          const items = result.data[collectionName].docs.map((item: any) => ({
+            id: String(item.id),
+            title: item.title,
+            slug:
+              typeof item.slug === 'string'
+                ? item.slug
+                : item.slug?.[locale] || item.slug?.sl || '',
+            collectionType: getCollectionTypeFromName(collectionName),
+          }))
+          allItems.push(...items)
+        }
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch ${collectionName}:`, error)
+    }
+  }
+
+  // Cache the result
+  filterCache.set(cacheKey, { data: allItems, timestamp: now })
+
+  return allItems
+}
+
+/**
+ * Get collection type from collection name
+ */
+function getCollectionTypeFromName(collectionName: string): string {
+  const typeMap: Record<string, string> = {
+    WineCountries: 'wineCountry',
+    Styles: 'style',
+    Regions: 'region',
+    Aromas: 'aroma',
+    Climates: 'climate',
+    Dishes: 'dish',
+    GrapeVarieties: 'grapeVariety',
+    Moods: 'mood',
+    Tags: 'tag',
+    Wineries: 'winery',
+  }
+  return typeMap[collectionName] || collectionName.toLowerCase()
+}
+
+/**
+ * Fetch collection items for a specific collection type using individual collection queries
+ */
+export async function fetchFlatCollectionItems({
+  collectionType,
+  locale,
+  limit = 18,
+  page = 1,
+}: {
+  collectionType: string
+  locale: Locale
+  limit?: number
+  page?: number
+}): Promise<FlatCollectionsResponse> {
+  const collectionName = getCollectionNameFromType(collectionType)
+
+  const query = `
+    query Get${collectionName}($locale: LocaleInputType!, $limit: Int!, $page: Int!) {
+      ${collectionName}(
+        where: { _status: { equals: published } }
+        limit: $limit
+        page: $page
+        sort: "title"
+        locale: $locale
+      ) {
+        docs {
+          id
+          title
+          slug
+          media {
+            url
+            alt
+          }
+        }
+        totalDocs
+        totalPages
+        page
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  `
+
+  const baseUrl = getApiBaseUrl()
+  const response = await fetch(`${baseUrl}/api/graphql`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      variables: { locale, limit, page },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`GraphQL request failed: ${response.statusText}`)
+  }
+
+  const result = await response.json()
+
+  if (result.errors) {
+    throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`)
+  }
+
+  return {
+    flatCollections: result.data[collectionName],
+  }
+}
+
+/**
+ * Get collection name from collection type
+ */
+function getCollectionNameFromType(collectionType: string): string {
+  const nameMap: Record<string, string> = {
+    wineCountry: 'WineCountries',
+    winery: 'Wineries',
+    style: 'Styles',
+    region: 'Regions',
+    aroma: 'Aromas',
+    climate: 'Climates',
+    dish: 'Dishes',
+    grapeVariety: 'GrapeVarieties',
+    mood: 'Moods',
+    tag: 'Tags',
+  }
+  return nameMap[collectionType] || 'WineCountries'
+}
+
+/**
+ * Get singular collection name for single item queries
+ */
+function getSingularCollectionName(collectionType: string): string {
+  const nameMap: Record<string, string> = {
+    wineCountry: 'WineCountry',
+    winery: 'Winery',
+    style: 'Style',
+    region: 'Region',
+    aroma: 'Aroma',
+    climate: 'Climate',
+    dish: 'Dish',
+    grapeVariety: 'GrapeVariety',
+    mood: 'Mood',
+    tag: 'Tag',
+  }
+  return nameMap[collectionType] || 'WineCountry'
+}
+
+/**
+ * Fetch a single collection item with all fields for detail view
+ */
+export async function fetchFlatCollectionItem({
+  id,
+  locale,
+  collectionType,
+}: {
+  id: string
+  locale: Locale
+  collectionType: string
+}): Promise<FlatCollectionItem | null> {
+  console.log('fetchFlatCollectionItem called with:', { id, locale, collectionType })
+
+  // Debug: Check if the item exists in the individual collection
+  const debugQuery = `
+    query Debug${getSingularCollectionName(collectionType)}($slug: String!, $locale: LocaleInputType!) {
+      ${getCollectionNameFromType(collectionType)}(
+        where: { slug: { equals: $slug } }
+        limit: 1
+        locale: $locale
+      ) {
+        docs {
+          id
+          title
+          slug
+        }
+      }
+    }
+  `
+
+  const baseUrl = getApiBaseUrl()
+  const debugResponse = await fetch(`${baseUrl}/api/graphql`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: debugQuery,
+      variables: { slug: id, locale },
+    }),
+  })
+
+  const debugResult = await debugResponse.json()
+  console.log('Debug - Individual collection result:', {
+    hasData: !!debugResult.data?.[getCollectionNameFromType(collectionType)]?.docs?.length,
+    docsCount: debugResult.data?.[getCollectionNameFromType(collectionType)]?.docs?.length || 0,
+    firstDoc: debugResult.data?.[getCollectionNameFromType(collectionType)]?.docs?.[0]
+      ? {
+          id: debugResult.data[getCollectionNameFromType(collectionType)].docs[0].id,
+          title: debugResult.data[getCollectionNameFromType(collectionType)].docs[0].title,
+          slug: debugResult.data[getCollectionNameFromType(collectionType)].docs[0].slug,
+        }
+      : null,
+  })
+
+  const collectionName = getCollectionNameFromType(collectionType)
+
+  // Create a slug-based query instead of ID-based
+  let query = ''
+
+  if (collectionType === 'wineCountry') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            whyCool
+            statistics {
+              landArea
+              wineriesCount
+            }
+            bestRegions {
+              id
+              title
+              slug
+            }
+            bestGrapes {
+              id
+              title
+              slug
+            }
+            legends {
+              id
+              title
+              slug
+            }
+            seo {
+              title
+              description
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'winery') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            whyCool
+            wineryCode
+            tags {
+              id
+              title
+              slug
+            }
+            social {
+              instagram
+              website
+            }
+            relatedWineries {
+              id
+              title
+              slug
+            }
+            seo {
+              title
+              description
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'region') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            whyCool
+            climate {
+              id
+              title
+              slug
+            }
+            country {
+              id
+              title
+              slug
+            }
+            neighbours {
+              id
+              title
+              slug
+            }
+            bestGrapes {
+              id
+              title
+              slug
+            }
+            legends {
+              id
+              title
+              slug
+            }
+            priceRange
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'grapeVariety') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            typicalStyle
+            character
+            whyCool
+            synonyms { title }
+            distinctiveAromas {
+              id
+              title
+              slug
+            }
+            bestRegions {
+              id
+              title
+              slug
+            }
+            blendingPartners {
+              id
+              title
+              slug
+            }
+            similarVarieties {
+              id
+              title
+              slug
+            }
+            seo {
+              title
+              description
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'style') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            whyCool
+            typicalStyle
+            character
+            iconKey
+            priceRange
+            skin
+            climate
+            climateTemperature
+            category
+            colorGroup
+            adjective
+            flavour
+            country
+            climateData
+            statistics
+            climateConditions
+            seo {
+              title
+              description
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'aroma') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            wines {
+              id
+              title
+              slug
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'climate') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            climateConditions {
+              diurnalRange
+              humidity
+            }
+            bestRegions {
+              id
+              title
+              slug
+            }
+            bestGrapes {
+              id
+              title
+              slug
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'dish') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            wines {
+              id
+              title
+              slug
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'mood') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            wines {
+              id
+              title
+              slug
+            }
+          }
+        }
+      }
+    `
+  } else if (collectionType === 'tag') {
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+            wines {
+              id
+              title
+              slug
+            }
+          }
+        }
+      }
+    `
+  } else {
+    // Generic query for other collection types
+    query = `
+      query Get${getSingularCollectionName(collectionType)}Item($slug: String!, $locale: LocaleInputType!) {
+        ${collectionName}(
+          where: { slug: { equals: $slug } }
+          limit: 1
+          locale: $locale
+        ) {
+          docs {
+            id
+            title
+            slug
+            description
+            media {
+              url
+              alt
+            }
+          }
+        }
+      }
+    `
+  }
+
+  const response = await fetch(`${baseUrl}/api/graphql`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      variables: { slug: id, locale },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`GraphQL request failed: ${response.statusText}`)
+  }
+
+  const result = await response.json()
+
+  if (result.errors) {
+    throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`)
+  }
+
+  // Return the first document from the docs array
+  const docs = result.data[collectionName]?.docs
+  return docs && docs.length > 0 ? docs[0] : null
+}
+
+/**
+ * Fetch flat collection items grouped by collection type for filters
+ */
+export async function fetchFlatCollectionItemsForFilters(
+  locale: Locale,
+  collectionType?: string,
+): Promise<Record<string, FlatCollectionFilters[]>> {
+  const filters = await fetchFlatCollectionFilters(locale)
+
+  // Group by collection slug (not collection type) to match FilterSortBar expectations
+  const grouped: Record<string, FlatCollectionFilters[]> = {}
+
+  filters.forEach((item) => {
+    if (collectionType && item.collectionType !== collectionType) {
+      return
+    }
+
+    // Map collection type to collection slug
+    const collectionSlugMap: Record<string, string> = {
+      wineCountry: 'wineCountries',
+      style: 'styles',
+      region: 'regions',
+      aroma: 'aromas',
+      climate: 'climates',
+      dish: 'dishes',
+      grapeVariety: 'grape-varieties',
+      mood: 'moods',
+      tag: 'tags',
+      winery: 'wineries',
+    }
+
+    const collectionSlug = collectionSlugMap[item.collectionType] || item.collectionType
+
+    if (!grouped[collectionSlug]) {
+      grouped[collectionSlug] = []
+    }
+
+    grouped[collectionSlug].push(item)
+  })
+
+  return grouped
 }

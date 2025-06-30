@@ -45,27 +45,12 @@ export default async function FilterSortBar({
       // Use CollectionService with flat collections for better performance
       const collectionService = new CollectionService()
 
-      // Get collection type for filtering if we're on a specific collection page
-      let collectionType: string | undefined
-      if (currentCollection?.type) {
-        const typeMap = {
-          aromas: 'aroma',
-          climates: 'climate',
-          dishes: 'dish',
-          'grape-varieties': 'grapeVariety',
-          moods: 'mood',
-          regions: 'region',
-          styles: 'style',
-          tags: 'tag',
-          wineCountries: 'wineCountry',
-          wineries: 'winery',
-        }
-        collectionType = typeMap[currentCollection.type as keyof typeof typeMap]
-      }
-
+      // For filters, we always want ALL collection items, not just the current collection
+      // This allows users to filter by any collection regardless of which page they're on
       const flatCollectionItems = await collectionService.fetchCollectionItems(
         resolvedLocale,
-        collectionType,
+        // Don't pass collectionType - we want all collections for filters
+        undefined,
       )
 
       // Transform flat collection items to the expected format
@@ -81,8 +66,16 @@ export default async function FilterSortBar({
       logger.info('Collection items fetched successfully for filters using flat collections', {
         totalCollections: Object.keys(collectionItems).length,
         totalItems: Object.values(collectionItems).reduce((sum, items) => sum + items.length, 0),
-        collectionType,
+        collectionType: 'all',
         currentCollection: currentCollection?.type,
+        collectionKeys: Object.keys(collectionItems),
+        sampleItems: Object.entries(collectionItems).reduce(
+          (acc, [key, items]) => {
+            acc[key] = items.slice(0, 3).map((item) => ({ id: item.id, title: item.title }))
+            return acc
+          },
+          {} as Record<string, any>,
+        ),
       })
     } catch (error) {
       logger.error('Failed to fetch collection items for filters', { error })

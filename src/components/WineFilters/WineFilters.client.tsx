@@ -104,9 +104,6 @@ export default function WineFiltersClient({
   const { filters, setFilter, clearFilter, variants } = useWineStore()
 
   // Migrate filters if needed (for persisted data) - removed _migrateFilters as it's not in new store
-  React.useEffect(() => {
-    // Migration is handled automatically in the new store
-  }, [])
 
   const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
