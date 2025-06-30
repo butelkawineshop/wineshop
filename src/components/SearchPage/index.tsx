@@ -134,7 +134,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ locale, basePath }) => {
       tag: 'tags',
       wineCountry: 'wineCountries',
       winery: 'wineries',
-      wineVariant: 'flat-wine-variants',
+      wineVariant: 'wines',
     }
 
     return collectionMap[type]

@@ -9,6 +9,7 @@ import {
   GetWineVariant,
   GetWineVariants,
   GetRelatedWineVariants,
+  GetAllCollectionItems,
 } from '@/generated/graphql'
 import type {
   GetFlatCollectionQueryResult,
@@ -19,6 +20,7 @@ import type {
   GetWineVariantQueryResult,
   GetWineVariantsQueryResult,
   GetRelatedWineVariantsQueryResult,
+  GetAllCollectionItemsQueryResult,
 } from '@/generated/graphql'
 import type { Locale } from '@/constants/routes'
 
@@ -217,5 +219,49 @@ export function useWineGridVariants(
       return data
     },
     enabled: Boolean(locale),
+  })
+}
+
+// Navigation items hook for ItemNavigation component
+export function useNavigationItems(collection: string, locale: Locale) {
+  return useQuery({
+    queryKey: ['navigationItems', collection, locale],
+    queryFn: async () => {
+      const { data, error } = await graphqlRequest<GetAllCollectionItemsQueryResult>({
+        query: GetAllCollectionItems,
+        variables: { locale },
+      })
+      if (error) throw new Error(error)
+      return data
+    },
+    enabled: Boolean(collection && locale),
+    select: (data) => {
+      if (!data) {
+        return { docs: [] }
+      }
+
+      // Map collection names to GraphQL field names
+      const collectionMap: Record<string, keyof GetAllCollectionItemsQueryResult> = {
+        regions: 'Regions',
+        wineCountries: 'WineCountries',
+        wineries: 'Wineries',
+        'grape-varieties': 'GrapeVarieties',
+        styles: 'Styles',
+        moods: 'Moods',
+        aromas: 'Aromas',
+        climates: 'Climates',
+        dishes: 'Dishes',
+        tags: 'Tags',
+      }
+
+      const fieldName = collectionMap[collection]
+      if (!fieldName || !data[fieldName]) {
+        return { docs: [] }
+      }
+
+      return data[fieldName] as {
+        docs: Array<{ id: number; title?: string | null; slug?: string | null }>
+      }
+    },
   })
 }

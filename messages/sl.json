@@ -16,7 +16,8 @@
     "noResults": "Sori, nič nismo našli",
     "page": "Stran",
     "logo": "Butelka logo",
-    "reset": "Počisti"
+    "reset": "Počisti",
+    "item": "Element"
   },
   "auth": {
     "login": "Prijava",

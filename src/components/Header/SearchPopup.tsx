@@ -94,7 +94,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
       tag: 'tags',
       wineCountry: 'wineCountries',
       winery: 'wineries',
-      wineVariant: 'flat-wine-variants',
+      wineVariant: 'wines',
     }
 
     const collection = typeToCollection[type]
@@ -117,7 +117,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
       tag: 'tags',
       wineCountry: 'wineCountries',
       winery: 'wineries',
-      wineVariant: 'flat-wine-variants',
+      wineVariant: 'wines',
     }
 
     const collection = collectionMap[result.type]

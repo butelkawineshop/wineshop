@@ -62,7 +62,8 @@
     "noResults": "No results found",
     "page": "Page",
     "logo": "Butelka logo",
-    "reset": "Clear"
+    "reset": "Clear",
+    "item": "Item"
   },
   "auth": {
     "login": "Login",
