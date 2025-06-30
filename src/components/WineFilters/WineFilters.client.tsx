@@ -101,7 +101,8 @@ export default function WineFiltersClient({
   locale,
 }: WineFiltersClientProps): React.JSX.Element {
   const { t } = useTranslation()
-  const { filters, setFilter, clearFilter, variants } = useWineStore()
+  const { filters, setFilter, clearFilter, isFilterLocked, getLockedFilterValue, variants } =
+    useWineStore()
 
   // Migrate filters if needed (for persisted data) - removed _migrateFilters as it's not in new store
 
@@ -217,7 +218,16 @@ export default function WineFiltersClient({
 
   const resetCollectionFilter = (key: string): void => {
     if (isArrayFilter(key)) {
-      clearFilter(key)
+      // Check if there's a locked value for this filter
+      const lockedValue = getLockedFilterValue(key)
+
+      if (lockedValue) {
+        // If there's a locked value, only keep that value
+        setFilter(key, [lockedValue])
+      } else {
+        // If no locked value, clear the entire filter
+        clearFilter(key)
+      }
     } else {
       logger.warn(`Invalid filter key: ${key}`)
     }
@@ -321,7 +331,8 @@ export default function WineFiltersClient({
                         {filteredItems.map((item) => {
                           const filterValue = getLocalizedTitle(item, locale)
                           const isSelected = activeFilters.includes(filterValue)
-                          const isLocked = isCurrentCollection && item.id === currentCollection.id
+                          const isLocked =
+                            isFilterLocked(key) && getLockedFilterValue(key) === filterValue
 
                           return (
                             <div

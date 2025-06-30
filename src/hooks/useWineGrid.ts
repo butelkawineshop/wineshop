@@ -43,7 +43,7 @@ export function useWineGrid(options: UseWineGridOptions): UseWineGridReturn {
     filters = {},
     sort = '-syncedAt',
     page = 1,
-    limit = 24,
+    limit = 1000,
   } = options
 
   const { setVariants, setLoading, setError, setHasFetched } = useWineStore()
@@ -80,6 +80,7 @@ export function useWineGrid(options: UseWineGridOptions): UseWineGridReturn {
     if (data?.FlatWineVariants?.docs) {
       logger.info('Setting wine grid data in store', {
         count: data.FlatWineVariants.docs.length,
+        totalDocs: data.FlatWineVariants.totalDocs,
         locale,
         currentCollection: currentCollection?.type,
       })

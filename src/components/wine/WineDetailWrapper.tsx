@@ -63,7 +63,6 @@ export function WineDetailWrapper({ slug, locale }: WineDetailWrapperProps) {
   const selectVariant = (variant: FlatWineVariant) => {
     // For now, we'll just use the same variant since we don't have multiple variants loaded
     // This could be enhanced to load different variants when needed
-    console.log('Variant selected:', variant)
   }
 
   return (

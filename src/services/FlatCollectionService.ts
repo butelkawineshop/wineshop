@@ -283,7 +283,7 @@ export class FlatCollectionService extends BaseSyncService {
     }
 
     return relationships.map((rel) => ({
-      id: rel.id || rel,
+      originalId: rel.id || rel,
       title: this.getLocalizedValue(rel.title, FLAT_COLLECTIONS_CONSTANTS.LOCALES.SLOVENIAN) || '',
       titleEn: this.getLocalizedValue(rel.title, FLAT_COLLECTIONS_CONSTANTS.LOCALES.ENGLISH) || '',
       slug: this.getLocalizedValue(rel.slug, FLAT_COLLECTIONS_CONSTANTS.LOCALES.SLOVENIAN) || '',
@@ -301,7 +301,7 @@ export class FlatCollectionService extends BaseSyncService {
     }
 
     return media.map((item) => ({
-      id: item.id || item,
+      originalId: item.id || item,
       alt: item.alt || '',
       url: item.url || '',
       thumbnailURL: item.thumbnailURL || '',
@@ -312,19 +312,37 @@ export class FlatCollectionService extends BaseSyncService {
    * Upserts a flat collection record
    */
   private async upsertFlatCollection(data: FlatCollectionData): Promise<void> {
-    const whereClause = {
-      originalID: {
-        equals: data.originalID,
-      },
-      collectionType: {
-        equals: data.collectionType,
-      },
-    }
+    try {
+      const whereClause = {
+        originalID: {
+          equals: data.originalID,
+        },
+        collectionType: {
+          equals: data.collectionType,
+        },
+      }
 
-    await this.upsertDocument(
-      FLAT_COLLECTIONS_CONSTANTS.COLLECTIONS.FLAT_COLLECTIONS,
-      data as unknown as Record<string, unknown>,
-      whereClause,
-    )
+      await this.upsertDocument(
+        FLAT_COLLECTIONS_CONSTANTS.COLLECTIONS.FLAT_COLLECTIONS,
+        data as unknown as Record<string, unknown>,
+        whereClause,
+      )
+
+      this.logger.info('Successfully upserted flat collection', {
+        originalID: data.originalID,
+        collectionType: data.collectionType,
+        title: data.title,
+        slug: data.slug,
+      })
+    } catch (error) {
+      this.logger.error('Failed to upsert flat collection', error as Error, {
+        originalID: data.originalID,
+        collectionType: data.collectionType,
+        title: data.title,
+        slug: data.slug,
+        error: String(error),
+      })
+      throw error
+    }
   }
 }

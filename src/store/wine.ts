@@ -53,6 +53,9 @@ export interface WineState {
   // Filters
   filters: WineFilters
 
+  // Locked filters (items that can't be deselected)
+  lockedFilters: Partial<Record<keyof WineFilters, string>>
+
   // Sorting
   sort: SortState
 }
@@ -75,6 +78,11 @@ export interface WineActions {
   setFilter: <K extends keyof WineFilters>(key: K, values: WineFilters[K]) => void
   clearFilter: (key: keyof WineFilters) => void
   clearAllFilters: () => void
+
+  // Locked filter actions
+  setLockedFilter: <K extends keyof WineFilters>(key: K, value: string) => void
+  clearLockedFilter: (key: keyof WineFilters) => void
+  clearAllLockedFilters: () => void
 
   // Sort actions
   setSort: (field: SortState['field'], direction?: SortState['direction']) => void
@@ -114,6 +122,11 @@ export interface WineSelectors {
   isPriceFilterActive: () => boolean
   isTastingNotesFilterActive: () => boolean
   hasActiveFilters: () => boolean
+
+  // Locked filter selectors
+  getLockedFilters: () => Partial<Record<keyof WineFilters, string>>
+  isFilterLocked: (key: keyof WineFilters) => boolean
+  getLockedFilterValue: (key: keyof WineFilters) => string | undefined
 
   // Sort selectors
   getCurrentSort: () => SortState
@@ -156,6 +169,7 @@ const initialState: WineState = {
       alcohol: [0, 20],
     },
   },
+  lockedFilters: {},
   sort: {
     field: 'createdAt',
     direction: 'desc',
@@ -200,11 +214,20 @@ const applySort = (variants: FlatWineVariant[], sort: SortState): FlatWineVarian
 // Filter logic
 const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWineVariant[] => {
   return variants.filter((variant) => {
+    // Helper function for flexible string matching
+    const matchesString = (
+      variantValue: string | null | undefined,
+      filterValue: string,
+    ): boolean => {
+      if (!variantValue) return false
+      return variantValue.toLowerCase().trim() === filterValue.toLowerCase().trim()
+    }
+
     // Region filter
     if (filters.regions.length > 0 && variant.regionTitle) {
       const regionMatch = filters.regions.some((filterRegion) => {
         if (typeof filterRegion === 'string' && filterRegion.length > 0) {
-          return variant.regionTitle?.toLowerCase().includes(filterRegion.toLowerCase())
+          return matchesString(variant.regionTitle, filterRegion)
         }
         return false
       })
@@ -215,7 +238,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
     if (filters.wineries.length > 0 && variant.wineryTitle) {
       const wineryMatch = filters.wineries.some((filterWinery) => {
         if (typeof filterWinery === 'string' && filterWinery.length > 0) {
-          return variant.wineryTitle?.toLowerCase().includes(filterWinery.toLowerCase())
+          return matchesString(variant.wineryTitle, filterWinery)
         }
         return false
       })
@@ -226,7 +249,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
     if (filters.wineCountries.length > 0 && variant.countryTitle) {
       const countryMatch = filters.wineCountries.some((filterCountry) => {
         if (typeof filterCountry === 'string' && filterCountry.length > 0) {
-          return variant.countryTitle?.toLowerCase().includes(filterCountry.toLowerCase())
+          return matchesString(variant.countryTitle, filterCountry)
         }
         return false
       })
@@ -237,7 +260,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
     if (filters.styles.length > 0 && variant.styleTitle) {
       const styleMatch = filters.styles.some((filterStyle) => {
         if (typeof filterStyle === 'string' && filterStyle.length > 0) {
-          return variant.styleTitle?.toLowerCase().includes(filterStyle.toLowerCase())
+          return matchesString(variant.styleTitle, filterStyle)
         }
         return false
       })
@@ -335,7 +358,7 @@ const applyFilters = (variants: FlatWineVariant[], filters: WineFilters): FlatWi
         }
 
         const hasMatch = filterTitles.some((filterTitle) => {
-          return fieldTitles.some((title) => title === filterTitle)
+          return fieldTitles.some((title) => matchesString(title, filterTitle))
         })
 
         if (!hasMatch) {
@@ -388,8 +411,35 @@ export const useWineStore = create<WineState & WineActions & WineSelectors>()(
 
         // Filter actions
         setFilter: (key, values) => {
-          const { variants, filters, sort } = get()
-          const newFilters = { ...filters, [key]: values }
+          const { variants, filters, sort, lockedFilters } = get()
+
+          // Ensure locked values are always included (only for string array filters)
+          let finalValues = values
+          const lockedValue = lockedFilters[key]
+
+          // Only apply locked filter logic to string array filters
+          const stringArrayFilterKeys = [
+            'regions',
+            'wineries',
+            'wineCountries',
+            'styles',
+            'aromas',
+            'moods',
+            'grape-varieties',
+            'tags',
+            'dishes',
+            'climates',
+          ] as const
+
+          if (lockedValue && stringArrayFilterKeys.includes(key as any)) {
+            const stringValues = values as string[]
+            // If the locked value is not in the new values, add it
+            if (!stringValues.includes(lockedValue)) {
+              finalValues = [...stringValues, lockedValue] as unknown as WineFilters[typeof key]
+            }
+          }
+
+          const newFilters = { ...filters, [key]: finalValues }
           const filteredVariants = applyFilters(variants, newFilters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
@@ -412,14 +462,56 @@ export const useWineStore = create<WineState & WineActions & WineSelectors>()(
         },
 
         clearAllFilters: () => {
-          const { variants, sort } = get()
-          const filteredVariants = applyFilters(variants, initialState.filters)
+          const { variants, sort, lockedFilters } = get()
+
+          // Create new filters object, preserving locked values
+          const newFilters = { ...initialState.filters }
+
+          // Restore locked values to their respective filters (only for string array filters)
+          const stringArrayFilterKeys = [
+            'regions',
+            'wineries',
+            'wineCountries',
+            'styles',
+            'aromas',
+            'moods',
+            'grape-varieties',
+            'tags',
+            'dishes',
+            'climates',
+          ] as const
+
+          Object.entries(lockedFilters).forEach(([key, lockedValue]) => {
+            if (lockedValue && stringArrayFilterKeys.includes(key as any)) {
+              ;(newFilters as any)[key] = [lockedValue]
+            }
+          })
+
+          const filteredVariants = applyFilters(variants, newFilters)
           const sortedAndFilteredVariants = applySort(filteredVariants, sort)
 
           set({
-            filters: initialState.filters,
+            filters: newFilters,
             filteredVariants: sortedAndFilteredVariants,
           })
+        },
+
+        // Locked filter actions
+        setLockedFilter: (key, value) => {
+          const { lockedFilters } = get()
+          const newLockedFilters = { ...lockedFilters, [key]: value }
+          set({ lockedFilters: newLockedFilters })
+        },
+
+        clearLockedFilter: (key) => {
+          const { lockedFilters } = get()
+          const newLockedFilters = { ...lockedFilters }
+          delete newLockedFilters[key]
+          set({ lockedFilters: newLockedFilters })
+        },
+
+        clearAllLockedFilters: () => {
+          set({ lockedFilters: {} })
         },
 
         // Sort actions
@@ -575,6 +667,15 @@ export const useWineStore = create<WineState & WineActions & WineSelectors>()(
           return hasArrayFilters || hasPriceFilter || hasTastingNotesFilter
         },
         getCurrentSort: () => get().sort,
+        getLockedFilters: () => get().lockedFilters,
+        isFilterLocked: (key) => {
+          const { lockedFilters } = get()
+          return lockedFilters[key] !== undefined
+        },
+        getLockedFilterValue: (key) => {
+          const { lockedFilters } = get()
+          return lockedFilters[key]
+        },
       }),
       {
         name: STORE_CONSTANTS.WINE_STORE_NAME,

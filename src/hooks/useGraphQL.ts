@@ -41,7 +41,7 @@ export function useFlatCollection(slug: string, locale: Locale) {
 export function useFlatCollections(
   collectionType: string,
   locale: Locale,
-  limit: number = 18,
+  limit: number = 1000,
   page: number = 1,
 ) {
   return useQuery({
@@ -159,7 +159,7 @@ export const flatCollectionOptions = (slug: string, locale: Locale) =>
 export const flatCollectionsOptions = (
   collectionType: string,
   locale: Locale,
-  limit: number = 18,
+  limit: number = 1000,
   page: number = 1,
 ) =>
   queryOptions({

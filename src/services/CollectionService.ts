@@ -12,9 +12,10 @@ import type {
   GetFlatCollectionQueryResult,
   GetFlatCollectionsQueryResult,
   FlatCollectionFieldsFragment,
+  GetAllCollectionItemsQueryResult,
 } from '@/generated/graphql'
 import { graphqlRequest } from '@/lib/graphql-client'
-import { GetFlatCollection, GetFlatCollections } from '@/generated/graphql'
+import { GetFlatCollection, GetFlatCollections, GetAllCollectionItems } from '@/generated/graphql'
 
 export interface CollectionItem {
   id: string
@@ -316,12 +317,86 @@ export class CollectionService {
     _collectionType?: string,
   ): Promise<Record<string, CollectionItem[]>> {
     try {
-      // For now, return empty collections since the old functions are removed
-      // This can be updated later to use the new GraphQL queries
-      console.warn('fetchCollectionItems: Using fallback - implement with new GraphQL queries')
-      return this.fetchCollectionItemsFallback(locale)
+      // Use the new GraphQL query to fetch all collection items
+      const { data, error } = await graphqlRequest<GetAllCollectionItemsQueryResult>({
+        query: GetAllCollectionItems,
+        variables: {
+          locale: locale as 'sl' | 'en',
+        },
+      })
+
+      if (error || !data) {
+        console.warn('GraphQL query failed for collection items:', error)
+        return this.fetchCollectionItemsFallback(locale)
+      }
+
+      // Transform the GraphQL response to the expected format
+      const collectionItems: Record<string, CollectionItem[]> = {
+        aromas:
+          data.Aromas?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        climates:
+          data.Climates?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        dishes:
+          data.Dishes?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        'grape-varieties':
+          data.GrapeVarieties?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        moods:
+          data.Moods?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        regions:
+          data.Regions?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        styles:
+          data.Styles?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        tags:
+          data.Tags?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        wineCountries:
+          data.WineCountries?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+        wineries:
+          data.Wineries?.docs?.map((item) => ({
+            id: String(item.id),
+            title: item.title || '',
+            slug: item.slug || '',
+          })) || [],
+      }
+
+      return collectionItems
     } catch (error) {
-      console.warn('GraphQL query failed, falling back to GraphQL fallback:', error)
+      console.warn('GraphQL query failed, falling back to fallback:', error)
       return this.fetchCollectionItemsFallback(locale)
     }
   }

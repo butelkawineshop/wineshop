@@ -6,12 +6,12 @@ import { InfoCarousel } from '../InfoCarousel'
 import { Media } from '../Media'
 import { Pagination } from '../Layout/Pagination'
 import * as motion from 'motion/react-client'
-import FilterSortBar from '@/components/FilterSortBar'
 import { collectionService } from '@/services/CollectionService'
 import { TranslationUtils } from '@/utils/translationUtils'
 import type { CollectionItem, PaginationInfo } from '@/services/CollectionService'
 import type { CollectionDisplayConfig } from '@/components/CollectionPage/CollectionConfig'
 import { CollectionLink } from '@/components/ui/CollectionLink'
+import { CollectionFilterSetter } from './CollectionFilterSetter'
 
 interface CollectionPageProps {
   params: {
@@ -166,11 +166,9 @@ function SingleItemView({
         </motion.div>
       </div>
 
-      {/* Show FilterSortBar for wine-related collections */}
+      {/* Set collection-specific filter for wine grid */}
       {collectionService.isWineCollection(collection) && (
-        <div className="mt-12">
-          <FilterSortBar currentCollection={{ id: collection, type: collection }} locale={locale} />
-        </div>
+        <CollectionFilterSetter collection={collection} collectionItem={data} locale={locale} />
       )}
     </article>
   )
@@ -340,13 +338,6 @@ function ListView({
       ) : (
         <div className="text-center py-12">
           <p className="text-lg text-gray-600">{t('common.noResults')}</p>
-        </div>
-      )}
-
-      {/* Show FilterSortBar for wine-related collections at the bottom */}
-      {collectionService.isWineCollection(collection) && (
-        <div className="mt-12">
-          <FilterSortBar currentCollection={{ id: collection, type: collection }} locale={locale} />
         </div>
       )}
     </div>

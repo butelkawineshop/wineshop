@@ -8,7 +8,7 @@ query GetFlatCollection($slug: String!, $locale: LocaleInputType!) {
   }
 }
 
-query GetFlatCollections($collectionType: FlatCollection_collectionType_Input!, $locale: LocaleInputType!, $limit: Int = 18, $page: Int = 1) {
+query GetFlatCollections($collectionType: FlatCollection_collectionType_Input!, $locale: LocaleInputType!, $limit: Int = 1000, $page: Int = 1) {
   FlatCollections(where: { collectionType: { equals: $collectionType } }, limit: $limit, page: $page, locale: $locale) {
     docs {
       ...FlatCollectionFields
