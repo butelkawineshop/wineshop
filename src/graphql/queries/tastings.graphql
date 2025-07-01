@@ -1,0 +1,17 @@
+#import "../fragments/tasting-fields.graphql"
+
+query GetTastings($locale: LocaleInputType) {
+  Tastings(where: { _status: { equals: published } }, locale: $locale) {
+    docs {
+      ...TastingFields
+    }
+  }
+}
+
+query GetTastingBySlug($slug: String!, $locale: LocaleInputType) {
+  Tastings(where: { slug: { equals: $slug }, _status: { equals: published } }, locale: $locale) {
+    docs {
+      ...TastingFields
+    }
+  }
+} 

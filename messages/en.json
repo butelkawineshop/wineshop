@@ -1,50 +1,4 @@
 {
-  "see-less": "Show less",
-  "tasting": {
-    "notes": {
-      "titlePage1": "Feel",
-      "titlePage2": "Character",
-      "dry": "Dry",
-      "sweet": "Sweet",
-      "freshFruit": "Fresh fruit",
-      "ripeFruit": "Ripe fruit",
-      "crisp": "Light",
-      "creamy": "Creamy",
-      "noOak": "No oak",
-      "oaky": "Barrique",
-      "simple": "Light",
-      "complex": "Complex",
-      "light": "Delicate",
-      "rich": "Rich",
-      "austere": "Sharp",
-      "smooth": "Smooth",
-      "mature": "Mature",
-      "youthful": "Youthful",
-      "restrained": "Restrained",
-      "energetic": "Energetic",
-      "noAlcohol": "No alcohol",
-      "highAlcohol": "High alcohol"
-    },
-    "descriptions": {
-      "dry": "From bone dry to seductively sweet",
-      "ripe": "From fresh to ripe fruit",
-      "creamy": "From light to creamy texture",
-      "oaky": "From inox to pronounced barrique",
-      "complex": "From light to complex character",
-      "light": "From light to rich body",
-      "smooth": "From smooth to sharp mouthfeel",
-      "youthful": "From youthful to mature character",
-      "energetic": "From restrained to energetic style",
-      "alcohol": "From no alcohol to high alcohol"
-    }
-  },
-  "see-more": "Show more",
-  "dark": "Turn off lights",
-  "light": "Turn on lights",
-  "system": "System theme",
-  "theme": "Theme",
-  "language": "Language",
-  "settings": "Settings",
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
@@ -66,6 +20,7 @@
     "item": "Item",
     "menu": "Menu"
   },
+
   "auth": {
     "login": "Login",
     "register": "Register",
@@ -86,24 +41,7 @@
       "preview": "Verify your email address"
     }
   },
-  "login": {
-    "title": "Sign in to your account",
-    "magicLink": "Sign in with Magic Link",
-    "or": "Sign in or",
-    "emailPlaceholder": "Enter your email.",
-    "facebook": "Sign in with your Facebook account.",
-    "google": "Sign in with your Google account."
-  },
-  "close": "Close",
-  "menu": "Menu",
-  "toTop": "To top",
-  "search": {
-    "placeholder": "Write and search!",
-    "button": "Search",
-    "search": "Search",
-    "noResults": "No results found",
-    "loading": "Searching fox...."
-  },
+
   "wine": {
     "title": "Wine",
     "details": "Wine details",
@@ -138,11 +76,6 @@
     "rowLabel": "Wine row {current} of {total}",
     "rowGridLabel": "Wine grid for row {row}",
     "accessibilityStatus": "Currently viewing row {current} of {total} with {winesInRow} wines",
-    "actions": {
-      "like": "Like wine",
-      "share": "Share wine",
-      "goToSlide": "Go to slide {slideNumber}"
-    },
     "cart": {
       "loading": "...",
       "success": "✓",
@@ -213,6 +146,110 @@
       }
     }
   },
+
+  "tasting": {
+    "quantity": "Quantity",
+    "notes": {
+      "titlePage1": "Feel",
+      "titlePage2": "Character",
+      "dry": "Dry",
+      "sweet": "Sweet",
+      "freshFruit": "Fresh fruit",
+      "ripeFruit": "Ripe fruit",
+      "crisp": "Light",
+      "creamy": "Creamy",
+      "noOak": "No oak",
+      "oaky": "Barrique",
+      "simple": "Light",
+      "complex": "Complex",
+      "light": "Delicate",
+      "rich": "Rich",
+      "austere": "Sharp",
+      "smooth": "Smooth",
+      "mature": "Mature",
+      "youthful": "Youthful",
+      "restrained": "Restrained",
+      "energetic": "Energetic",
+      "noAlcohol": "No alcohol",
+      "highAlcohol": "High alcohol"
+    },
+    "descriptions": {
+      "dry": "From bone dry to seductively sweet",
+      "ripe": "From fresh to ripe fruit",
+      "creamy": "From light to creamy texture",
+      "oaky": "From inox to pronounced barrique",
+      "complex": "From light to complex character",
+      "light": "From light to rich body",
+      "smooth": "From smooth to sharp mouthfeel",
+      "youthful": "From youthful to mature character",
+      "energetic": "From restrained to energetic style",
+      "alcohol": "From no alcohol to high alcohol"
+    },
+    "perPerson": "({price} € per person)",
+    "perPersonTB": "({price} € per person)",
+    "perPersonShort": "per person",
+    "actions": {
+      "share": "Share tasting",
+      "like": "Like tasting",
+      "goToSlide": "Go to slide {slideNumber}",
+      "addToCart": "Add to cart"
+    },
+    "contact": {
+      "email": "info@butelka.si",
+      "phone": "+386 1 234 5678",
+      "emailLabel": "Email for tasting",
+      "emailDisplay": "info@butelka.si",
+      "phoneLabel": "Phone for tasting",
+      "phoneDisplay": "+386 1 234 5678"
+    },
+    "fields": {
+      "details": "Details",
+      "pricePerPerson": "Price per person",
+      "duration": "Duration",
+      "people": "Group size",
+      "peopleRange": "{min}–{max} people",
+      "wineTypes": "Wines",
+      "exampleWines": "Example Wines",
+      "quantity": "Quantity"
+    },
+    "slides": {
+      "overview": {
+        "title": "Overview",
+        "defaultDescription": "Discover our carefully prepared wine tasting experience."
+      },
+      "details": {
+        "title": "Details"
+      },
+      "themes": {
+        "title": "Themes",
+        "noThemes": "No themes specified"
+      }
+    },
+    "details": {
+      "title": "Tasting Details"
+    },
+    "budget": {
+      "title": "Budget",
+      "totalRevenue": "Total revenue",
+      "foodAndExpenses": "Food and expenses",
+      "wineBudget": "Wine budget"
+    },
+    "themes": {
+      "title": "Tasting Themes"
+    },
+    "wineSelection": {
+      "title": "Wine Selection",
+      "description": "Our system will help you select the best wines for your tasting based on budget and themes."
+    },
+    "selectedWines": {
+      "title": "Selected Wines",
+      "totalCost": "Total cost"
+    },
+    "exampleWines": {
+      "title": "Example Wines for Tasting"
+    }
+  },
+
   "cart": {
     "title": "Cart",
     "empty": "Your cart is empty :(",
@@ -276,6 +313,132 @@
     "common": {
       "error": "Error"
     }
+  },
+
+  "checkout": {
+    "title": "Checkout",
+    "processing": "Processing...",
+    "continueToPayment": "Continue to payment",
+    "address": {
+      "isBusiness": "Is business",
+      "businessName": "Business",
+      "vatNumber": "VAT number",
+      "searchPlaceholder": "Enter address..."
+    },
+    "paymentMethod": {
+      "title": "Payment method",
+      "creditCard": "Credit card",
+      "bankTransfer": "Bank transfer",
+      "payInStore": "Pay in store",
+      "paymentDetails": "Payment details",
+      "payNow": "Pay now"
+    },
+    "auth": {
+      "login": "Sign in",
+      "noAccount": "Don't have an account?",
+      "sendMagicLink": "Send magic link",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email.",
+      "legalConfirmation": "I agree to the terms and conditions, privacy policy, cookies and confirm that I am over 18 years old.",
+      "createAccount": "Create account",
+      "saveAddress": "Save address"
+    },
+    "shippingAddress": {
+      "title": "Shipping address",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "address1": "Address",
+      "address2": "Apartment, floor, etc.",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "phone": "Phone"
+    },
+    "billingAddress": {
+      "title": "Billing address",
+      "sameAsShipping": "Billing address is the same as shipping address",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "address1": "Address",
+      "address2": "Additional address (optional)",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "phone": "Phone"
+    },
+    "error": {
+      "emptyCart": "Your cart is empty",
+      "redirectingToHome": "Redirecting to home page...",
+      "failedToLoadCart": "Error loading cart",
+      "paymentSystemNotConfigured": "Payment system is not properly configured. Please contact support.",
+      "failedToCreateOrder": "Error creating order",
+      "checkoutFailed": "Checkout failed",
+      "unknownError": "An unknown error occurred",
+      "validationFailed": "Check your data",
+      "pleaseCheckFields": "Some required fields are missing or invalid",
+      "stockUnavailable": "Stock unavailable",
+      "orderNotFound": "Order not found",
+      "cartNotFound": "Cart not found",
+      "cartCleared": "Cart successfully cleared",
+      "cartNotCleared": "Cart not cleared",
+      "paymentFailed": "Payment failed",
+      "paymentSuccessful": "Payment successful"
+    },
+    "success": {
+      "orderCreated": "Order successfully created",
+      "redirectingToConfirmation": "Redirecting to order confirmation...",
+      "paymentFailed": "Payment failed",
+      "paymentSuccessful": "Payment successful"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Enter a valid email address",
+      "invalidPhone": "Enter a valid phone number",
+      "invalidPostalCode": "Enter a valid postal code"
+    },
+    "summary": {
+      "title": "Order summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "VAT",
+      "total": "Total",
+      "free": "Free shipping"
+    }
+  },
+
+  "quantity": {
+    "label": "Quantity",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "min": "min {min}",
+    "max": "max {max}"
+  },
+
+  "see-less": "Show less",
+  "see-more": "Show more",
+  "dark": "Turn off lights",
+  "light": "Turn on lights",
+  "system": "System theme",
+  "theme": "Theme",
+  "language": "Language",
+  "settings": "Settings",
+  "login": {
+    "title": "Sign in to your account",
+    "magicLink": "Sign in with Magic Link",
+    "or": "Sign in or",
+    "emailPlaceholder": "Enter your email.",
+    "facebook": "Sign in with your Facebook account.",
+    "google": "Sign in with your Google account."
+  },
+  "close": "Close",
+  "menu": "Menu",
+  "toTop": "To top",
+  "search": {
+    "placeholder": "Write and search!",
+    "button": "Search",
+    "search": "Search",
+    "noResults": "No results found",
+    "loading": "Searching fox...."
   },
   "account": "Account",
   "posts": {
@@ -622,96 +785,6 @@
   "collection": {
     "list": {
       "title": "Collection"
-    }
-  },
-  "checkout": {
-    "title": "Checkout",
-    "processing": "Processing...",
-    "continueToPayment": "Continue to payment",
-    "address": {
-      "isBusiness": "Is business",
-      "businessName": "Business",
-      "vatNumber": "VAT number",
-      "searchPlaceholder": "Enter address..."
-    },
-    "paymentMethod": {
-      "title": "Payment method",
-      "creditCard": "Credit card",
-      "bankTransfer": "Bank transfer",
-      "payInStore": "Pay in store",
-      "paymentDetails": "Payment details",
-      "payNow": "Pay now"
-    },
-    "auth": {
-      "login": "Sign in",
-      "noAccount": "Don't have an account?",
-      "sendMagicLink": "Send magic link",
-      "email": "Email",
-      "emailPlaceholder": "Enter your email.",
-      "legalConfirmation": "I agree to the terms and conditions, privacy policy, cookies and confirm that I am over 18 years old.",
-      "createAccount": "Create account",
-      "saveAddress": "Save address"
-    },
-    "shippingAddress": {
-      "title": "Shipping address",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "address1": "Address",
-      "address2": "Apartment, floor, etc.",
-      "city": "City",
-      "postalCode": "Postal code",
-      "country": "Country",
-      "phone": "Phone"
-    },
-    "billingAddress": {
-      "title": "Billing address",
-      "sameAsShipping": "Billing address is the same as shipping address",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "address1": "Address",
-      "address2": "Additional address (optional)",
-      "city": "City",
-      "postalCode": "Postal code",
-      "country": "Country",
-      "phone": "Phone"
-    },
-    "error": {
-      "emptyCart": "Your cart is empty",
-      "redirectingToHome": "Redirecting to home page...",
-      "failedToLoadCart": "Error loading cart",
-      "paymentSystemNotConfigured": "Payment system is not properly configured. Please contact support.",
-      "failedToCreateOrder": "Error creating order",
-      "checkoutFailed": "Checkout failed",
-      "unknownError": "An unknown error occurred",
-      "validationFailed": "Check your data",
-      "pleaseCheckFields": "Some required fields are missing or invalid",
-      "stockUnavailable": "Stock unavailable",
-      "orderNotFound": "Order not found",
-      "cartNotFound": "Cart not found",
-      "cartCleared": "Cart successfully cleared",
-      "cartNotCleared": "Cart not cleared",
-      "paymentFailed": "Payment failed",
-      "paymentSuccessful": "Payment successful"
-    },
-    "success": {
-      "orderCreated": "Order successfully created",
-      "redirectingToConfirmation": "Redirecting to order confirmation...",
-      "paymentFailed": "Payment failed",
-      "paymentSuccessful": "Payment successful"
-    },
-    "validation": {
-      "required": "This field is required",
-      "invalidEmail": "Enter a valid email address",
-      "invalidPhone": "Enter a valid phone number",
-      "invalidPostalCode": "Enter a valid postal code"
-    },
-    "summary": {
-      "title": "Order summary",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "tax": "VAT",
-      "total": "Total",
-      "free": "Free shipping"
     }
   },
   "orderConfirmation": {

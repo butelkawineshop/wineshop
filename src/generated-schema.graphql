@@ -141,6 +141,12 @@ type Query {
   docAccessFlatCollection(id: Int!): flat_collectionsDocAccess
   versionFlatCollection(id: Int, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): FlatCollectionVersion
   versionsFlatCollections(where: versionsFlatCollection_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): versionsFlatCollections
+  Tasting(id: Int!, draft: Boolean, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): Tasting
+  Tastings(draft: Boolean, where: Tasting_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): Tastings
+  countTastings(draft: Boolean, where: Tasting_where, locale: LocaleInputType): countTastings
+  docAccessTasting(id: Int!): tastingsDocAccess
+  versionTasting(id: Int, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): TastingVersion
+  versionsTastings(where: versionsTasting_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): versionsTastings
   PayloadJob(id: Int!, draft: Boolean, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): PayloadJob
   PayloadJobs(draft: Boolean, where: PayloadJob_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): PayloadJobs
   countPayloadJobs(draft: Boolean, where: PayloadJob_where, locale: LocaleInputType): countPayloadJobs
@@ -154,11 +160,6 @@ type Query {
   countPayloadPreferences(draft: Boolean, where: PayloadPreference_where, locale: LocaleInputType): countPayloadPreferences
   docAccessPayloadPreference(id: Int!): payload_preferencesDocAccess
   Access: Access
-
-  """
-  Fetches a wine variant, all its variants, and related variants in a single call.
-  """
-  wineDetail(slug: String!, locale: String!): WineDetailResult
 }
 
 type User {
@@ -34766,6 +34767,1385 @@ input versionsFlatCollection_where_or {
   OR: [versionsFlatCollection_where_or]
 }
 
+type Tasting {
+  id: Int!
+  title: String
+  slug: String
+  description: String
+  pricePerPerson: Float
+  minPeople: Float
+  maxPeople: Float
+  wineTypes: [Tasting_WineTypes!]!
+  exampleWines(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [FlatWineVariant!]
+  duration: Float
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
+  seo: Tasting_Seo
+  updatedAt: DateTime
+  createdAt: DateTime
+  _status: Tasting__status
+}
+
+type Tasting_WineTypes {
+  wineType: Tasting_WineTypes_wineType
+  quantity: Float!
+  id: String
+}
+
+enum Tasting_WineTypes_wineType {
+  red
+  white
+  rose
+  sparkling
+  sweet
+  skin_contact
+  beasts
+  babies
+}
+
+type Tasting_Seo {
+  manualOverride: Boolean
+  title: String
+  description: String
+  image: String
+  structuredData: JSON
+}
+
+enum Tasting__status {
+  draft
+  published
+}
+
+type Tastings {
+  docs: [Tasting!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input Tasting_where {
+  title: Tasting_title_operator
+  slug: Tasting_slug_operator
+  description: Tasting_description_operator
+  pricePerPerson: Tasting_pricePerPerson_operator
+  minPeople: Tasting_minPeople_operator
+  maxPeople: Tasting_maxPeople_operator
+  wineTypes__wineType: Tasting_wineTypes__wineType_operator
+  wineTypes__quantity: Tasting_wineTypes__quantity_operator
+  wineTypes__id: Tasting_wineTypes__id_operator
+  exampleWines: Tasting_exampleWines_operator
+  duration: Tasting_duration_operator
+  media: Tasting_media_operator
+  seo__manualOverride: Tasting_seo__manualOverride_operator
+  seo__title: Tasting_seo__title_operator
+  seo__description: Tasting_seo__description_operator
+  seo__image: Tasting_seo__image_operator
+  seo__structuredData: Tasting_seo__structuredData_operator
+  updatedAt: Tasting_updatedAt_operator
+  createdAt: Tasting_createdAt_operator
+  _status: Tasting__status_operator
+  id: Tasting_id_operator
+  AND: [Tasting_where_and]
+  OR: [Tasting_where_or]
+}
+
+input Tasting_title_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Tasting_slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Tasting_description_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input Tasting_pricePerPerson_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input Tasting_minPeople_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input Tasting_maxPeople_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input Tasting_wineTypes__wineType_operator {
+  equals: Tasting_wineTypes__wineType_Input
+  not_equals: Tasting_wineTypes__wineType_Input
+  in: [Tasting_wineTypes__wineType_Input]
+  not_in: [Tasting_wineTypes__wineType_Input]
+  all: [Tasting_wineTypes__wineType_Input]
+  exists: Boolean
+}
+
+enum Tasting_wineTypes__wineType_Input {
+  red
+  white
+  rose
+  sparkling
+  sweet
+  skin_contact
+  beasts
+  babies
+}
+
+input Tasting_wineTypes__quantity_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input Tasting_wineTypes__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Tasting_exampleWines_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Tasting_duration_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input Tasting_media_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input Tasting_seo__manualOverride_operator {
+  equals: Boolean
+  not_equals: Boolean
+  exists: Boolean
+}
+
+input Tasting_seo__title_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Tasting_seo__description_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input Tasting_seo__image_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Tasting_seo__structuredData_operator {
+  equals: JSON
+  not_equals: JSON
+  like: JSON
+  contains: JSON
+  within: JSON
+  intersects: JSON
+  exists: Boolean
+}
+
+input Tasting_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Tasting_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input Tasting__status_operator {
+  equals: Tasting__status_Input
+  not_equals: Tasting__status_Input
+  in: [Tasting__status_Input]
+  not_in: [Tasting__status_Input]
+  all: [Tasting__status_Input]
+  exists: Boolean
+}
+
+enum Tasting__status_Input {
+  draft
+  published
+}
+
+input Tasting_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input Tasting_where_and {
+  title: Tasting_title_operator
+  slug: Tasting_slug_operator
+  description: Tasting_description_operator
+  pricePerPerson: Tasting_pricePerPerson_operator
+  minPeople: Tasting_minPeople_operator
+  maxPeople: Tasting_maxPeople_operator
+  wineTypes__wineType: Tasting_wineTypes__wineType_operator
+  wineTypes__quantity: Tasting_wineTypes__quantity_operator
+  wineTypes__id: Tasting_wineTypes__id_operator
+  exampleWines: Tasting_exampleWines_operator
+  duration: Tasting_duration_operator
+  media: Tasting_media_operator
+  seo__manualOverride: Tasting_seo__manualOverride_operator
+  seo__title: Tasting_seo__title_operator
+  seo__description: Tasting_seo__description_operator
+  seo__image: Tasting_seo__image_operator
+  seo__structuredData: Tasting_seo__structuredData_operator
+  updatedAt: Tasting_updatedAt_operator
+  createdAt: Tasting_createdAt_operator
+  _status: Tasting__status_operator
+  id: Tasting_id_operator
+  AND: [Tasting_where_and]
+  OR: [Tasting_where_or]
+}
+
+input Tasting_where_or {
+  title: Tasting_title_operator
+  slug: Tasting_slug_operator
+  description: Tasting_description_operator
+  pricePerPerson: Tasting_pricePerPerson_operator
+  minPeople: Tasting_minPeople_operator
+  maxPeople: Tasting_maxPeople_operator
+  wineTypes__wineType: Tasting_wineTypes__wineType_operator
+  wineTypes__quantity: Tasting_wineTypes__quantity_operator
+  wineTypes__id: Tasting_wineTypes__id_operator
+  exampleWines: Tasting_exampleWines_operator
+  duration: Tasting_duration_operator
+  media: Tasting_media_operator
+  seo__manualOverride: Tasting_seo__manualOverride_operator
+  seo__title: Tasting_seo__title_operator
+  seo__description: Tasting_seo__description_operator
+  seo__image: Tasting_seo__image_operator
+  seo__structuredData: Tasting_seo__structuredData_operator
+  updatedAt: Tasting_updatedAt_operator
+  createdAt: Tasting_createdAt_operator
+  _status: Tasting__status_operator
+  id: Tasting_id_operator
+  AND: [Tasting_where_and]
+  OR: [Tasting_where_or]
+}
+
+type countTastings {
+  totalDocs: Int
+}
+
+type tastingsDocAccess {
+  fields: TastingsDocAccessFields
+  create: TastingsCreateDocAccess
+  read: TastingsReadDocAccess
+  update: TastingsUpdateDocAccess
+  delete: TastingsDeleteDocAccess
+  readVersions: TastingsReadVersionsDocAccess
+}
+
+type TastingsDocAccessFields {
+  title: TastingsDocAccessFields_title
+  slug: TastingsDocAccessFields_slug
+  description: TastingsDocAccessFields_description
+  pricePerPerson: TastingsDocAccessFields_pricePerPerson
+  minPeople: TastingsDocAccessFields_minPeople
+  maxPeople: TastingsDocAccessFields_maxPeople
+  wineTypes: TastingsDocAccessFields_wineTypes
+  exampleWines: TastingsDocAccessFields_exampleWines
+  duration: TastingsDocAccessFields_duration
+  media: TastingsDocAccessFields_media
+  seo: TastingsDocAccessFields_seo
+  updatedAt: TastingsDocAccessFields_updatedAt
+  createdAt: TastingsDocAccessFields_createdAt
+  _status: TastingsDocAccessFields__status
+}
+
+type TastingsDocAccessFields_title {
+  create: TastingsDocAccessFields_title_Create
+  read: TastingsDocAccessFields_title_Read
+  update: TastingsDocAccessFields_title_Update
+  delete: TastingsDocAccessFields_title_Delete
+}
+
+type TastingsDocAccessFields_title_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_title_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_title_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_title_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_slug {
+  create: TastingsDocAccessFields_slug_Create
+  read: TastingsDocAccessFields_slug_Read
+  update: TastingsDocAccessFields_slug_Update
+  delete: TastingsDocAccessFields_slug_Delete
+}
+
+type TastingsDocAccessFields_slug_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_slug_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_slug_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_slug_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_description {
+  create: TastingsDocAccessFields_description_Create
+  read: TastingsDocAccessFields_description_Read
+  update: TastingsDocAccessFields_description_Update
+  delete: TastingsDocAccessFields_description_Delete
+}
+
+type TastingsDocAccessFields_description_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_description_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_description_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_description_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_pricePerPerson {
+  create: TastingsDocAccessFields_pricePerPerson_Create
+  read: TastingsDocAccessFields_pricePerPerson_Read
+  update: TastingsDocAccessFields_pricePerPerson_Update
+  delete: TastingsDocAccessFields_pricePerPerson_Delete
+}
+
+type TastingsDocAccessFields_pricePerPerson_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_pricePerPerson_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_pricePerPerson_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_pricePerPerson_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_minPeople {
+  create: TastingsDocAccessFields_minPeople_Create
+  read: TastingsDocAccessFields_minPeople_Read
+  update: TastingsDocAccessFields_minPeople_Update
+  delete: TastingsDocAccessFields_minPeople_Delete
+}
+
+type TastingsDocAccessFields_minPeople_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_minPeople_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_minPeople_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_minPeople_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_maxPeople {
+  create: TastingsDocAccessFields_maxPeople_Create
+  read: TastingsDocAccessFields_maxPeople_Read
+  update: TastingsDocAccessFields_maxPeople_Update
+  delete: TastingsDocAccessFields_maxPeople_Delete
+}
+
+type TastingsDocAccessFields_maxPeople_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_maxPeople_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_maxPeople_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_maxPeople_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes {
+  create: TastingsDocAccessFields_wineTypes_Create
+  read: TastingsDocAccessFields_wineTypes_Read
+  update: TastingsDocAccessFields_wineTypes_Update
+  delete: TastingsDocAccessFields_wineTypes_Delete
+  fields: TastingsDocAccessFields_wineTypes_Fields
+}
+
+type TastingsDocAccessFields_wineTypes_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_Fields {
+  wineType: TastingsDocAccessFields_wineTypes_wineType
+  quantity: TastingsDocAccessFields_wineTypes_quantity
+  id: TastingsDocAccessFields_wineTypes_id
+}
+
+type TastingsDocAccessFields_wineTypes_wineType {
+  create: TastingsDocAccessFields_wineTypes_wineType_Create
+  read: TastingsDocAccessFields_wineTypes_wineType_Read
+  update: TastingsDocAccessFields_wineTypes_wineType_Update
+  delete: TastingsDocAccessFields_wineTypes_wineType_Delete
+}
+
+type TastingsDocAccessFields_wineTypes_wineType_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_wineType_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_wineType_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_wineType_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_quantity {
+  create: TastingsDocAccessFields_wineTypes_quantity_Create
+  read: TastingsDocAccessFields_wineTypes_quantity_Read
+  update: TastingsDocAccessFields_wineTypes_quantity_Update
+  delete: TastingsDocAccessFields_wineTypes_quantity_Delete
+}
+
+type TastingsDocAccessFields_wineTypes_quantity_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_quantity_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_quantity_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_quantity_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_id {
+  create: TastingsDocAccessFields_wineTypes_id_Create
+  read: TastingsDocAccessFields_wineTypes_id_Read
+  update: TastingsDocAccessFields_wineTypes_id_Update
+  delete: TastingsDocAccessFields_wineTypes_id_Delete
+}
+
+type TastingsDocAccessFields_wineTypes_id_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_id_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_id_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_wineTypes_id_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_exampleWines {
+  create: TastingsDocAccessFields_exampleWines_Create
+  read: TastingsDocAccessFields_exampleWines_Read
+  update: TastingsDocAccessFields_exampleWines_Update
+  delete: TastingsDocAccessFields_exampleWines_Delete
+}
+
+type TastingsDocAccessFields_exampleWines_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_exampleWines_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_exampleWines_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_exampleWines_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_duration {
+  create: TastingsDocAccessFields_duration_Create
+  read: TastingsDocAccessFields_duration_Read
+  update: TastingsDocAccessFields_duration_Update
+  delete: TastingsDocAccessFields_duration_Delete
+}
+
+type TastingsDocAccessFields_duration_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_duration_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_duration_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_duration_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_media {
+  create: TastingsDocAccessFields_media_Create
+  read: TastingsDocAccessFields_media_Read
+  update: TastingsDocAccessFields_media_Update
+  delete: TastingsDocAccessFields_media_Delete
+}
+
+type TastingsDocAccessFields_media_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_media_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_media_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_media_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo {
+  create: TastingsDocAccessFields_seo_Create
+  read: TastingsDocAccessFields_seo_Read
+  update: TastingsDocAccessFields_seo_Update
+  delete: TastingsDocAccessFields_seo_Delete
+  fields: TastingsDocAccessFields_seo_Fields
+}
+
+type TastingsDocAccessFields_seo_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_Fields {
+  manualOverride: TastingsDocAccessFields_seo_manualOverride
+  title: TastingsDocAccessFields_seo_title
+  description: TastingsDocAccessFields_seo_description
+  image: TastingsDocAccessFields_seo_image
+  structuredData: TastingsDocAccessFields_seo_structuredData
+}
+
+type TastingsDocAccessFields_seo_manualOverride {
+  create: TastingsDocAccessFields_seo_manualOverride_Create
+  read: TastingsDocAccessFields_seo_manualOverride_Read
+  update: TastingsDocAccessFields_seo_manualOverride_Update
+  delete: TastingsDocAccessFields_seo_manualOverride_Delete
+}
+
+type TastingsDocAccessFields_seo_manualOverride_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_manualOverride_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_manualOverride_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_manualOverride_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_title {
+  create: TastingsDocAccessFields_seo_title_Create
+  read: TastingsDocAccessFields_seo_title_Read
+  update: TastingsDocAccessFields_seo_title_Update
+  delete: TastingsDocAccessFields_seo_title_Delete
+}
+
+type TastingsDocAccessFields_seo_title_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_title_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_title_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_title_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_description {
+  create: TastingsDocAccessFields_seo_description_Create
+  read: TastingsDocAccessFields_seo_description_Read
+  update: TastingsDocAccessFields_seo_description_Update
+  delete: TastingsDocAccessFields_seo_description_Delete
+}
+
+type TastingsDocAccessFields_seo_description_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_description_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_description_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_description_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_image {
+  create: TastingsDocAccessFields_seo_image_Create
+  read: TastingsDocAccessFields_seo_image_Read
+  update: TastingsDocAccessFields_seo_image_Update
+  delete: TastingsDocAccessFields_seo_image_Delete
+}
+
+type TastingsDocAccessFields_seo_image_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_image_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_image_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_image_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_structuredData {
+  create: TastingsDocAccessFields_seo_structuredData_Create
+  read: TastingsDocAccessFields_seo_structuredData_Read
+  update: TastingsDocAccessFields_seo_structuredData_Update
+  delete: TastingsDocAccessFields_seo_structuredData_Delete
+}
+
+type TastingsDocAccessFields_seo_structuredData_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_structuredData_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_structuredData_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_seo_structuredData_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_updatedAt {
+  create: TastingsDocAccessFields_updatedAt_Create
+  read: TastingsDocAccessFields_updatedAt_Read
+  update: TastingsDocAccessFields_updatedAt_Update
+  delete: TastingsDocAccessFields_updatedAt_Delete
+}
+
+type TastingsDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_createdAt {
+  create: TastingsDocAccessFields_createdAt_Create
+  read: TastingsDocAccessFields_createdAt_Read
+  update: TastingsDocAccessFields_createdAt_Update
+  delete: TastingsDocAccessFields_createdAt_Delete
+}
+
+type TastingsDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields__status {
+  create: TastingsDocAccessFields__status_Create
+  read: TastingsDocAccessFields__status_Read
+  update: TastingsDocAccessFields__status_Update
+  delete: TastingsDocAccessFields__status_Delete
+}
+
+type TastingsDocAccessFields__status_Create {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields__status_Read {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields__status_Update {
+  permission: Boolean!
+}
+
+type TastingsDocAccessFields__status_Delete {
+  permission: Boolean!
+}
+
+type TastingsCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsReadVersionsDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingVersion {
+  parent(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Tasting
+  version: TastingVersion_Version
+  createdAt: DateTime
+  updatedAt: DateTime
+  snapshot: Boolean
+  publishedLocale: TastingVersion_publishedLocale
+  latest: Boolean
+  id: Int
+}
+
+type TastingVersion_Version {
+  title: String
+  slug: String
+  description: String
+  pricePerPerson: Float
+  minPeople: Float
+  maxPeople: Float
+  wineTypes: [TastingVersion_Version_WineTypes!]!
+  exampleWines(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [FlatWineVariant!]
+  duration: Float
+  media(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): [Media!]
+  seo: TastingVersion_Version_Seo
+  updatedAt: DateTime
+  createdAt: DateTime
+  _status: TastingVersion_Version__status
+}
+
+type TastingVersion_Version_WineTypes {
+  wineType: TastingVersion_Version_WineTypes_wineType
+  quantity: Float!
+  id: String
+}
+
+enum TastingVersion_Version_WineTypes_wineType {
+  red
+  white
+  rose
+  sparkling
+  sweet
+  skin_contact
+  beasts
+  babies
+}
+
+type TastingVersion_Version_Seo {
+  manualOverride: Boolean
+  title: String
+  description: String
+  image: String
+  structuredData: JSON
+}
+
+enum TastingVersion_Version__status {
+  draft
+  published
+}
+
+enum TastingVersion_publishedLocale {
+  sl
+  en
+}
+
+type versionsTastings {
+  docs: [TastingVersion!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input versionsTasting_where {
+  parent: versionsTasting_parent_operator
+  version__title: versionsTasting_version__title_operator
+  version__slug: versionsTasting_version__slug_operator
+  version__description: versionsTasting_version__description_operator
+  version__pricePerPerson: versionsTasting_version__pricePerPerson_operator
+  version__minPeople: versionsTasting_version__minPeople_operator
+  version__maxPeople: versionsTasting_version__maxPeople_operator
+  version__wineTypes__wineType: versionsTasting_version__wineTypes__wineType_operator
+  version__wineTypes__quantity: versionsTasting_version__wineTypes__quantity_operator
+  version__wineTypes__id: versionsTasting_version__wineTypes__id_operator
+  version__exampleWines: versionsTasting_version__exampleWines_operator
+  version__duration: versionsTasting_version__duration_operator
+  version__media: versionsTasting_version__media_operator
+  version__seo__manualOverride: versionsTasting_version__seo__manualOverride_operator
+  version__seo__title: versionsTasting_version__seo__title_operator
+  version__seo__description: versionsTasting_version__seo__description_operator
+  version__seo__image: versionsTasting_version__seo__image_operator
+  version__seo__structuredData: versionsTasting_version__seo__structuredData_operator
+  version__updatedAt: versionsTasting_version__updatedAt_operator
+  version__createdAt: versionsTasting_version__createdAt_operator
+  version___status: versionsTasting_version___status_operator
+  createdAt: versionsTasting_createdAt_operator
+  updatedAt: versionsTasting_updatedAt_operator
+  snapshot: versionsTasting_snapshot_operator
+  publishedLocale: versionsTasting_publishedLocale_operator
+  latest: versionsTasting_latest_operator
+  id: versionsTasting_id_operator
+  AND: [versionsTasting_where_and]
+  OR: [versionsTasting_where_or]
+}
+
+input versionsTasting_parent_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input versionsTasting_version__title_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsTasting_version__slug_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsTasting_version__description_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input versionsTasting_version__pricePerPerson_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsTasting_version__minPeople_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsTasting_version__maxPeople_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsTasting_version__wineTypes__wineType_operator {
+  equals: versionsTasting_version__wineTypes__wineType_Input
+  not_equals: versionsTasting_version__wineTypes__wineType_Input
+  in: [versionsTasting_version__wineTypes__wineType_Input]
+  not_in: [versionsTasting_version__wineTypes__wineType_Input]
+  all: [versionsTasting_version__wineTypes__wineType_Input]
+  exists: Boolean
+}
+
+enum versionsTasting_version__wineTypes__wineType_Input {
+  red
+  white
+  rose
+  sparkling
+  sweet
+  skin_contact
+  beasts
+  babies
+}
+
+input versionsTasting_version__wineTypes__quantity_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsTasting_version__wineTypes__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsTasting_version__exampleWines_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input versionsTasting_version__duration_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsTasting_version__media_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input versionsTasting_version__seo__manualOverride_operator {
+  equals: Boolean
+  not_equals: Boolean
+  exists: Boolean
+}
+
+input versionsTasting_version__seo__title_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsTasting_version__seo__description_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  exists: Boolean
+}
+
+input versionsTasting_version__seo__image_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input versionsTasting_version__seo__structuredData_operator {
+  equals: JSON
+  not_equals: JSON
+  like: JSON
+  contains: JSON
+  within: JSON
+  intersects: JSON
+  exists: Boolean
+}
+
+input versionsTasting_version__updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsTasting_version__createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsTasting_version___status_operator {
+  equals: versionsTasting_version___status_Input
+  not_equals: versionsTasting_version___status_Input
+  in: [versionsTasting_version___status_Input]
+  not_in: [versionsTasting_version___status_Input]
+  all: [versionsTasting_version___status_Input]
+  exists: Boolean
+}
+
+enum versionsTasting_version___status_Input {
+  draft
+  published
+}
+
+input versionsTasting_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsTasting_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input versionsTasting_snapshot_operator {
+  equals: Boolean
+  not_equals: Boolean
+  exists: Boolean
+}
+
+input versionsTasting_publishedLocale_operator {
+  equals: versionsTasting_publishedLocale_Input
+  not_equals: versionsTasting_publishedLocale_Input
+  in: [versionsTasting_publishedLocale_Input]
+  not_in: [versionsTasting_publishedLocale_Input]
+  all: [versionsTasting_publishedLocale_Input]
+  exists: Boolean
+}
+
+enum versionsTasting_publishedLocale_Input {
+  sl
+  en
+}
+
+input versionsTasting_latest_operator {
+  equals: Boolean
+  not_equals: Boolean
+  exists: Boolean
+}
+
+input versionsTasting_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input versionsTasting_where_and {
+  parent: versionsTasting_parent_operator
+  version__title: versionsTasting_version__title_operator
+  version__slug: versionsTasting_version__slug_operator
+  version__description: versionsTasting_version__description_operator
+  version__pricePerPerson: versionsTasting_version__pricePerPerson_operator
+  version__minPeople: versionsTasting_version__minPeople_operator
+  version__maxPeople: versionsTasting_version__maxPeople_operator
+  version__wineTypes__wineType: versionsTasting_version__wineTypes__wineType_operator
+  version__wineTypes__quantity: versionsTasting_version__wineTypes__quantity_operator
+  version__wineTypes__id: versionsTasting_version__wineTypes__id_operator
+  version__exampleWines: versionsTasting_version__exampleWines_operator
+  version__duration: versionsTasting_version__duration_operator
+  version__media: versionsTasting_version__media_operator
+  version__seo__manualOverride: versionsTasting_version__seo__manualOverride_operator
+  version__seo__title: versionsTasting_version__seo__title_operator
+  version__seo__description: versionsTasting_version__seo__description_operator
+  version__seo__image: versionsTasting_version__seo__image_operator
+  version__seo__structuredData: versionsTasting_version__seo__structuredData_operator
+  version__updatedAt: versionsTasting_version__updatedAt_operator
+  version__createdAt: versionsTasting_version__createdAt_operator
+  version___status: versionsTasting_version___status_operator
+  createdAt: versionsTasting_createdAt_operator
+  updatedAt: versionsTasting_updatedAt_operator
+  snapshot: versionsTasting_snapshot_operator
+  publishedLocale: versionsTasting_publishedLocale_operator
+  latest: versionsTasting_latest_operator
+  id: versionsTasting_id_operator
+  AND: [versionsTasting_where_and]
+  OR: [versionsTasting_where_or]
+}
+
+input versionsTasting_where_or {
+  parent: versionsTasting_parent_operator
+  version__title: versionsTasting_version__title_operator
+  version__slug: versionsTasting_version__slug_operator
+  version__description: versionsTasting_version__description_operator
+  version__pricePerPerson: versionsTasting_version__pricePerPerson_operator
+  version__minPeople: versionsTasting_version__minPeople_operator
+  version__maxPeople: versionsTasting_version__maxPeople_operator
+  version__wineTypes__wineType: versionsTasting_version__wineTypes__wineType_operator
+  version__wineTypes__quantity: versionsTasting_version__wineTypes__quantity_operator
+  version__wineTypes__id: versionsTasting_version__wineTypes__id_operator
+  version__exampleWines: versionsTasting_version__exampleWines_operator
+  version__duration: versionsTasting_version__duration_operator
+  version__media: versionsTasting_version__media_operator
+  version__seo__manualOverride: versionsTasting_version__seo__manualOverride_operator
+  version__seo__title: versionsTasting_version__seo__title_operator
+  version__seo__description: versionsTasting_version__seo__description_operator
+  version__seo__image: versionsTasting_version__seo__image_operator
+  version__seo__structuredData: versionsTasting_version__seo__structuredData_operator
+  version__updatedAt: versionsTasting_version__updatedAt_operator
+  version__createdAt: versionsTasting_version__createdAt_operator
+  version___status: versionsTasting_version___status_operator
+  createdAt: versionsTasting_createdAt_operator
+  updatedAt: versionsTasting_updatedAt_operator
+  snapshot: versionsTasting_snapshot_operator
+  publishedLocale: versionsTasting_publishedLocale_operator
+  latest: versionsTasting_latest_operator
+  id: versionsTasting_id_operator
+  AND: [versionsTasting_where_and]
+  OR: [versionsTasting_where_or]
+}
+
 type PayloadJob {
   id: Int!
   input: JSON
@@ -35794,10 +37174,11 @@ enum PayloadLockedDocument_Document_RelationTo {
   related_wine_variants
   flat_wine_variants
   flat_collections
+  tastings
   payload_jobs
 }
 
-union PayloadLockedDocument_Document = User | Customer | Media | Invoice | ActiveCart | SavedCart | SharedCart | StockReservation | Order | Wine | WineVariant | Winery | Region | WineCountry | GrapeVariety | Tag | Aroma | Adjective | Flavour | Style | Climate | Mood | Dish | RelatedWineVariant | FlatWineVariant | FlatCollection | PayloadJob
+union PayloadLockedDocument_Document = User | Customer | Media | Invoice | ActiveCart | SavedCart | SharedCart | StockReservation | Order | Wine | WineVariant | Winery | Region | WineCountry | GrapeVariety | Tag | Aroma | Adjective | Flavour | Style | Climate | Mood | Dish | RelatedWineVariant | FlatWineVariant | FlatCollection | Tasting | PayloadJob
 
 type PayloadLockedDocument_User_Relationship {
   relationTo: PayloadLockedDocument_User_RelationTo
@@ -35868,6 +37249,7 @@ enum PayloadLockedDocument_document_Relation_RelationTo {
   related_wine_variants
   flat_wine_variants
   flat_collections
+  tastings
   payload_jobs
 }
 
@@ -36415,6 +37797,7 @@ type Access {
   related_wine_variants: related_wine_variantsAccess
   flat_wine_variants: flat_wine_variantsAccess
   flat_collections: flat_collectionsAccess
+  tastings: tastingsAccess
   payload_jobs: payload_jobsAccess
   payload_locked_documents: payload_locked_documentsAccess
   payload_preferences: payload_preferencesAccess
@@ -52076,6 +53459,579 @@ type FlatCollectionsReadVersionsAccess {
   where: JSONObject
 }
 
+type tastingsAccess {
+  fields: TastingsFields
+  create: TastingsCreateAccess
+  read: TastingsReadAccess
+  update: TastingsUpdateAccess
+  delete: TastingsDeleteAccess
+  readVersions: TastingsReadVersionsAccess
+}
+
+type TastingsFields {
+  title: TastingsFields_title
+  slug: TastingsFields_slug
+  description: TastingsFields_description
+  pricePerPerson: TastingsFields_pricePerPerson
+  minPeople: TastingsFields_minPeople
+  maxPeople: TastingsFields_maxPeople
+  wineTypes: TastingsFields_wineTypes
+  exampleWines: TastingsFields_exampleWines
+  duration: TastingsFields_duration
+  media: TastingsFields_media
+  seo: TastingsFields_seo
+  updatedAt: TastingsFields_updatedAt
+  createdAt: TastingsFields_createdAt
+  _status: TastingsFields__status
+}
+
+type TastingsFields_title {
+  create: TastingsFields_title_Create
+  read: TastingsFields_title_Read
+  update: TastingsFields_title_Update
+  delete: TastingsFields_title_Delete
+}
+
+type TastingsFields_title_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_title_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_title_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_title_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_slug {
+  create: TastingsFields_slug_Create
+  read: TastingsFields_slug_Read
+  update: TastingsFields_slug_Update
+  delete: TastingsFields_slug_Delete
+}
+
+type TastingsFields_slug_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_slug_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_slug_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_slug_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_description {
+  create: TastingsFields_description_Create
+  read: TastingsFields_description_Read
+  update: TastingsFields_description_Update
+  delete: TastingsFields_description_Delete
+}
+
+type TastingsFields_description_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_description_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_description_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_description_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_pricePerPerson {
+  create: TastingsFields_pricePerPerson_Create
+  read: TastingsFields_pricePerPerson_Read
+  update: TastingsFields_pricePerPerson_Update
+  delete: TastingsFields_pricePerPerson_Delete
+}
+
+type TastingsFields_pricePerPerson_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_pricePerPerson_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_pricePerPerson_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_pricePerPerson_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_minPeople {
+  create: TastingsFields_minPeople_Create
+  read: TastingsFields_minPeople_Read
+  update: TastingsFields_minPeople_Update
+  delete: TastingsFields_minPeople_Delete
+}
+
+type TastingsFields_minPeople_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_minPeople_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_minPeople_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_minPeople_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_maxPeople {
+  create: TastingsFields_maxPeople_Create
+  read: TastingsFields_maxPeople_Read
+  update: TastingsFields_maxPeople_Update
+  delete: TastingsFields_maxPeople_Delete
+}
+
+type TastingsFields_maxPeople_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_maxPeople_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_maxPeople_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_maxPeople_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes {
+  create: TastingsFields_wineTypes_Create
+  read: TastingsFields_wineTypes_Read
+  update: TastingsFields_wineTypes_Update
+  delete: TastingsFields_wineTypes_Delete
+  fields: TastingsFields_wineTypes_Fields
+}
+
+type TastingsFields_wineTypes_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_Fields {
+  wineType: TastingsFields_wineTypes_wineType
+  quantity: TastingsFields_wineTypes_quantity
+  id: TastingsFields_wineTypes_id
+}
+
+type TastingsFields_wineTypes_wineType {
+  create: TastingsFields_wineTypes_wineType_Create
+  read: TastingsFields_wineTypes_wineType_Read
+  update: TastingsFields_wineTypes_wineType_Update
+  delete: TastingsFields_wineTypes_wineType_Delete
+}
+
+type TastingsFields_wineTypes_wineType_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_wineType_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_wineType_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_wineType_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_quantity {
+  create: TastingsFields_wineTypes_quantity_Create
+  read: TastingsFields_wineTypes_quantity_Read
+  update: TastingsFields_wineTypes_quantity_Update
+  delete: TastingsFields_wineTypes_quantity_Delete
+}
+
+type TastingsFields_wineTypes_quantity_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_quantity_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_quantity_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_quantity_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_id {
+  create: TastingsFields_wineTypes_id_Create
+  read: TastingsFields_wineTypes_id_Read
+  update: TastingsFields_wineTypes_id_Update
+  delete: TastingsFields_wineTypes_id_Delete
+}
+
+type TastingsFields_wineTypes_id_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_id_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_id_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_wineTypes_id_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_exampleWines {
+  create: TastingsFields_exampleWines_Create
+  read: TastingsFields_exampleWines_Read
+  update: TastingsFields_exampleWines_Update
+  delete: TastingsFields_exampleWines_Delete
+}
+
+type TastingsFields_exampleWines_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_exampleWines_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_exampleWines_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_exampleWines_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_duration {
+  create: TastingsFields_duration_Create
+  read: TastingsFields_duration_Read
+  update: TastingsFields_duration_Update
+  delete: TastingsFields_duration_Delete
+}
+
+type TastingsFields_duration_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_duration_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_duration_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_duration_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_media {
+  create: TastingsFields_media_Create
+  read: TastingsFields_media_Read
+  update: TastingsFields_media_Update
+  delete: TastingsFields_media_Delete
+}
+
+type TastingsFields_media_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_media_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_media_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_media_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_seo {
+  create: TastingsFields_seo_Create
+  read: TastingsFields_seo_Read
+  update: TastingsFields_seo_Update
+  delete: TastingsFields_seo_Delete
+  fields: TastingsFields_seo_Fields
+}
+
+type TastingsFields_seo_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_Fields {
+  manualOverride: TastingsFields_seo_manualOverride
+  title: TastingsFields_seo_title
+  description: TastingsFields_seo_description
+  image: TastingsFields_seo_image
+  structuredData: TastingsFields_seo_structuredData
+}
+
+type TastingsFields_seo_manualOverride {
+  create: TastingsFields_seo_manualOverride_Create
+  read: TastingsFields_seo_manualOverride_Read
+  update: TastingsFields_seo_manualOverride_Update
+  delete: TastingsFields_seo_manualOverride_Delete
+}
+
+type TastingsFields_seo_manualOverride_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_manualOverride_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_manualOverride_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_manualOverride_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_title {
+  create: TastingsFields_seo_title_Create
+  read: TastingsFields_seo_title_Read
+  update: TastingsFields_seo_title_Update
+  delete: TastingsFields_seo_title_Delete
+}
+
+type TastingsFields_seo_title_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_title_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_title_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_title_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_description {
+  create: TastingsFields_seo_description_Create
+  read: TastingsFields_seo_description_Read
+  update: TastingsFields_seo_description_Update
+  delete: TastingsFields_seo_description_Delete
+}
+
+type TastingsFields_seo_description_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_description_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_description_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_description_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_image {
+  create: TastingsFields_seo_image_Create
+  read: TastingsFields_seo_image_Read
+  update: TastingsFields_seo_image_Update
+  delete: TastingsFields_seo_image_Delete
+}
+
+type TastingsFields_seo_image_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_image_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_image_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_image_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_structuredData {
+  create: TastingsFields_seo_structuredData_Create
+  read: TastingsFields_seo_structuredData_Read
+  update: TastingsFields_seo_structuredData_Update
+  delete: TastingsFields_seo_structuredData_Delete
+}
+
+type TastingsFields_seo_structuredData_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_structuredData_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_structuredData_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_seo_structuredData_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_updatedAt {
+  create: TastingsFields_updatedAt_Create
+  read: TastingsFields_updatedAt_Read
+  update: TastingsFields_updatedAt_Update
+  delete: TastingsFields_updatedAt_Delete
+}
+
+type TastingsFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields_createdAt {
+  create: TastingsFields_createdAt_Create
+  read: TastingsFields_createdAt_Read
+  update: TastingsFields_createdAt_Update
+  delete: TastingsFields_createdAt_Delete
+}
+
+type TastingsFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type TastingsFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type TastingsFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type TastingsFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type TastingsFields__status {
+  create: TastingsFields__status_Create
+  read: TastingsFields__status_Read
+  update: TastingsFields__status_Update
+  delete: TastingsFields__status_Delete
+}
+
+type TastingsFields__status_Create {
+  permission: Boolean!
+}
+
+type TastingsFields__status_Read {
+  permission: Boolean!
+}
+
+type TastingsFields__status_Update {
+  permission: Boolean!
+}
+
+type TastingsFields__status_Delete {
+  permission: Boolean!
+}
+
+type TastingsCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type TastingsReadVersionsAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type payload_jobsAccess {
   fields: PayloadJobsFields
   create: PayloadJobsCreateAccess
@@ -52965,19 +54921,6 @@ type PayloadPreferencesDeleteAccess {
   where: JSONObject
 }
 
-type WineDetailResult {
-  variant: FlatWineVariant
-  variants: [FlatWineVariant]
-  relatedVariants: [CustomRelatedWineVariant]
-  error: String
-}
-
-type CustomRelatedWineVariant {
-  type: String
-  title: String
-  variants: [FlatWineVariant]
-}
-
 type Mutation {
   createUser(data: mutationUserInput!, draft: Boolean, locale: LocaleInputType): User
   updateUser(id: Int!, autosave: Boolean, data: mutationUserUpdateInput!, draft: Boolean, locale: LocaleInputType): User
@@ -53112,6 +55055,11 @@ type Mutation {
   deleteFlatCollection(id: Int!): FlatCollection
   duplicateFlatCollection(id: Int!, data: mutationFlatCollectionInput!): FlatCollection
   restoreVersionFlatCollection(id: Int, draft: Boolean): FlatCollection
+  createTasting(data: mutationTastingInput!, draft: Boolean, locale: LocaleInputType): Tasting
+  updateTasting(id: Int!, autosave: Boolean, data: mutationTastingUpdateInput!, draft: Boolean, locale: LocaleInputType): Tasting
+  deleteTasting(id: Int!): Tasting
+  duplicateTasting(id: Int!, data: mutationTastingInput!): Tasting
+  restoreVersionTasting(id: Int, draft: Boolean): Tasting
   createPayloadJob(data: mutationPayloadJobInput!, draft: Boolean, locale: LocaleInputType): PayloadJob
   updatePayloadJob(id: Int!, autosave: Boolean, data: mutationPayloadJobUpdateInput!, draft: Boolean, locale: LocaleInputType): PayloadJob
   deletePayloadJob(id: Int!): PayloadJob
@@ -55404,6 +57352,100 @@ enum FlatCollectionUpdate__status_MutationInput {
   published
 }
 
+input mutationTastingInput {
+  title: String
+  slug: String
+  description: String
+  pricePerPerson: Float!
+  minPeople: Float!
+  maxPeople: Float!
+  wineTypes: [mutationTasting_WineTypesInput!]
+  exampleWines: [Int]
+  duration: Float!
+  media: [Int]
+  seo: mutationTasting_SeoInput
+  updatedAt: String
+  createdAt: String
+  _status: Tasting__status_MutationInput
+}
+
+input mutationTasting_WineTypesInput {
+  wineType: Tasting_WineTypes_wineType_MutationInput
+  quantity: Float!
+  id: String
+}
+
+enum Tasting_WineTypes_wineType_MutationInput {
+  red
+  white
+  rose
+  sparkling
+  sweet
+  skin_contact
+  beasts
+  babies
+}
+
+input mutationTasting_SeoInput {
+  manualOverride: Boolean
+  title: String
+  description: String
+  image: String
+  structuredData: JSON
+}
+
+enum Tasting__status_MutationInput {
+  draft
+  published
+}
+
+input mutationTastingUpdateInput {
+  title: String
+  slug: String
+  description: String
+  pricePerPerson: Float
+  minPeople: Float
+  maxPeople: Float
+  wineTypes: [mutationTastingUpdate_WineTypesInput]
+  exampleWines: [Int]
+  duration: Float
+  media: [Int]
+  seo: mutationTastingUpdate_SeoInput
+  updatedAt: String
+  createdAt: String
+  _status: TastingUpdate__status_MutationInput
+}
+
+input mutationTastingUpdate_WineTypesInput {
+  wineType: TastingUpdate_WineTypes_wineType_MutationInput
+  quantity: Float!
+  id: String
+}
+
+enum TastingUpdate_WineTypes_wineType_MutationInput {
+  red
+  white
+  rose
+  sparkling
+  sweet
+  skin_contact
+  beasts
+  babies
+}
+
+input mutationTastingUpdate_SeoInput {
+  manualOverride: Boolean
+  title: String
+  description: String
+  image: String
+  structuredData: JSON
+}
+
+enum TastingUpdate__status_MutationInput {
+  draft
+  published
+}
+
 input mutationPayloadJobInput {
   input: JSON
   taskStatus: JSON
@@ -55540,6 +57582,7 @@ enum PayloadLockedDocument_DocumentRelationshipInputRelationTo {
   related_wine_variants
   flat_wine_variants
   flat_collections
+  tastings
   payload_jobs
 }
 
@@ -55593,6 +57636,7 @@ enum PayloadLockedDocumentUpdate_DocumentRelationshipInputRelationTo {
   related_wine_variants
   flat_wine_variants
   flat_collections
+  tastings
   payload_jobs
 }
 

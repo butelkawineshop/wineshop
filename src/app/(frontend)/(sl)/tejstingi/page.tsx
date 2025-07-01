@@ -1,20 +1,5 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import { TastingPage } from '@/components/Tastings/TastingPage'
 
-export default async function TejstingiPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug?: string[] }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="sl"
-      baseSegment="tejstingi"
-    />
-  )
+export default function TejstingiPage() {
+  return <TastingPage locale="sl" />
 }

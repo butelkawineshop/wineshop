@@ -1,7 +1,7 @@
 {
   "common": {
     "loading": "Nalaganje...",
-    "error": "Upsi, neki ga sraćkamo...",
+    "error": "Upsi, neki ga sračkamo...",
     "success": "Woohoo!!",
     "save": "Shrani",
     "cancel": "Prekliči",
@@ -13,13 +13,14 @@
     "showing": "Prikazano",
     "of": "od",
     "results": "rezultatov",
-    "noResults": "Sori, nič nismo našli",
+    "noResults": "Sori, nič ni tuki...",
     "page": "Stran",
     "logo": "Butelka logo",
     "reset": "Počisti",
     "item": "Element",
     "menu": "Meni"
   },
+
   "auth": {
     "login": "Prijava",
     "register": "Registracija",
@@ -29,8 +30,8 @@
     "forgotPassword": "Pozabljeno geslo?",
     "resetPassword": "Ponastavi geslo",
     "verifyEmail": "Potrdi e-pošto",
-    "magicLink": "Pošlji čarobno povezavo",
-    "continueWithGoogle": "Nadaljuj z Google",
+    "magicLink": "Pošlji čirole čarole link",
+    "continueWithGoogle": "Nadaljuj z Googlom",
     "emailVerification": {
       "title": "Potrdite svoj e-poštni naslov",
       "description": "Prosimo, kliknite spodnji gumb za potrditev vašega e-poštnega naslova:",
@@ -40,6 +41,7 @@
       "preview": "Potrdite svoj e-poštni naslov"
     }
   },
+
   "wine": {
     "title": "Vina",
     "details": "Podrobnosti",
@@ -68,12 +70,12 @@
     "nextRow": "Naslednja vrstica",
     "firstRow": "Prva vrstica",
     "lastRow": "Zadnja vrstica",
-    "keyboardInstructions": "Uporabite puščice za navigacijo med vinskimi vrsticami. Tipki Home in End za skok na prvo ali zadnjo vrstico. Page Up in Page Down za skok za 3 vrstice.",
-    "wineGridLabel": "Vinska mreža z vertikalno navigacijo vrstic",
-    "sliderLabel": "Vinski koleselj vrstic",
-    "rowLabel": "Vinska vrstica {current} od {total}",
-    "rowGridLabel": "Vinska mreža za vrstico {row}",
-    "accessibilityStatus": "Trenutno ogledujete vrstico {current} od {total} z {winesInRow} vini",
+    "keyboardInstructions": "Uporabi puščice za navigacijo med vrsticami. Tipki Home in End za skok na prvo ali zadnjo vrstico. Page Up in Page Down za skok za 3 vrstice.",
+    "wineGridLabel": "Vina",
+    "sliderLabel": "Vinski slideshow",
+    "rowLabel": "Vrstica {current} od {total}",
+    "rowGridLabel": "Vrstica {row}",
+    "accessibilityStatus": "Trenutno ogleduješ vrstico {current} od {total} z {winesInRow} vini",
     "actions": {
       "like": "Všeč mi je vino",
       "share": "Deli vino",
@@ -92,8 +94,8 @@
       "showLess": "Prikaži manj"
     },
     "tastingNotes": {
-      "tasteProfile": "Okusni profil",
-      "characterNotes": "Značajne opombe"
+      "tasteProfile": "Okus",
+      "characterNotes": "Značaj"
     },
     "list": {
       "title": "Vina",
@@ -101,7 +103,7 @@
     },
     "filters": {
       "title": "Filtri",
-      "price": "Cenovni razpon",
+      "price": "Budget",
       "region": "Regija",
       "variety": "Sorta grozdja",
       "year": "Letnik"
@@ -149,6 +151,152 @@
       }
     }
   },
+
+  "tasting": {
+    "list": {
+      "title": "Tejstingi",
+      "description": "Pridružite se našim tejstingom!"
+    },
+    "fields": {
+      "description": "Opis",
+      "date": "Datum",
+      "location": "Lokacija",
+      "details": "Podrobnosti",
+      "pricePerPerson": "Cena na osebo",
+      "duration": "Trajanje",
+      "people": "Velikost skupine",
+      "peopleRange": "{min}–{max} oseb",
+      "wineTypes": "Vina",
+      "exampleWines": "Primeri vin",
+      "quantity": "Gostje"
+    },
+    "notes": {
+      "titlePage1": "Občutek",
+      "titlePage2": "Značaj",
+      "dry": "Suho",
+      "sweet": "Sladko",
+      "freshFruit": "Sveže sadje",
+      "ripeFruit": "Zrelo sadje",
+      "crisp": "Lahkotno",
+      "creamy": "Kremno",
+      "noOak": "Brez lesa",
+      "oaky": "Barrique",
+      "simple": "Lahkotno",
+      "complex": "Kompleksno",
+      "light": "Nežno",
+      "rich": "Bogato",
+      "austere": "Ostro",
+      "smooth": "Nežno",
+      "mature": "Zrelo",
+      "youthful": "Mladostno",
+      "restrained": "Zadržano",
+      "energetic": "Energično",
+      "noAlcohol": "Brez alkohola",
+      "highAlcohol": "Veliko alkohola"
+    },
+    "descriptions": {
+      "dry": "Od popolnoma suhega do zapeljivo sladkega",
+      "ripe": "Od svežega do zrelega sadja",
+      "creamy": "Od lahkotne do kremne teksture",
+      "oaky": "Od inoxa do izrazite barikiranosti",
+      "complex": "Od lahkotnega do kompleksnega značaja",
+      "light": "Od lahkotnega do bogatega telesa",
+      "smooth": "Od nežnega do ostrega občutka v ustih",
+      "youthful": "Od mladostnega do zrelega značaja",
+      "energetic": "Od zadržanega do energičnega stila",
+      "alcohol": "Od brez alkohola do visokega alkohola"
+    },
+    "perPersonTB": "({price} € na osebo z DDV)",
+    "perPersonShort": "na osebo",
+    "actions": {
+      "share": "Deli tejsting",
+      "like": "Všeč mi je degustacija",
+      "goToSlide": "Pojdi na diapozitiv {slideNumber}",
+      "addToCart": "Dodaj v košarico"
+    },
+    "slides": {
+      "overview": {
+        "title": "Pregled",
+        "defaultDescription": "Odkrijte naše tejstinge!"
+      },
+      "details": {
+        "title": "Podrobnosti"
+      },
+      "themes": {
+        "title": "Teme",
+        "noThemes": "Ni določenih tem"
+      }
+    },
+    "contact": {
+      "email": "info@butelka.si",
+      "phone": "+386 1 234 5678",
+      "emailLabel": "Email za tejsting",
+      "emailDisplay": "info@butelka.si",
+      "phoneLabel": "Telefon za tejsting",
+      "phoneDisplay": "+386 1 234 5678"
+    },
+    "details": {
+      "title": "Podrobnosti degustacije"
+    },
+    "budget": {
+      "title": "Proračun",
+      "totalRevenue": "Skupni prihodek",
+      "foodAndExpenses": "Hrana in stroški",
+      "wineBudget": "Proračun za vina"
+    },
+    "themes": {
+      "title": "Teme degustacije"
+    },
+    "wineSelection": {
+      "title": "Izbira vin",
+      "description": "Naš sistem vam bo pomagal izbrati najboljše vina za vašo degustacijo glede na proračun in teme."
+    },
+    "selectedWines": {
+      "title": "Izbrana vina",
+      "totalCost": "Skupni strošek"
+    },
+    "exampleWines": {
+      "title": "Primeri vin za degustacijo"
+    }
+  },
+
+  "cart": {
+    "title": "Cekarček",
+    "empty": "Tvoj cekarček je prazen",
+    "subtotal": "Vmesni znesek",
+    "total": "Skupaj",
+    "checkout": "Na kasu",
+    "continueShopping": "Nadaljuj z nakupom",
+    "remove": "Odstrani izdelek"
+  },
+
+  "checkout": {
+    "title": "Blagajna",
+    "shipping": "Podatki za dostavo",
+    "orderSummary": "Povzetek naročila",
+    "placeOrder": "Oddaj naročilo",
+    "address": {
+      "street": "Ulica",
+      "city": "Mesto",
+      "postalCode": "Poštna številka",
+      "country": "Država"
+    },
+    "payment": {
+      "title": "Podatki za plačilo",
+      "cardNumber": "Številka kartice",
+      "expiry": "Datum veljavnosti",
+      "cvv": "CVV"
+    }
+  },
+
+  "quantity": {
+    "label": "Količina",
+    "decrease": "Zmanjšaj količino",
+    "increase": "Povečaj količino",
+    "min": "min {min}",
+    "max": "max {max}"
+  },
+
   "winery": {
     "list": {
       "title": "Kleti",
@@ -162,6 +310,7 @@
       "relatedWineries": "Sorodne kleti"
     }
   },
+
   "region": {
     "list": {
       "title": "Regije",
@@ -178,6 +327,7 @@
       "legends": "Legende"
     }
   },
+
   "wineCountry": {
     "list": {
       "title": "Države",
@@ -199,6 +349,7 @@
       "wineries": "kleti"
     }
   },
+
   "grapeVariety": {
     "list": {
       "title": "Sorte",
@@ -217,6 +368,7 @@
       "similarVarieties": "Podobne sorte"
     }
   },
+
   "style": {
     "list": {
       "title": "Stili",
@@ -227,6 +379,7 @@
       "wines": "Vina"
     }
   },
+
   "aroma": {
     "list": {
       "title": "Arome",
@@ -237,6 +390,7 @@
       "wines": "Vina"
     }
   },
+
   "climate": {
     "list": {
       "title": "Podnebja",
@@ -279,6 +433,7 @@
       }
     }
   },
+
   "mood": {
     "list": {
       "title": "Filing",
@@ -289,6 +444,7 @@
       "wines": "Vina"
     }
   },
+
   "dish": {
     "list": {
       "title": "Jedi",
@@ -299,6 +455,7 @@
       "wines": "Vina"
     }
   },
+
   "tag": {
     "list": {
       "title": "Zbirke",
@@ -309,73 +466,7 @@
       "wines": "Vina"
     }
   },
-  "tasting": {
-    "list": {
-      "title": "Tejstingi",
-      "description": "Pridružite se našim degustacijam vin"
-    },
-    "fields": {
-      "description": "Opis",
-      "date": "Datum",
-      "location": "Lokacija"
-    },
-    "notes": {
-      "titlePage1": "Občutek",
-      "titlePage2": "Značaj",
-      "dry": "Suho",
-      "sweet": "Sladko",
-      "freshFruit": "Sveže sadje",
-      "ripeFruit": "Zrelo sadje",
-      "crisp": "Lahkotno",
-      "creamy": "Kremno",
-      "noOak": "Brez lesa",
-      "oaky": "Barrique",
-      "simple": "Lahkotno",
-      "complex": "Kompleksno",
-      "light": "Nežno",
-      "rich": "Bogato",
-      "austere": "Ostro",
-      "smooth": "Nežno",
-      "mature": "Zrelo",
-      "youthful": "Mladostno",
-      "restrained": "Zadržano",
-      "energetic": "Energično",
-      "noAlcohol": "Brez alkohola",
-      "highAlcohol": "Veliko alkohola"
-    },
-    "descriptions": {
-      "dry": "Od popolnoma suhega do zapeljivo sladkega",
-      "ripe": "Od svežega do zrelega sadja",
-      "creamy": "Od lahkotne do kremne teksture",
-      "oaky": "Od inoxa do izrazite barikiranosti",
-      "complex": "Od lahkotnega do kompleksnega značaja",
-      "light": "Od lahkotnega do bogatega telesa",
-      "smooth": "Od nežnega do ostrega občutka v ustih",
-      "youthful": "Od mladostnega do zrelega značaja",
-      "energetic": "Od zadržanega do energičnega stila",
-      "alcohol": "Od brez alkohola do visokega alkohola"
-    }
-  },
-  "giftCard": {
-    "list": {
-      "title": "Darilni Boni",
-      "description": "Popolni darila za ljubitelje vina"
-    },
-    "fields": {
-      "description": "Opis",
-      "value": "Vrednost"
-    }
-  },
-  "merch": {
-    "list": {
-      "title": "Roba",
-      "description": "Vinska meršanda in dodatki"
-    },
-    "fields": {
-      "description": "Opis",
-      "price": "Cena"
-    }
-  },
+
   "post": {
     "list": {
       "title": "Enciklopedija",
@@ -388,6 +479,7 @@
       "categories": "Kategorije"
     }
   },
+
   "page": {
     "list": {
       "title": "Strani",
@@ -398,38 +490,13 @@
       "content": "Vsebina"
     }
   },
+
   "collection": {
     "list": {
       "title": "Zbirka"
     }
   },
-  "cart": {
-    "title": "Cekarček",
-    "empty": "Tvoj cekarček je prazen",
-    "subtotal": "Vmesni znesek",
-    "total": "Skupaj",
-    "checkout": "Na kasu",
-    "continueShopping": "Nadaljuj z nakupom",
-    "remove": "Odstrani izdelek"
-  },
-  "checkout": {
-    "title": "Blagajna",
-    "shipping": "Podatki za dostavo",
-    "orderSummary": "Povzetek naročila",
-    "placeOrder": "Oddaj naročilo",
-    "address": {
-      "street": "Ulica",
-      "city": "Mesto",
-      "postalCode": "Poštna številka",
-      "country": "Država"
-    },
-    "payment": {
-      "title": "Podatki za plačilo",
-      "cardNumber": "Številka kartice",
-      "expiry": "Datum veljavnosti",
-      "cvv": "CVV"
-    }
-  },
+
   "errors": {
     "required": "To polje je obvezno",
     "invalidEmail": "Neveljaven e-poštni naslov",
@@ -439,6 +506,7 @@
     "invalidExpiry": "Neveljaven datum veljavnosti",
     "invalidCVV": "Neveljaven CVV"
   },
+
   "home": {
     "hero": {
       "title": "Butelka",
@@ -446,33 +514,13 @@
       "alt": "Čaša vina s trto v ozadju",
       "cta": "Raziskujte Vina"
     },
-    "featured": {
-      "title": "Izbrana Vina",
-      "wines": {
-        "rebula": {
-          "name": "Rebula",
-          "region": "Goriška Brda",
-          "alt": "Steklenica vina Rebula"
-        },
-        "teran": {
-          "name": "Teran",
-          "region": "Kras",
-          "alt": "Steklenica vina Teran"
-        },
-        "malvazija": {
-          "name": "Malvazija",
-          "region": "Primorska",
-          "alt": "Steklenica vina Malvazija"
-        },
-        "learnMore": "Več o Vinu"
-      }
-    },
     "about": {
       "title": "O Butelki",
       "description": "Strastno vam prinašamo najboljšo izbiro slovenskih vin, skrbno izbrano iz najboljših vinogradov naše lepe države.",
       "cta": "Naša Zgodba"
     }
   },
+
   "header": {
     "language": {
       "switch": "English"
@@ -518,6 +566,7 @@
     "cart": "Cekarček",
     "account": "Račun"
   },
+
   "filters": {
     "aromas": "Arome",
     "climates": "Podnebja",
@@ -537,6 +586,7 @@
     "search": "Išči...",
     "collections": "Filtri"
   },
+
   "sorting": {
     "createdAt": {
       "label": "Po friškosti",

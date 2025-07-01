@@ -1,20 +1,16 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import { TastingPage } from '@/components/Tastings/TastingPage'
+import { notFound } from 'next/navigation'
 
-export default async function TejstingiItemPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string[] }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="sl"
-      baseSegment="tejstingi"
-    />
-  )
+interface TejstingiItemPageProps {
+  params: Promise<{ slug: string }>
+}
+
+export default async function TejstingiItemPage({ params }: TejstingiItemPageProps) {
+  const { slug } = await params
+
+  if (!slug) {
+    notFound()
+  }
+
+  return <TastingPage locale="sl" slug={slug} />
 }

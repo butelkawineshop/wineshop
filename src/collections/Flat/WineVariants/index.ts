@@ -4,10 +4,11 @@ import { syncTypesense, deleteFromTypesense } from '@/hooks/syncTypesense'
 export const FlatWineVariants: CollectionConfig = {
   slug: 'flat-wine-variants',
   admin: {
-    useAsTitle: 'sku',
+    useAsTitle: 'slug',
     group: 'Wine',
     hidden: false,
     defaultColumns: [
+      'slug',
       'sku',
       'wineTitle',
       'wineryTitle',

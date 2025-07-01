@@ -94,6 +94,7 @@ export interface Config {
     'related-wine-variants': RelatedWineVariant
     'flat-wine-variants': FlatWineVariant
     'flat-collections': FlatCollection
+    tastings: Tasting
     'payload-jobs': PayloadJob
     'payload-locked-documents': PayloadLockedDocument
     'payload-preferences': PayloadPreference
@@ -134,6 +135,7 @@ export interface Config {
     'related-wine-variants': RelatedWineVariantsSelect<false> | RelatedWineVariantsSelect<true>
     'flat-wine-variants': FlatWineVariantsSelect<false> | FlatWineVariantsSelect<true>
     'flat-collections': FlatCollectionsSelect<false> | FlatCollectionsSelect<true>
+    tastings: TastingsSelect<false> | TastingsSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-locked-documents':
       | PayloadLockedDocumentsSelect<false>
@@ -1705,6 +1707,62 @@ export interface FlatCollection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tastings".
+ */
+export interface Tasting {
+  id: number
+  /**
+   * The title of the tasting
+   */
+  title?: string | null
+  /**
+   * Automatically generated from title
+   */
+  slug?: string | null
+  description?: string | null
+  pricePerPerson: number
+  minPeople: number
+  maxPeople: number
+  wineTypes: {
+    wineType?:
+      | ('red' | 'white' | 'rose' | 'sparkling' | 'sweet' | 'skin-contact' | 'beasts' | 'babies')
+      | null
+    quantity: number
+    id?: string | null
+  }[]
+  /**
+   * Example wines to showcase for this tasting. These will be displayed as recommendations.
+   */
+  exampleWines?: (number | FlatWineVariant)[] | null
+  duration: number
+  media?: (number | Media)[] | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo?: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title?: string | null
+    description?: string | null
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
@@ -1906,6 +1964,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'flat-collections'
         value: number | FlatCollection
+      } | null)
+    | ({
+        relationTo: 'tastings'
+        value: number | Tasting
       } | null)
     | ({
         relationTo: 'payload-jobs'
@@ -2896,6 +2958,40 @@ export interface FlatCollectionsSelect<T extends boolean = true> {
       }
   syncedAt?: T
   isPublished?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tastings_select".
+ */
+export interface TastingsSelect<T extends boolean = true> {
+  title?: T
+  slug?: T
+  description?: T
+  pricePerPerson?: T
+  minPeople?: T
+  maxPeople?: T
+  wineTypes?:
+    | T
+    | {
+        wineType?: T
+        quantity?: T
+        id?: T
+      }
+  exampleWines?: T
+  duration?: T
+  media?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
   updatedAt?: T
   createdAt?: T
   _status?: T

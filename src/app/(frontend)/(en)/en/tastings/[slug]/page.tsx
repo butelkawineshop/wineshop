@@ -1,20 +1,16 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import { TastingPage } from '@/components/Tastings/TastingPage'
+import { notFound } from 'next/navigation'
 
-export default async function TastingsItemPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string[] }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="en"
-      baseSegment="tastings"
-    />
-  )
+interface TastingsItemPageProps {
+  params: Promise<{ slug: string }>
+}
+
+export default async function TastingsItemPage({ params }: TastingsItemPageProps) {
+  const { slug } = await params
+
+  if (!slug) {
+    notFound()
+  }
+
+  return <TastingPage locale="en" slug={slug} />
 }

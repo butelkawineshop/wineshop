@@ -7,6 +7,7 @@ generates:
       - 'typescript'
       - 'typescript-operations'
       - 'typescript-document-nodes'
+      - 'typescript-react-query'
     config:
       scalars:
         DateTime: string
@@ -18,6 +19,9 @@ generates:
       operationResultSuffix: 'Result'
       namingConvention:
         enumValues: keep
+      reactQueryVersion: 5
+      exposeQueryKeys: true
+      exposeDocument: true
   src/generated/graphql.schema.json:
     plugins:
       - 'introspection'

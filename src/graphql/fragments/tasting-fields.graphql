@@ -1,0 +1,25 @@
+#import "./flat-wine-variant-fields.graphql"
+
+fragment TastingFields on Tasting {
+  id
+  title
+  slug
+  description
+  pricePerPerson
+  minPeople
+  maxPeople
+  duration
+  wineTypes {
+    wineType
+    quantity
+    id
+  }
+  exampleWines {
+    ...FlatWineVariantFields
+  }
+  media {
+    id
+    url
+    alt
+  }
+} 

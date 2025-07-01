@@ -27,7 +27,7 @@ const SearchImage = ({ src, alt }: { src: string; alt: string }) => {
   if (error) {
     return (
       <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-        <Icon name="image" width={24} height={24} className="text-gray-400" />
+        <Icon name="image" width={24} height={24} variant="color" className="text-gray-400" />
       </div>
     )
   }
@@ -195,7 +195,7 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({ isOpen, onClose }) => 
                     onClick={onClose}
                     className="p-2 icon-container rounded-full transition-colors"
                   >
-                    <Icon name="close" width={24} height={24} />
+                    <Icon name="close" width={24} height={24} variant="color" />
                   </button>
                 </div>
 

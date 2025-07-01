@@ -17,6 +17,7 @@ import { CartCollections } from './collections/Ecommerce/Cart'
 import { StockReservations } from './collections/Ecommerce/StockReservations'
 import { Orders } from './collections/Ecommerce/Orders/index'
 import { FlatCollections } from './collections/Flat'
+import { ProductsCollections } from './collections/Products'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -39,6 +40,7 @@ export default buildConfig({
     Orders,
     ...WineCollections,
     ...FlatCollections,
+    ...ProductsCollections,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
