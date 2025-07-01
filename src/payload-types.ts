@@ -63,13 +63,11 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations
     customers: CustomerAuthOperations
+    users: UserAuthOperations
   }
   blocks: {}
   collections: {
-    users: User
-    customers: Customer
     media: Media
     invoices: Invoice
     'active-carts': ActiveCart
@@ -95,6 +93,12 @@ export interface Config {
     'flat-wine-variants': FlatWineVariant
     'flat-collections': FlatCollection
     tastings: Tasting
+    'kgb-products': KgbProduct
+    'kgb-subscriptions': KgbSubscription
+    'kgb-packages': KgbPackage
+    addresses: Address
+    customers: Customer
+    users: User
     'payload-jobs': PayloadJob
     'payload-locked-documents': PayloadLockedDocument
     'payload-preferences': PayloadPreference
@@ -109,8 +113,6 @@ export interface Config {
     }
   }
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>
-    customers: CustomersSelect<false> | CustomersSelect<true>
     media: MediaSelect<false> | MediaSelect<true>
     invoices: InvoicesSelect<false> | InvoicesSelect<true>
     'active-carts': ActiveCartsSelect<false> | ActiveCartsSelect<true>
@@ -136,6 +138,12 @@ export interface Config {
     'flat-wine-variants': FlatWineVariantsSelect<false> | FlatWineVariantsSelect<true>
     'flat-collections': FlatCollectionsSelect<false> | FlatCollectionsSelect<true>
     tastings: TastingsSelect<false> | TastingsSelect<true>
+    'kgb-products': KgbProductsSelect<false> | KgbProductsSelect<true>
+    'kgb-subscriptions': KgbSubscriptionsSelect<false> | KgbSubscriptionsSelect<true>
+    'kgb-packages': KgbPackagesSelect<false> | KgbPackagesSelect<true>
+    addresses: AddressesSelect<false> | AddressesSelect<true>
+    customers: CustomersSelect<false> | CustomersSelect<true>
+    users: UsersSelect<false> | UsersSelect<true>
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>
     'payload-locked-documents':
       | PayloadLockedDocumentsSelect<false>
@@ -150,11 +158,11 @@ export interface Config {
   globalsSelect: {}
   locale: 'sl' | 'en'
   user:
-    | (User & {
-        collection: 'users'
-      })
     | (Customer & {
         collection: 'customers'
+      })
+    | (User & {
+        collection: 'users'
       })
   jobs: {
     tasks: {
@@ -170,24 +178,6 @@ export interface Config {
       queueAllFlatWineVariants: WorkflowQueueAllFlatWineVariants
       queueAllFlatCollections: WorkflowQueueAllFlatCollections
     }
-  }
-}
-export interface UserAuthOperations {
-  forgotPassword: {
-    email: string
-    password: string
-  }
-  login: {
-    email: string
-    password: string
-  }
-  registerFirstUser: {
-    email: string
-    password: string
-  }
-  unlock: {
-    email: string
-    password: string
   }
 }
 export interface CustomerAuthOperations {
@@ -208,44 +198,23 @@ export interface CustomerAuthOperations {
     password: string
   }
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number
-  updatedAt: string
-  createdAt: string
-  email: string
-  resetPasswordToken?: string | null
-  resetPasswordExpiration?: string | null
-  salt?: string | null
-  hash?: string | null
-  loginAttempts?: number | null
-  lockUntil?: string | null
-  password?: string | null
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "customers".
- */
-export interface Customer {
-  id: number
-  updatedAt: string
-  createdAt: string
-  enableAPIKey?: boolean | null
-  apiKey?: string | null
-  apiKeyIndex?: string | null
-  email: string
-  resetPasswordToken?: string | null
-  resetPasswordExpiration?: string | null
-  salt?: string | null
-  hash?: string | null
-  _verified?: boolean | null
-  _verificationToken?: string | null
-  loginAttempts?: number | null
-  lockUntil?: string | null
-  password?: string | null
+export interface UserAuthOperations {
+  forgotPassword: {
+    email: string
+    password: string
+  }
+  login: {
+    email: string
+    password: string
+  }
+  registerFirstUser: {
+    email: string
+    password: string
+  }
+  unlock: {
+    email: string
+    password: string
+  }
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -308,6 +277,191 @@ export interface ActiveCart {
     | null
   updatedAt: string
   createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers".
+ */
+export interface Customer {
+  id: number
+  /**
+   * All KGB subscriptions for this customer.
+   */
+  kgbSubscriptions?: (number | KgbSubscription)[] | null
+  /**
+   * Stripe customer ID for this user.
+   */
+  stripeCustomerId?: string | null
+  updatedAt: string
+  createdAt: string
+  enableAPIKey?: boolean | null
+  apiKey?: string | null
+  apiKeyIndex?: string | null
+  email: string
+  resetPasswordToken?: string | null
+  resetPasswordExpiration?: string | null
+  salt?: string | null
+  hash?: string | null
+  _verified?: boolean | null
+  _verificationToken?: string | null
+  loginAttempts?: number | null
+  lockUntil?: string | null
+  password?: string | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kgb-subscriptions".
+ */
+export interface KgbSubscription {
+  id: number
+  customer: number | Customer
+  kgbProduct: number | KgbProduct
+  bottleQuantity: number
+  price: number
+  frequency: 'monthly' | 'bi-monthly' | 'quarterly'
+  subscriptionStatus: 'active' | 'paused' | 'cancelled' | 'trialing'
+  startDate: string
+  nextDeliveryDate?: string | null
+  stripeSubscriptionId?: string | null
+  stripeCustomerId?: string | null
+  cancelAtPeriodEnd?: boolean | null
+  pauseReason?: string | null
+  lastPaymentStatus?: string | null
+  /**
+   * Status change events.
+   */
+  log?:
+    | {
+        date: string
+        subscriptionStatus: string
+        reason?: string | null
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Delivery address for this subscription.
+   */
+  deliveryAddress: number | Address
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kgb-products".
+ */
+export interface KgbProduct {
+  id: number
+  /**
+   * Frontend-facing product title.
+   */
+  title: string
+  /**
+   * Frontend-facing product description.
+   */
+  description: string
+  media?: (number | Media)[] | null
+  bottleQuantity: number
+  price: number
+  /**
+   * Available delivery frequencies.
+   */
+  frequencyOptions: {
+    frequency?: ('monthly' | 'bi-monthly' | 'quarterly') | null
+    id?: string | null
+  }[]
+  active?: boolean | null
+  isDefault?: boolean | null
+  /**
+   * Automatically generated SEO data
+   */
+  seo?: {
+    /**
+     * Check this to edit SEO fields manually
+     */
+    manualOverride?: boolean | null
+    title?: string | null
+    description?: string | null
+    image?: string | null
+    structuredData?:
+      | {
+          [k: string]: unknown
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null
+  }
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses".
+ */
+export interface Address {
+  id: number
+  /**
+   * Owning customer.
+   */
+  customer: number | Customer
+  /**
+   * Address label (e.g. Home, Office, Gift for Mom)
+   */
+  label: string
+  /**
+   * Full name of recipient.
+   */
+  recipientName: string
+  /**
+   * Is this a company address?
+   */
+  isCompany?: boolean | null
+  /**
+   * Company name (if applicable).
+   */
+  companyName?: string | null
+  /**
+   * VAT number (if applicable).
+   */
+  vatNumber?: string | null
+  /**
+   * Street address.
+   */
+  street: string
+  /**
+   * Additional address info (optional).
+   */
+  street2?: string | null
+  /**
+   * Postal code.
+   */
+  postalCode: string
+  /**
+   * City.
+   */
+  city: string
+  /**
+   * Region/State/Province (optional).
+   */
+  region?: string | null
+  /**
+   * Country.
+   */
+  country: string
+  /**
+   * Phone number (optional).
+   */
+  phone?: string | null
+  /**
+   * Delivery notes (optional).
+   */
+  notes?: string | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1763,6 +1917,71 @@ export interface Tasting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kgb-packages".
+ */
+export interface KgbPackage {
+  id: number
+  subscription: number | KgbSubscription
+  paymentDate: string
+  deliveryDate: string
+  status: 'skipped' | 'failed' | 'delivered' | 'in_transit'
+  /**
+   * Admin-only notes.
+   */
+  notes?: string | null
+  /**
+   * Wines included in this package.
+   */
+  wines: {
+    wine: number | FlatWineVariant
+    id?: string | null
+  }[]
+  /**
+   * Frontend-facing tasting notes.
+   */
+  tastingNotes?: string | null
+  /**
+   * Frontend-facing admin message.
+   */
+  adminMessage?: {
+    root: {
+      type: string
+      children: {
+        type: string
+        version: number
+        [k: string]: unknown
+      }[]
+      direction: ('ltr' | 'rtl') | null
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | ''
+      indent: number
+      version: number
+    }
+    [k: string]: unknown
+  } | null
+  createdBy: number | User
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number
+  updatedAt: string
+  createdAt: string
+  email: string
+  resetPasswordToken?: string | null
+  resetPasswordExpiration?: string | null
+  salt?: string | null
+  hash?: string | null
+  loginAttempts?: number | null
+  lockUntil?: string | null
+  password?: string | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
@@ -1861,14 +2080,6 @@ export interface PayloadJob {
 export interface PayloadLockedDocument {
   id: number
   document?:
-    | ({
-        relationTo: 'users'
-        value: number | User
-      } | null)
-    | ({
-        relationTo: 'customers'
-        value: number | Customer
-      } | null)
     | ({
         relationTo: 'media'
         value: number | Media
@@ -1970,18 +2181,42 @@ export interface PayloadLockedDocument {
         value: number | Tasting
       } | null)
     | ({
+        relationTo: 'kgb-products'
+        value: number | KgbProduct
+      } | null)
+    | ({
+        relationTo: 'kgb-subscriptions'
+        value: number | KgbSubscription
+      } | null)
+    | ({
+        relationTo: 'kgb-packages'
+        value: number | KgbPackage
+      } | null)
+    | ({
+        relationTo: 'addresses'
+        value: number | Address
+      } | null)
+    | ({
+        relationTo: 'customers'
+        value: number | Customer
+      } | null)
+    | ({
+        relationTo: 'users'
+        value: number | User
+      } | null)
+    | ({
         relationTo: 'payload-jobs'
         value: number | PayloadJob
       } | null)
   globalSlug?: string | null
   user:
     | {
-        relationTo: 'users'
-        value: number | User
-      }
-    | {
         relationTo: 'customers'
         value: number | Customer
+      }
+    | {
+        relationTo: 'users'
+        value: number | User
       }
   updatedAt: string
   createdAt: string
@@ -1994,12 +2229,12 @@ export interface PayloadPreference {
   id: number
   user:
     | {
-        relationTo: 'users'
-        value: number | User
-      }
-    | {
         relationTo: 'customers'
         value: number | Customer
+      }
+    | {
+        relationTo: 'users'
+        value: number | User
       }
   key?: string | null
   value?:
@@ -2024,41 +2259,6 @@ export interface PayloadMigration {
   batch?: number | null
   updatedAt: string
   createdAt: string
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  updatedAt?: T
-  createdAt?: T
-  email?: T
-  resetPasswordToken?: T
-  resetPasswordExpiration?: T
-  salt?: T
-  hash?: T
-  loginAttempts?: T
-  lockUntil?: T
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "customers_select".
- */
-export interface CustomersSelect<T extends boolean = true> {
-  updatedAt?: T
-  createdAt?: T
-  enableAPIKey?: T
-  apiKey?: T
-  apiKeyIndex?: T
-  email?: T
-  resetPasswordToken?: T
-  resetPasswordExpiration?: T
-  salt?: T
-  hash?: T
-  _verified?: T
-  _verificationToken?: T
-  loginAttempts?: T
-  lockUntil?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2995,6 +3195,151 @@ export interface TastingsSelect<T extends boolean = true> {
   updatedAt?: T
   createdAt?: T
   _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kgb-products_select".
+ */
+export interface KgbProductsSelect<T extends boolean = true> {
+  title?: T
+  description?: T
+  media?: T
+  bottleQuantity?: T
+  price?: T
+  frequencyOptions?:
+    | T
+    | {
+        frequency?: T
+        id?: T
+      }
+  active?: T
+  isDefault?: T
+  seo?:
+    | T
+    | {
+        manualOverride?: T
+        title?: T
+        description?: T
+        image?: T
+        structuredData?: T
+      }
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kgb-subscriptions_select".
+ */
+export interface KgbSubscriptionsSelect<T extends boolean = true> {
+  customer?: T
+  kgbProduct?: T
+  bottleQuantity?: T
+  price?: T
+  frequency?: T
+  subscriptionStatus?: T
+  startDate?: T
+  nextDeliveryDate?: T
+  stripeSubscriptionId?: T
+  stripeCustomerId?: T
+  cancelAtPeriodEnd?: T
+  pauseReason?: T
+  lastPaymentStatus?: T
+  log?:
+    | T
+    | {
+        date?: T
+        subscriptionStatus?: T
+        reason?: T
+        id?: T
+      }
+  deliveryAddress?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kgb-packages_select".
+ */
+export interface KgbPackagesSelect<T extends boolean = true> {
+  subscription?: T
+  paymentDate?: T
+  deliveryDate?: T
+  status?: T
+  notes?: T
+  wines?:
+    | T
+    | {
+        wine?: T
+        id?: T
+      }
+  tastingNotes?: T
+  adminMessage?: T
+  createdBy?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses_select".
+ */
+export interface AddressesSelect<T extends boolean = true> {
+  customer?: T
+  label?: T
+  recipientName?: T
+  isCompany?: T
+  companyName?: T
+  vatNumber?: T
+  street?: T
+  street2?: T
+  postalCode?: T
+  city?: T
+  region?: T
+  country?: T
+  phone?: T
+  notes?: T
+  updatedAt?: T
+  createdAt?: T
+  _status?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
+  kgbSubscriptions?: T
+  stripeCustomerId?: T
+  updatedAt?: T
+  createdAt?: T
+  enableAPIKey?: T
+  apiKey?: T
+  apiKeyIndex?: T
+  email?: T
+  resetPasswordToken?: T
+  resetPasswordExpiration?: T
+  salt?: T
+  hash?: T
+  _verified?: T
+  _verificationToken?: T
+  loginAttempts?: T
+  lockUntil?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  updatedAt?: T
+  createdAt?: T
+  email?: T
+  resetPasswordToken?: T
+  resetPasswordExpiration?: T
+  salt?: T
+  hash?: T
+  loginAttempts?: T
+  lockUntil?: T
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

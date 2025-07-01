@@ -1,6 +1,7 @@
 import { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { isAdminOrSelf } from '@/access/isAdminOrSelf'
+import type { CollectionSlug } from 'payload'
 
 export const Customers: CollectionConfig = {
   slug: 'customers',
@@ -33,6 +34,18 @@ export const Customers: CollectionConfig = {
       type: 'email',
       required: true,
       unique: true,
+    },
+    {
+      name: 'kgbSubscriptions',
+      type: 'relationship',
+      relationTo: 'kgb-subscriptions' as CollectionSlug,
+      hasMany: true,
+      admin: { description: 'All KGB subscriptions for this customer.' },
+    },
+    {
+      name: 'stripeCustomerId',
+      type: 'text',
+      admin: { description: 'Stripe customer ID for this user.' },
     },
   ],
 }

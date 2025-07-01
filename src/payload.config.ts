@@ -9,7 +9,6 @@ import sharp from 'sharp'
 import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Users } from './collections/Users/Users'
-import { Customers } from './collections/Users/Customers'
 import { Media } from './collections/Content/Media'
 import { Invoices } from './collections/Ecommerce/Invoices'
 import { WineCollections } from './collections/Wine'
@@ -18,6 +17,7 @@ import { StockReservations } from './collections/Ecommerce/StockReservations'
 import { Orders } from './collections/Ecommerce/Orders/index'
 import { FlatCollections } from './collections/Flat'
 import { ProductsCollections } from './collections/Products'
+import { UsersCollections } from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -31,8 +31,6 @@ export default buildConfig({
     },
   },
   collections: [
-    Users,
-    Customers,
     Media,
     Invoices,
     ...CartCollections,
@@ -41,6 +39,7 @@ export default buildConfig({
     ...WineCollections,
     ...FlatCollections,
     ...ProductsCollections,
+    ...UsersCollections,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
