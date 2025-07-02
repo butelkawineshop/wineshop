@@ -1,0 +1,5 @@
+mutation DeleteWineFeedback($id: Int!) {
+  deleteWineFeedback(id: $id) {
+    id
+  }
+} 

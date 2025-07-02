@@ -1,0 +1,8 @@
+query GetWineFeedback($wine: JSON!) {
+  WineFeedbacks(where: { wine: { equals: $wine } }, limit: 1) {
+    docs {
+      id
+      feedback
+    }
+  }
+} 

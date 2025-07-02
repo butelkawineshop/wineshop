@@ -584,6 +584,33 @@ export const FlatWineVariants: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'likeCount',
+      type: 'number',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description: 'Number of likes for this wine variant.',
+      },
+    },
+    {
+      name: 'dislikeCount',
+      type: 'number',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description: 'Number of dislikes for this wine variant.',
+      },
+    },
+    {
+      name: 'mehCount',
+      type: 'number',
+      required: true,
+      defaultValue: 0,
+      admin: {
+        description: 'Number of "meh" feedbacks for this wine variant.',
+      },
+    },
   ],
   versions: {
     drafts: true,

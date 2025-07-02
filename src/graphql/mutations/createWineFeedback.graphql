@@ -1,0 +1,6 @@
+mutation CreateWineFeedback($wine: Int!, $feedback: WineFeedback_feedback_MutationInput!) {
+  createWineFeedback(data: { wine: $wine, feedback: $feedback }) {
+    id
+    feedback
+  }
+} 

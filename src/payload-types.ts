@@ -90,6 +90,7 @@ export interface Config {
     moods: Mood
     dishes: Dish
     'related-wine-variants': RelatedWineVariant
+    'wine-feedback': WineFeedback
     'flat-wine-variants': FlatWineVariant
     'flat-collections': FlatCollection
     tastings: Tasting
@@ -135,6 +136,7 @@ export interface Config {
     moods: MoodsSelect<false> | MoodsSelect<true>
     dishes: DishesSelect<false> | DishesSelect<true>
     'related-wine-variants': RelatedWineVariantsSelect<false> | RelatedWineVariantsSelect<true>
+    'wine-feedback': WineFeedbackSelect<false> | WineFeedbackSelect<true>
     'flat-wine-variants': FlatWineVariantsSelect<false> | FlatWineVariantsSelect<true>
     'flat-collections': FlatCollectionsSelect<false> | FlatCollectionsSelect<true>
     tastings: TastingsSelect<false> | TastingsSelect<true>
@@ -674,6 +676,18 @@ export interface FlatWineVariant {
   slug?: string | null
   syncedAt?: string | null
   isPublished?: boolean | null
+  /**
+   * Number of likes for this wine variant.
+   */
+  likeCount: number
+  /**
+   * Number of dislikes for this wine variant.
+   */
+  dislikeCount: number
+  /**
+   * Number of "meh" feedbacks for this wine variant.
+   */
+  mehCount: number
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -1543,6 +1557,27 @@ export interface RelatedWineVariant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wine-feedback".
+ */
+export interface WineFeedback {
+  id: number
+  /**
+   * Optional relationship to a customer. Not required for anonymous feedback.
+   */
+  customer?: (number | null) | Customer
+  /**
+   * Required relationship to the wine variant being rated.
+   */
+  wine: number | FlatWineVariant
+  /**
+   * The type of feedback given for this wine.
+   */
+  feedback: 'like' | 'dislike' | 'meh'
+  updatedAt: string
+  createdAt: string
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "flat-collections".
  */
 export interface FlatCollection {
@@ -2175,6 +2210,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'related-wine-variants'
         value: number | RelatedWineVariant
+      } | null)
+    | ({
+        relationTo: 'wine-feedback'
+        value: number | WineFeedback
       } | null)
     | ({
         relationTo: 'flat-wine-variants'
@@ -2839,6 +2878,17 @@ export interface RelatedWineVariantsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wine-feedback_select".
+ */
+export interface WineFeedbackSelect<T extends boolean = true> {
+  customer?: T
+  wine?: T
+  feedback?: T
+  updatedAt?: T
+  createdAt?: T
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "flat-wine-variants_select".
  */
 export interface FlatWineVariantsSelect<T extends boolean = true> {
@@ -2969,6 +3019,9 @@ export interface FlatWineVariantsSelect<T extends boolean = true> {
   slug?: T
   syncedAt?: T
   isPublished?: T
+  likeCount?: T
+  dislikeCount?: T
+  mehCount?: T
   updatedAt?: T
   createdAt?: T
   _status?: T

@@ -11,7 +11,7 @@ export const FILTER_CONSTANTS = {
   DROPDOWN_MAX_HEIGHT: 'max-h-60',
 
   // Grid layouts
-  COLLECTION_GRID: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
+  COLLECTION_GRID: 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-5',
   TASTING_NOTES_GRID: 'grid-cols-1 sm:grid-cols-2',
   GRID_GAP: 'gap-2',
 

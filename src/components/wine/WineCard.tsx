@@ -17,6 +17,8 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { WINE_CONSTANTS } from '@/constants/wine'
 import { formatPrice } from '@/utils/formatters'
 import type { Locale } from '@/i18n/locales'
+import { WineActionButtons } from './components/WineActionButtons'
+import { useWineFeedback } from '@/hooks/useWineFeedback'
 
 interface WineCardProps {
   variant: FlatWineVariant
@@ -37,16 +39,19 @@ export function WineCard({
   const swiperRef = useRef<{ swiper: SwiperType }>(null)
   const [activeIndex, setActiveIndex] = useState<number>(WINE_CONSTANTS.INITIAL_SLIDE_INDEX)
 
+  const { isLiked, isMeh, isDisliked, isLoading, error, like, meh, dislike } = useWineFeedback({
+    wineId: variant.id,
+    onFeedbackChange: (feedbackType) => {
+      if (feedbackType === 'like') onLike?.(variant)
+    },
+  })
+
   const formattedPrice = formatPrice(variant.price)
   const formattedDiscountedPrice = formatPrice(discountedPrice)
   const hasDiscount = discountedPrice !== undefined && discountedPrice < (variant.price || 0)
 
   const handleShareWine = (): void => {
     onShare?.(variant)
-  }
-
-  const handleLikeWine = (): void => {
-    onLike?.(variant)
   }
 
   const handleSlideChange = (swiper: SwiperType): void => {
@@ -146,32 +151,14 @@ export function WineCard({
         {/* Action buttons */}
         <div className="grid grid-cols-3 w-full py-2 px-2">
           <div className="flex items-center">
-            <div className="flex gap-2">
-              <button
-                onClick={handleLikeWine}
-                className="interactive rounded-full p-1 focus-ring"
-                aria-label={t('wine.actions.like')}
-              >
-                <Icon
-                  name="like"
-                  variant="active"
-                  width={WINE_CONSTANTS.ICON_SIZE}
-                  height={WINE_CONSTANTS.ICON_SIZE}
-                />
-              </button>
-              <button
-                onClick={handleShareWine}
-                className="interactive rounded-full p-1 focus-ring"
-                aria-label={t('wine.actions.share')}
-              >
-                <Icon
-                  name="share"
-                  variant="color"
-                  width={WINE_CONSTANTS.ICON_SIZE}
-                  height={WINE_CONSTANTS.ICON_SIZE}
-                />
-              </button>
-            </div>
+            <WineActionButtons
+              showLike
+              showShare
+              onLike={like}
+              onShare={handleShareWine}
+              t={t}
+              activeLike={isLiked}
+            />
           </div>
 
           {/* Slide indicators */}

@@ -117,6 +117,10 @@ type Query {
   docAccessRelatedWineVariant(id: Int!): related_wine_variantsDocAccess
   versionRelatedWineVariant(id: Int, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): RelatedWineVariantVersion
   versionsRelatedWineVariants(where: versionsRelatedWineVariant_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): versionsRelatedWineVariants
+  WineFeedback(id: Int!, draft: Boolean, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): WineFeedback
+  WineFeedbacks(draft: Boolean, where: WineFeedback_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): WineFeedbacks
+  countWineFeedbacks(draft: Boolean, where: WineFeedback_where, locale: LocaleInputType): countWineFeedbacks
+  docAccessWineFeedback(id: Int!): wine_feedbackDocAccess
   FlatWineVariant(id: Int!, draft: Boolean, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType): FlatWineVariant
   FlatWineVariants(draft: Boolean, where: FlatWineVariant_where, fallbackLocale: FallbackLocaleInputType, locale: LocaleInputType, limit: Int, page: Int, pagination: Boolean, sort: String): FlatWineVariants
   countFlatWineVariants(draft: Boolean, where: FlatWineVariant_where, locale: LocaleInputType): countFlatWineVariants
@@ -1502,6 +1506,9 @@ type FlatWineVariant {
   slug: String
   syncedAt: DateTime
   isPublished: Boolean
+  likeCount: Float
+  dislikeCount: Float
+  mehCount: Float
   updatedAt: DateTime
   createdAt: DateTime
   _status: FlatWineVariant__status
@@ -21874,6 +21881,286 @@ input versionsRelatedWineVariant_where_or {
   OR: [versionsRelatedWineVariant_where_or]
 }
 
+type WineFeedback {
+  id: Int!
+  customer(locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): Customer
+  wine(draft: Boolean, locale: LocaleInputType, fallbackLocale: FallbackLocaleInputType): FlatWineVariant!
+  feedback: WineFeedback_feedback!
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+enum WineFeedback_feedback {
+  like
+  dislike
+  meh
+}
+
+type WineFeedbacks {
+  docs: [WineFeedback!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input WineFeedback_where {
+  customer: WineFeedback_customer_operator
+  wine: WineFeedback_wine_operator
+  feedback: WineFeedback_feedback_operator
+  updatedAt: WineFeedback_updatedAt_operator
+  createdAt: WineFeedback_createdAt_operator
+  id: WineFeedback_id_operator
+  AND: [WineFeedback_where_and]
+  OR: [WineFeedback_where_or]
+}
+
+input WineFeedback_customer_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input WineFeedback_wine_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input WineFeedback_feedback_operator {
+  equals: WineFeedback_feedback_Input
+  not_equals: WineFeedback_feedback_Input
+  in: [WineFeedback_feedback_Input]
+  not_in: [WineFeedback_feedback_Input]
+  all: [WineFeedback_feedback_Input]
+}
+
+enum WineFeedback_feedback_Input {
+  like
+  dislike
+  meh
+}
+
+input WineFeedback_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input WineFeedback_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input WineFeedback_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input WineFeedback_where_and {
+  customer: WineFeedback_customer_operator
+  wine: WineFeedback_wine_operator
+  feedback: WineFeedback_feedback_operator
+  updatedAt: WineFeedback_updatedAt_operator
+  createdAt: WineFeedback_createdAt_operator
+  id: WineFeedback_id_operator
+  AND: [WineFeedback_where_and]
+  OR: [WineFeedback_where_or]
+}
+
+input WineFeedback_where_or {
+  customer: WineFeedback_customer_operator
+  wine: WineFeedback_wine_operator
+  feedback: WineFeedback_feedback_operator
+  updatedAt: WineFeedback_updatedAt_operator
+  createdAt: WineFeedback_createdAt_operator
+  id: WineFeedback_id_operator
+  AND: [WineFeedback_where_and]
+  OR: [WineFeedback_where_or]
+}
+
+type countWineFeedbacks {
+  totalDocs: Int
+}
+
+type wine_feedbackDocAccess {
+  fields: WineFeedbackDocAccessFields
+  create: WineFeedbackCreateDocAccess
+  read: WineFeedbackReadDocAccess
+  update: WineFeedbackUpdateDocAccess
+  delete: WineFeedbackDeleteDocAccess
+}
+
+type WineFeedbackDocAccessFields {
+  customer: WineFeedbackDocAccessFields_customer
+  wine: WineFeedbackDocAccessFields_wine
+  feedback: WineFeedbackDocAccessFields_feedback
+  updatedAt: WineFeedbackDocAccessFields_updatedAt
+  createdAt: WineFeedbackDocAccessFields_createdAt
+}
+
+type WineFeedbackDocAccessFields_customer {
+  create: WineFeedbackDocAccessFields_customer_Create
+  read: WineFeedbackDocAccessFields_customer_Read
+  update: WineFeedbackDocAccessFields_customer_Update
+  delete: WineFeedbackDocAccessFields_customer_Delete
+}
+
+type WineFeedbackDocAccessFields_customer_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_customer_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_customer_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_customer_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_wine {
+  create: WineFeedbackDocAccessFields_wine_Create
+  read: WineFeedbackDocAccessFields_wine_Read
+  update: WineFeedbackDocAccessFields_wine_Update
+  delete: WineFeedbackDocAccessFields_wine_Delete
+}
+
+type WineFeedbackDocAccessFields_wine_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_wine_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_wine_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_wine_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_feedback {
+  create: WineFeedbackDocAccessFields_feedback_Create
+  read: WineFeedbackDocAccessFields_feedback_Read
+  update: WineFeedbackDocAccessFields_feedback_Update
+  delete: WineFeedbackDocAccessFields_feedback_Delete
+}
+
+type WineFeedbackDocAccessFields_feedback_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_feedback_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_feedback_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_feedback_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_updatedAt {
+  create: WineFeedbackDocAccessFields_updatedAt_Create
+  read: WineFeedbackDocAccessFields_updatedAt_Read
+  update: WineFeedbackDocAccessFields_updatedAt_Update
+  delete: WineFeedbackDocAccessFields_updatedAt_Delete
+}
+
+type WineFeedbackDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_createdAt {
+  create: WineFeedbackDocAccessFields_createdAt_Create
+  read: WineFeedbackDocAccessFields_createdAt_Read
+  update: WineFeedbackDocAccessFields_createdAt_Update
+  delete: WineFeedbackDocAccessFields_createdAt_Delete
+}
+
+type WineFeedbackDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type WineFeedbackReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type WineFeedbackUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type WineFeedbackDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type FlatWineVariants {
   docs: [FlatWineVariant!]!
   hasNextPage: Boolean!
@@ -21976,6 +22263,9 @@ input FlatWineVariant_where {
   slug: FlatWineVariant_slug_operator
   syncedAt: FlatWineVariant_syncedAt_operator
   isPublished: FlatWineVariant_isPublished_operator
+  likeCount: FlatWineVariant_likeCount_operator
+  dislikeCount: FlatWineVariant_dislikeCount_operator
+  mehCount: FlatWineVariant_mehCount_operator
   updatedAt: FlatWineVariant_updatedAt_operator
   createdAt: FlatWineVariant_createdAt_operator
   _status: FlatWineVariant__status_operator
@@ -22898,6 +23188,33 @@ input FlatWineVariant_isPublished_operator {
   exists: Boolean
 }
 
+input FlatWineVariant_likeCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input FlatWineVariant_dislikeCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input FlatWineVariant_mehCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
 input FlatWineVariant_updatedAt_operator {
   equals: DateTime
   not_equals: DateTime
@@ -23032,6 +23349,9 @@ input FlatWineVariant_where_and {
   slug: FlatWineVariant_slug_operator
   syncedAt: FlatWineVariant_syncedAt_operator
   isPublished: FlatWineVariant_isPublished_operator
+  likeCount: FlatWineVariant_likeCount_operator
+  dislikeCount: FlatWineVariant_dislikeCount_operator
+  mehCount: FlatWineVariant_mehCount_operator
   updatedAt: FlatWineVariant_updatedAt_operator
   createdAt: FlatWineVariant_createdAt_operator
   _status: FlatWineVariant__status_operator
@@ -23128,6 +23448,9 @@ input FlatWineVariant_where_or {
   slug: FlatWineVariant_slug_operator
   syncedAt: FlatWineVariant_syncedAt_operator
   isPublished: FlatWineVariant_isPublished_operator
+  likeCount: FlatWineVariant_likeCount_operator
+  dislikeCount: FlatWineVariant_dislikeCount_operator
+  mehCount: FlatWineVariant_mehCount_operator
   updatedAt: FlatWineVariant_updatedAt_operator
   createdAt: FlatWineVariant_createdAt_operator
   _status: FlatWineVariant__status_operator
@@ -23199,6 +23522,9 @@ type FlatWineVariantsDocAccessFields {
   slug: FlatWineVariantsDocAccessFields_slug
   syncedAt: FlatWineVariantsDocAccessFields_syncedAt
   isPublished: FlatWineVariantsDocAccessFields_isPublished
+  likeCount: FlatWineVariantsDocAccessFields_likeCount
+  dislikeCount: FlatWineVariantsDocAccessFields_dislikeCount
+  mehCount: FlatWineVariantsDocAccessFields_mehCount
   updatedAt: FlatWineVariantsDocAccessFields_updatedAt
   createdAt: FlatWineVariantsDocAccessFields_createdAt
   _status: FlatWineVariantsDocAccessFields__status
@@ -25523,6 +25849,75 @@ type FlatWineVariantsDocAccessFields_isPublished_Delete {
   permission: Boolean!
 }
 
+type FlatWineVariantsDocAccessFields_likeCount {
+  create: FlatWineVariantsDocAccessFields_likeCount_Create
+  read: FlatWineVariantsDocAccessFields_likeCount_Read
+  update: FlatWineVariantsDocAccessFields_likeCount_Update
+  delete: FlatWineVariantsDocAccessFields_likeCount_Delete
+}
+
+type FlatWineVariantsDocAccessFields_likeCount_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_likeCount_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_likeCount_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_likeCount_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dislikeCount {
+  create: FlatWineVariantsDocAccessFields_dislikeCount_Create
+  read: FlatWineVariantsDocAccessFields_dislikeCount_Read
+  update: FlatWineVariantsDocAccessFields_dislikeCount_Update
+  delete: FlatWineVariantsDocAccessFields_dislikeCount_Delete
+}
+
+type FlatWineVariantsDocAccessFields_dislikeCount_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dislikeCount_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dislikeCount_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_dislikeCount_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_mehCount {
+  create: FlatWineVariantsDocAccessFields_mehCount_Create
+  read: FlatWineVariantsDocAccessFields_mehCount_Read
+  update: FlatWineVariantsDocAccessFields_mehCount_Update
+  delete: FlatWineVariantsDocAccessFields_mehCount_Delete
+}
+
+type FlatWineVariantsDocAccessFields_mehCount_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_mehCount_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_mehCount_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsDocAccessFields_mehCount_Delete {
+  permission: Boolean!
+}
+
 type FlatWineVariantsDocAccessFields_updatedAt {
   create: FlatWineVariantsDocAccessFields_updatedAt_Create
   read: FlatWineVariantsDocAccessFields_updatedAt_Read
@@ -25678,6 +26073,9 @@ type FlatWineVariantVersion_Version {
   slug: String
   syncedAt: DateTime
   isPublished: Boolean
+  likeCount: Float
+  dislikeCount: Float
+  mehCount: Float
   updatedAt: DateTime
   createdAt: DateTime
   _status: FlatWineVariantVersion_Version__status
@@ -25874,6 +26272,9 @@ input versionsFlatWineVariant_where {
   version__slug: versionsFlatWineVariant_version__slug_operator
   version__syncedAt: versionsFlatWineVariant_version__syncedAt_operator
   version__isPublished: versionsFlatWineVariant_version__isPublished_operator
+  version__likeCount: versionsFlatWineVariant_version__likeCount_operator
+  version__dislikeCount: versionsFlatWineVariant_version__dislikeCount_operator
+  version__mehCount: versionsFlatWineVariant_version__mehCount_operator
   version__updatedAt: versionsFlatWineVariant_version__updatedAt_operator
   version__createdAt: versionsFlatWineVariant_version__createdAt_operator
   version___status: versionsFlatWineVariant_version___status_operator
@@ -26810,6 +27211,33 @@ input versionsFlatWineVariant_version__isPublished_operator {
   exists: Boolean
 }
 
+input versionsFlatWineVariant_version__likeCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsFlatWineVariant_version__dislikeCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
+input versionsFlatWineVariant_version__mehCount_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+}
+
 input versionsFlatWineVariant_version__updatedAt_operator {
   equals: DateTime
   not_equals: DateTime
@@ -26993,6 +27421,9 @@ input versionsFlatWineVariant_where_and {
   version__slug: versionsFlatWineVariant_version__slug_operator
   version__syncedAt: versionsFlatWineVariant_version__syncedAt_operator
   version__isPublished: versionsFlatWineVariant_version__isPublished_operator
+  version__likeCount: versionsFlatWineVariant_version__likeCount_operator
+  version__dislikeCount: versionsFlatWineVariant_version__dislikeCount_operator
+  version__mehCount: versionsFlatWineVariant_version__mehCount_operator
   version__updatedAt: versionsFlatWineVariant_version__updatedAt_operator
   version__createdAt: versionsFlatWineVariant_version__createdAt_operator
   version___status: versionsFlatWineVariant_version___status_operator
@@ -27095,6 +27526,9 @@ input versionsFlatWineVariant_where_or {
   version__slug: versionsFlatWineVariant_version__slug_operator
   version__syncedAt: versionsFlatWineVariant_version__syncedAt_operator
   version__isPublished: versionsFlatWineVariant_version__isPublished_operator
+  version__likeCount: versionsFlatWineVariant_version__likeCount_operator
+  version__dislikeCount: versionsFlatWineVariant_version__dislikeCount_operator
+  version__mehCount: versionsFlatWineVariant_version__mehCount_operator
   version__updatedAt: versionsFlatWineVariant_version__updatedAt_operator
   version__createdAt: versionsFlatWineVariant_version__createdAt_operator
   version___status: versionsFlatWineVariant_version___status_operator
@@ -42040,6 +42474,7 @@ enum PayloadLockedDocument_Document_RelationTo {
   moods
   dishes
   related_wine_variants
+  wine_feedback
   flat_wine_variants
   flat_collections
   tastings
@@ -42052,7 +42487,7 @@ enum PayloadLockedDocument_Document_RelationTo {
   payload_jobs
 }
 
-union PayloadLockedDocument_Document = Media | Invoice | ActiveCart | SavedCart | SharedCart | StockReservation | Order | Wine | WineVariant | Winery | Region | WineCountry | GrapeVariety | Tag | Aroma | Adjective | Flavour | Style | Climate | Mood | Dish | RelatedWineVariant | FlatWineVariant | FlatCollection | Tasting | KGBProduct | KgbSubscription | KgbPackage | Address | Customer | User | PayloadJob
+union PayloadLockedDocument_Document = Media | Invoice | ActiveCart | SavedCart | SharedCart | StockReservation | Order | Wine | WineVariant | Winery | Region | WineCountry | GrapeVariety | Tag | Aroma | Adjective | Flavour | Style | Climate | Mood | Dish | RelatedWineVariant | WineFeedback | FlatWineVariant | FlatCollection | Tasting | KGBProduct | KgbSubscription | KgbPackage | Address | Customer | User | PayloadJob
 
 type PayloadLockedDocument_User_Relationship {
   relationTo: PayloadLockedDocument_User_RelationTo
@@ -42119,6 +42554,7 @@ enum PayloadLockedDocument_document_Relation_RelationTo {
   moods
   dishes
   related_wine_variants
+  wine_feedback
   flat_wine_variants
   flat_collections
   tastings
@@ -42671,6 +43107,7 @@ type Access {
   moods: moodsAccess
   dishes: dishesAccess
   related_wine_variants: related_wine_variantsAccess
+  wine_feedback: wine_feedbackAccess
   flat_wine_variants: flat_wine_variantsAccess
   flat_collections: flat_collectionsAccess
   tastings: tastingsAccess
@@ -52245,6 +52682,157 @@ type RelatedWineVariantsReadVersionsAccess {
   where: JSONObject
 }
 
+type wine_feedbackAccess {
+  fields: WineFeedbackFields
+  create: WineFeedbackCreateAccess
+  read: WineFeedbackReadAccess
+  update: WineFeedbackUpdateAccess
+  delete: WineFeedbackDeleteAccess
+}
+
+type WineFeedbackFields {
+  customer: WineFeedbackFields_customer
+  wine: WineFeedbackFields_wine
+  feedback: WineFeedbackFields_feedback
+  updatedAt: WineFeedbackFields_updatedAt
+  createdAt: WineFeedbackFields_createdAt
+}
+
+type WineFeedbackFields_customer {
+  create: WineFeedbackFields_customer_Create
+  read: WineFeedbackFields_customer_Read
+  update: WineFeedbackFields_customer_Update
+  delete: WineFeedbackFields_customer_Delete
+}
+
+type WineFeedbackFields_customer_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_customer_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_customer_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_customer_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_wine {
+  create: WineFeedbackFields_wine_Create
+  read: WineFeedbackFields_wine_Read
+  update: WineFeedbackFields_wine_Update
+  delete: WineFeedbackFields_wine_Delete
+}
+
+type WineFeedbackFields_wine_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_wine_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_wine_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_wine_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_feedback {
+  create: WineFeedbackFields_feedback_Create
+  read: WineFeedbackFields_feedback_Read
+  update: WineFeedbackFields_feedback_Update
+  delete: WineFeedbackFields_feedback_Delete
+}
+
+type WineFeedbackFields_feedback_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_feedback_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_feedback_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_feedback_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_updatedAt {
+  create: WineFeedbackFields_updatedAt_Create
+  read: WineFeedbackFields_updatedAt_Read
+  update: WineFeedbackFields_updatedAt_Update
+  delete: WineFeedbackFields_updatedAt_Delete
+}
+
+type WineFeedbackFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_createdAt {
+  create: WineFeedbackFields_createdAt_Create
+  read: WineFeedbackFields_createdAt_Read
+  update: WineFeedbackFields_createdAt_Update
+  delete: WineFeedbackFields_createdAt_Delete
+}
+
+type WineFeedbackFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type WineFeedbackFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type WineFeedbackCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type WineFeedbackReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type WineFeedbackUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type WineFeedbackDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type flat_wine_variantsAccess {
   fields: FlatWineVariantsFields
   create: FlatWineVariantsCreateAccess
@@ -52304,6 +52892,9 @@ type FlatWineVariantsFields {
   slug: FlatWineVariantsFields_slug
   syncedAt: FlatWineVariantsFields_syncedAt
   isPublished: FlatWineVariantsFields_isPublished
+  likeCount: FlatWineVariantsFields_likeCount
+  dislikeCount: FlatWineVariantsFields_dislikeCount
+  mehCount: FlatWineVariantsFields_mehCount
   updatedAt: FlatWineVariantsFields_updatedAt
   createdAt: FlatWineVariantsFields_createdAt
   _status: FlatWineVariantsFields__status
@@ -54625,6 +55216,75 @@ type FlatWineVariantsFields_isPublished_Update {
 }
 
 type FlatWineVariantsFields_isPublished_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_likeCount {
+  create: FlatWineVariantsFields_likeCount_Create
+  read: FlatWineVariantsFields_likeCount_Read
+  update: FlatWineVariantsFields_likeCount_Update
+  delete: FlatWineVariantsFields_likeCount_Delete
+}
+
+type FlatWineVariantsFields_likeCount_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_likeCount_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_likeCount_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_likeCount_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dislikeCount {
+  create: FlatWineVariantsFields_dislikeCount_Create
+  read: FlatWineVariantsFields_dislikeCount_Read
+  update: FlatWineVariantsFields_dislikeCount_Update
+  delete: FlatWineVariantsFields_dislikeCount_Delete
+}
+
+type FlatWineVariantsFields_dislikeCount_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dislikeCount_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dislikeCount_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_dislikeCount_Delete {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_mehCount {
+  create: FlatWineVariantsFields_mehCount_Create
+  read: FlatWineVariantsFields_mehCount_Read
+  update: FlatWineVariantsFields_mehCount_Update
+  delete: FlatWineVariantsFields_mehCount_Delete
+}
+
+type FlatWineVariantsFields_mehCount_Create {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_mehCount_Read {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_mehCount_Update {
+  permission: Boolean!
+}
+
+type FlatWineVariantsFields_mehCount_Delete {
   permission: Boolean!
 }
 
@@ -61895,6 +62555,10 @@ type Mutation {
   deleteRelatedWineVariant(id: Int!): RelatedWineVariant
   duplicateRelatedWineVariant(id: Int!, data: mutationRelatedWineVariantInput!): RelatedWineVariant
   restoreVersionRelatedWineVariant(id: Int, draft: Boolean): RelatedWineVariant
+  createWineFeedback(data: mutationWineFeedbackInput!, draft: Boolean, locale: LocaleInputType): WineFeedback
+  updateWineFeedback(id: Int!, autosave: Boolean, data: mutationWineFeedbackUpdateInput!, draft: Boolean, locale: LocaleInputType): WineFeedback
+  deleteWineFeedback(id: Int!): WineFeedback
+  duplicateWineFeedback(id: Int!, data: mutationWineFeedbackInput!): WineFeedback
   createFlatWineVariant(data: mutationFlatWineVariantInput!, draft: Boolean, locale: LocaleInputType): FlatWineVariant
   updateFlatWineVariant(id: Int!, autosave: Boolean, data: mutationFlatWineVariantUpdateInput!, draft: Boolean, locale: LocaleInputType): FlatWineVariant
   deleteFlatWineVariant(id: Int!): FlatWineVariant
@@ -63332,6 +63996,34 @@ enum RelatedWineVariantUpdate__status_MutationInput {
   published
 }
 
+input mutationWineFeedbackInput {
+  customer: Int
+  wine: Int
+  feedback: WineFeedback_feedback_MutationInput!
+  updatedAt: String
+  createdAt: String
+}
+
+enum WineFeedback_feedback_MutationInput {
+  like
+  dislike
+  meh
+}
+
+input mutationWineFeedbackUpdateInput {
+  customer: Int
+  wine: Int
+  feedback: WineFeedbackUpdate_feedback_MutationInput
+  updatedAt: String
+  createdAt: String
+}
+
+enum WineFeedbackUpdate_feedback_MutationInput {
+  like
+  dislike
+  meh
+}
+
 input mutationFlatWineVariantInput {
   originalVariant: Int
   wineID: Float
@@ -63382,6 +64074,9 @@ input mutationFlatWineVariantInput {
   slug: String
   syncedAt: String
   isPublished: Boolean
+  likeCount: Float!
+  dislikeCount: Float!
+  mehCount: Float!
   updatedAt: String
   createdAt: String
   _status: FlatWineVariant__status_MutationInput
@@ -63520,6 +64215,9 @@ input mutationFlatWineVariantUpdateInput {
   slug: String
   syncedAt: String
   isPublished: Boolean
+  likeCount: Float
+  dislikeCount: Float
+  mehCount: Float
   updatedAt: String
   createdAt: String
   _status: FlatWineVariantUpdate__status_MutationInput
@@ -64760,6 +65458,7 @@ enum PayloadLockedDocument_DocumentRelationshipInputRelationTo {
   moods
   dishes
   related_wine_variants
+  wine_feedback
   flat_wine_variants
   flat_collections
   tastings
@@ -64818,6 +65517,7 @@ enum PayloadLockedDocumentUpdate_DocumentRelationshipInputRelationTo {
   moods
   dishes
   related_wine_variants
+  wine_feedback
   flat_wine_variants
   flat_collections
   tastings

@@ -265,6 +265,9 @@ export class FlatWineVariantService {
       slug,
       isPublished: wineVariant._status === SYNC_CONSTANTS.PUBLISHED_STATUS,
       syncedAt: new Date().toISOString(),
+      likeCount: 0,
+      dislikeCount: 0,
+      mehCount: 0,
     }
   }
 
@@ -375,10 +378,38 @@ export class FlatWineVariantService {
 
       const flatVariantData = await this.prepareFlatVariantData(wineVariant)
 
+      // Aggregate feedback counts for this flat wine variant
+      const flatVariantId = flatVariantData.originalVariant
+      const feedbacks = await this.req.payload.find({
+        collection: 'wine-feedback' as any,
+        where: {
+          wine: {
+            equals: flatVariantId,
+          },
+        },
+        limit: 10000, // Large enough to cover all feedbacks for a wine
+      })
+
+      // TODO: Use generated types for wine-feedback after next typegen run
+      let likeCount = 0
+      let dislikeCount = 0
+      let mehCount = 0
+      for (const fb of feedbacks.docs as any[]) {
+        if (fb.feedback === 'like') likeCount++
+        else if (fb.feedback === 'dislike') dislikeCount++
+        else if (fb.feedback === 'meh') mehCount++
+      }
+      ;(flatVariantData as any).likeCount = likeCount
+      ;(flatVariantData as any).dislikeCount = dislikeCount
+      ;(flatVariantData as any).mehCount = mehCount
+
       this.logger.debug('Prepared flat variant data', {
         wineTitle: flatVariantData.wineTitle,
         vintage: flatVariantData.vintage,
         size: flatVariantData.size,
+        likeCount,
+        dislikeCount,
+        mehCount,
       })
 
       await this.createOrUpdateFlatVariant(flatVariantData)
