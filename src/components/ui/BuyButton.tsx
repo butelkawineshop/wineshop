@@ -54,6 +54,9 @@ export function BuyButton({
     createdAt: '',
     updatedAt: '',
     _status: 'published',
+    likeCount: 0,
+    dislikeCount: 0,
+    mehCount: 0,
   }
 
   if (showQuantity) {

@@ -21,6 +21,24 @@ interface FeedbackState {
   error: string | null
 }
 
+interface WineFeedbackDoc {
+  id: number
+  feedback: string
+}
+
+interface WineFeedbacksResponse {
+  WineFeedbacks: {
+    docs: WineFeedbackDoc[]
+  }
+}
+
+interface CreateWineFeedbackResponse {
+  createWineFeedback: {
+    id: number
+    feedback: string
+  }
+}
+
 export const useWineFeedback = ({ wineId, onFeedbackChange }: UseWineFeedbackOptions) => {
   const [state, setState] = useState<FeedbackState>({
     activeFeedback: null,
@@ -67,14 +85,17 @@ export const useWineFeedback = ({ wineId, onFeedbackChange }: UseWineFeedbackOpt
       // If setting a new feedback type, create it
       if (feedbackType) {
         // Check if feedback already exists for this wine
-        const existingFeedback = await graphqlRequest({
+        const existingFeedback = await graphqlRequest<WineFeedbacksResponse>({
           query: getWineFeedbackQuery,
           variables: { wine: wineId },
         })
 
-        if ((existingFeedback.data as any)?.WineFeedbacks?.docs?.length > 0) {
+        if (
+          existingFeedback.data?.WineFeedbacks?.docs &&
+          existingFeedback.data.WineFeedbacks.docs.length > 0
+        ) {
           // Feedback already exists, update it
-          const existingId = (existingFeedback.data as any).WineFeedbacks.docs[0].id
+          const existingId = existingFeedback.data.WineFeedbacks.docs[0].id
           // Note: We'd need an update mutation here, but for now we'll delete and recreate
           await graphqlRequest({
             query: deleteWineFeedbackMutation,
@@ -83,13 +104,13 @@ export const useWineFeedback = ({ wineId, onFeedbackChange }: UseWineFeedbackOpt
         }
 
         // Create new feedback
-        const result = await graphqlRequest({
+        const result = await graphqlRequest<CreateWineFeedbackResponse>({
           query: createWineFeedbackMutation,
           variables: { wine: wineId, feedback: feedbackType },
         })
 
-        if ((result.data as any)?.createWineFeedback) {
-          const newFeedbackId = (result.data as any).createWineFeedback.id
+        if (result.data?.createWineFeedback) {
+          const newFeedbackId = result.data.createWineFeedback.id
 
           // Update session storage
           const feedbackData = JSON.parse(sessionStorage.getItem('wineFeedback') || '{}')

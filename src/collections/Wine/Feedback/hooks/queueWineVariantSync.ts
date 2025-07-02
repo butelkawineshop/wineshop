@@ -13,16 +13,30 @@ export const queueWineVariantSyncAfterFeedbackChange: CollectionAfterChangeHook 
 
   try {
     // Extract wine variant ID from the feedback document
-    const wineVariantId = typeof doc.wine === 'object' ? doc.wine.id : doc.wine
+    const flatWineVariantId = typeof doc.wine === 'object' ? doc.wine.id : doc.wine
 
-    if (wineVariantId) {
-      logger.info('Queueing sync for wine variant', { wineVariantId })
-      await req.payload.jobs.queue({
-        task: 'syncFlatWineVariant',
-        input: {
-          wineVariantId: String(wineVariantId),
-        },
+    if (flatWineVariantId) {
+      // Get the original wine variant ID from the flat wine variant
+      const flatWineVariant = await req.payload.findByID({
+        collection: 'flat-wine-variants',
+        id: flatWineVariantId,
       })
+
+      if (flatWineVariant && flatWineVariant.originalVariant) {
+        const wineVariantId =
+          typeof flatWineVariant.originalVariant === 'object'
+            ? flatWineVariant.originalVariant.id
+            : flatWineVariant.originalVariant
+        logger.info('Queueing sync for wine variant', { wineVariantId, flatWineVariantId })
+        await req.payload.jobs.queue({
+          task: 'syncFlatWineVariant',
+          input: {
+            wineVariantId: String(wineVariantId),
+          },
+        })
+      } else {
+        logger.warn('No originalVariant found in flat wine variant', { flatWineVariantId })
+      }
     } else {
       logger.warn('No wine variant ID found in feedback document')
     }
@@ -46,16 +60,33 @@ export const queueWineVariantSyncAfterFeedbackDelete: CollectionAfterDeleteHook 
 
   try {
     // Extract wine variant ID from the feedback document
-    const wineVariantId = typeof doc.wine === 'object' ? doc.wine.id : doc.wine
+    const flatWineVariantId = typeof doc.wine === 'object' ? doc.wine.id : doc.wine
 
-    if (wineVariantId) {
-      logger.info('Queueing sync for wine variant after feedback deletion', { wineVariantId })
-      await req.payload.jobs.queue({
-        task: 'syncFlatWineVariant',
-        input: {
-          wineVariantId: String(wineVariantId),
-        },
+    if (flatWineVariantId) {
+      // Get the original wine variant ID from the flat wine variant
+      const flatWineVariant = await req.payload.findByID({
+        collection: 'flat-wine-variants',
+        id: flatWineVariantId,
       })
+
+      if (flatWineVariant && flatWineVariant.originalVariant) {
+        const wineVariantId =
+          typeof flatWineVariant.originalVariant === 'object'
+            ? flatWineVariant.originalVariant.id
+            : flatWineVariant.originalVariant
+        logger.info('Queueing sync for wine variant after feedback deletion', {
+          wineVariantId,
+          flatWineVariantId,
+        })
+        await req.payload.jobs.queue({
+          task: 'syncFlatWineVariant',
+          input: {
+            wineVariantId: String(wineVariantId),
+          },
+        })
+      } else {
+        logger.warn('No originalVariant found in flat wine variant', { flatWineVariantId })
+      }
     } else {
       logger.warn('No wine variant ID found in deleted feedback document')
     }

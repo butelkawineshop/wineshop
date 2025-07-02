@@ -12,6 +12,24 @@ interface UseWineLikeOptions {
   onLikeChange?: (liked: boolean) => void
 }
 
+interface WineFeedbackDoc {
+  id: number
+  feedback: string
+}
+
+interface WineFeedbacksResponse {
+  WineFeedbacks: {
+    docs: WineFeedbackDoc[]
+  }
+}
+
+interface CreateWineFeedbackResponse {
+  createWineFeedback: {
+    id: number
+    feedback: string
+  }
+}
+
 export const useWineLike = ({ wineId, onLikeChange }: UseWineLikeOptions) => {
   const [liked, setLiked] = useState<boolean>(false)
   const [feedbackId, setFeedbackId] = useState<number | null>(null)
@@ -58,14 +76,17 @@ export const useWineLike = ({ wineId, onLikeChange }: UseWineLikeOptions) => {
         }
       } else {
         // Check if feedback already exists for this wine
-        const existingFeedback = await graphqlRequest({
+        const existingFeedback = await graphqlRequest<WineFeedbacksResponse>({
           query: getWineFeedbackQuery,
           variables: { wine: wineId },
         })
 
-        if ((existingFeedback.data as any)?.WineFeedbacks?.docs?.length > 0) {
+        if (
+          existingFeedback.data?.WineFeedbacks?.docs &&
+          existingFeedback.data.WineFeedbacks.docs.length > 0
+        ) {
           // Feedback already exists, just update state
-          const existingId = (existingFeedback.data as any).WineFeedbacks.docs[0].id
+          const existingId = existingFeedback.data.WineFeedbacks.docs[0].id
           setLiked(true)
           setFeedbackId(existingId)
 
@@ -80,21 +101,21 @@ export const useWineLike = ({ wineId, onLikeChange }: UseWineLikeOptions) => {
           sessionStorage.setItem('feedbackIds', JSON.stringify(feedbackIds))
         } else {
           // Create new feedback
-          const result = await graphqlRequest({
+          const result = await graphqlRequest<CreateWineFeedbackResponse>({
             query: createWineFeedbackMutation,
             variables: { wine: wineId, feedback: 'like' },
           })
 
-          if ((result.data as any)?.createWineFeedback) {
+          if (result.data?.createWineFeedback) {
             setLiked(true)
-            setFeedbackId((result.data as any).createWineFeedback.id)
+            setFeedbackId(result.data.createWineFeedback.id)
 
             const likedWines = JSON.parse(sessionStorage.getItem('likedWines') || '[]')
             likedWines.push(wineId)
             sessionStorage.setItem('likedWines', JSON.stringify(likedWines))
 
             const feedbackIds = JSON.parse(sessionStorage.getItem('feedbackIds') || '{}')
-            feedbackIds[wineId] = (result.data as any).createWineFeedback.id
+            feedbackIds[wineId] = result.data.createWineFeedback.id
             sessionStorage.setItem('feedbackIds', JSON.stringify(feedbackIds))
           }
         }

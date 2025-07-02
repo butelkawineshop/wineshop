@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 
-import { Icon } from '@/components/Icon'
 import { Media } from '@/components/Media'
 import { WineTitleBar } from './components/WineTitleBar'
 import { WineTastingNotes } from './components/WineTastingNotes'
@@ -39,7 +38,7 @@ export function WineCard({
   const swiperRef = useRef<{ swiper: SwiperType }>(null)
   const [activeIndex, setActiveIndex] = useState<number>(WINE_CONSTANTS.INITIAL_SLIDE_INDEX)
 
-  const { isLiked, isMeh, isDisliked, isLoading, error, like, meh, dislike } = useWineFeedback({
+  const { isLiked, like } = useWineFeedback({
     wineId: variant.id,
     onFeedbackChange: (feedbackType) => {
       if (feedbackType === 'like') onLike?.(variant)

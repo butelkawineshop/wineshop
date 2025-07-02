@@ -1,4 +1,4 @@
-import type { PayloadRequest } from 'payload'
+import type { CollectionSlug, PayloadRequest } from 'payload'
 import type { WineVariant, Wine, FlatWineVariant, Media } from '@/payload-types'
 import { createLogger } from '@/lib/logger'
 import { ValidationError } from '@/lib/errors'
@@ -381,7 +381,7 @@ export class FlatWineVariantService {
       // Aggregate feedback counts for this flat wine variant
       const flatVariantId = flatVariantData.originalVariant
       const feedbacks = await this.req.payload.find({
-        collection: 'wine-feedback' as any,
+        collection: 'wine-feedback' as unknown as CollectionSlug,
         where: {
           wine: {
             equals: flatVariantId,
@@ -394,14 +394,21 @@ export class FlatWineVariantService {
       let likeCount = 0
       let dislikeCount = 0
       let mehCount = 0
-      for (const fb of feedbacks.docs as any[]) {
+      for (const fb of feedbacks.docs as Array<{ feedback: string }>) {
         if (fb.feedback === 'like') likeCount++
         else if (fb.feedback === 'dislike') dislikeCount++
         else if (fb.feedback === 'meh') mehCount++
       }
-      ;(flatVariantData as any).likeCount = likeCount
-      ;(flatVariantData as any).dislikeCount = dislikeCount
-      ;(flatVariantData as any).mehCount = mehCount
+
+      // Update the flat variant data with feedback counts
+      const flatVariantDataWithFeedback = flatVariantData as typeof flatVariantData & {
+        likeCount: number
+        dislikeCount: number
+        mehCount: number
+      }
+      flatVariantDataWithFeedback.likeCount = likeCount
+      flatVariantDataWithFeedback.dislikeCount = dislikeCount
+      flatVariantDataWithFeedback.mehCount = mehCount
 
       this.logger.debug('Prepared flat variant data', {
         wineTitle: flatVariantData.wineTitle,
@@ -412,7 +419,7 @@ export class FlatWineVariantService {
         mehCount,
       })
 
-      await this.createOrUpdateFlatVariant(flatVariantData)
+      await this.createOrUpdateFlatVariant(flatVariantDataWithFeedback)
 
       this.logger.info('Successfully synced flat wine variant')
       return {
