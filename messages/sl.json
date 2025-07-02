@@ -18,7 +18,17 @@
     "logo": "Butelka logo",
     "reset": "Počisti",
     "item": "Element",
-    "menu": "Meni"
+    "menu": "Meni",
+    "actions": {
+      "addToCart": "Dodaj v košarico"
+    },
+    "price": {
+      "perUnit": "({price} € na enoto)"
+    },
+    "contact": {
+      "emailLabel": "Email",
+      "phoneLabel": "Telefon"
+    }
   },
 
   "auth": {
@@ -157,6 +167,7 @@
       "title": "Tejstingi",
       "description": "Pridružite se našim tejstingom!"
     },
+    "empty": "Trenutno ni na voljo nobenih degustacij",
     "fields": {
       "description": "Opis",
       "date": "Datum",
@@ -602,6 +613,32 @@
       "label": "Po kleti",
       "asc": "Od A do Ž",
       "desc": "Od Ž do A"
+    }
+  },
+
+  "kgb": {
+    "perPack": "na paket",
+    "carousel": {
+      "details": "Podrobnosti"
+    },
+    "fields": {
+      "quantity": "Količina",
+      "bottles": "steklenic",
+      "frequencies": "Frekvence",
+      "price": "Cena",
+      "exampleWines": "Primeri vin"
+    },
+    "actions": {
+      "subscribe": "Naroči"
+    },
+    "empty": "Ni KGB paketov na voljo",
+    "error": "Napaka pri nalaganju KGB paketov: {{error}}",
+    "frequency": {
+      "monthly": "Mesečno",
+      "biWeekly": "Dvo-tedensko",
+      "biMonthly": "Dvo-mesečno",
+      "quarterly": "Četrtletno",
+      "weekly": "Tedensko"
     }
   }
 }

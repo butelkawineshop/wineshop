@@ -1,0 +1,17 @@
+query GetKGBProducts($locale: LocaleInputType) {
+  KGBProducts(where: { _status: { equals: published } }, locale: $locale) {
+    docs {
+      ...KGBProductFields
+    }
+  }
+}
+
+query GetKGBProductBySlug($slug: String!, $locale: LocaleInputType) {
+  KGBProducts(where: { slug: { equals: $slug }, _status: { equals: published } }, locale: $locale) {
+    docs {
+      ...KGBProductFields
+    }
+  }
+}
+
+# import KGBProductFields from '../fragments/kgb-product-fields.graphql' 

@@ -1,20 +1,10 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import { KGBPage } from '@/components/KGB/KGBPage'
 
-export default async function KGBItemPage({
-  params,
-  searchParams,
-}: {
+interface KGBProductPageProps {
   params: Promise<{ slug: string[] }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="sl"
-      baseSegment="kgb"
-    />
-  )
+}
+
+export default async function KGBProductPage({ params }: KGBProductPageProps) {
+  const { slug } = await params
+  return <KGBPage locale="sl" slug={Array.isArray(slug) ? slug[0] : slug} />
 }

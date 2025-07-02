@@ -1,20 +1,5 @@
-import { CollectionPage } from '@/components/CollectionPage'
+import { KGBPage } from '@/components/KGB/KGBPage'
 
-export default async function KGBPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug?: string[] }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-  return (
-    <CollectionPage
-      params={resolvedParams}
-      searchParams={resolvedSearchParams}
-      locale="sl"
-      baseSegment="kgb"
-    />
-  )
+export default function KGBProductsPage() {
+  return <KGBPage locale="sl" />
 }

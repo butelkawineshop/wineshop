@@ -52,7 +52,7 @@ export const ROUTE_MAPPINGS = {
   blog: { sl: 'enciklopedija', en: 'encyclopedia', collection: 'posts' },
 
   // Special routes
-  kgb: { sl: 'kgb', en: 'kgb', collection: 'pages' },
+  kgb: { sl: 'kgb', en: 'kgb', collection: 'kgb-products' },
 
   // E-commerce routes
   'darilni-boni': { sl: 'darilni-boni', en: 'gift-cards', collection: 'gift-cards' },

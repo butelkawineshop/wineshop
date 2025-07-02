@@ -1,0 +1,18 @@
+fragment KGBProductFields on KGBProduct {
+  id
+  title
+  description
+  slug
+  media {
+    id
+    url
+    alt
+  }
+  bottleQuantity
+  price
+  frequencyOptions {
+    frequency
+  }
+  active
+  isDefault
+} 

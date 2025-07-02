@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { seoField } from '@/fields/seo'
+import { slugField } from '@/fields/slug'
 
 export const KGBProducts: CollectionConfig = {
   slug: 'kgb-products',
@@ -24,6 +25,7 @@ export const KGBProducts: CollectionConfig = {
       index: true,
       admin: { description: 'Frontend-facing product title.' },
     },
+    slugField({}),
     {
       name: 'description',
       type: 'textarea',
@@ -80,6 +82,16 @@ export const KGBProducts: CollectionConfig = {
       defaultValue: false,
       admin: { width: '50%' },
     },
+    {
+      name: 'exampleWines',
+      type: 'relationship',
+      relationTo: 'flat-wine-variants',
+      hasMany: true,
+      admin: {
+        description:
+          'Example wines to showcase for this KGB subscription. These will be displayed as recommendations.',
+      },
+    },
     seoField({
       titleField: 'title',
       descriptionField: 'description',
@@ -89,5 +101,9 @@ export const KGBProducts: CollectionConfig = {
   ],
   versions: {
     drafts: true,
+  },
+  graphQL: {
+    singularName: 'KGBProduct',
+    pluralName: 'KGBProducts',
   },
 }

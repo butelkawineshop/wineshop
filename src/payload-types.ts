@@ -357,6 +357,10 @@ export interface KgbProduct {
    */
   title: string
   /**
+   * Automatically generated from title
+   */
+  slug?: string | null
+  /**
    * Frontend-facing product description.
    */
   description: string
@@ -372,6 +376,10 @@ export interface KgbProduct {
   }[]
   active?: boolean | null
   isDefault?: boolean | null
+  /**
+   * Example wines to showcase for this KGB subscription. These will be displayed as recommendations.
+   */
+  exampleWines?: (number | FlatWineVariant)[] | null
   /**
    * Automatically generated SEO data
    */
@@ -399,66 +407,273 @@ export interface KgbProduct {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses".
+ * via the `definition` "flat-wine-variants".
  */
-export interface Address {
+export interface FlatWineVariant {
   id: number
   /**
-   * Owning customer.
+   * Reference to the original wine variant
    */
-  customer: number | Customer
+  originalVariant: number | WineVariant
   /**
-   * Address label (e.g. Home, Office, Gift for Mom)
+   * Reference to the parent wine (for grouping variants)
    */
-  label: string
+  wineID?: number | null
   /**
-   * Full name of recipient.
+   * Reference to the winery (for related wines)
    */
-  recipientName: string
+  wineryID?: number | null
   /**
-   * Is this a company address?
+   * Reference to the region (for related wines)
    */
-  isCompany?: boolean | null
+  regionID?: number | null
   /**
-   * Company name (if applicable).
+   * Reference to the wine country (for related wines)
    */
-  companyName?: string | null
+  countryID?: number | null
   /**
-   * VAT number (if applicable).
+   * Reference to the wine style (for related wines)
    */
-  vatNumber?: string | null
+  styleID?: number | null
+  sku?: string | null
+  wineTitle?: string | null
+  wineryTitle?: string | null
+  wineryCode?: string | null
+  regionTitle?: string | null
+  countryTitle?: string | null
   /**
-   * Street address.
+   * English country title
    */
-  street: string
+  countryTitleEn?: string | null
+  styleTitle?: string | null
   /**
-   * Additional address info (optional).
+   * English style title
    */
-  street2?: string | null
+  styleTitleEn?: string | null
+  styleIconKey?: string | null
   /**
-   * Postal code.
+   * Style slug for URL generation
    */
-  postalCode: string
+  styleSlug?: string | null
   /**
-   * City.
+   * English style slug for URL generation
    */
-  city: string
+  styleSlugEn?: string | null
   /**
-   * Region/State/Province (optional).
+   * Winery slug for URL generation
    */
-  region?: string | null
+  winerySlug?: string | null
   /**
-   * Country.
+   * English winery slug for URL generation
    */
-  country: string
+  winerySlugEn?: string | null
   /**
-   * Phone number (optional).
+   * Region slug for URL generation
    */
-  phone?: string | null
+  regionSlug?: string | null
   /**
-   * Delivery notes (optional).
+   * English region slug for URL generation
    */
-  notes?: string | null
+  regionSlugEn?: string | null
+  /**
+   * Country slug for URL generation
+   */
+  countrySlug?: string | null
+  /**
+   * English country slug for URL generation
+   */
+  countrySlugEn?: string | null
+  size?: string | null
+  vintage?: string | null
+  price?: number | null
+  stockOnHand?: number | null
+  canBackorder?: boolean | null
+  maxBackorderQuantity?: number | null
+  servingTemp?: string | null
+  decanting?: boolean | null
+  tastingProfile?: string | null
+  /**
+   * Wine description
+   */
+  description?: string | null
+  /**
+   * English wine description
+   */
+  descriptionEn?: string | null
+  /**
+   * Related wineries for filtering
+   */
+  relatedWineries?:
+    | {
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Related regions for filtering
+   */
+  relatedRegions?:
+    | {
+        id?: string | null
+      }[]
+    | null
+  /**
+   * Winery tags for filtering
+   */
+  wineryTags?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Individual tasting note values for filtering
+   */
+  tastingNotes?: {
+    dry?: number | null
+    ripe?: number | null
+    creamy?: number | null
+    oaky?: number | null
+    complex?: number | null
+    light?: number | null
+    smooth?: number | null
+    youthful?: number | null
+    energetic?: number | null
+    alcohol?: number | null
+  }
+  aromas?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  tags?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  moods?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  grapeVarieties?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Grape variety percentage
+         */
+        percentage?: number | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Climate information for filtering
+   */
+  climates?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  /**
+   * Food pairing dishes for filtering
+   */
+  dishes?:
+    | {
+        title?: string | null
+        /**
+         * English title
+         */
+        titleEn?: string | null
+        id?: string | null
+        /**
+         * Slovenian slug
+         */
+        slug?: string | null
+        /**
+         * English slug
+         */
+        slugEn?: string | null
+      }[]
+    | null
+  primaryImageUrl?: string | null
+  slug?: string | null
+  syncedAt?: string | null
+  isPublished?: boolean | null
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -1090,6 +1305,72 @@ export interface Mood {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses".
+ */
+export interface Address {
+  id: number
+  /**
+   * Owning customer.
+   */
+  customer: number | Customer
+  /**
+   * Address label (e.g. Home, Office, Gift for Mom)
+   */
+  label: string
+  /**
+   * Full name of recipient.
+   */
+  recipientName: string
+  /**
+   * Is this a company address?
+   */
+  isCompany?: boolean | null
+  /**
+   * Company name (if applicable).
+   */
+  companyName?: string | null
+  /**
+   * VAT number (if applicable).
+   */
+  vatNumber?: string | null
+  /**
+   * Street address.
+   */
+  street: string
+  /**
+   * Additional address info (optional).
+   */
+  street2?: string | null
+  /**
+   * Postal code.
+   */
+  postalCode: string
+  /**
+   * City.
+   */
+  city: string
+  /**
+   * Region/State/Province (optional).
+   */
+  region?: string | null
+  /**
+   * Country.
+   */
+  country: string
+  /**
+   * Phone number (optional).
+   */
+  phone?: string | null
+  /**
+   * Delivery notes (optional).
+   */
+  notes?: string | null
+  updatedAt: string
+  createdAt: string
+  _status?: ('draft' | 'published') | null
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "saved-carts".
  */
 export interface SavedCart {
@@ -1256,279 +1537,6 @@ export interface RelatedWineVariant {
    * Version of the computation logic used
    */
   computationVersion?: string | null
-  updatedAt: string
-  createdAt: string
-  _status?: ('draft' | 'published') | null
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "flat-wine-variants".
- */
-export interface FlatWineVariant {
-  id: number
-  /**
-   * Reference to the original wine variant
-   */
-  originalVariant: number | WineVariant
-  /**
-   * Reference to the parent wine (for grouping variants)
-   */
-  wineID?: number | null
-  /**
-   * Reference to the winery (for related wines)
-   */
-  wineryID?: number | null
-  /**
-   * Reference to the region (for related wines)
-   */
-  regionID?: number | null
-  /**
-   * Reference to the wine country (for related wines)
-   */
-  countryID?: number | null
-  /**
-   * Reference to the wine style (for related wines)
-   */
-  styleID?: number | null
-  sku?: string | null
-  wineTitle?: string | null
-  wineryTitle?: string | null
-  wineryCode?: string | null
-  regionTitle?: string | null
-  countryTitle?: string | null
-  /**
-   * English country title
-   */
-  countryTitleEn?: string | null
-  styleTitle?: string | null
-  /**
-   * English style title
-   */
-  styleTitleEn?: string | null
-  styleIconKey?: string | null
-  /**
-   * Style slug for URL generation
-   */
-  styleSlug?: string | null
-  /**
-   * English style slug for URL generation
-   */
-  styleSlugEn?: string | null
-  /**
-   * Winery slug for URL generation
-   */
-  winerySlug?: string | null
-  /**
-   * English winery slug for URL generation
-   */
-  winerySlugEn?: string | null
-  /**
-   * Region slug for URL generation
-   */
-  regionSlug?: string | null
-  /**
-   * English region slug for URL generation
-   */
-  regionSlugEn?: string | null
-  /**
-   * Country slug for URL generation
-   */
-  countrySlug?: string | null
-  /**
-   * English country slug for URL generation
-   */
-  countrySlugEn?: string | null
-  size?: string | null
-  vintage?: string | null
-  price?: number | null
-  stockOnHand?: number | null
-  canBackorder?: boolean | null
-  maxBackorderQuantity?: number | null
-  servingTemp?: string | null
-  decanting?: boolean | null
-  tastingProfile?: string | null
-  /**
-   * Wine description
-   */
-  description?: string | null
-  /**
-   * English wine description
-   */
-  descriptionEn?: string | null
-  /**
-   * Related wineries for filtering
-   */
-  relatedWineries?:
-    | {
-        id?: string | null
-      }[]
-    | null
-  /**
-   * Related regions for filtering
-   */
-  relatedRegions?:
-    | {
-        id?: string | null
-      }[]
-    | null
-  /**
-   * Winery tags for filtering
-   */
-  wineryTags?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  /**
-   * Individual tasting note values for filtering
-   */
-  tastingNotes?: {
-    dry?: number | null
-    ripe?: number | null
-    creamy?: number | null
-    oaky?: number | null
-    complex?: number | null
-    light?: number | null
-    smooth?: number | null
-    youthful?: number | null
-    energetic?: number | null
-    alcohol?: number | null
-  }
-  aromas?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  tags?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  moods?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  grapeVarieties?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Grape variety percentage
-         */
-        percentage?: number | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  /**
-   * Climate information for filtering
-   */
-  climates?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  /**
-   * Food pairing dishes for filtering
-   */
-  dishes?:
-    | {
-        title?: string | null
-        /**
-         * English title
-         */
-        titleEn?: string | null
-        id?: string | null
-        /**
-         * Slovenian slug
-         */
-        slug?: string | null
-        /**
-         * English slug
-         */
-        slugEn?: string | null
-      }[]
-    | null
-  primaryImageUrl?: string | null
-  slug?: string | null
-  syncedAt?: string | null
-  isPublished?: boolean | null
   updatedAt: string
   createdAt: string
   _status?: ('draft' | 'published') | null
@@ -3202,6 +3210,7 @@ export interface TastingsSelect<T extends boolean = true> {
  */
 export interface KgbProductsSelect<T extends boolean = true> {
   title?: T
+  slug?: T
   description?: T
   media?: T
   bottleQuantity?: T
@@ -3214,6 +3223,7 @@ export interface KgbProductsSelect<T extends boolean = true> {
       }
   active?: T
   isDefault?: T
+  exampleWines?: T
   seo?:
     | T
     | {

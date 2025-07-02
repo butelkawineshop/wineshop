@@ -18,7 +18,17 @@
     "logo": "Butelka logo",
     "reset": "Clear",
     "item": "Item",
-    "menu": "Menu"
+    "menu": "Menu",
+    "actions": {
+      "addToCart": "Add to cart"
+    },
+    "price": {
+      "perUnit": "({price} € per unit)"
+    },
+    "contact": {
+      "emailLabel": "Email",
+      "phoneLabel": "Phone"
+    }
   },
 
   "auth": {
@@ -148,6 +158,11 @@
   },
 
   "tasting": {
+    "list": {
+      "title": "Tastings",
+      "description": "Join our tastings!"
+    },
+    "empty": "No tastings available at the moment",
     "quantity": "Quantity",
     "notes": {
       "titlePage1": "Feel",
@@ -448,7 +463,14 @@
     "title": "Butelka"
   },
   "kgb": {
-    "title": "KGB"
+    "title": "KGB",
+    "perPack": "per pack",
+    "fields": {
+      "quantity": "Quantity",
+      "bottles": "bottles",
+      "frequencies": "Frequencies",
+      "exampleWines": "Example wines"
+    }
   },
   "blog": {
     "title": "Blog"
