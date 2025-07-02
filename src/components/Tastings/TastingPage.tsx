@@ -94,7 +94,6 @@ export function TastingPage({ locale, slug: propSlug }: TastingPageProps) {
         } as TastingType)
       : tastings[0] || null
 
-  const media = tasting?.media || []
   const content = {
     sl: {
       overview: {

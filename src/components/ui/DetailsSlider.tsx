@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 import { useRef, useState } from 'react'
 import 'swiper/css'
+import Image from 'next/image'
 
 export interface DetailsSlide {
   id: string
@@ -56,7 +57,7 @@ export function DetailsSlider({
         role="region"
         aria-label={ariaLabel}
       >
-        {slides.map((slide, idx) => (
+        {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
             {slide.custom ? (
               slide.custom
@@ -65,10 +66,12 @@ export function DetailsSlider({
                 {slide.title && <h2 className="heading-3 mb-2">{slide.title}</h2>}
                 {slide.content && <div>{slide.content}</div>}
                 {slide.mediaUrl && (
-                  <img
+                  <Image
                     src={slide.mediaUrl}
                     alt={slide.alt || ''}
                     className="w-full rounded-lg mt-2"
+                    width={500}
+                    height={500}
                   />
                 )}
               </div>
